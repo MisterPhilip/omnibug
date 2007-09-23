@@ -1,3 +1,4 @@
 content omnibug chrome/content/omnibug/ xpcnativewrappers=no
+skin    omnibug classic/1.0     chrome/skin/classic/
 
 overlay chrome://firebug/content/firebugOverlay.xul         chrome://omnibug/content/FirebugOverlay.xul
