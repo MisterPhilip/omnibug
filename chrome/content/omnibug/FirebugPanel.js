@@ -34,8 +34,15 @@
  * ***** END LICENSE BLOCK ***** */
 
 
+/*
+ * $Id$
+ * $URL$
+ */
+
+
 /**
  * @TODO: add pattern preference
+ *        license work
  */
 
 FBL.ns( function() { with( FBL ) { 
