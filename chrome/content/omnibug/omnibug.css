@@ -1,0 +1,38 @@
+.hilite {
+    background-color: #ff0;
+}
+
+dt {
+    font-weight: bold;
+}
+
+p {
+    background-color: #faa;
+    margin: 0;
+    line-height: 16px;
+}
+
+div.hid {
+    background-color: #ccc;
+    display: none;
+}
+
+table.req {
+    width: 100%;
+}
+td {
+    vertical-align: top;
+}
+td.load {
+    width: 30px;
+    text-align: center;
+}
+td.exp {
+    width: 30px;
+    text-align: center;
+    line-height: 16px;
+}
+a img {
+    border: 0;
+}
+

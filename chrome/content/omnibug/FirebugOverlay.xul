@@ -1,0 +1,25 @@
+<?xml version="1.0"?> 
+
+<?xml-stylesheet type="text/css" href="chrome://omnibug/content/omnibug.css"?>
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"> 
+    <script type="application/x-javascript" src="chrome://omnibug/content/FirebugPanel.js"/> 
+
+    <commandset id="mainCommandSet"> 
+            <!--
+        <command id="cmd_button1Omnibug" oncommand="Firebug.Omnibug.button1()"/> 
+        <command id="cmd_button2Omnibug" oncommand="Firebug.Omnibug.button2()"/> 
+        -->
+    </commandset> 
+    
+    <toolbar id="fbToolbar" align="center"> 
+        <hbox id="fbToolbarInner" insertbefore="fbDetachButton" flex="1" align="center"> 
+            <hbox id="fbOmnibugButtons" insertafter="fbNetButtons"> 
+            <!--
+                <toolbarbutton label="Button 1" class="toolbar-text-button" tooltiptext="Button 1" command="cmd_button1Omnibug"/> 
+                <toolbarbutton label="Button 2" class="toolbar-text-button" tooltiptext="Button 2" command="cmd_button2Omnibug"/> 
+            -->
+            </hbox> 
+        </hbox> 
+    </toolbar> 
+</overlay>

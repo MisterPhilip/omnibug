@@ -1,0 +1,3 @@
+content omnibug chrome/content/omnibug/ xpcnativewrappers=no
+
+overlay chrome://firebug/content/firebugOverlay.xul         chrome://omnibug/content/FirebugOverlay.xul
