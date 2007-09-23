@@ -54,7 +54,6 @@ const nsIWebProgressListener = CI( "nsIWebProgressListener" );
 const nsIWebProgress = CI( "nsIWebProgress" );
 const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
 const nsISupports = CI( "nsISupports" );
-//const nsPrefSvc = CC( "@mozilla.org/preferences-service;1" );
 
 const NOTIFY_STATE_DOCUMENT = nsIWebProgress.NOTIFY_STATE_DOCUMENT;
 const NOTIFY_ALL = nsIWebProgress.NOTIFY_ALL;
@@ -62,7 +61,6 @@ const NOTIFY_ALL = nsIWebProgress.NOTIFY_ALL;
 const STATE_IS_WINDOW = nsIWebProgressListener.STATE_IS_WINDOW;
 const STATE_IS_DOCUMENT = nsIWebProgressListener.STATE_IS_DOCUMENT;
 const STATE_IS_REQUEST = nsIWebProgressListener.STATE_IS_REQUEST;
-
 const STATE_START = nsIWebProgressListener.STATE_START;
 const STATE_STOP = nsIWebProgressListener.STATE_STOP;
 const STATE_TRANSFERRING = nsIWebProgressListener.STATE_TRANSFERRING;
@@ -238,7 +236,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
 
         html  = "<table cellspacing='0' border='0' class='req'><tr>";
         //html += "<td class='load'><img src='chrome://global/skin/icons/loading_16_grey.gif' /></td>";
-        html += "<td class='exp'><a href='#' onClick='top.OmnibugToggle( this )'><img src='chrome://firebug-os/skin/twistyClosed.png' /></a></td>";
+        html += "<td class='exp'><a href='#' onClick='top.OmnibugToggle( this )'><img src='chrome://omnibug/skin/win/twistyClosed.png' /></a></td>";
         html += "<td><p>" + OmnibugPanel.cur["request"].name + "...</p><div class='hid'>";
 
 
@@ -526,7 +524,7 @@ top.OmnibugToggle = function( el, id ) {
         if( td[i].className.match( /exp/ ) ) {
            img = td[i].getElementsByTagName( "img" )[0];
            if( img ) {
-               img.src = "chrome://firebug-os/skin/twisty" + ( img.src.match( /Closed/ ) ? "Open" : "Closed" ) + ".png";
+               img.src = "chrome://omnibug/skin/win/twisty" + ( img.src.match( /Closed/ ) ? "Open" : "Closed" ) + ".png";
            }
         }
     }
