@@ -36,8 +36,6 @@
 
 /**
  * @TODO: add pattern preference
- *        watch for STATE_STOP and disable spinner
- *        get exp/collapse control working
  */
 
 FBL.ns( function() { with( FBL ) { 
@@ -61,7 +59,7 @@ const STATE_START = nsIWebProgressListener.STATE_START;
 const STATE_STOP = nsIWebProgressListener.STATE_STOP;
 const STATE_TRANSFERRING = nsIWebProgressListener.STATE_TRANSFERRING;
 
-var requests = [];
+var requests = {};
 
 Firebug.Omnibug = extend( Firebug.Module, 
 { 
@@ -116,20 +114,17 @@ Firebug.Omnibug = extend( Firebug.Module,
     },
 
     loadedContext: function( context ) {
-        dump( ">>>   loadedContext: requests='" + requests + "' (" + requests.length + ")\n" );
-        if( requests.length ) {
-            for( req in requests ) {
-                dump( ">>>   req=" + requests[req] + "\n" );
-                if( requests.hasOwnProperty( req ) ) {
-                    var r = requests.pop( req );
-                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( r );
-                }
+        dump( ">>>   loadedContext\n" );
+        for( key in requests ) {
+            dump( ">>>   req=" + requests[key] + "\n" );
+            if( requests.hasOwnProperty( key ) ) {
+                FirebugContext.getPanel( "Omnibug" ).decodeUrl( requests[key], key );
+                delete requests[key];
             }
         }
     }
 
-} ); 
-
+} );
 
 /**
  * Panel
@@ -140,7 +135,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
     title: "Omnibug", 
     searchable: false, 
     editable: false,
-    thisReq: null,
+    cur: {},
     other: [],
     props: [],
     vars: [],
@@ -169,8 +164,8 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         this.panelNode.appendChild( el );
     },
 
-    decodeUrl: function( request ) {
-        OmnibugPanel.thisReq = request;
+    decodeUrl: function( request, key ) {
+        OmnibugPanel.cur = { request: request, key: key };
         OmnibugPanel.props = [];
         OmnibugPanel.other = [];
         OmnibugPanel.vars = [];
@@ -194,9 +189,9 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         var i, el, len, html;
 
         html  = "<table cellspacing='0' border='0' class='req'><tr>";
-        html += "<td class='load'><img src='chrome://global/skin/icons/loading_16_grey.gif' /></td>";
+        //html += "<td class='load'><img src='chrome://global/skin/icons/loading_16_grey.gif' /></td>";
         html += "<td class='exp'><a href='#' onClick='top.OmnibugToggle( this )'><img src='chrome://firebug-os/skin/twistyClosed.png' /></a></td>";
-        html += "<td><p>" + OmnibugPanel.thisReq.name.substring( 0, 130 ) + "</p><div class='hid'>";
+        html += "<td><p>" + OmnibugPanel.cur["request"].name + "...</p><div class='hid'>";
 
 
         if( OmnibugPanel.props.length ) {
@@ -217,23 +212,46 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
             }
         }
 
+        var list = "|pageName|ch|h1|purchaseID|events|products|pev2|";
+            otherNamed = {},
+            otherOther = {};
+
         if( OmnibugPanel.other.length ) {
-            html += "<dt>Other</dt>";
             for( i = 0, len = OmnibugPanel.other.length; i < len; ++i ) {
                 if( OmnibugPanel.other[i] ) {
-
-                    var cn = ( OmnibugPanel.other[i][0] === 'events' || OmnibugPanel.other[i][0] === 'products' ) ? "hilite" : "";
-                    html += "<dd class='" + cn + " " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>" + OmnibugPanel.other[i][0] + '= ' + OmnibugPanel.other[i][1] + "</dd>\n";
+                    if( list.indexOf( "|" + OmnibugPanel.other[i][0] + "|" ) !== -1 ) {
+                        otherNamed[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
+                    } else {
+                        otherOther[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
+                    }
                 }
             }
         }
+
+        html += "<dt>Useful</dt>";
+        var el, cn, i = 0;
+        for( var el in otherNamed ) {
+            if( otherNamed.hasOwnProperty( el ) ) {
+                var cn = ( el === 'events' || el === 'products' ) ? "hilite" : "";
+                html += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherNamed[el] + "</dd>\n";
+            }
+        }
+
+        html += "<dt>Other</dt>";
+        var el, cn, i = 0;
+        for( var el in otherOther ) {
+            if( otherOther.hasOwnProperty( el ) ) {
+                var cn = ( el === 'events' || el === 'products' ) ? "hilite" : "";
+                html += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherOther[el] + "</dd>\n";
+            }
+        }
+
 
         html += "</div></td></tr></table>\n";
 
         dump( ">>>   output html:\n\n\nhtml\n\n\n" );
         FirebugContext.getPanel("Omnibug").appendHtml( html );
     }
-
 
 } ); 
 
@@ -266,10 +284,10 @@ OmNetProgress.prototype = {
         //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
 
         if( request.name.match( /2o7/ ) ) {
-            //dump( ">>>   onStateChange:\n>>>\tname=" + request.name + "\n>>>\tflags=" + getStateDescription( flag ) + "\n\n" );
+            var key = hex_md5( request.name );
+            dump( ">>> onStateChange:\n>>>\tname=" + request.name + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
             if( flag & STATE_START ) {
-                requests.push( request );
-                FirebugContext.getPanel( "Omnibug" ).decodeUrl( request );
+                requests[key] = request;
             }
         }
     },
