@@ -7,7 +7,6 @@ dt {
 }
 
 p {
-    background-color: #faa;
     margin: 0;
     line-height: 16px;
 }
@@ -22,15 +21,13 @@ table.req {
 }
 td {
     vertical-align: top;
-}
-td.load {
-    width: 30px;
-    text-align: center;
+    border-bottom: 1px solid #aaa;
 }
 td.exp {
-    width: 30px;
+    width: 50px;
     text-align: center;
-    line-height: 16px;
+    line-height: 20px;
+    padding: 0 5px;
 }
 a img {
     border: 0;
