@@ -41,7 +41,7 @@
 
 
 /**
- * @TODO: add pattern preference
+ * @TODO: add pattern preference input box
  *        license work
  */
 
@@ -54,6 +54,7 @@ const nsIWebProgressListener = CI( "nsIWebProgressListener" );
 const nsIWebProgress = CI( "nsIWebProgress" );
 const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
 const nsISupports = CI( "nsISupports" );
+//const nsPrefSvc = CC( "@mozilla.org/preferences-service;1" );
 
 const NOTIFY_STATE_DOCUMENT = nsIWebProgress.NOTIFY_STATE_DOCUMENT;
 const NOTIFY_ALL = nsIWebProgress.NOTIFY_ALL;
@@ -70,6 +71,8 @@ var requests = {};
 
 Firebug.Omnibug = extend( Firebug.Module, 
 { 
+    prefService: null,
+
     shutdown: function() {
         if( Firebug.getPref( 'defaultPanelName' ) == 'Omnibug' ) {
             Firebug.setPref( 'defaultPanelName', 'console' );
@@ -97,8 +100,19 @@ Firebug.Omnibug = extend( Firebug.Module,
         FirebugContext.getPanel( "Omnibug" ).printLine( msg );
     },
 */
+
     initContext: function( context ) {
         //dump( ">>>   initContext: context=" + context + "\n" );
+
+        /* Get preferences service */
+        if( this.prefService == null ) {
+            //dump( ">>>>>>>>> initContext: getting pref service\n" );
+            try {
+                this.prefService = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch2);
+            } catch (err) {}
+        }
+        //dump( ">>>>>>>>> initContext: pref service=" + this.prefService + "\n" );
+
         monitorContext( context );
     },
 
@@ -121,13 +135,40 @@ Firebug.Omnibug = extend( Firebug.Module,
     },
 
     loadedContext: function( context ) {
-        dump( ">>>   loadedContext\n" );
+        //dump( ">>>   loadedContext\n" );
         for( key in requests ) {
-            dump( ">>>   req=" + requests[key] + "\n" );
+            //dump( ">>>   req=" + requests[key] + "\n" );
             if( requests.hasOwnProperty( key ) ) {
                 FirebugContext.getPanel( "Omnibug" ).decodeUrl( requests[key], key );
                 delete requests[key];
             }
+        }
+    },
+
+    setPreference: function( key, val ) {
+        key = "extensions.omnibug." + key;
+        switch( this.prefService.getPrefType( key ) ) {
+            case Components.interfaces.nsIPrefBranch.PREF_STRING:
+                this.prefService.setCharPref( key, val);
+                break;
+            case Components.interfaces.nsIPrefBranch.PREF_INT:
+                this.prefService.setIntPref( key, val );
+                break;
+            case Components.interfaces.nsIPrefBranch.PREF_BOOL:
+                this.prefService.setBoolPref( key, val );
+                break;
+        }
+    },
+
+    getPreference: function( key ) {
+        key = "extensions.omnibug." + key;
+        switch( this.prefService.getPrefType( key ) ) {
+            case Components.interfaces.nsIPrefBranch.PREF_STRING:
+                return this.prefService.getCharPref( key );
+            case Components.interfaces.nsIPrefBranch.PREF_INT:
+                return this.prefService.getIntPref( key );
+            case Components.interfaces.nsIPrefBranch.PREF_BOOL:
+                return this.prefService.getBoolPref( key );
         }
     }
 
@@ -155,7 +196,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
     },
 
     appendHtml: function( data ) {
-            dump( ">>>   htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
+            //dump( ">>>   htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
         var str = "";
         var elType = "<div>";
         //if( ! OmnibugPanel.htmlOutput ) {
@@ -164,7 +205,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
             elType = "html";
             OmnibugPanel.htmlOutput = true;
         //}
-        dump( ">>> dumping html:\n\n" + str + data + "\n\n" );
+        //dump( ">>> dumping html:\n\n" + str + data + "\n\n" );
 
         var el = this.document.createElement( elType );
         el.innerHTML = str + data;
@@ -256,7 +297,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
 
         html += "</div></td></tr></table>\n";
 
-        dump( ">>>   output html:\n\n\nhtml\n\n\n" );
+        //dump( ">>>   output html:\n\n\nhtml\n\n\n" );
         FirebugContext.getPanel("Omnibug").appendHtml( html );
     }
 
@@ -289,10 +330,13 @@ OmNetProgress.prototype = {
 
     onStateChange: function( progress, request, flag, status ) {
         //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
+        var key,
+            pattern = Firebug.Omnibug.getPreference( "urlPattern" ),
+            regex = new RegExp( pattern );
 
-        if( request.name.match( /2o7/ ) ) {
-            var key = hex_md5( request.name );
-            dump( ">>> onStateChange:\n>>>\tname=" + request.name + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
+        if( request.name.match( regex ) ) {
+            key = hex_md5( request.name );
+            //dump( ">>> onStateChange:\n>>>\tname=" + request.name + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
             if( flag & STATE_START ) {
                 requests[key] = request;
             }
