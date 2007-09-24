@@ -134,9 +134,15 @@ Firebug.Omnibug = extend( Firebug.Module,
 
     loadedContext: function( context ) {
         //dump( ">>>   loadedContext\n" );
+        this.processRequests();
+    },
+
+    processRequests: function() {
+        //dump( ">>>   processRequests\n" );
         for( key in requests ) {
             //dump( ">>>   req=" + requests[key] + "\n" );
             if( requests.hasOwnProperty( key ) ) {
+                //dump( ">>>   processRequests: processing " + key + "\n" );
                 FirebugContext.getPanel( "Omnibug" ).decodeUrl( requests[key], key );
                 delete requests[key];
             }
@@ -235,11 +241,11 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         var i, el, len, html;
 
         html  = "<table cellspacing='0' border='0' class='req'><tr>";
-        //html += "<td class='load'><img src='chrome://global/skin/icons/loading_16_grey.gif' /></td>";
         html += "<td class='exp'><a href='#' onClick='top.OmnibugToggle( this )'><img src='chrome://omnibug/skin/win/twistyClosed.png' /></a></td>";
         html += "<td><p>" + OmnibugPanel.cur["request"].name + "...</p><div class='hid'>";
 
 
+        // omniture props
         if( OmnibugPanel.props.length ) {
             html += "<dt>Props</dt>";
             for( i = 0, len = OmnibugPanel.props.length; i < len; ++i ) {
@@ -249,6 +255,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
             }
         }
 
+        // omniture eVars
         if( OmnibugPanel.vars.length ) {
             html += "<dt>eVars</dt>";
             for( i = 0, len = OmnibugPanel.vars.length; i < len; ++i ) {
@@ -258,9 +265,10 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
             }
         }
 
-        var list = "|pageName|ch|h1|purchaseID|events|products|pev2|";
-            otherNamed = {},
-            otherOther = {};
+        // everything else
+        var otherNamed = {},
+            otherOther = {},
+            list = "|pageName|ch|h1|purchaseID|events|products|pev2|";
 
         if( OmnibugPanel.other.length ) {
             for( i = 0, len = OmnibugPanel.other.length; i < len; ++i ) {
@@ -274,24 +282,48 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
             }
         }
 
-        html += "<dt>Useful</dt>";
-        var el, cn, i = 0;
-        for( var el in otherNamed ) {
+        var el, cn,
+            i = 0,
+            tmp = "",
+            mf = "";
+
+        // useful omniture params
+        for( el in otherNamed ) {
             if( otherNamed.hasOwnProperty( el ) ) {
-                var cn = ( el === 'events' || el === 'products' ) ? "hilite" : "";
-                html += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherNamed[el] + "</dd>\n";
+                cn = ( el === 'events' || el === 'products' ) ? "hilite" : "";
+                tmp += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherNamed[el] + "</dd>\n";
             }
         }
+        if( !! tmp ) {
+            html += "<dt>Useful</dt>";
+            html += tmp;
+        }
 
-        html += "<dt>Other</dt>";
-        var el, cn, i = 0;
-        for( var el in otherOther ) {
+        i = 0;
+        tmp = ""
+
+        for( el in otherOther ) {
             if( otherOther.hasOwnProperty( el ) ) {
-                var cn = ( el === 'events' || el === 'products' ) ? "hilite" : "";
-                html += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherOther[el] + "</dd>\n";
+                if( el.match( /mfinfo/ ) ) {
+                    mf += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherOther[el] + "</dd>\n";A
+                } else {
+                    cn = ( el === 'events' || el === 'products' ) ? "hilite" : "";
+                    tmp += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherOther[el] + "</dd>\n";
+                }
             }
         }
 
+        // moniforce
+        if( !! mf ) {
+            html += "<dt>Moniforce</dt>";
+            html += mf;
+        }
+
+        // everything else, really
+        if( !! tmp ) {
+            html += "<dt>Other</dt>";
+            html += tmp;
+        }
 
         html += "</div></td></tr></table>\n";
 
@@ -332,10 +364,14 @@ OmNetProgress.prototype = {
             pattern = Firebug.Omnibug.getPreference( "urlPattern" ),
             regex = new RegExp( pattern );
 
+//dump( ">>>   onStateChange: key=" + hex_md5( request.name ) + " (" + request.name + ")" + "\n" );
         if( request.name.match( regex ) ) {
             key = hex_md5( request.name );
             //dump( ">>> onStateChange:\n>>>\tname=" + request.name + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
             if( flag & STATE_START ) {
+                //dump( ">>>   onStateChange: MATCH! " + key + "\n" );
+                // @TODO: how to tell which to show now (via decodeUrl(); this page) and which to show later ( via requests{}, due to page load
+                FirebugContext.getPanel( "Omnibug" ).decodeUrl( request, key );
                 requests[key] = request;
             }
         }
@@ -387,17 +423,17 @@ function getStateDescription( flag ) {
         state += "STATE_STOP ";
     }
 
-    if( flag & nsIWebProgressListener.STATE_IS_REQUEST )  state += "STATE_IS_REQUEST ";
-    if( flag & nsIWebProgressListener.STATE_IS_DOCUMENT ) state += "STATE_IS_DOCUMENT ";
-    if( flag & nsIWebProgressListener.STATE_IS_NETWORK )  state += "STATE_IS_NETWORK ";
-    if( flag & nsIWebProgressListener.STATE_IS_WINDOW )   state += "STATE_IS_WINDOW ";
-    if( flag & nsIWebProgressListener.STATE_RESTORING )   state += "STATE_RESTORING ";
-    if( flag & nsIWebProgressListener.STATE_IS_INSECURE ) state += "STATE_IS_INSECURE ";
-    if( flag & nsIWebProgressListener.STATE_IS_BROKEN )   state += "STATE_IS_BROKEN ";
-    if( flag & nsIWebProgressListener.STATE_IS_SECURE )   state += "STATE_IS_SECURE ";
-    if( flag & nsIWebProgressListener.STATE_SECURE_HIGH ) state += "STATE_SECURE_HIGH ";
-    if( flag & nsIWebProgressListener.STATE_SECURE_MED )  state += "STATE_SECURE_MED ";
-    if( flag & nsIWebProgressListener.STATE_SECURE_LOW )  state += "STATE_SECURE_LOW ";
+    if( flag & nsIWebProgressListener.STATE_IS_REQUEST )  { state += "STATE_IS_REQUEST "; }
+    if( flag & nsIWebProgressListener.STATE_IS_DOCUMENT ) { state += "STATE_IS_DOCUMENT "; }
+    if( flag & nsIWebProgressListener.STATE_IS_NETWORK )  { state += "STATE_IS_NETWORK "; }
+    if( flag & nsIWebProgressListener.STATE_IS_WINDOW )   { state += "STATE_IS_WINDOW "; }
+    if( flag & nsIWebProgressListener.STATE_RESTORING )   { state += "STATE_RESTORING "; }
+    if( flag & nsIWebProgressListener.STATE_IS_INSECURE ) { state += "STATE_IS_INSECURE "; }
+    if( flag & nsIWebProgressListener.STATE_IS_BROKEN )   { state += "STATE_IS_BROKEN "; }
+    if( flag & nsIWebProgressListener.STATE_IS_SECURE )   { state += "STATE_IS_SECURE "; }
+    if( flag & nsIWebProgressListener.STATE_SECURE_HIGH ) { state += "STATE_SECURE_HIGH "; }
+    if( flag & nsIWebProgressListener.STATE_SECURE_MED )  { state += "STATE_SECURE_MED "; }
+    if( flag & nsIWebProgressListener.STATE_SECURE_LOW )  { state += "STATE_SECURE_LOW "; }
 
     return state;
 }
