@@ -1,2 +1,2 @@
 // pattern to match in request url
-pref( "extensions.omnibug.urlPattern", "2o7" );
+pref( "extensions.omnibug.urlPattern", "2o7|moniforce\.gif" );
