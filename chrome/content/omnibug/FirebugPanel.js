@@ -83,21 +83,9 @@ Firebug.Omnibug = extend( Firebug.Module,
         collapse( OmnibugButtons, !isOmnibug ); 
     },
 
-/*
-    button1: function() 
-    { 
-      FirebugContext.getPanel("Omnibug").printLine('Clicked Button 1'); 
+    clearPanel: function() { 
+        FirebugContext.getPanel("Omnibug").clear();
     }, 
-
-    button2: function() 
-    { 
-      FirebugContext.getPanel("Omnibug").printLine('Clicked Button 2'); 
-    },
-
-    printLine: function( msg ) {
-        FirebugContext.getPanel( "Omnibug" ).printLine( msg );
-    },
-*/
 
     initContext: function( context ) {
         //dump( ">>>   initContext: context=" + context + "\n" );
@@ -199,8 +187,18 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
       this.panelNode.appendChild( el );
     },
 
+    clear: function() {
+        var tables = this.panelNode.getElementsByTagName( "table" );
+
+        for( var i=0; i<tables.length; ++i ) {
+            //dump( ">>> removing table #" + i + ": " + tables[i].className + " (parent=" + tables[i].parentNode + ")\n" );
+            //tables[i].parentNode.removeChild( tables[i] ); // doesn't work for some reason
+            tables[i].style.display = "none";
+        }
+    },
+
     appendHtml: function( data ) {
-            //dump( ">>>   htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
+        //dump( ">>>   htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
         var str = "";
         var elType = "<div>";
         //if( ! OmnibugPanel.htmlOutput ) {
