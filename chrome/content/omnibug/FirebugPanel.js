@@ -65,78 +65,136 @@ const STATE_START = nsIWebProgressListener.STATE_START;
 const STATE_STOP = nsIWebProgressListener.STATE_STOP;
 const STATE_TRANSFERRING = nsIWebProgressListener.STATE_TRANSFERRING;
 
-var requests = {};
 
-Firebug.Omnibug = extend( Firebug.Module, 
-{ 
+Firebug.Omnibug = extend( Firebug.Module, { 
     prefService: null,
+    requests: {},
+    contextLoaded: false,
 
+    /**
+     * Supposedly called when the browser exits; doesn't seem to ever be called
+     */
     shutdown: function() {
+        console.log( ">>>   shutdown\n" );
         if( Firebug.getPref( 'defaultPanelName' ) == 'Omnibug' ) {
             Firebug.setPref( 'defaultPanelName', 'console' );
         }
     },
 
+    /**
+     * Called when panels are selected
+     */
     showPanel: function( browser, panel ) { 
+        dump( ">>>   showPanel: browser=" + browser + "; panel=" + panel + "\n" );
         var isOmnibug = panel && panel.name == "Omnibug"; 
         var OmnibugButtons = browser.chrome.$( "fbOmnibugButtons" ); 
         collapse( OmnibugButtons, !isOmnibug ); 
     },
 
+    /**
+     * Called when the clear button is pushed
+     */
     clearPanel: function() { 
         FirebugContext.getPanel("Omnibug").clear();
     }, 
 
-    initContext: function( context ) {
-        //dump( ">>>   initContext: context=" + context + "\n" );
+    /**
+     * Called once, at browser startup
+     */
+    initialize: function() {
+        dump( ">>>   initialize: arguments=" + arguments + "\n" );
 
-        /* Get preferences service */
+       /* Get preferences service */
         if( this.prefService == null ) {
-            //dump( ">>>>>>>>> initContext: getting pref service\n" );
             try {
                 this.prefService = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch2);
             } catch (err) {}
         }
-        //dump( ">>>>>>>>> initContext: pref service=" + this.prefService + "\n" );
+    },
+
+    /**
+     * Called when new page is going to be rendered
+     */
+    initContext: function( context ) {
+        dump( ">>>   initContext: context=" + context + "\n" );
 
         monitorContext( context );
     },
 
+    /**
+     * Called just before old page is thrown away
+     */
     destroyContext: function( context ) {
+        dump( ">>>   destroyContext: context=" + context + "\n" );
+        this.contextLoaded = false;
         if( context.omNetProgress ) {
             unmonitorContext( context );
         }
     },
 
-    showContext: function( browser, context ) {
-        //dump( ">>>   showContext: browser=" + browser + "; context=" + context + "\n" );
-    },
-
-    watchWindow: function( context, win ) {
-        //dump( ">>>   watchWindow: win=" + win + "; context=" + context + "\n" );
-    },
-
-    watchContext: function( win, context, isSystem ) {
-        //dump( ">>>   watchContext: win=" + win + "; context=" + context + "; isSystem=" + isSystem + "\n" );
-    },
-
+    /**
+     * Called when page is completely finished loading
+     */
     loadedContext: function( context ) {
-        //dump( ">>>   loadedContext\n" );
+        dump( ">>>   loadedContext: context=" + context + "\n" );
+        this.contextLoaded = true;
+        //dump( ">>>   loadedContext: calling processRequests\n" );
         this.processRequests();
     },
 
+    /**
+     * ?
+     */
+    reattachContext: function( context ) {
+        dump( ">>>   reattachContext: context=" + context + "\n" );
+    },
+
+    /**
+     * Called as page is rendering (?)
+     */
+    showContext: function( browser, context ) {
+        dump( ">>>   showContext: browser=" + browser + "; context=" + context + "\n" );
+    },
+
+    /**
+     * ?
+     */
+    watchContext: function( win, context, isSystem ) {
+        dump( ">>>   watchContext: win=" + win + "; context=" + context + "; isSystem=" + isSystem + "\n" );
+    },
+
+    /**
+     * Called when navigating away from a page
+     */
+    unwatchWindow: function( context, win ) {
+        dump( ">>>   unwatchWindow: context=" + context + "; win=" + win + "\n" );
+    },
+
+    /**
+     * Called when a new page is going to be watched (?)
+     */
+    watchWindow: function( context, win ) {
+        dump( ">>>   watchWindow: win=" + win + "; context=" + context + "\n" );
+    },
+
+    /**
+     * Called to process the requests object and write to panel
+     */
     processRequests: function() {
-        //dump( ">>>   processRequests\n" );
-        for( key in requests ) {
-            //dump( ">>>   req=" + requests[key] + "\n" );
-            if( requests.hasOwnProperty( key ) ) {
-                //dump( ">>>   processRequests: processing " + key + "\n" );
-                FirebugContext.getPanel( "Omnibug" ).decodeUrl( requests[key], key );
-                delete requests[key];
+        dump( ">>>   processRequests: processing requests: " + objDump( this.requests ) + "\n" );
+        for( key in this.requests ) {
+            dump( ">>>   req=" + this.requests[key] + "\n" );
+            if( this.requests.hasOwnProperty( key ) ) {
+                dump( ">>>   processRequests: processing " + key + "\n" );
+                FirebugContext.getPanel( "Omnibug" ).decodeUrl( this.requests[key], key );
+                delete this.requests[key];
             }
         }
     },
 
+    /**
+     * Sets a preference
+     */
     setPreference: function( key, val ) {
         key = "extensions.omnibug." + key;
         switch( this.prefService.getPrefType( key ) ) {
@@ -152,6 +210,9 @@ Firebug.Omnibug = extend( Firebug.Module,
         }
     },
 
+    /**
+     * Gets a preference from the preference service
+     */
     getPreference: function( key ) {
         key = "extensions.omnibug." + key;
         switch( this.prefService.getPrefType( key ) ) {
@@ -165,6 +226,7 @@ Firebug.Omnibug = extend( Firebug.Module,
     }
 
 } );
+
 
 /**
  * Panel
@@ -191,8 +253,8 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         var tables = this.panelNode.getElementsByTagName( "table" );
 
         for( var i=0; i<tables.length; ++i ) {
-            //dump( ">>> removing table #" + i + ": " + tables[i].className + " (parent=" + tables[i].parentNode + ")\n" );
             //tables[i].parentNode.removeChild( tables[i] ); // doesn't work for some reason
+            // @TODO: really should remove these for memory's sake
             tables[i].style.display = "none";
         }
     },
@@ -201,6 +263,8 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         //dump( ">>>   htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
         var str = "";
         var elType = "<div>";
+
+        // @TODO: figure out if html has already been output, and only send the link tag if not.
         //if( ! OmnibugPanel.htmlOutput ) {
             str = "<head><link rel='stylesheet' type='text/css' href='chrome://omnibug/content/omnibug.css' /></head><body></div>\n";
 
@@ -214,12 +278,13 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         this.panelNode.appendChild( el );
     },
 
-    decodeUrl: function( request, key ) {
-        OmnibugPanel.cur = { request: request, key: key };
+    decodeUrl: function( req, key ) {
+        dump( ">>> decodeUrl: processing key=" + key + "\n" );
+        OmnibugPanel.cur = { request: req, key: key };
         OmnibugPanel.props = [];
         OmnibugPanel.other = [];
         OmnibugPanel.vars = [];
-        var u = new OmniUrl( request.name );
+        var u = new OmniUrl( req.name );
 
         u.getQueryNames().forEach( function( n ) {
             if( n ) {
@@ -362,15 +427,20 @@ OmNetProgress.prototype = {
             pattern = Firebug.Omnibug.getPreference( "urlPattern" ),
             regex = new RegExp( pattern );
 
-//dump( ">>>   onStateChange: key=" + hex_md5( request.name ) + " (" + request.name + ")" + "\n" );
+        //dump( ">>>   onStateChange: key=" + hex_md5( request.name ) + " (" + request.name + ")" + "\n" );
         if( request.name.match( regex ) ) {
-            key = hex_md5( request.name );
-            //dump( ">>> onStateChange:\n>>>\tname=" + request.name + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
             if( flag & STATE_START ) {
-                //dump( ">>>   onStateChange: MATCH! " + key + "\n" );
-                // @TODO: how to tell which to show now (via decodeUrl(); this page) and which to show later ( via requests{}, due to page load
+                key = hex_md5( request.name );
+                dump( ">>>   onStateChange:\n>>>\tname=" + request.name.substring( 0, 50 ) + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
+
+                // write the request to the panel.  must happen here so beacons will be called
                 FirebugContext.getPanel( "Omnibug" ).decodeUrl( request, key );
-                requests[key] = request;
+
+                // add to requests object only if the context has been loaded (e.g. dump requests added from the previous page)
+                if( Firebug.Omnibug.contextLoaded ) {
+                    dump( ">>>   onStateChange: adding request to request list: " + objDump( Firebug.Omnibug.requests ) + "\n" );
+                    Firebug.Omnibug.requests[key] = request;
+                }
             }
         }
     },
@@ -571,9 +641,18 @@ top.OmnibugToggle = function( el, id ) {
     }
 }
 
+function objDump( obj ) {
+    var str = "Object{";
+    for( var key in obj ) {
+        if( obj.hasOwnProperty( key ) ) {
+            str += key + "=" + obj[key] + "; ";
+        }
+    }
+    return str + "}";
+}
+
 
 Firebug.registerModule( Firebug.Omnibug ); 
 Firebug.registerPanel( OmnibugPanel ); 
 
 }} );
-
