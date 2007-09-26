@@ -3,20 +3,20 @@
  * $URL$
  */
 
-.hilite {
+table.req .hilite {
     background-color: #ff0;
 }
 
-dt {
+table.req dt {
     font-weight: bold;
 }
 
-p {
+table.req p {
     margin: 0;
     line-height: 16px;
 }
 
-div.hid {
+table.req div.hid {
     background-color: #ccc;
     display: none;
 }
@@ -24,17 +24,20 @@ div.hid {
 table.req {
     width: 100%;
 }
-td {
+
+table.req td {
     vertical-align: top;
     border-bottom: 1px solid #aaa;
 }
-td.exp {
+
+table.req td.exp {
     width: 1px;
     text-align: center;
     line-height: 20px;
     padding: 0 5px;
 }
-a img {
+
+table.req a img {
     border: 0;
 }
 
