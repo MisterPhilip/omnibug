@@ -17,18 +17,20 @@
       </Description>
     </em:targetApplication>
 
+    <!--
     <em:requires>
         <Description>
             <em:id>firebug@software.joehewitt.com</em:id>
             <em:minVersion>1.05</em:minVersion>
         </Description>
     </em:requires>
+    -->
 
     <em:name>Omnibug</em:name>
     <em:description>Firebug Extension for Omniture testing</em:description>
     <em:creator>Ross Simpson</em:creator>
     <em:homepageURL>http://www.rosssimpson.com/dev/omnibug.html</em:homepageURL>
-    <em:updateURL>https://www.rosssimpson.com/dev/update.rdf</em:updateURL>
+    <em:updateURL>http://www.rosssimpson.com/dev/update.rdf</em:updateURL>
     <!--
     <em:optionsURL>chrome://myext/content/options.xul</em:optionsURL>
     <em:aboutURL>chrome://myext/content/about.xul</em:aboutURL>
