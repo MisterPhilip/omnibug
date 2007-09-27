@@ -6,7 +6,6 @@
 #
 
 APP=omnibug
-REV=`svn info install.rdf |grep ^Revision|awk '{ print $2 }'`
 
 find . -name *.jar -exec rm {} \;
 find . -name *.xpi -exec rm {} \;
@@ -19,7 +18,7 @@ cd ..
 echo ""
 
 echo "Creating xpi"
-xpifile=${APP}-${REV}.xpi
+xpifile=${APP}.xpi
 zip "$xpifile" chrome/${APP}.jar install.rdf chrome.manifest
 echo ""
 
