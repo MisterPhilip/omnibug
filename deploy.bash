@@ -31,7 +31,7 @@ echo ""
 OMNI=omnibug-${VER}.xpi
 
 cat update.rdf.tpl | sed "s/XXX/${VER}/g" > update.rdf
-cp omnibug.xpi $OMNI
+mv omnibug.xpi $OMNI
 
 echo "Adding updated install.rdf to omnibug.xpi"
 zip -u $OMNI
@@ -44,3 +44,4 @@ echo ""
 echo "Updating symlink"
 ssh rosssimpson@galactica.7mph.com "rm httpdocs/dev/omnibug-current.xpi; ln -s $OMNI httpdocs/dev/omnibug-current.xpi"
 echo "Done."
+
