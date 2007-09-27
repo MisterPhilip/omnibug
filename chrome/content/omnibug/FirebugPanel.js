@@ -75,7 +75,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
      * Supposedly called when the browser exits; doesn't seem to ever be called
      */
     shutdown: function() {
-        console.log( ">>>   shutdown\n" );
+        dump( ">>>   shutdown\n" );
         if( Firebug.getPref( 'defaultPanelName' ) == 'Omnibug' ) {
             Firebug.setPref( 'defaultPanelName', 'console' );
         }
