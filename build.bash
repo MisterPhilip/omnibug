@@ -7,8 +7,8 @@
 
 APP=omnibug
 
-find . -name *.jar -exec rm {} \;
-find . -name *.xpi -exec rm {} \;
+find . -name "*.jar" -exec rm {} \;
+find . -name "*.xpi" -exec rm {} \;
 
 echo "Creating chrome jar"
 cd chrome
