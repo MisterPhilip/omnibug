@@ -31,7 +31,7 @@ echo ""
 OMNI=omnibug-${VER}.xpi
 
 cat update.rdf.tpl | sed "s/XXX/${VER}/g" > update.rdf
-mv omnibug.xpi $OMNI
+cp omnibug.xpi $OMNI
 
 echo "Adding updated install.rdf to omnibug.xpi"
 zip -u $OMNI
