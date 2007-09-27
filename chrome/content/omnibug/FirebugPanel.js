@@ -76,7 +76,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
      */
     shutdown: function() {
         dump( ">>>   shutdown\n" );
-        if( Firebug.getPref( 'defaultPanelName' ) == 'Omnibug' ) {
+        if( Firebug.getPref( 'defaultPanelName' ) === 'Omnibug' ) {
             Firebug.setPref( 'defaultPanelName', 'console' );
         }
     },
@@ -86,7 +86,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
      */
     showPanel: function( browser, panel ) { 
         dump( ">>>   showPanel: browser=" + browser + "; panel=" + panel + "\n" );
-        var isOmnibug = panel && panel.name == "Omnibug"; 
+        var isOmnibug = panel && panel.name === "Omnibug"; 
         var OmnibugButtons = browser.chrome.$( "fbOmnibugButtons" ); 
         collapse( OmnibugButtons, !isOmnibug ); 
     },
@@ -105,7 +105,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
         dump( ">>>   initialize: arguments=" + arguments + "\n" );
 
        /* Get preferences service */
-        if( this.prefService == null ) {
+        if( this.prefService === null ) {
             try {
                 this.prefService = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch2);
             } catch (err) {}
@@ -182,7 +182,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
      */
     processRequests: function() {
         dump( ">>>   processRequests: processing requests: " + objDump( this.requests ) + "\n" );
-        for( key in this.requests ) {
+        for( var key in this.requests ) {
             dump( ">>>   req=" + this.requests[key] + "\n" );
             if( this.requests.hasOwnProperty( key ) ) {
                 dump( ">>>   processRequests: processing " + key + "\n" );
@@ -301,11 +301,11 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
     },
 
     report: function() {
-        var i, el, len, html;
+        var i, el, cn, len, html, tmp, mf;
 
         html  = "<table cellspacing='0' border='0' class='req'><tr>";
         html += "<td class='exp'><a href='#' onClick='top.OmnibugToggle( this )'><img src='chrome://omnibug/skin/win/twistyClosed.png' /></a></td>";
-        html += "<td><p>" + OmnibugPanel.cur["request"].name + "...</p><div class='hid'>";
+        html += "<td><p>" + OmnibugPanel.cur.request.name + "</p><div class='hid'>";
 
 
         // omniture props
@@ -345,10 +345,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
             }
         }
 
-        var el, cn,
-            i = 0,
-            tmp = "",
-            mf = "";
+        i = 0;
 
         // useful omniture params
         for( el in otherNamed ) {
@@ -363,15 +360,15 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         }
 
         i = 0;
-        tmp = ""
+        tmp = "";
 
         for( el in otherOther ) {
             if( otherOther.hasOwnProperty( el ) ) {
                 if( el.match( /mfinfo/ ) ) {
-                    mf += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherOther[el] + "</dd>\n";A
+                    mf += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "= " + otherOther[el] + "</dd>\n";
                 } else {
-                    cn = ( el === 'events' || el === 'products' ) ? "hilite" : "";
-                    tmp += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherOther[el] + "</dd>\n";
+                    cn = ( el === "events" || el === "products" ) ? "hilite" : "";
+                    tmp += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "= " + otherOther[el] + "</dd>\n";
                 }
             }
         }
@@ -457,9 +454,9 @@ OmNetProgress.prototype = {
 function monitorContext( context ) {
     //dump( ">>>   monitorContext: context=" + context + "\n" );
     if( !context.omNetProgress ) {
-        var listener = context.omNetProgress = new OmNetProgress( context );
+        context.omNetProgress = new OmNetProgress( context );
 
-        context.browser.addProgressListener( listener, NOTIFY_ALL );
+        context.browser.addProgressListener( context.omNetProgress, NOTIFY_ALL );
     }
 }
 
@@ -618,7 +615,7 @@ OmniUrl.prototype = (function() {
 
 
 top.OmnibugToggle = function( el, id ) {
-    var i, td, img,
+    var i, img,
         tr = el.parentNode.parentNode,
         td = tr.getElementsByTagName( "td" ),
         div = tr.getElementsByTagName( "div" )[0];
@@ -639,7 +636,7 @@ top.OmnibugToggle = function( el, id ) {
     } else {
         div.className = 'hid';
     }
-}
+};
 
 function objDump( obj ) {
     var str = "Object{";
