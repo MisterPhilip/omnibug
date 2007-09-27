@@ -37,11 +37,14 @@ echo "Adding updated install.rdf to omnibug.xpi"
 zip -u $OMNI
 echo ""
 
-echo "Sending update.rdf and xpi to galactica"
-scp update.rdf $OMNI rosssimpson@galactica.7mph.com:httpdocs/dev/
-echo ""
+if [[ "x$1" == "" ]]; then
+    echo "Sending update.rdf and xpi to galactica"
+    scp update.rdf $OMNI rosssimpson@galactica.7mph.com:httpdocs/dev/
+    echo ""
 
-echo "Updating symlink"
-ssh rosssimpson@galactica.7mph.com "rm httpdocs/dev/omnibug-current.xpi; ln -s $OMNI httpdocs/dev/omnibug-current.xpi"
+    echo "Updating symlink"
+    ssh rosssimpson@galactica.7mph.com "rm httpdocs/dev/omnibug-current.xpi; ln -s $OMNI httpdocs/dev/omnibug-current.xpi"
+fi
+
 echo "Done."
 
