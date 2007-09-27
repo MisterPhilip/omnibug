@@ -37,7 +37,7 @@ echo "Adding updated install.rdf to omnibug.xpi"
 zip -u $OMNI
 echo ""
 
-if [[ "x$1" == "" ]]; then
+if [[ "x$1" == "x" ]]; then
     echo "Sending update.rdf and xpi to galactica"
     scp update.rdf $OMNI rosssimpson@galactica.7mph.com:httpdocs/dev/
     echo ""
