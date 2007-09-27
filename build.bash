@@ -1,8 +1,7 @@
 #!/bin/bash
 
-
 #
-# @TODO: update install.rdf with rev version
+# Build extension .xpi
 #
 
 APP=omnibug
