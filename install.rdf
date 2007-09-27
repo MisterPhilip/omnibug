@@ -5,7 +5,7 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:id>Omnibug@rosssimpson.com</em:id>
-    <em:version>0.3</em:version>
+    <em:version>0.27</em:version>
     <em:type>2</em:type>
    
     <!-- Firefox -->
