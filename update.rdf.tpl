@@ -17,7 +17,7 @@
                                 <em:maxVersion>2.0.0.*</em:maxVersion>
             
                                 <!-- This is where this version of the add-on will be downloaded from -->
-                                <em:updateLink>https://www.rosssimpson.com/dev/omnibug.xpi</em:updateLink>
+                                <em:updateLink>https://www.rosssimpson.com/dev/omnibug-XXX.xpi</em:updateLink>
             
                                 <!-- A page describing what is new in this updated version -->
                                 <em:updateInfoURL>http://www.rosssimpson.com/dev/omnibug.html</em:updateInfoURL>
