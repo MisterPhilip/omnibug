@@ -28,10 +28,15 @@ echo "Comitting updated install.rdf"
 svn commit -m"[$0] Incrementing revision for build" install.rdf
 echo ""
 
+OMNI=omnibug-${VER}.xpi
+
 cat update.rdf.tpl | sed "s/XXX/${VER}/g" > update.rdf
-cp omnibug.xpi omnibug-${VER}.xpi
+cp omnibug.xpi $OMNI
 
 echo "Sending update.rdf and xpi to galactica"
-scp update.rdf omnibug-${VER}.xpi rosssimpson@galactica.7mph.com:httpdocs/dev/
-echo "Done."
+scp update.rdf $OMNI rosssimpson@galactica.7mph.com:httpdocs/dev/
+echo ""
 
+echo "Updating symlink"
+ssh rosssimpson@galactica.7mph.com "rm httpdocs/dev/omnibug-current.xpi; ln -s $OMNI httpdocs/dev/omnibug-current.xpi"
+echo "Done."
