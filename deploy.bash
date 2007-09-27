@@ -34,7 +34,7 @@ cat update.rdf.tpl | sed "s/XXX/${VER}/g" > update.rdf
 cp omnibug.xpi $OMNI
 
 echo "Adding updated install.rdf to omnibug.xpi"
-zip -u omnibug.xpi
+zip -u $OMNI
 echo ""
 
 echo "Sending update.rdf and xpi to galactica"
