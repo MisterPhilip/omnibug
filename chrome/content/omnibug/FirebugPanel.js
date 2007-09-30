@@ -44,6 +44,10 @@
  *        license work
  */
 
+if( typeof FBL === "undefined" ) {
+    FBL = { ns: function() {} }
+}
+
 FBL.ns( function() { with( FBL ) {
 
 // ************************************************************************************************
@@ -88,6 +92,9 @@ Firebug.Omnibug = extend( Firebug.Module, {
         var isOmnibug = panel && panel.name === "Omnibug";
         var OmnibugButtons = browser.chrome.$( "fbOmnibugButtons" );
         collapse( OmnibugButtons, !isOmnibug );
+
+        // ref in panel
+        panel.OmnibugToggle = top.OmnibugToggle;
     },
 
     /**
@@ -125,6 +132,8 @@ Firebug.Omnibug = extend( Firebug.Module, {
      */
     destroyContext: function( context ) {
         dump( ">>>   destroyContext: context=" + context + "\n" );
+
+        latestOmnibugContext = undefined;
         this.contextLoaded = false;
         if( context.omNetProgress ) {
             unmonitorContext( context );
@@ -136,6 +145,12 @@ Firebug.Omnibug = extend( Firebug.Module, {
      */
     loadedContext: function( context ) {
         dump( ">>>   loadedContext: context=" + context + "\n" );
+
+        // Makes detach work.
+        if ( ! context.omnibugContext ) {
+            context.omnibugContext = latestOmnibugContext;
+        }
+
         this.contextLoaded = true;
         //dump( ">>>   loadedContext: calling processRequests\n" );
         this.processRequests();
@@ -144,9 +159,18 @@ Firebug.Omnibug = extend( Firebug.Module, {
     /**
      * ?
      */
-    reattachContext: function( context ) {
+    reattachContext: function(context) {
         dump( ">>>   reattachContext: context=" + context + "\n" );
+
+        // Makes detach work.
+        if ( ! FirebugContext.getPanel( "Omnibug" ).document.omnibugContext ) {
+            // Save a pointer back to this object from the iframe's document:
+            FirebugContext.getPanel( "Omnibug" ).document.omnibugPanel = FirebugContext.getPanel( "Omnibug" );
+            FirebugContext.getPanel( "Omnibug" ).document.omnibugContext = FirebugContext.omnibugContext;
+        }
     },
+
+
 
     /**
      * Called as page is rendering (?)
@@ -242,6 +266,46 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
     vars: [],
     htmlOutput: false,
 
+    /**
+     * Initialize the panel. This is called when the Panel is activated and
+     * whenever the browser document changes (new URL, reload).
+     *
+     * (this must override a method in Firebug)
+     */
+    initialize: function( context, doc ) {
+        this.context = context;
+        this.document = doc;
+        this.panelNode = doc.createElement( "div" );
+        this.panelNode.ownerPanel = this;
+        this.panelNode.className = "panelNode panelNode-omnibug";
+        doc.body.appendChild( this.panelNode );
+
+        dump( ">>>   panel initialize: arguments=" + arguments + "\n" );
+        if ( FirebugContext.omnibugContext ) {
+            dump( ">>>   initialize: context already exists" );
+            return;
+        }
+
+        // Create a context for this instance.
+        FirebugContext.omnibugContext = new Omnibug.OmnibugContext( this );
+
+        this.document.omnibugPanel = this;
+        this.document.omnibugContext = FirebugContext.omnibugContext;
+    },
+
+    /*
+     * Called whenever the panel comes into view. Like toggling between browser tabs.
+     */
+    show: function() {
+        dump( ">>>   show" );
+
+        latestOmnibugContext = FirebugContext.omnibugContext;  // save this to make detach work
+
+        // There is only ONE DOCUMENT shared by all browser tabs. So if the user opens two
+        // browser tabs, we have to restore the appropriate context when switching between tabs.
+        this.document.omnibugContext = FirebugContext.omnibugContext;
+    },
+
     printLine: function( msg ) {
       var el = this.document.createElement( "p" );
       el.innerHTML = msg;
@@ -285,6 +349,8 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         OmnibugPanel.vars = [];
         var u = new OmniUrl( req.name );
 
+        //XXX 		FirebugContext.yslowContext.addButtonView(
+
         u.getQueryNames().forEach( function( n ) {
             if( n ) {
                 if( n.match( /^c(\d+)$/ ) ) {
@@ -303,9 +369,8 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         var i, el, cn, len, html, tmp, mf;
 
         html  = "<table cellspacing='0' border='0' class='req'><tr>";
-        html += "<td class='exp'><a href='#' onClick='top.OmnibugToggle( this )'><img src='chrome://omnibug/skin/win/twistyClosed.png' /></a></td>";
+        html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='chrome://omnibug/skin/win/twistyClosed.png' /></a></td>";
         html += "<td><p>" + OmnibugPanel.cur.request.name + "</p><div class='hid'>";
-
 
         // omniture props
         if( OmnibugPanel.props.length ) {
@@ -502,7 +567,6 @@ function getStateDescription( flag ) {
     return state;
 }
 
-
 var OmniUrl = function( url ) {
     this.url = url;
     this.parseUrl();
@@ -613,29 +677,6 @@ OmniUrl.prototype = (function() {
 } )();
 
 
-top.OmnibugToggle = function( el, id ) {
-    var i, img,
-        tr = el.parentNode.parentNode,
-        td = tr.getElementsByTagName( "td" ),
-        div = tr.getElementsByTagName( "div" )[0];
-
-    // change expand/collapse icon
-    for( i=0; i<td.length; ++i ) {
-        if( td[i].className.match( /exp/ ) ) {
-           img = td[i].getElementsByTagName( "img" )[0];
-           if( img ) {
-               img.src = "chrome://omnibug/skin/win/twisty" + ( img.src.match( /Closed/ ) ? "Open" : "Closed" ) + ".png";
-           }
-        }
-    }
-
-    // hide/show the content div
-    if( div.className.match( /hid/ ) ) {
-        div.className = 'reg';
-    } else {
-        div.className = 'hid';
-    }
-};
 
 function objDump( obj ) {
     var str = "Object{";
@@ -652,3 +693,6 @@ Firebug.registerModule( Firebug.Omnibug );
 Firebug.registerPanel( OmnibugPanel );
 
 }} );
+
+
+//FirebugContext.window.console.log( "arguments=", arguments );
