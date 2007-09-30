@@ -325,16 +325,15 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
     appendHtml: function( data ) {
         //dump( ">>>   htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
         var str = "";
-        var elType = "<div>";
+        //var elType = "<div>";
 
         // @TODO: figure out if html has already been output, and only send the link tag if not.
-        //if( ! OmnibugPanel.htmlOutput ) {
-            str = "<head><link rel='stylesheet' type='text/css' href='chrome://omnibug/content/omnibug.css' /></head><body></div>\n";
+        str = "<head><link rel='stylesheet' type='text/css' href='chrome://omnibug/content/omnibug.css' /></head><body>\n";
 
-            elType = "html";
-            OmnibugPanel.htmlOutput = true;
-        //}
-        //dump( ">>> dumping html:\n\n" + str + data + "\n\n" );
+        elType = "html";
+        OmnibugPanel.htmlOutput = true;
+
+        //dump( ">>> dumping html:\n\n>>>" + data + "\n\n" );
 
         var el = this.document.createElement( elType );
         el.innerHTML = str + data;
@@ -348,8 +347,6 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         OmnibugPanel.other = [];
         OmnibugPanel.vars = [];
         var u = new OmniUrl( req.name );
-
-        //XXX 		FirebugContext.yslowContext.addButtonView(
 
         u.getQueryNames().forEach( function( n ) {
             if( n ) {
@@ -366,7 +363,8 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
     },
 
     report: function() {
-        var i, el, cn, len, html, tmp, mf;
+        var i, el, cn, len, html, mf,
+            tmp = "";
 
         html  = "<table cellspacing='0' border='0' class='req'><tr>";
         html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='chrome://omnibug/skin/win/twistyClosed.png' /></a></td>";
@@ -395,7 +393,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         // everything else
         var otherNamed = {},
             otherOther = {},
-            list = "|pageName|ch|h1|purchaseID|events|products|pev2|";
+            list = "|pageName|ch|h1|purchaseID|events|products|pev2|"; // @TODO: move to a pref
 
         if( OmnibugPanel.other.length ) {
             for( i = 0, len = OmnibugPanel.other.length; i < len; ++i ) {
