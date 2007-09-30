@@ -33,7 +33,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-
 /*
  * $Id$
  * $URL$
@@ -45,7 +44,7 @@
  *        license work
  */
 
-FBL.ns( function() { with( FBL ) { 
+FBL.ns( function() { with( FBL ) {
 
 // ************************************************************************************************
 // Constants
@@ -66,7 +65,7 @@ const STATE_STOP = nsIWebProgressListener.STATE_STOP;
 const STATE_TRANSFERRING = nsIWebProgressListener.STATE_TRANSFERRING;
 
 
-Firebug.Omnibug = extend( Firebug.Module, { 
+Firebug.Omnibug = extend( Firebug.Module, {
     prefService: null,
     requests: {},
     contextLoaded: false,
@@ -84,19 +83,19 @@ Firebug.Omnibug = extend( Firebug.Module, {
     /**
      * Called when panels are selected
      */
-    showPanel: function( browser, panel ) { 
+    showPanel: function( browser, panel ) {
         dump( ">>>   showPanel: browser=" + browser + "; panel=" + panel + "\n" );
-        var isOmnibug = panel && panel.name === "Omnibug"; 
-        var OmnibugButtons = browser.chrome.$( "fbOmnibugButtons" ); 
-        collapse( OmnibugButtons, !isOmnibug ); 
+        var isOmnibug = panel && panel.name === "Omnibug";
+        var OmnibugButtons = browser.chrome.$( "fbOmnibugButtons" );
+        collapse( OmnibugButtons, !isOmnibug );
     },
 
     /**
      * Called when the clear button is pushed
      */
-    clearPanel: function() { 
+    clearPanel: function() {
         FirebugContext.getPanel("Omnibug").clear();
-    }, 
+    },
 
     /**
      * Called once, at browser startup
@@ -231,11 +230,11 @@ Firebug.Omnibug = extend( Firebug.Module, {
 /**
  * Panel
  */
-function OmnibugPanel() {} 
-OmnibugPanel.prototype = extend( Firebug.Panel, { 
-    name: "Omnibug", 
-    title: "Omnibug", 
-    searchable: false, 
+function OmnibugPanel() {}
+OmnibugPanel.prototype = extend( Firebug.Panel, {
+    name: "Omnibug",
+    title: "Omnibug",
+    searchable: false,
     editable: false,
     cur: {},
     other: [],
@@ -391,7 +390,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         FirebugContext.getPanel("Omnibug").appendHtml( html );
     }
 
-} ); 
+} );
 
 
 /**
@@ -649,7 +648,7 @@ function objDump( obj ) {
 }
 
 
-Firebug.registerModule( Firebug.Omnibug ); 
-Firebug.registerPanel( OmnibugPanel ); 
+Firebug.registerModule( Firebug.Omnibug );
+Firebug.registerPanel( OmnibugPanel );
 
 }} );
