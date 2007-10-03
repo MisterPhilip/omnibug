@@ -18,9 +18,10 @@ find . -name "*.xpi" -exec rm {} \;
 #echo ""
 
 echo "Creating xpi"
-files=`find chrome -type f|grep -v \.svn`
+chrome_files=`find chrome -type f|grep -v \.svn`
+defaults_files=`find defaults -type f|grep -v \.svn`
 
-zip "$XPIFILE" $files install.rdf chrome.manifest
+zip "$XPIFILE" $chrome_files $defaults_files install.rdf chrome.manifest
 echo ""
 
 echo -n "Created file: "
