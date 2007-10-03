@@ -70,9 +70,12 @@ const STATE_TRANSFERRING = nsIWebProgressListener.STATE_TRANSFERRING;
 
 
 Firebug.Omnibug = extend( Firebug.Module, {
-    prefService: null,
     requests: {},
+    messages: [],
     contextLoaded: false,
+    outFile: null,
+    prefService: null,
+    latestOmnibugContext: null,
 
     /**
      * Supposedly called when the browser exits; doesn't seem to ever be called
@@ -92,9 +95,6 @@ Firebug.Omnibug = extend( Firebug.Module, {
         var isOmnibug = panel && panel.name === "Omnibug";
         var OmnibugButtons = browser.chrome.$( "fbOmnibugButtons" );
         collapse( OmnibugButtons, !isOmnibug );
-
-        // ref in panel
-        panel.OmnibugToggle = top.OmnibugToggle;
     },
 
     /**
@@ -108,13 +108,45 @@ Firebug.Omnibug = extend( Firebug.Module, {
      * Called once, at browser startup
      */
     initialize: function() {
+        var fileOutput;
         dump( ">>>   initialize: arguments=" + arguments + "\n" );
 
        /* Get preferences service */
         if( this.prefService === null ) {
             try {
-                this.prefService = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch2);
-            } catch (err) {}
+                this.prefService = Components.classes['@mozilla.org/preferences-service;1']
+                                             .getService( Components.interfaces.nsIPrefBranch2 );
+            } catch( ex ) {
+                dump( ">>>   initialize: error getting prefs service: " + ex + "\n" );
+            }
+        }
+
+        /* init datafile */
+        fileOutput = this.getPreference( "enableFileLogging" );
+        if( fileOutput ) {
+            var prefFile;
+            try {
+                prefFile = this.getPreference( "logFileName" );
+            } catch( ex ) {}
+
+            try {
+                if( prefFile ) {
+                    dump( ">>>   initialize: enabling logging to " + prefFile + "\n" );
+                    this.outFile = FileIO.open( prefFile );
+                } else {
+                    dump( ">>>   initialize: enabling logging to default log file\n" );
+                    // @TODO: add a picker and save value
+                    var path = FileIO.getTmpDir();
+                    var fn = "omnibug.log";
+                    this.outFile = FileIO.append( path, fn );
+                }
+
+                var msg = "File logging enabled; requests will be written to " + this.outFile.path;
+                dump( ">>> initialize: " + msg + "\n" );
+                this.messages.push( msg );
+            } catch( ex ) {
+                dump( ">>>   initialize: unable to create output file: " + ex + "\n" );
+            }
         }
     },
 
@@ -123,7 +155,6 @@ Firebug.Omnibug = extend( Firebug.Module, {
      */
     initContext: function( context ) {
         dump( ">>>   initContext: context=" + context + "\n" );
-
         monitorContext( context );
     },
 
@@ -133,7 +164,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
     destroyContext: function( context ) {
         dump( ">>>   destroyContext: context=" + context + "\n" );
 
-        latestOmnibugContext = undefined;
+        this.latestOmnibugContext = undefined;
         this.contextLoaded = false;
         if( context.omNetProgress ) {
             unmonitorContext( context );
@@ -147,11 +178,17 @@ Firebug.Omnibug = extend( Firebug.Module, {
         dump( ">>>   loadedContext: context=" + context + "\n" );
 
         // Makes detach work.
-        if ( ! context.omnibugContext ) {
-            context.omnibugContext = latestOmnibugContext;
+        if ( ! context.omnibugContext && this.latestOmnibugContext ) {
+            context.omnibugContext = this.latestOmnibugContext;
         }
 
         this.contextLoaded = true;
+
+        // dump any messages waiting
+        while( this.messages.length ) {
+            FirebugContext.getPanel("Omnibug").printLine( this.messages.shift() );
+        }
+
         //dump( ">>>   loadedContext: calling processRequests\n" );
         this.processRequests();
     },
@@ -299,7 +336,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
     show: function() {
         dump( ">>>   show" );
 
-        latestOmnibugContext = FirebugContext.omnibugContext;  // save this to make detach work
+        this.latestOmnibugContext = FirebugContext.omnibugContext;  // save this to make detach work
 
         // There is only ONE DOCUMENT shared by all browser tabs. So if the user opens two
         // browser tabs, we have to restore the appropriate context when switching between tabs.
@@ -308,6 +345,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
 
     printLine: function( msg ) {
       var el = this.document.createElement( "p" );
+      el.className = "om";
       el.innerHTML = msg;
       this.panelNode.appendChild( el );
     },
@@ -482,12 +520,17 @@ OmNetProgress.prototype = {
 
     onStateChange: function( progress, request, flag, status ) {
         //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
-        var key,
-            pattern = Firebug.Omnibug.getPreference( "urlPattern" ),
-            regex = new RegExp( pattern );
+        var key, file, userRegex,
+            defaultPattern = Firebug.Omnibug.getPreference( "defaultPattern" ),
+            userPattern = Firebug.Omnibug.getPreference( "userPattern" );
+            defaultRegex = new RegExp( defaultPattern );
+
+            if( userPattern ) {
+                userRegex = new RegExp( userPattern );
+            }
 
         //dump( ">>>   onStateChange: key=" + hex_md5( request.name ) + " (" + request.name + ")" + "\n" );
-        if( request.name.match( regex ) ) {
+        if(    request.name.match( defaultRegex ) || ( userPattern && request.name.match( userRegex ) ) ) {
             if( flag & STATE_START ) {
                 key = hex_md5( request.name );
                 dump( ">>>   onStateChange:\n>>>\tname=" + request.name.substring( 0, 50 ) + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
@@ -499,6 +542,12 @@ OmNetProgress.prototype = {
                 if( Firebug.Omnibug.contextLoaded ) {
                     dump( ">>>   onStateChange: adding request to request list: " + objDump( Firebug.Omnibug.requests ) + "\n" );
                     Firebug.Omnibug.requests[key] = request;
+                }
+
+                // write to file, if defined
+                file = Firebug.Omnibug.outFile;
+                if( file !== null ) {
+                    FileIO.write( file, new Date() + "\t" + key + "\t" + request.name + "\n", "a" );
                 }
             }
         }
