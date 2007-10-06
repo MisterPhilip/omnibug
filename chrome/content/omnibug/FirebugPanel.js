@@ -74,8 +74,8 @@ Firebug.Omnibug = extend( Firebug.Module, {
     messages: [],
     contextLoaded: false,
     outFile: null,
-    prefService: null,
     latestOmnibugContext: null,
+    win: null,
 
     /**
      * Supposedly called when the browser exits; doesn't seem to ever be called
@@ -108,45 +108,52 @@ Firebug.Omnibug = extend( Firebug.Module, {
      * Called once, at browser startup
      */
     initialize: function() {
-        var fileOutput;
         dump( ">>>   initialize: arguments=" + arguments + "\n" );
 
-       /* Get preferences service */
-        if( this.prefService === null ) {
-            try {
-                this.prefService = Components.classes['@mozilla.org/preferences-service;1']
-                                             .getService( Components.interfaces.nsIPrefBranch2 );
-            } catch( ex ) {
-                dump( ">>>   initialize: error getting prefs service: " + ex + "\n" );
-            }
+        /* set default pref */
+        var defaultPattern = Omnibug.Tools.getPreference( "defaultPattern" );
+        if( defaultPattern !== "/b/ss/|2o7|moniforce\.gif" ) {
+            dump( ">>>   initialize: resetting defaultPattern preference\n" );
+            Omnibug.Tools.setPreference( "defaultPattern", "/b/ss/|2o7|moniforce\.gif" );
         }
 
-        /* init datafile */
-        fileOutput = this.getPreference( "enableFileLogging" );
+        /* init logging */
+        this.initLogging();
+    },
+
+    /**
+     * Init logging behavior
+     */
+    initLogging: function() {
+        dump( ">>>   initLogging: arguments=" + arguments + "\n" );
+        var fileOutput = Omnibug.Tools.getPreference( "enableFileLogging" );
+        dump( ">>>   initLogging: fileOutput=" + fileOutput + "\n" );
         if( fileOutput ) {
             var prefFile;
             try {
-                prefFile = this.getPreference( "logFileName" );
+                prefFile = Omnibug.Tools.getPreference( "logFileName" );
             } catch( ex ) {}
 
             try {
                 if( prefFile ) {
-                    dump( ">>>   initialize: enabling logging to " + prefFile + "\n" );
+                    dump( ">>>   initLogging: enabling logging to " + prefFile + "\n" );
                     this.outFile = FileIO.open( prefFile );
                 } else {
-                    dump( ">>>   initialize: enabling logging to default log file\n" );
-                    // @TODO: add a picker and save value
+                    dump( ">>>   initLogging: enabling logging to default log file\n" );
                     var path = FileIO.getTmpDir();
                     var fn = "omnibug.log";
                     this.outFile = FileIO.append( path, fn );
                 }
 
                 var msg = "File logging enabled; requests will be written to " + this.outFile.path;
-                dump( ">>> initialize: " + msg + "\n" );
+                dump( ">>>   initLogging: " + msg + "\n" );
                 this.messages.push( msg );
             } catch( ex ) {
-                dump( ">>>   initialize: unable to create output file: " + ex + "\n" );
+                dump( ">>>   initLogging: unable to create output file: " + ex + "\n" );
             }
+        } else {
+            dump( ">>>   initLogging: logging is disabled.\n" );
+            this.outFile = null;
         }
     },
 
@@ -159,7 +166,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
     },
 
     /**
-     * Called just before old page is thrown away
+     * Called just before old page is thrown away;
      */
     destroyContext: function( context ) {
         dump( ">>>   destroyContext: context=" + context + "\n" );
@@ -196,7 +203,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
     /**
      * ?
      */
-    reattachContext: function(context) {
+    reattachContext: function( context ) {
         dump( ">>>   reattachContext: context=" + context + "\n" );
 
         // Makes detach work.
@@ -206,8 +213,6 @@ Firebug.Omnibug = extend( Firebug.Module, {
             FirebugContext.getPanel( "Omnibug" ).document.omnibugContext = FirebugContext.omnibugContext;
         }
     },
-
-
 
     /**
      * Called as page is rendering (?)
@@ -228,6 +233,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
      */
     unwatchWindow: function( context, win ) {
         dump( ">>>   unwatchWindow: context=" + context + "; win=" + win + "\n" );
+        this.win = null;
     },
 
     /**
@@ -235,6 +241,7 @@ Firebug.Omnibug = extend( Firebug.Module, {
      */
     watchWindow: function( context, win ) {
         dump( ">>>   watchWindow: win=" + win + "; context=" + context + "\n" );
+        this.win = win;
     },
 
     /**
@@ -253,35 +260,18 @@ Firebug.Omnibug = extend( Firebug.Module, {
     },
 
     /**
-     * Sets a preference
+     * Tools menu handler
      */
-    setPreference: function( key, val ) {
-        key = "extensions.omnibug." + key;
-        switch( this.prefService.getPrefType( key ) ) {
-            case Components.interfaces.nsIPrefBranch.PREF_STRING:
-                this.prefService.setCharPref( key, val);
-                break;
-            case Components.interfaces.nsIPrefBranch.PREF_INT:
-                this.prefService.setIntPref( key, val );
-                break;
-            case Components.interfaces.nsIPrefBranch.PREF_BOOL:
-                this.prefService.setBoolPref( key, val );
-                break;
-        }
-    },
+    omnibugTools: function( menuitem ) {
+        dump( ">>>   omnibugTools: label=" + menuitem.label + "\n" );
 
-    /**
-     * Gets a preference from the preference service
-     */
-    getPreference: function( key ) {
-        key = "extensions.omnibug." + key;
-        switch( this.prefService.getPrefType( key ) ) {
-            case Components.interfaces.nsIPrefBranch.PREF_STRING:
-                return this.prefService.getCharPref( key );
-            case Components.interfaces.nsIPrefBranch.PREF_INT:
-                return this.prefService.getIntPref( key );
-            case Components.interfaces.nsIPrefBranch.PREF_BOOL:
-                return this.prefService.getBoolPref( key );
+        if( menuitem.label === "Choose log file" ) {
+            if( Omnibug.Tools.chooseLogFile( this.win ) ) {
+                // successfully picked a log file
+                dump( ">>>   omnibugTools: logFileName=" + Omnibug.Tools.getPreference( "logFileName" ) + "\n" );
+
+                this.initLogging();
+            }
         }
     }
 
@@ -319,7 +309,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
 
         dump( ">>>   panel initialize: arguments=" + arguments + "\n" );
         if ( FirebugContext.omnibugContext ) {
-            dump( ">>>   initialize: context already exists" );
+            dump( ">>>   initialize: context already exists\n" );
             return;
         }
 
@@ -334,7 +324,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
      * Called whenever the panel comes into view. Like toggling between browser tabs.
      */
     show: function() {
-        dump( ">>>   show" );
+        dump( ">>>   show: arguments=" + arguments + "\n" );
 
         this.latestOmnibugContext = FirebugContext.omnibugContext;  // save this to make detach work
 
@@ -431,7 +421,7 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
         // everything else
         var otherNamed = {},
             otherOther = {},
-            list = "|pageName|ch|h1|purchaseID|events|products|pev2|"; // @TODO: move to a pref
+            list = "|pageName|ch|h1|purchaseID|events|products|pev2|"; // @TODO: move to a pref?
 
         if( OmnibugPanel.other.length ) {
             for( i = 0, len = OmnibugPanel.other.length; i < len; ++i ) {
@@ -489,6 +479,31 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
 
         //dump( ">>>   output html:\n\n\nhtml\n\n\n" );
         FirebugContext.getPanel("Omnibug").appendHtml( html );
+    },
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    //   OPTIONS MENU
+    ////////////////////////////////////////////////////////////////////////////
+
+    // This is called EVERY time the options menu is opened.
+    // Return an array of menu option objects.
+    getOptionsMenuItems: function() {
+        return [
+            this.optionMenu( "Enable File Logging", "enableFileLogging" )
+        ];
+    },
+
+    // Return an option menu item.
+    optionMenu: function( label, option ) {
+        var value = Omnibug.Tools.getPreference( option );
+        var updatePref = function( key, val ) {
+            Omnibug.Tools.setPreference( key, val );
+            Firebug.Omnibug.initLogging();
+        };
+        // bindFixed is from Firebug. It helps to pass the args along.
+        //return { label: label, nol10n: true, type: "checkbox", checked: value, command: bindFixed( Omnibug.Tools.setPreference, Firebug, option, !value ) }
+        return { label: label, nol10n: true, type: "checkbox", checked: value, command: bindFixed( updatePref, Firebug, option, !value ) }
     }
 
 } );
@@ -521,8 +536,8 @@ OmNetProgress.prototype = {
     onStateChange: function( progress, request, flag, status ) {
         //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
         var key, file, userRegex,
-            defaultPattern = Firebug.Omnibug.getPreference( "defaultPattern" ),
-            userPattern = Firebug.Omnibug.getPreference( "userPattern" );
+            defaultPattern = Omnibug.Tools.getPreference( "defaultPattern" ),
+            userPattern = Omnibug.Tools.getPreference( "userPattern" );
             defaultRegex = new RegExp( defaultPattern );
 
             if( userPattern ) {
@@ -742,4 +757,95 @@ Firebug.registerPanel( OmnibugPanel );
 }} );
 
 
-//FirebugContext.window.console.log( "arguments=", arguments );
+if( typeof Omnibug.Tools == "undefined" ) {
+    Omnibug.Tools = {};
+}
+
+Omnibug.Tools.chooseLogFile = function( win ) {
+    dump( ">>>   chooseLogFile: win=" + win + "\n" );
+
+    const nsIFilePicker = Components.interfaces.nsIFilePicker;
+    var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance( nsIFilePicker );
+    fp.init( win, "Choose log file location", nsIFilePicker.modeSave );
+    fp.defaultString = "omnibug.log";
+
+    var rv = fp.show();
+    if( rv == nsIFilePicker.returnOK || rv == nsIFilePicker.returnReplace ) {
+        var path = fp.file.path;
+        dump( ">>>   chooseLogFile: new path = " + path + "\n" );
+
+        Omnibug.Tools.setPreference( "logFileName", path );
+        Omnibug.Tools.setPreference( "enableFileLogging", true );
+
+        dump( ">>>   chooseLogFile: set new path; get=" + Omnibug.Tools.getPreference( "logFileName" ) + "\n" );
+
+        return true;
+    }
+    return false;
+}
+
+
+/*
+ * Get preferences service
+ */
+Omnibug.Tools.getPrefsService = function() {
+    var ps;
+
+    try {
+        ps = Components.classes['@mozilla.org/preferences-service;1']
+                       .getService( Components.interfaces.nsIPrefBranch2 );
+    } catch( ex ) {
+        dump( ">>>   getPrefsService: error getting prefs service: " + ex + "\n" );
+    }
+
+    return ps;
+}
+
+
+/**
+ * Gets a preference from the preference service
+ */
+Omnibug.Tools.getPreference = function( key ) {
+    var ps = Omnibug.Tools.getPrefsService();
+
+    key = "extensions.omnibug." + key;
+    switch( ps.getPrefType( key ) ) {
+        case Components.interfaces.nsIPrefBranch.PREF_STRING:
+            return ps.getCharPref( key );
+        case Components.interfaces.nsIPrefBranch.PREF_INT:
+            return ps.getIntPref( key );
+        case Components.interfaces.nsIPrefBranch.PREF_BOOL:
+            return ps.getBoolPref( key );
+    }
+}
+
+/**
+ * Sets a preference
+ */
+Omnibug.Tools.setPreference = function( key, val ) {
+    var ps = Omnibug.Tools.getPrefsService();
+
+    key = "extensions.omnibug." + key;
+dump( ">>>   setPref: ps=" + ps + "; key=" + key + "; val=" + val + "\n" );
+    switch( ps.getPrefType( key ) ) {
+        /*
+        case Components.interfaces.nsIPrefBranch.PREF_STRING:
+dump( ">>>   setPref: setting string pref\n" );
+            ps.setCharPref( key, val);
+            break;
+        */
+        case Components.interfaces.nsIPrefBranch.PREF_INT:
+dump( ">>>   setPref: setting int pref\n" );
+            ps.setIntPref( key, val );
+            break;
+        case Components.interfaces.nsIPrefBranch.PREF_BOOL:
+dump( ">>>   setPref: setting bool pref\n" );
+            ps.setBoolPref( key, val );
+            break;
+        default:
+dump( ">>>   setPref: setting string pref (default)\n" );
+            ps.setCharPref( key, val);
+            break;
+    }
+dump( ">>>   setPref: done setting\n" );
+}
