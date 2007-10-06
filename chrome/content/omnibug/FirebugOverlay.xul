@@ -21,7 +21,13 @@
         <hbox id="fbToolbarInner" insertbefore="fbDetachButton" flex="1" align="center">
             <hbox id="fbOmnibugButtons" insertafter="fbNetButtons">
                 <toolbarbutton label="Clear" class="toolbar-text-button" tooltiptext="Clear console window" command="cmd_clear"/>
+                <toolbarbutton label="Tools" id="omnibugToolsMenu" type="menu">
+                    <menupopup>
+                        <menuitem label="Choose log file" oncommand="Firebug.Omnibug.omnibugTools( this )"/>
+                    </menupopup>
+                </toolbarbutton>
             </hbox>
         </hbox>
     </toolbar>
+
 </overlay>
