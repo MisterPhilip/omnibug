@@ -22,7 +22,8 @@ INC=$((INC+1))
 VER="${MAJOR}.${MINOR}.${INC}"
 echo "new=${INC}"
 echo ""
-cat install.rdf | sed "s/em:version>.*</em:version>${VER}</" > install.rdf
+cat install.rdf | sed "s/em:version>.*</em:version>${VER}</" > install.rdf.$$
+mv install.rdf.$$  install.rdf
 
 echo "Comitting updated install.rdf"
 # Commit modified install to svn
