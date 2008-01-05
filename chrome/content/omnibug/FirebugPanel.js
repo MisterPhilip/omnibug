@@ -362,12 +362,22 @@ OmnibugPanel.prototype = extend( Firebug.Panel, {
     },
 
     clear: function() {
+        /*
         var tables = this.panelNode.getElementsByTagName( "table" );
-
         for( var i=0; i<tables.length; ++i ) {
             //tables[i].parentNode.removeChild( tables[i] ); // doesn't work for some reason
             // @TODO: really should remove these for memory's sake
             tables[i].style.display = "none";
+        }
+        */
+        
+        /*
+         * works better than the above.  still have to click clear more than once occasionally.. not sure why this is.
+         * using this.panelNode.parentNode removes too much; subsequent requests without a page refresh won't get logged.
+         */
+        var el = this.panelNode;
+                for( var i=0; i<el.childNodes.length; ++i ) {
+            el.removeChild( el.childNodes[i] );
         }
     },
 
