@@ -76,6 +76,8 @@ Firebug.Omnibug = extend( Firebug.Module, {
     outFile: null,
     latestOmnibugContext: null,
     win: null,
+    defaultRegex: null,
+    userRegex: null,
 
     /**
      * Supposedly called when the browser exits; doesn't seem to ever be called
@@ -119,6 +121,9 @@ Firebug.Omnibug = extend( Firebug.Module, {
 
         /* init logging */
         this.initLogging();
+
+        /* init request-matching patterns */
+        this.initPatterns();
     },
 
     /**
@@ -272,6 +277,22 @@ Firebug.Omnibug = extend( Firebug.Module, {
 
                 this.initLogging();
             }
+        }
+    },
+
+
+    /**
+     * Init and compile regex patterns for matching requests
+     */
+    initPatterns: function() {
+        dump( ">>>   initPatterns: initing patterns from prefs\n" );
+        var defaultPattern = Omnibug.Tools.getPreference( "defaultPattern" ),
+            userPattern = Omnibug.Tools.getPreference( "userPattern" );
+
+        this.defaultRegex = new RegExp( defaultPattern );
+
+        if( userPattern ) {
+            this.userRegex = new RegExp( userPattern );
         }
     }
 
@@ -530,25 +551,24 @@ OmNetProgress.prototype = {
         throw Components.results.NS_NOINTERFACE;
     },
 
+
+
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     // nsIWebProgressListener
 
     onStateChange: function( progress, request, flag, status ) {
         //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
-        var key, file, userRegex,
-            defaultPattern = Omnibug.Tools.getPreference( "defaultPattern" ),
-            userPattern = Omnibug.Tools.getPreference( "userPattern" );
-            defaultRegex = new RegExp( defaultPattern );
+        var key, file,
+            om = Firebug.Omnibug;
 
-            if( userPattern ) {
-                userRegex = new RegExp( userPattern );
-            }
+        //dump( ">>>   onStateChange: key=" + hex_md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
+        if( request.name.match( om.defaultRegex ) || ( om.userRegex && request.name.match( om.userRegex ) ) ) {
+            //dump( ">>>   onStateChange pattern match: key=" + hex_md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
+            if( ! this.seenReqs[request.name] ) {
+                this.seenReqs[request.name] = true;
 
-        //dump( ">>>   onStateChange: key=" + hex_md5( request.name ) + " (" + request.name + ")" + "\n" );
-        if(    request.name.match( defaultRegex ) || ( userPattern && request.name.match( userRegex ) ) ) {
-            if( flag & STATE_START ) {
                 key = hex_md5( request.name );
-                dump( ">>>   onStateChange:\n>>>\tname=" + request.name.substring( 0, 50 ) + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
+                dump( ">>>   onStateChange:\n>>>\tname=" + request.name.substring( 0, 100 ) + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
 
                 // write the request to the panel.  must happen here so beacons will be called
                 FirebugContext.getPanel( "Omnibug" ).decodeUrl( request, key );
@@ -568,6 +588,7 @@ OmNetProgress.prototype = {
         }
     },
 
+    seenReqs: {},
     stateIsRequest: false,
     onLocationChange: function() {},
     onProgressChange: function() {},
