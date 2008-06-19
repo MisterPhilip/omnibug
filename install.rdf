@@ -1,26 +1,21 @@
 <?xml version="1.0"?>
-
-<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
-
-    <Description about="urn:mozilla:install-manifest">
-        <em:id>Omnibug@rosssimpson.com</em:id>
-        <em:version>0.4.135</em:version>
-        <em:type>2</em:type>
-
-        <!-- Firefox -->
-        <em:targetApplication>
-            <Description>
-                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-                <em:minVersion>1.5</em:minVersion>
-                <em:maxVersion>2.0.0.*</em:maxVersion>
-            </Description>
-        </em:targetApplication>
-
-        <em:name>Omnibug</em:name>
-        <em:description>Firebug Extension for Omniture testing</em:description>
-        <em:creator>Ross Simpson</em:creator>
-        <em:homepageURL>http://www.rosssimpson.com/dev/omnibug.html</em:homepageURL>
-        <em:updateURL>http://www.rosssimpson.com/dev/update.rdf</em:updateURL>
-    </Description>
-</RDF>
+<RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="rdf:#$AdUzy3"
+                   em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   em:minVersion="1.5"
+                   em:maxVersion="3.0.0.*" />
+  <RDF:Description RDF:about="urn:mozilla:install-manifest"
+                   em:id="Omnibug@rosssimpson.com"
+                   em:version="0.4.135"
+                   em:type="2"
+                   em:name="Omnibug"
+                   em:description="Firebug Extension for Omniture testing"
+                   em:creator="Ross Simpson"
+                   em:homepageURL="http://www.rosssimpson.com/dev/omnibug.html"
+                   em:updateURL="http://www.rosssimpson.com/dev/update.rdf"
+                   em:updateKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDW6UjioaK4ma+++R9jYZv177DnYhDbfMqHzY5tfiKK+t+J5j+0aJXHyiWgOIQ/UDtXHi0znlK4MMVLDTXg0G8O9LfzbnYduAeaDQKxkXfV9e7HPBzU5zBmIOcejZWs3nAADhLHIXZBV4pLfSb0Fjk4+Y3eAPT+CkbzgKPkrkh8vwIDAQAB">
+    <em:targetApplication RDF:resource="rdf:#$AdUzy3"/>
+  </RDF:Description>
+</RDF:RDF>
