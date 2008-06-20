@@ -4,6 +4,7 @@
  */
 
 if ( typeof Omnibug == "undefined" ) {
+    dump( ">>>   OmnibugContext: creating new Omnibug object\n" );
     var Omnibug = {};
 }
 
@@ -16,6 +17,8 @@ Omnibug.OmnibugContext = function( panel ) {
  * @param {HTMLElement} el link clicked to toggle
  */
 Omnibug.OmnibugContext.prototype.toggle = function( el ) {
+    dump( ">>>   OmnibugContext: toggle, el=" + el + "\n" );
+
     var i, img,
         tr = el.parentNode.parentNode,
         td = tr.getElementsByTagName( "td" ),
@@ -38,3 +41,5 @@ Omnibug.OmnibugContext.prototype.toggle = function( el ) {
         div.className = 'hid';
     }
 }
+
+
