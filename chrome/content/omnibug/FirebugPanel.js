@@ -48,15 +48,28 @@ if( typeof FBL === "undefined" ) {
     FBL = { ns: function() {} }
 }
 
+function CC( className ) {
+    return Components.classes[className];
+}
+
+function CI( ifaceName ) {
+    return Components.interfaces[ifaceName];
+}
+
+
 FBL.ns( function() { with( FBL ) {
 
     // ************************************************************************************************
     // Constants
 
-    const nsIWebProgressListener = CI( "nsIWebProgressListener" );
-    const nsIWebProgress = CI( "nsIWebProgress" );
-    const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
-    const nsISupports = CI( "nsISupports" );
+    try {
+        const nsIWebProgressListener = CI( "nsIWebProgressListener" );
+        const nsIWebProgress = CI( "nsIWebProgress" );
+        const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
+        const nsISupports = CI( "nsISupports" );
+    } catch( ex ) {
+        dump( ">>>   Error instantiating component interfaces: " + ex + "\n" );
+    }
 
     const NOTIFY_STATE_DOCUMENT = nsIWebProgress.NOTIFY_STATE_DOCUMENT;
     const NOTIFY_ALL = nsIWebProgress.NOTIFY_ALL;
