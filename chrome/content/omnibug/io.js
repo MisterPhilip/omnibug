@@ -1,3 +1,12 @@
+/*
+ * JS I/O in Firefox; fetched and modified slightly on 17-July-2008 from:
+ *     http://kb.mozillazine.org/Io.js
+ *
+ * $Id$
+ * $URL$
+ */
+
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 //
