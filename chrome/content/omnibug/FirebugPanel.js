@@ -18,6 +18,7 @@
  *
  * Contributor(s):
  *     Christoph Dorn <christoph@christophdorn.com>
+ *     Ross Simpson <simpsora@gmail.com>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -41,19 +42,24 @@
 
 /**
  * @TODO: add pattern preference input box
- *        license work
  */
 
 if( typeof FBL === "undefined" ) {
     FBL = { ns: function() {} }
 }
 
-function CC( className ) {
-    return Components.classes[className];
+// Components.classes helper
+if( typeof( "CC" ) !== "function" ) {
+    function CC( className ) {
+        return Components.classes[className];
+    }
 }
 
-function CI( ifaceName ) {
-    return Components.interfaces[ifaceName];
+// Components.interfaces helper
+if( typeof( "CI" ) !== "function" ) {
+    function CI( ifaceName ) {
+        return Components.interfaces[ifaceName];
+    }
 }
 
 
@@ -125,17 +131,17 @@ FBL.ns( function() { with( FBL ) {
         initialize: function() {
             dump( ">>>   initialize: arguments=" + arguments + "\n" );
 
-            /* set default pref */
+            // set default pref
             var defaultPattern = Omnibug.Tools.getPreference( "defaultPattern" );
             if( defaultPattern !== "/b/ss/|2o7|moniforce\.gif" ) {
                 dump( ">>>   initialize: resetting defaultPattern preference\n" );
                 Omnibug.Tools.setPreference( "defaultPattern", "/b/ss/|2o7|moniforce\.gif" );
             }
 
-            /* init logging */
+            // init logging
             this.initLogging();
 
-            /* init request-matching patterns */
+            // init request-matching patterns
             this.initPatterns();
         },
 
@@ -383,7 +389,7 @@ FBL.ns( function() { with( FBL ) {
                 tables[i].style.display = "none";
             }
             */
-            
+
             /*
              * works better than the above.  still have to click clear more than once occasionally.. not sure why this is.
              * using this.panelNode.parentNode removes too much; subsequent requests without a page refresh won't get logged.
@@ -546,7 +552,6 @@ FBL.ns( function() { with( FBL ) {
                 Firebug.Omnibug.initLogging();
             };
             // bindFixed is from Firebug. It helps to pass the args along.
-            //return { label: label, nol10n: true, type: "checkbox", checked: value, command: bindFixed( Omnibug.Tools.setPreference, Firebug, option, !value ) }
             return { label: label, nol10n: true, type: "checkbox", checked: value, command: bindFixed( updatePref, Firebug, option, !value ) }
         }
 
@@ -584,13 +589,13 @@ FBL.ns( function() { with( FBL ) {
             var key, file,
                 om = Firebug.Omnibug;
 
-            //dump( ">>>   onStateChange: key=" + hex_md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
+            //dump( ">>>   onStateChange: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
             if( request.name.match( om.defaultRegex ) || ( om.userRegex && request.name.match( om.userRegex ) ) ) {
-                //dump( ">>>   onStateChange pattern match: key=" + hex_md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
+                //dump( ">>>   onStateChange pattern match: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
                 if( ! this.seenReqs[request.name] ) {
                     this.seenReqs[request.name] = true;
 
-                    key = hex_md5( request.name );
+                    key = Md5Impl.md5( request.name );
                     dump( ">>>   onStateChange:\n>>>\tname=" + request.name.substring( 0, 100 ) + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
 
                     // write the request to the panel.  must happen here so beacons will be called
@@ -680,32 +685,15 @@ FBL.ns( function() { with( FBL ) {
 
     OmniUrl.prototype = (function() {
         var U = {
-            /**
-             * @method hasQueryValue
-             * @param key
-             */
             hasQueryValue: function( key ) {
                 return typeof this.query[key] !== 'undefined';
             },
-            /**
-             * returns the the first value for key
-             * @method getFirstQueryValue
-             * @param key
-             */
             getFirstQueryValue: function( key ) {
                 return this.query[key] ? this.query[key][0] : '';
             },
-            /**
-             * returns the array of values for key
-             * @method getQueryValues
-             * @param key
-             */
             getQueryValues: function( key ) {
                 return this.query[key] ? this.query[key] : [];
             },
-            /**
-             * @method getQueryNames
-             */
             getQueryNames: function() {
                 var i, a = [];
                 for( i in this.query ) {
@@ -713,25 +701,12 @@ FBL.ns( function() { with( FBL ) {
                 }
                 return a;
             },
-            /**
-             * @method getLocation
-             */
             getLocation: function() {
                 return this.location;
             },
-            /**
-             * @method getParamString
-             */
             getParamString: function() {
                 return this.paramString;
             },
-            /**
-             * if param exists a new value is pushed into it's array
-             * if it it doesn't it's added with the passed values
-             * @method addParamValue
-             * @param key
-             * @param value any number of values can be passed
-             */
             addQueryValue: function( key ) {
                 if( ! this.hasQueryValue( key ) ) {
                     this.query[key] = [];
@@ -740,10 +715,6 @@ FBL.ns( function() { with( FBL ) {
                     this.query[key].push( arguments[i] );
                 }
             },
-            /**
-             * @method decode
-             * @param val
-             */
             decode: function( val ) {
                 var retVal;
                 try {
@@ -752,10 +723,6 @@ FBL.ns( function() { with( FBL ) {
                     return val;
                 }
             },
-            /**
-             * @method parseUrl
-             * @private
-             */
             parseUrl: function() {
                 var url = this.url;
                 var pieces = url.split( '?' );
@@ -764,7 +731,7 @@ FBL.ns( function() { with( FBL ) {
                 this.queryString = '';
                 this.anchor = '';
                 this.location = p2[0];
-                this.paramString = ( p2[1] ? p2[1] : '');
+                this.paramString = ( p2[1] ? p2[1] : '' );
                 if( pieces[1] ) {
                     var p3 = pieces[1].split( '#' );
                     this.queryString = p3[0];
@@ -870,26 +837,20 @@ Omnibug.Tools.setPreference = function( key, val ) {
     var ps = Omnibug.Tools.getPrefsService();
 
     key = "extensions.omnibug." + key;
-dump( ">>>   setPref: ps=" + ps + "; key=" + key + "; val=" + val + "\n" );
     switch( ps.getPrefType( key ) ) {
         /*
         case Components.interfaces.nsIPrefBranch.PREF_STRING:
-dump( ">>>   setPref: setting string pref\n" );
             ps.setCharPref( key, val);
             break;
         */
         case Components.interfaces.nsIPrefBranch.PREF_INT:
-dump( ">>>   setPref: setting int pref\n" );
             ps.setIntPref( key, val );
             break;
         case Components.interfaces.nsIPrefBranch.PREF_BOOL:
-dump( ">>>   setPref: setting bool pref\n" );
             ps.setBoolPref( key, val );
             break;
         default:
-dump( ">>>   setPref: setting string pref (default)\n" );
             ps.setCharPref( key, val);
             break;
     }
-dump( ">>>   setPref: done setting\n" );
 }
