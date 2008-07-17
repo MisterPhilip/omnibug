@@ -97,6 +97,8 @@ FBL.ns( function() { with( FBL ) {
         win: null,
         defaultRegex: null,
         userRegex: null,
+        usefulKeys: {},
+        highlightKeys: {},
 
         /**
          * Supposedly called when the browser exits; doesn't seem to ever be called
@@ -313,6 +315,31 @@ FBL.ns( function() { with( FBL ) {
             if( userPattern ) {
                 this.userRegex = new RegExp( userPattern );
             }
+
+            // init useful keys
+            var keyList = Omnibug.Tools.getPreference( "usefulKeys" );
+            if( keyList ) {
+                var parts = keyList.split( "," );
+                for( var part in parts ) {
+                    if( parts.hasOwnProperty( part ) ) {
+                        this.usefulKeys[parts[part]] = 1;
+                    }
+                }
+            }
+            dump( ">>>   initPatterns: usefulKeys=" + objDump( this.usefulKeys ) + "\n" );
+
+            // init highlight keys
+            keyList = Omnibug.Tools.getPreference( "highlightKeys" );
+            if( keyList ) {
+                var parts = keyList.split( "," );
+                for( var part in parts ) {
+                    if( parts.hasOwnProperty( part ) ) {
+                        this.highlightKeys[parts[part]] = 1;
+                    }
+                }
+            }
+            dump( ">>>   initPatterns: highlightKeys=" + objDump( this.highlightKeys ) + "\n" );
+
         }
 
     } );
@@ -453,7 +480,8 @@ FBL.ns( function() { with( FBL ) {
                 html += "<dt>Props</dt>";
                 for( i = 0, len = OmnibugPanel.props.length; i < len; ++i ) {
                     if( OmnibugPanel.props[i] ) {
-                        html += "<dd class='" + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>prop" + i + '= ' + OmnibugPanel.props[i] + "</dd>\n";
+                        cn = this.isHighlightable( "prop" + i ) ? "hilite" : "";
+                        html += "<dd class='" + cn + " " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>prop" + i + '= ' + OmnibugPanel.props[i] + "</dd>\n";
                     }
                 }
             }
@@ -463,20 +491,21 @@ FBL.ns( function() { with( FBL ) {
                 html += "<dt>eVars</dt>";
                 for( i = 0, len = OmnibugPanel.vars.length; i < len; ++i ) {
                     if( OmnibugPanel.vars[i] ) {
-                        html += "<dd class='" + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>eVar" + i + '= ' + OmnibugPanel.vars[i] + "</dd>\n";
+                        cn = this.isHighlightable( "eVar" + i ) ? "hilite" : "";
+                        html += "<dd class='" + cn + " " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>eVar" + i + '= ' + OmnibugPanel.vars[i] + "</dd>\n";
                     }
                 }
             }
 
+
             // everything else
             var otherNamed = {},
-                otherOther = {},
-                list = "|pageName|ch|h1|purchaseID|events|products|pev2|"; // @TODO: move to a pref?
+                otherOther = {};
 
             if( OmnibugPanel.other.length ) {
                 for( i = 0, len = OmnibugPanel.other.length; i < len; ++i ) {
                     if( OmnibugPanel.other[i] ) {
-                        if( list.indexOf( "|" + OmnibugPanel.other[i][0] + "|" ) !== -1 ) {
+                        if( Firebug.Omnibug.usefulKeys[OmnibugPanel.other[i][0]] ) {
                             otherNamed[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
                         } else {
                             otherOther[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
@@ -490,7 +519,7 @@ FBL.ns( function() { with( FBL ) {
             // useful omniture params
             for( el in otherNamed ) {
                 if( otherNamed.hasOwnProperty( el ) ) {
-                    cn = ( el === 'events' || el === 'products' ) ? "hilite" : "";
+                    cn = this.isHighlightable( el ) ? "hilite" : "";
                     tmp += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherNamed[el] + "</dd>\n";
                 }
             }
@@ -504,10 +533,10 @@ FBL.ns( function() { with( FBL ) {
 
             for( el in otherOther ) {
                 if( otherOther.hasOwnProperty( el ) ) {
+                    cn = this.isHighlightable( el ) ? "hilite" : "";
                     if( el.match( /mfinfo/ ) ) {
                         mf += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "= " + otherOther[el] + "</dd>\n";
                     } else {
-                        cn = ( el === "events" || el === "products" ) ? "hilite" : "";
                         tmp += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "= " + otherOther[el] + "</dd>\n";
                     }
                 }
@@ -531,20 +560,22 @@ FBL.ns( function() { with( FBL ) {
             FirebugContext.getPanel("Omnibug").appendHtml( html );
         },
 
+        // returns true when the given name is in the highlightKeys list
+        isHighlightable: function( elName ) {
+            return Firebug.Omnibug.highlightKeys[elName];
+        },
 
-        ////////////////////////////////////////////////////////////////////////////
-        //   OPTIONS MENU
-        ////////////////////////////////////////////////////////////////////////////
 
-        // This is called EVERY time the options menu is opened.
-        // Return an array of menu option objects.
+        // Options menu
+
+        // Called every time the options menu is opened
         getOptionsMenuItems: function() {
             return [
                 this.optionMenu( "Enable File Logging", "enableFileLogging" )
             ];
         },
 
-        // Return an option menu item.
+        // Return an option menu item
         optionMenu: function( label, option ) {
             var value = Omnibug.Tools.getPreference( option );
             var updatePref = function( key, val ) {
@@ -752,7 +783,7 @@ FBL.ns( function() { with( FBL ) {
 
 
     function objDump( obj ) {
-        var str = "Object{";
+        var str = "Object{ ";
         for( var key in obj ) {
             if( obj.hasOwnProperty( key ) ) {
                 str += key + "=" + obj[key] + "; ";
