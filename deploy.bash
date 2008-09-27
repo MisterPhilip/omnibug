@@ -22,6 +22,8 @@ if [[ "$1" == "ross" ]]; then
     echo "Doing private deployment to ${extrapath}"
 fi
 
+./build.bash
+
 # update revision
 echo -n "$0: incrementing version: old=$INC; "
 INC=$((INC+1))
@@ -37,13 +39,17 @@ svn commit -m"[$0] Incrementing revision for build" install.rdf
 echo ""
 
 XPI=omnibug-${VER}.xpi
-
-cat update.rdf.tpl | sed "s/XXX/${VER}/g" > update.rdf
 cp omnibug.xpi $XPI
 
 echo "Adding updated install.rdf to omnibug.xpi"
 zip -u $XPI
 echo ""
+
+# Don't generate hash until after adding the updated install.rdf
+HASH=`shasum ${XPI} | awk '{ print $1 }'`
+
+cat update.rdf.tpl | sed "s/TOK_VER/${VER}/g" | sed "s/TOK_HASH/${HASH}/g" > update.rdf
+
 
 echo -n "Please sign `pwd`/update.rdf with McCoy now; press enter when done."
 read foo
