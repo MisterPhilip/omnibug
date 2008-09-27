@@ -9,10 +9,11 @@
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="1.5"
                    em:maxVersion="3.0.3.*"
-                   em:updateLink="http://www.rosssimpson.com/dev/omnibug-XXX.xpi"
+                   em:updateLink="http://www.rosssimpson.com/dev/omnibug-TOK_VER.xpi"
+                   em:updateHash="sha1:TOK_HASH"
                    em:updateInfoURL="http://www.rosssimpson.com/dev/omnibug_rel_notes.xhtml" />
   <RDF:Description RDF:about="rdf:#$LdUzy3"
-                   em:version="XXX">
+                   em:version="TOK_VER">
     <em:targetApplication RDF:resource="rdf:#$OdUzy3"/>
   </RDF:Description>
   <RDF:Description RDF:about="urn:mozilla:extension:Omnibug@rosssimpson.com"
