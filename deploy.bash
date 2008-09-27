@@ -45,7 +45,7 @@ echo "Adding updated install.rdf to omnibug.xpi"
 zip -u $XPI
 echo ""
 
-echo -n "Please sign the update.rdf file with McCoy now; press enter when done."
+echo -n "Please sign `pwd`/update.rdf with McCoy now; press enter when done."
 read foo
 
 if [[ "x$1" == "x" || "$1" == "ross" ]]; then
@@ -57,5 +57,5 @@ if [[ "x$1" == "x" || "$1" == "ross" ]]; then
     ssh rosssimpson@galactica.7mph.com "ln -sf $XPI httpdocs/dev/${extrapath}omnibug-current.xpi"
 fi
 
-echo "Done."
+echo "Done. URL is https://rosssimpson.com/dev/${extrapath}omnibug-current.xpi"
 
