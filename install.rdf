@@ -14,7 +14,7 @@
                    em:description="Firebug Extension for Omniture testing"
                    em:creator="Ross Simpson"
                    em:homepageURL="http://www.rosssimpson.com/dev/omnibug.html"
-                   em:updateURL="http://www.rosssimpson.com/dev/ross/update.rdf"
+                   em:updateURL="http://www.rosssimpson.com/dev/update.rdf"
                    em:updateKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDW6UjioaK4ma+++R9jYZv177DnYhDbfMqHzY5tfiKK+t+J5j+0aJXHyiWgOIQ/UDtXHi0znlK4MMVLDTXg0G8O9LfzbnYduAeaDQKxkXfV9e7HPBzU5zBmIOcejZWs3nAADhLHIXZBV4pLfSb0Fjk4+Y3eAPT+CkbzgKPkrkh8vwIDAQAB">
     <em:targetApplication RDF:resource="rdf:#$AdUzy3"/>
   </RDF:Description>
