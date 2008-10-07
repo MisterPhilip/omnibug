@@ -451,16 +451,20 @@ FBL.ns( function() { with( FBL ) {
             OmnibugPanel.props = [];
             OmnibugPanel.other = [];
             OmnibugPanel.vars = [];
-            var u = new OmniUrl( req.name );
+
+            var val,
+                u = new OmniUrl( req.name );
 
             u.getQueryNames().forEach( function( n ) {
                 if( n ) {
+                    val = u.getFirstQueryValue( n ).replace( "<", "&lt;" );  // escape HTML in output HTML
+
                     if( n.match( /^c(\d+)$/ ) ) {
-                        OmnibugPanel.props[RegExp.$1] = u.getFirstQueryValue( n );
+                        OmnibugPanel.props[RegExp.$1] = val;
                     } else if( n.match( /^v(\d+)$/ ) ) {
-                        OmnibugPanel.vars[RegExp.$1] = u.getFirstQueryValue( n );
+                        OmnibugPanel.vars[RegExp.$1] = val;
                     } else {
-                        OmnibugPanel.other.push( [ n, u.getFirstQueryValue( n ) ] );
+                        OmnibugPanel.other.push( [ n, val ] );
                     }
                 }
             } );
@@ -556,7 +560,7 @@ FBL.ns( function() { with( FBL ) {
 
             html += "</div></td></tr></table>\n";
 
-            //dump( ">>>   output html:\n\n\nhtml\n\n\n" );
+            //dump( ">>>   output html:\n\n\n" + html + "\n\n\n" );
             FirebugContext.getPanel("Omnibug").appendHtml( html );
         },
 
