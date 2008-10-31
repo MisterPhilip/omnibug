@@ -41,7 +41,12 @@
 
 
 /**
- * @TODO: add pattern preference input box
+ * @TODOs:
+ *  - add pattern preference input box
+ *  - re-read prefs button, or something (like a prefs change listener that re-init'd)
+ *  - fix clear button weirdness
+ *  - platform-specific images (not just win)
+ *  - menu opt for alwaysExpand
  */
 
 if( typeof FBL === "undefined" ) {
@@ -99,6 +104,7 @@ FBL.ns( function() { with( FBL ) {
         userRegex: null,
         usefulKeys: {},
         highlightKeys: {},
+        alwaysExpand: false,
 
         /**
          * Supposedly called when the browser exits; doesn't seem to ever be called
@@ -139,6 +145,9 @@ FBL.ns( function() { with( FBL ) {
                 dump( ">>>   initialize: resetting defaultPattern preference\n" );
                 Omnibug.Tools.setPreference( "defaultPattern", "/b/ss/|2o7|moniforce\.gif" );
             }
+
+            // always expand preference
+            this.alwaysExpand = Omnibug.Tools.getPreference( "alwaysExpand" );
 
             // init logging
             this.initLogging();
@@ -472,12 +481,20 @@ FBL.ns( function() { with( FBL ) {
         },
 
         report: function() {
-            var i, el, cn, len, html, mf,
+            var i, el, cn, len, html, mf, expanderImage, expanderClass,
                 tmp = "";
 
+            if( Firebug.Omnibug.alwaysExpand ) {
+                expanderClass = "reg";
+                expanderImage = "chrome://omnibug/skin/win/twistyOpen.png";
+            } else {
+                expanderClass = "hid";
+                expanderImage = "chrome://omnibug/skin/win/twistyClosed.png";
+            }
+
             html  = "<table cellspacing='0' border='0' class='req'><tr>";
-            html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='chrome://omnibug/skin/win/twistyClosed.png' /></a></td>";
-            html += "<td><p>" + OmnibugPanel.cur.request.name + "</p><div class='hid'>";
+            html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='" + expanderImage + "' /></a></td>";
+            html += "<td><p>" + OmnibugPanel.cur.request.name + "</p><div class='" + expanderClass + "'>";
 
             // omniture props
             if( OmnibugPanel.props.length ) {
