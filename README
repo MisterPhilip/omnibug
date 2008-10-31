@@ -1,18 +1,25 @@
 @TODOs:
 
- - Rename (to? WAbug?)
+ 1  Rename (to? WAbug?)
 
- - Vendor-specific rules, chooser, and pref entries
-     Omniture
-     Moniforce
-     WebTrends
-     GoogleAnalytics
-     Sophus3?
-     Custom
+ 2  Vendor-specific rules, chooser, and pref entries
+      Omniture
+      Moniforce
+      WebTrends
+      GoogleAnalytics
+      Sophus3?
+      Custom
 
- - add pattern preference input box
+ 3  add pattern preference input box
 
- - fix clear button weirdness
+ 4  fix clear button weirdness
 
- - platform-specific images (not just win)
+ 5  platform-specific images (not just win)
 
+ 6  icon (not just puzzle piece)
+
+ 7  real prefs screen (to support #2 above)
+
+ 8  hosted by moz?
+
+ 9  update build process to use svn rev as build #, not version #
