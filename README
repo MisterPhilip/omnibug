@@ -1,0 +1,18 @@
+@TODOs:
+
+ - Rename (to? WAbug?)
+
+ - Vendor-specific rules, chooser, and pref entries
+     Omniture
+     Moniforce
+     WebTrends
+     GoogleAnalytics
+     Sophus3?
+     Custom
+
+ - add pattern preference input box
+
+ - fix clear button weirdness
+
+ - platform-specific images (not just win)
+
