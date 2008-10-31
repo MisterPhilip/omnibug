@@ -40,15 +40,6 @@
  */
 
 
-/**
- * @TODOs:
- *  - add pattern preference input box
- *  - re-read prefs button, or something (like a prefs change listener that re-init'd)
- *  - fix clear button weirdness
- *  - platform-specific images (not just win)
- *  - menu opt for alwaysExpand
- */
-
 if( typeof FBL === "undefined" ) {
     FBL = { ns: function() {} }
 }
