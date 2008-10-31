@@ -146,6 +146,17 @@ FBL.ns( function() { with( FBL ) {
                 Omnibug.Tools.setPreference( "defaultPattern", "/b/ss/|2o7|moniforce\.gif" );
             }
 
+            // initialize prefs
+            this.initPrefs();
+        },
+
+        /**
+         * Initialize prefs
+         *   this is called by initialize(), as well as other times when prefs may be changed and need to be re-read
+         */
+        initPrefs: function() {
+            dump( ">>>   initPrefs: (re)initializing preferences\n" );
+
             // always expand preference
             this.alwaysExpand = Omnibug.Tools.getPreference( "alwaysExpand" );
 
@@ -161,6 +172,7 @@ FBL.ns( function() { with( FBL ) {
          */
         initLogging: function() {
             dump( ">>>   initLogging: arguments=" + arguments + "\n" );
+
             var fileOutput = Omnibug.Tools.getPreference( "enableFileLogging" );
             dump( ">>>   initLogging: fileOutput=" + fileOutput + "\n" );
             if( fileOutput ) {
@@ -305,7 +317,7 @@ FBL.ns( function() { with( FBL ) {
                     // successfully picked a log file
                     dump( ">>>   omnibugTools: logFileName=" + Omnibug.Tools.getPreference( "logFileName" ) + "\n" );
 
-                    this.initLogging();
+                    this.initPrefs();
                 }
             }
         },
@@ -592,7 +604,8 @@ FBL.ns( function() { with( FBL ) {
         // Called every time the options menu is opened
         getOptionsMenuItems: function() {
             return [
-                this.optionMenu( "Enable File Logging", "enableFileLogging" )
+                this.optionMenu( "Enable File Logging", "enableFileLogging" ),
+                this.optionMenu( "Always expand entries", "alwaysExpand" )
             ];
         },
 
@@ -601,7 +614,7 @@ FBL.ns( function() { with( FBL ) {
             var value = Omnibug.Tools.getPreference( option );
             var updatePref = function( key, val ) {
                 Omnibug.Tools.setPreference( key, val );
-                Firebug.Omnibug.initLogging();
+                Firebug.Omnibug.initPrefs();
             };
             // bindFixed is from Firebug. It helps to pass the args along.
             return { label: label, nol10n: true, type: "checkbox", checked: value, command: bindFixed( updatePref, Firebug, option, !value ) }
