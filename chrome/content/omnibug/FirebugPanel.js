@@ -96,6 +96,7 @@ FBL.ns( function() { with( FBL ) {
         usefulKeys: {},
         highlightKeys: {},
         alwaysExpand: false,
+        prefsService: null,
 
         /**
          * Supposedly called when the browser exits; doesn't seem to ever be called
@@ -125,16 +126,73 @@ FBL.ns( function() { with( FBL ) {
         },
 
         /**
+         * Initialize the preferences service
+         */
+        initPrefsService: function() {
+            try {
+                this.prefsService = CC( '@mozilla.org/preferences-service;1' )
+                                              .getService( CI( "nsIPrefService" ) )
+                                              .getBranch( "extensions.omnibug." );
+
+                this.prefsService.QueryInterface( CI( "nsIPrefBranchInternal" ) );
+
+                // add prefs observer
+                this.prefsService.addObserver( "", this, false );
+            } catch( ex ) {
+                dump( ">>>   initPrefsService: error getting prefs service: " + ex + "\n" );
+            }
+        },
+
+        /**
+         * Gets a preference from the preference service
+         */
+        getPreference: function( key ) {
+            switch( this.prefsService.getPrefType( key ) ) {
+                case Components.interfaces.nsIPrefBranch.PREF_STRING:
+                    return this.prefsService.getCharPref( key );
+                case Components.interfaces.nsIPrefBranch.PREF_INT:
+                    return this.prefsService.getIntPref( key );
+                case Components.interfaces.nsIPrefBranch.PREF_BOOL:
+                    return this.prefsService.getBoolPref( key );
+            }
+        },
+
+        /**
+         * Sets a preference
+         */
+        setPreference: function( key, val ) {
+            switch( this.prefsService.getPrefType( key ) ) {
+                /*
+                case Components.interfaces.nsIPrefBranch.PREF_STRING:
+                    this.prefsService.setCharPref( key, val);
+                    break;
+                */
+                case Components.interfaces.nsIPrefBranch.PREF_INT:
+                    this.prefsService.setIntPref( key, val );
+                    break;
+                case Components.interfaces.nsIPrefBranch.PREF_BOOL:
+                    this.prefsService.setBoolPref( key, val );
+                    break;
+                default:
+                    this.prefsService.setCharPref( key, val);
+                    break;
+            }
+        },
+
+
+        /**
          * Called once, at browser startup
          */
         initialize: function() {
             dump( ">>>   initialize: arguments=" + arguments + "\n" );
 
+            this.initPrefsService();
+
             // set default pref
-            var defaultPattern = Omnibug.Tools.getPreference( "defaultPattern" );
+            var defaultPattern = this.getPreference( "defaultPattern" );
             if( defaultPattern !== "/b/ss/|2o7|moniforce\.gif" ) {
                 dump( ">>>   initialize: resetting defaultPattern preference\n" );
-                Omnibug.Tools.setPreference( "defaultPattern", "/b/ss/|2o7|moniforce\.gif" );
+                this.setPreference( "defaultPattern", "/b/ss/|2o7|moniforce\.gif" );
             }
 
             // initialize prefs
@@ -149,7 +207,7 @@ FBL.ns( function() { with( FBL ) {
             dump( ">>>   initPrefs: (re)initializing preferences\n" );
 
             // always expand preference
-            this.alwaysExpand = Omnibug.Tools.getPreference( "alwaysExpand" );
+            this.alwaysExpand = this.getPreference( "alwaysExpand" );
 
             // init logging
             this.initLogging();
@@ -164,12 +222,12 @@ FBL.ns( function() { with( FBL ) {
         initLogging: function() {
             dump( ">>>   initLogging: arguments=" + arguments + "\n" );
 
-            var fileOutput = Omnibug.Tools.getPreference( "enableFileLogging" );
+            var fileOutput = this.getPreference( "enableFileLogging" );
             dump( ">>>   initLogging: fileOutput=" + fileOutput + "\n" );
             if( fileOutput ) {
                 var prefFile;
                 try {
-                    prefFile = Omnibug.Tools.getPreference( "logFileName" );
+                    prefFile = this.getPreference( "logFileName" );
                 } catch( ex ) {}
 
                 try {
@@ -306,9 +364,9 @@ FBL.ns( function() { with( FBL ) {
             if( menuitem.label === "Choose log file" ) {
                 if( Omnibug.Tools.chooseLogFile( this.win ) ) {
                     // successfully picked a log file
-                    dump( ">>>   omnibugTools: logFileName=" + Omnibug.Tools.getPreference( "logFileName" ) + "\n" );
+                    dump( ">>>   omnibugTools: logFileName=" + this.getPreference( "logFileName" ) + "\n" );
 
-                    this.initPrefs();
+                    //this.initPrefs();
                 }
             }
         },
@@ -319,8 +377,8 @@ FBL.ns( function() { with( FBL ) {
          */
         initPatterns: function() {
             dump( ">>>   initPatterns: initing patterns from prefs\n" );
-            var defaultPattern = Omnibug.Tools.getPreference( "defaultPattern" ),
-                userPattern = Omnibug.Tools.getPreference( "userPattern" );
+            var defaultPattern = this.getPreference( "defaultPattern" ),
+                userPattern = this.getPreference( "userPattern" );
 
             this.defaultRegex = new RegExp( defaultPattern );
 
@@ -329,7 +387,7 @@ FBL.ns( function() { with( FBL ) {
             }
 
             // init useful keys
-            var keyList = Omnibug.Tools.getPreference( "usefulKeys" );
+            var keyList = this.getPreference( "usefulKeys" );
             if( keyList ) {
                 var parts = keyList.split( "," );
                 for( var part in parts ) {
@@ -341,7 +399,7 @@ FBL.ns( function() { with( FBL ) {
             dump( ">>>   initPatterns: usefulKeys=" + objDump( this.usefulKeys ) + "\n" );
 
             // init highlight keys
-            keyList = Omnibug.Tools.getPreference( "highlightKeys" );
+            keyList = this.getPreference( "highlightKeys" );
             if( keyList ) {
                 var parts = keyList.split( "," );
                 for( var part in parts ) {
@@ -351,7 +409,37 @@ FBL.ns( function() { with( FBL ) {
                 }
             }
             dump( ">>>   initPatterns: highlightKeys=" + objDump( this.highlightKeys ) + "\n" );
+        },
 
+        /**
+         * Preferences observer handler
+         */
+        observe: function( subject, topic, key ) {
+            dump( ">>>   observe: subject='" + subject + "'; topic='" + topic + "'; key='" + key + "'; value='" + this.getPreference( key ) + "'\n" );
+
+            if( topic !== "nsPref:changed" ) {
+                return;
+            }
+
+            var newValue = this.getPreference( key );
+
+            switch( key ) {
+                case "alwaysExpand":
+                    this.alwaysExpand = newValue;
+                    break;
+
+                case "enableFileLogging":
+                case "logFileName":
+                    this.initLogging();
+                    break;
+
+                case "defaultPattern":
+                case "userPattern":
+                case "usefulKeys":
+                case "highlightKeys":
+                    this.initPatterns();
+                    break;
+            }
         }
 
     } );
@@ -602,10 +690,10 @@ FBL.ns( function() { with( FBL ) {
 
         // Return an option menu item
         optionMenu: function( label, option ) {
-            var value = Omnibug.Tools.getPreference( option );
+            var value = Firebug.Omnibug.getPreference( option );
             var updatePref = function( key, val ) {
-                Omnibug.Tools.setPreference( key, val );
-                Firebug.Omnibug.initPrefs();
+                Firebug.Omnibug.setPreference( key, val );
+                //Firebug.Omnibug.initPrefs();
             };
             // bindFixed is from Firebug. It helps to pass the args along.
             return { label: label, nol10n: true, type: "checkbox", checked: value, command: bindFixed( updatePref, Firebug, option, !value ) }
@@ -824,6 +912,9 @@ FBL.ns( function() { with( FBL ) {
 }} );
 
 
+/*
+ * Omnibug.Tools
+ */
 if( typeof Omnibug.Tools == "undefined" ) {
     Omnibug.Tools = {};
 }
@@ -832,7 +923,7 @@ Omnibug.Tools.chooseLogFile = function( win ) {
     dump( ">>>   chooseLogFile: win=" + win + "\n" );
 
     const nsIFilePicker = Components.interfaces.nsIFilePicker;
-    var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance( nsIFilePicker );
+    var fp = CC( "@mozilla.org/filepicker;1" ).createInstance( nsIFilePicker );
     fp.init( win, "Choose log file location", nsIFilePicker.modeSave );
     fp.defaultString = "omnibug.log";
 
@@ -841,72 +932,13 @@ Omnibug.Tools.chooseLogFile = function( win ) {
         var path = fp.file.path;
         dump( ">>>   chooseLogFile: new path = " + path + "\n" );
 
-        Omnibug.Tools.setPreference( "logFileName", path );
-        Omnibug.Tools.setPreference( "enableFileLogging", true );
+        Firebug.Omnibug.setPreference( "logFileName", path );
+        Firebug.Omnibug.setPreference( "enableFileLogging", true );
 
-        dump( ">>>   chooseLogFile: set new path; get=" + Omnibug.Tools.getPreference( "logFileName" ) + "\n" );
+        dump( ">>>   chooseLogFile: set new path; get=" + Firebug.Omnibug.getPreference( "logFileName" ) + "\n" );
 
         return true;
     }
     return false;
 }
 
-
-/*
- * Get preferences service
- */
-Omnibug.Tools.getPrefsService = function() {
-    var ps;
-
-    try {
-        ps = Components.classes['@mozilla.org/preferences-service;1']
-                       .getService( Components.interfaces.nsIPrefBranch2 );
-    } catch( ex ) {
-        dump( ">>>   getPrefsService: error getting prefs service: " + ex + "\n" );
-    }
-
-    return ps;
-}
-
-
-/**
- * Gets a preference from the preference service
- */
-Omnibug.Tools.getPreference = function( key ) {
-    var ps = Omnibug.Tools.getPrefsService();
-
-    key = "extensions.omnibug." + key;
-    switch( ps.getPrefType( key ) ) {
-        case Components.interfaces.nsIPrefBranch.PREF_STRING:
-            return ps.getCharPref( key );
-        case Components.interfaces.nsIPrefBranch.PREF_INT:
-            return ps.getIntPref( key );
-        case Components.interfaces.nsIPrefBranch.PREF_BOOL:
-            return ps.getBoolPref( key );
-    }
-}
-
-/**
- * Sets a preference
- */
-Omnibug.Tools.setPreference = function( key, val ) {
-    var ps = Omnibug.Tools.getPrefsService();
-
-    key = "extensions.omnibug." + key;
-    switch( ps.getPrefType( key ) ) {
-        /*
-        case Components.interfaces.nsIPrefBranch.PREF_STRING:
-            ps.setCharPref( key, val);
-            break;
-        */
-        case Components.interfaces.nsIPrefBranch.PREF_INT:
-            ps.setIntPref( key, val );
-            break;
-        case Components.interfaces.nsIPrefBranch.PREF_BOOL:
-            ps.setBoolPref( key, val );
-            break;
-        default:
-            ps.setCharPref( key, val);
-            break;
-    }
-}
