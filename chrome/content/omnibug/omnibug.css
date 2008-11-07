@@ -7,9 +7,11 @@ table.req .hilite {
     background-color: #ff0;
 }
 
+/*
 table.req dt {
     font-weight: bold;
 }
+*/
 
 table.req p {
     margin: 0;
@@ -24,6 +26,7 @@ table.req div.hid {
 table.req {
     width: 100%;
 }
+
 
 table.req td {
     vertical-align: top;
@@ -44,3 +47,50 @@ table.req a img {
 p.om {
     margin: 0;
 }
+
+table.req span.qq {
+    color: #f00;
+}
+
+/* entry tables */
+table.ent,
+table.ent tbody,
+table.ent tr,
+table.ent th,
+table.ent td {
+    border-collapse: collapse;
+}
+
+table.ent {
+    margin-bottom: 15px;
+}
+table.ent th {
+    text-align: left;
+    padding-top: 12px;
+}
+table.ent td {
+    border: 1px solid #aaa;
+    border-width: 1px 0 0 0;
+}
+
+table.ent td.k,
+table.ent td.v {
+    padding-right: 10px;
+}
+
+
+/* debugging only */
+/*
+table.req,
+table.req > tbody,
+table.req > tr,
+table.req > th,
+table.req > td {
+    border: 1px solid #f66;
+    border-collapse: collapse;
+}
+
+table.req p {
+    background-color: #afa;
+}
+*/
