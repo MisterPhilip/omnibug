@@ -2,15 +2,15 @@
 
  1  Rename (to? WAbug?)
 
- 2  Vendor-specific rules, chooser, and pref entries
-      Omniture
-      Moniforce
-      WebTrends
+ 2  Vendor-specific rules, chooser, and pref entries (and new logic model)
+      Omniture (√)
+      Moniforce (√)
+      WebTrends (√)
       GoogleAnalytics
       Sophus3?
       Custom
 
- 3  add pattern preference input box
+ 3  add pattern preference input box (how does this work with #2?)
 
  4  fix clear button weirdness
 
@@ -23,3 +23,21 @@
  8  hosted by moz?
 
  9  update build process to use svn rev as build #, not version #
+
+ 9.5 private build process, for developing
+
+ 10  dump prefs?
+
+ 12  names for known keys (e.g. pev2 -> "Page Event 2")
+
+ 14  trim displayed full url and display in expanded version?
+
+ 15  switch from innerHTML/appendHTML to DOM
+
+------
+
+@DONE:
+
+ 11  instead of calling initPrefs(), add prefs observer service to call it (or something like it)
+
+ 13  table-ize data
