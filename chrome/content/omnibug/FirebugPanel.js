@@ -97,6 +97,7 @@ FBL.ns( function() { with( FBL ) {
         highlightKeys: {},
         alwaysExpand: false,
         prefsService: null,
+        showQuotes: false,
 
         /**
          * Called when the browser exits
@@ -211,6 +212,9 @@ FBL.ns( function() { with( FBL ) {
 
             // always expand preference
             this.alwaysExpand = this.getPreference( "alwaysExpand" );
+
+            // quotes around values pref
+            this.showQuotes = this.getPreference( "showQuotes" );
 
             // init logging
             this.initLogging();
@@ -413,6 +417,7 @@ FBL.ns( function() { with( FBL ) {
             dump( ">>>   initPatterns: highlightKeys=" + objDump( this.highlightKeys ) + "\n" );
         },
 
+
         /**
          * Preferences observer handler
          */
@@ -428,6 +433,10 @@ FBL.ns( function() { with( FBL ) {
             switch( key ) {
                 case "alwaysExpand":
                     this.alwaysExpand = newValue;
+                    break;
+
+                case "showQuotes":
+                    this.showQuotes = newValue;
                     break;
 
                 case "enableFileLogging":
@@ -461,6 +470,7 @@ FBL.ns( function() { with( FBL ) {
         props: [],
         vars: [],
         htmlOutput: false,
+        omRef: Firebug.Omnibug,
 
         /**
          * Initialize the panel. This is called when the Panel is activated and
@@ -555,11 +565,17 @@ FBL.ns( function() { with( FBL ) {
             OmnibugPanel.vars = [];
 
             var val,
-                u = new OmniUrl( req.name );
+                u = new OmniUrl( req.name ),
+                _omRef = this.omRef;
 
             u.getQueryNames().forEach( function( n ) {
                 if( n ) {
                     val = u.getFirstQueryValue( n ).replace( "<", "&lt;" );  // escape HTML in output HTML
+
+                    // add surrounding quotes
+                    if( _omRef.showQuotes ) {
+                        val = "<span class='qq'>\"</span>" + val + "<span class='qq'>\"</span>";
+                    }
 
                     if( n.match( /^c(\d+)$/ ) ) {
                         OmnibugPanel.props[RegExp.$1] = val;
@@ -575,9 +591,10 @@ FBL.ns( function() { with( FBL ) {
 
         report: function() {
             var i, el, cn, len, html, mf, expanderImage, expanderClass,
-                tmp = "";
+                tmp = "",
+                wt = "";
 
-            if( Firebug.Omnibug.alwaysExpand ) {
+            if( this.omRef.alwaysExpand ) {
                 expanderClass = "reg";
                 expanderImage = "chrome://omnibug/skin/win/twistyOpen.png";
             } else {
@@ -587,26 +604,30 @@ FBL.ns( function() { with( FBL ) {
 
             html  = "<table cellspacing='0' border='0' class='req'><tr>";
             html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='" + expanderImage + "' /></a></td>";
-            html += "<td><p>" + OmnibugPanel.cur.request.name + "</p><div class='" + expanderClass + "'>";
+            html += "<td>";
+            html += "<p>" + OmnibugPanel.cur.request.name + "</p><div class='" + expanderClass + "'>";
+            html += "<table class='ent'>";
 
             // omniture props
             if( OmnibugPanel.props.length ) {
-                html += "<dt>Props</dt>";
+                //html += "<dt>Props</dt>";
+                html += "<th colspan='2'>Props</th>";
                 for( i = 0, len = OmnibugPanel.props.length; i < len; ++i ) {
                     if( OmnibugPanel.props[i] ) {
                         cn = this.isHighlightable( "prop" + i ) ? "hilite" : "";
-                        html += "<dd class='" + cn + " " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>prop" + i + '= ' + OmnibugPanel.props[i] + "</dd>\n";
+                        html += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>prop" + i + "</td><td class='v'>" + OmnibugPanel.props[i] + "</td></tr>\n";
                     }
                 }
             }
 
             // omniture eVars
             if( OmnibugPanel.vars.length ) {
-                html += "<dt>eVars</dt>";
+                //html += "<dt>eVars</dt>";
+                html += "<th colspan='2'>eVars</th>";
                 for( i = 0, len = OmnibugPanel.vars.length; i < len; ++i ) {
                     if( OmnibugPanel.vars[i] ) {
                         cn = this.isHighlightable( "eVar" + i ) ? "hilite" : "";
-                        html += "<dd class='" + cn + " " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>eVar" + i + '= ' + OmnibugPanel.vars[i] + "</dd>\n";
+                        html += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>eVar" + i + "</td><td class='v'>" + OmnibugPanel.vars[i] + "</td></tr>\n";
                     }
                 }
             }
@@ -619,7 +640,7 @@ FBL.ns( function() { with( FBL ) {
             if( OmnibugPanel.other.length ) {
                 for( i = 0, len = OmnibugPanel.other.length; i < len; ++i ) {
                     if( OmnibugPanel.other[i] ) {
-                        if( Firebug.Omnibug.usefulKeys[OmnibugPanel.other[i][0]] ) {
+                        if( this.omRef.usefulKeys[OmnibugPanel.other[i][0]] ) {
                             otherNamed[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
                         } else {
                             otherOther[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
@@ -634,11 +655,11 @@ FBL.ns( function() { with( FBL ) {
             for( el in otherNamed ) {
                 if( otherNamed.hasOwnProperty( el ) ) {
                     cn = this.isHighlightable( el ) ? "hilite" : "";
-                    tmp += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + '= ' + otherNamed[el] + "</dd>\n";
+                    tmp += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + "</td><td class='v'>" + otherNamed[el] + "</td></tr>\n";
                 }
             }
             if( !! tmp ) {
-                html += "<dt>Useful</dt>";
+                html += "<th colspan='2'>Useful</th>";
                 html += tmp;
             }
 
@@ -648,27 +669,35 @@ FBL.ns( function() { with( FBL ) {
             for( el in otherOther ) {
                 if( otherOther.hasOwnProperty( el ) ) {
                     cn = this.isHighlightable( el ) ? "hilite" : "";
-                    if( el.match( /mfinfo/ ) ) {
-                        mf += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "= " + otherOther[el] + "</dd>\n";
+                    if( el.match( /^mfinfo/ ) ) {
+                        mf += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "</td><td class='v'>" + otherOther[el] + "</td></tr>\n";
+                    } else if( el.match( /^WT\./ ) ) {
+                        wt += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "</td><td class='v'>" + otherOther[el] + "</td></tr>\n";
                     } else {
-                        tmp += "<dd class='" + cn + " " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "= " + otherOther[el] + "</dd>\n";
+                        tmp += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "</td><td class='v'>" + otherOther[el] + "</td></tr>\n";
                     }
                 }
             }
 
             // moniforce
             if( !! mf ) {
-                html += "<dt>Moniforce</dt>";
+                html += "<th colspan='2'>Moniforce</th>";
                 html += mf;
+            }
+
+            // WebTrends
+            if( !! wt ) {
+                html += "<th colspan='2'>WebTrends</th>";
+                html += wt;
             }
 
             // everything else, really
             if( !! tmp ) {
-                html += "<dt>Other</dt>";
+                html += "<th colspan='2'>Other</th>";
                 html += tmp;
             }
 
-            html += "</div></td></tr></table>\n";
+            html += "</table></div></td></tr></table>\n";
 
             //dump( ">>>   output html:\n\n\n" + html + "\n\n\n" );
             FirebugContext.getPanel("Omnibug").appendHtml( html );
@@ -676,7 +705,7 @@ FBL.ns( function() { with( FBL ) {
 
         // returns true when the given name is in the highlightKeys list
         isHighlightable: function( elName ) {
-            return Firebug.Omnibug.highlightKeys[elName];
+            return this.omRef.highlightKeys[elName];
         },
 
 
@@ -686,16 +715,17 @@ FBL.ns( function() { with( FBL ) {
         getOptionsMenuItems: function() {
             return [
                 this.optionMenu( "Enable File Logging", "enableFileLogging" ),
-                this.optionMenu( "Always expand entries", "alwaysExpand" )
+                this.optionMenu( "Always expand entries", "alwaysExpand" ),
+                this.optionMenu( "Surround values with quotes", "showQuotes" )
             ];
         },
 
         // Return an option menu item
         optionMenu: function( label, option ) {
-            var value = Firebug.Omnibug.getPreference( option );
-            var updatePref = function( key, val ) {
-                Firebug.Omnibug.setPreference( key, val );
-                //Firebug.Omnibug.initPrefs();
+            var value = this.omRef.getPreference( option ),
+                _omRef = this.omRef,
+                updatePref = function( key, val ) {
+                _omRef.setPreference( key, val );
             };
             // bindFixed is from Firebug. It helps to pass the args along.
             return { label: label, nol10n: true, type: "checkbox", checked: value, command: bindFixed( updatePref, Firebug, option, !value ) }
@@ -712,9 +742,6 @@ FBL.ns( function() { with( FBL ) {
     }
 
     OmNetProgress.prototype = {
-        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        // nsISupports
-
         QueryInterface: function( iid ) {
             if(    iid.equals( nsIWebProgressListener )
                 || iid.equals( nsISupportsWeakReference )
@@ -725,18 +752,14 @@ FBL.ns( function() { with( FBL ) {
             throw Components.results.NS_NOINTERFACE;
         },
 
-
-
-        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
         // nsIWebProgressListener
-
         onStateChange: function( progress, request, flag, status ) {
             //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
             var key, file,
-                om = Firebug.Omnibug;
+                omRef = Firebug.Omnibug;
 
             //dump( ">>>   onStateChange: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
-            if( request.name.match( om.defaultRegex ) || ( om.userRegex && request.name.match( om.userRegex ) ) ) {
+            if( request.name.match( omRef.defaultRegex ) || ( omRef.userRegex && request.name.match( omRef.userRegex ) ) ) {
                 //dump( ">>>   onStateChange pattern match: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
                 if( ! this.seenReqs[request.name] ) {
                     this.seenReqs[request.name] = true;
@@ -748,13 +771,13 @@ FBL.ns( function() { with( FBL ) {
                     FirebugContext.getPanel( "Omnibug" ).decodeUrl( request, key );
 
                     // add to requests object only if the context has been loaded (e.g. dump requests added from the previous page)
-                    if( Firebug.Omnibug.contextLoaded ) {
-                        dump( ">>>   onStateChange: adding request to request list: " + objDump( Firebug.Omnibug.requests ) + "\n" );
-                        Firebug.Omnibug.requests[key] = request;
+                    if( omRef.contextLoaded ) {
+                        dump( ">>>   onStateChange: adding request to request list: " + objDump( omRef.requests ) + "\n" );
+                        omRef.requests[key] = request;
                     }
 
                     // write to file, if defined
-                    file = Firebug.Omnibug.outFile;
+                    file = omRef.outFile;
                     if( file !== null ) {
                         FileIO.write( file, new Date() + "\t" + key + "\t" + request.name + "\n", "a" );
                     }
