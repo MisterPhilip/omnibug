@@ -4,3 +4,4 @@ pref( "extensions.omnibug.enableFileLogging", false );
 pref( "extensions.omnibug.usefulKeys", "pageName,ch,h1,purchaseID,events,products,pev2" );
 pref( "extensions.omnibug.highlightKeys", "events,products" );
 pref( "extensions.omnibug.alwaysExpand", false );
+pref( "extensions.omnibug.showQuotes", true );
