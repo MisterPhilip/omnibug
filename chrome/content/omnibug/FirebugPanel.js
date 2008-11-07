@@ -99,7 +99,7 @@ FBL.ns( function() { with( FBL ) {
         prefsService: null,
 
         /**
-         * Supposedly called when the browser exits; doesn't seem to ever be called
+         * Called when the browser exits
          */
         shutdown: function() {
             dump( ">>>   shutdown\n" );
@@ -189,10 +189,13 @@ FBL.ns( function() { with( FBL ) {
             this.initPrefsService();
 
             // set default pref
+            // @TODO: these patterns have to stay in sync with the version in defaults/omnibug.js... how?  still needed?
+            var coreDefaultPattern = "/b/ss/|2o7|moniforce\.gif|dcs\.gif";
+
             var defaultPattern = this.getPreference( "defaultPattern" );
-            if( defaultPattern !== "/b/ss/|2o7|moniforce\.gif" ) {
+            if( defaultPattern !== coreDefaultPattern ) {
                 dump( ">>>   initialize: resetting defaultPattern preference\n" );
-                this.setPreference( "defaultPattern", "/b/ss/|2o7|moniforce\.gif" );
+                this.setPreference( "defaultPattern", coreDefaultPattern );
             }
 
             // initialize prefs
@@ -370,7 +373,6 @@ FBL.ns( function() { with( FBL ) {
                 }
             }
         },
-
 
         /**
          * Init and compile regex patterns for matching requests
