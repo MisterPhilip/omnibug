@@ -190,14 +190,7 @@ FBL.ns( function() { with( FBL ) {
             this.initPrefsService();
 
             // set default pref
-            // @TODO: these patterns have to stay in sync with the version in defaults/omnibug.js... how?  still needed?
-            var coreDefaultPattern = "/b/ss/|2o7|moniforce\.gif|dcs\.gif";
-
-            var defaultPattern = this.getPreference( "defaultPattern" );
-            if( defaultPattern !== coreDefaultPattern ) {
-                dump( ">>>   initialize: resetting defaultPattern preference\n" );
-                this.setPreference( "defaultPattern", coreDefaultPattern );
-            }
+            this.prefsService.clearUserPref( "defaultPattern" );
 
             // initialize prefs
             this.initPrefs();
@@ -444,7 +437,7 @@ FBL.ns( function() { with( FBL ) {
                     this.initLogging();
                     break;
 
-                case "defaultPattern":
+                //case "defaultPattern":
                 case "userPattern":
                 case "usefulKeys":
                 case "highlightKeys":
@@ -759,6 +752,8 @@ FBL.ns( function() { with( FBL ) {
                 omRef = Firebug.Omnibug;
 
             //dump( ">>>   onStateChange: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
+
+            // @TODO: is this the right order (default then user)?  Should we always be matching both?
             if( request.name.match( omRef.defaultRegex ) || ( omRef.userRegex && request.name.match( omRef.userRegex ) ) ) {
                 //dump( ">>>   onStateChange pattern match: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
                 if( ! this.seenReqs[request.name] ) {
