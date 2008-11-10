@@ -50,10 +50,16 @@ HASH=`shasum ${XPI} | awk '{ print $1 }'`
 
 cat update.rdf.tpl | sed "s/TOK_VER/${VER}/g" | sed "s/TOK_HASH/${HASH}/g" > update.rdf
 
-
+#
+# Sign update.rdf
+#
 echo -n "Please sign `pwd`/update.rdf with McCoy now; press enter when done."
 read foo
 
+
+#
+# Deploy (or not) to galactica
+#
 if [[ "x$1" == "x" || "$1" == "ross" ]]; then
     echo "Sending update.rdf and xpi to galactica"
     scp update.rdf $XPI rosssimpson@galactica.7mph.com:httpdocs/dev/${extrapath}
@@ -61,7 +67,9 @@ if [[ "x$1" == "x" || "$1" == "ross" ]]; then
 
     echo "Updating symlink"
     ssh rosssimpson@galactica.7mph.com "ln -sf $XPI httpdocs/dev/${extrapath}omnibug-current.xpi"
-fi
 
-echo "Done. URL is https://rosssimpson.com/dev/${extrapath}omnibug-current.xpi"
+    echo "Done.  URL is https://rosssimpson.com/dev/${extrapath}omnibug-current.xpi"
+else
+    echo "Done.  Did not deploy to galactica."
+fi
 
