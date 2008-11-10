@@ -560,16 +560,14 @@ FBL.ns( function() { with( FBL ) {
 
             var val,
                 u = new OmniUrl( data[0] ),
-                _omRef = this.omRef;
+                _quote = this.quote;
 
             u.getQueryNames().forEach( function( n ) {
                 if( n ) {
                     val = u.getFirstQueryValue( n ).replace( "<", "&lt;" );  // escape HTML in output HTML
 
-                    // add surrounding quotes
-                    if( _omRef.showQuotes ) {
-                        val = "<span class='qq'>\"</span>" + val + "<span class='qq'>\"</span>";
-                    }
+                    // add surrounding quotes, if necessary
+                    val = _quote( val );
 
                     if( n.match( /^c(\d+)$/ ) ) {
                         OmnibugPanel.props[RegExp.$1] = val;
@@ -580,11 +578,21 @@ FBL.ns( function() { with( FBL ) {
                     }
                 }
             } );
+
             this.report();
         },
 
+        /**
+         * Return a quoted string (if the pref is set)
+         */
+        quote: function( str ) {
+            return( Firebug.Omnibug.showQuotes
+                        ? "<span class='qq'>\"</span>" + str + "<span class='qq'>\"</span>"
+                        : str );
+        },
+
         report: function() {
-            var i, el, cn, len, html, mf, expanderImage, expanderClass, pUrl,
+            var i, el, cn, len, html, mf, expanderImage, expanderClass,
                 tmp = "",
                 wt = "";
 
@@ -604,8 +612,8 @@ FBL.ns( function() { with( FBL ) {
 
             // parent url
             html += "<th colspan='2'>Omnibug</th>";
-            pUrl = "<span class='qq'>\"</span>" + OmnibugPanel.cur.parentUrl + "<span class='qq'>\"</span>";
-            html += "<tr><td>Parent URL</td><td>" + pUrl + "</td></tr>\n";
+            html += "<tr><td>Key</td><td>" + this.quote( OmnibugPanel.cur.key ) + "</td></tr>\n";
+            html += "<tr><td>Parent URL</td><td>" + this.quote( OmnibugPanel.cur.parentUrl ) + "</td></tr>\n";
 
             // omniture props
             if( OmnibugPanel.props.length ) {
