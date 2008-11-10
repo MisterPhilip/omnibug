@@ -190,7 +190,9 @@ FBL.ns( function() { with( FBL ) {
             this.initPrefsService();
 
             // set default pref
-            this.prefsService.clearUserPref( "defaultPattern" );
+            if( this.prefsService.prefHasUserValue( "defaultPattern" ) ) {
+                this.prefsService.clearUserPref( "defaultPattern" );
+            }
 
             // initialize prefs
             this.initPrefs();
@@ -198,7 +200,7 @@ FBL.ns( function() { with( FBL ) {
 
         /**
          * Initialize prefs
-         *   this is called by initialize(), as well as other times when prefs may be changed and need to be re-read
+         *   this is called by initialize(), as well by the prefs observer service
          */
         initPrefs: function() {
             dump( ">>>   initPrefs: (re)initializing preferences\n" );
@@ -215,6 +217,43 @@ FBL.ns( function() { with( FBL ) {
             // init request-matching patterns
             this.initPatterns();
         },
+
+
+        /**
+         * Preferences observer handler
+         */
+        observe: function( subject, topic, key ) {
+            dump( ">>>   observe: subject='" + subject + "'; topic='" + topic + "'; key='" + key + "'; value='" + this.getPreference( key ) + "'\n" );
+
+            if( topic !== "nsPref:changed" ) {
+                return;
+            }
+
+            var newValue = this.getPreference( key );
+
+            switch( key ) {
+                case "alwaysExpand":
+                    this.alwaysExpand = newValue;
+                    break;
+
+                case "showQuotes":
+                    this.showQuotes = newValue;
+                    break;
+
+                case "enableFileLogging":
+                case "logFileName":
+                    this.initLogging();
+                    break;
+
+                //case "defaultPattern":
+                case "userPattern":
+                case "usefulKeys":
+                case "highlightKeys":
+                    this.initPatterns();
+                    break;
+            }
+        },
+
 
         /**
          * Init logging behavior
@@ -337,7 +376,7 @@ FBL.ns( function() { with( FBL ) {
          */
         watchWindow: function( context, win ) {
             dump( ">>>   watchWindow: win=" + win + "; context=" + context + "\n" );
-            this.win = win;
+            this.win = win; // @TODO: not sure 'this' is the right place for the window reference
         },
 
         /**
@@ -349,7 +388,7 @@ FBL.ns( function() { with( FBL ) {
                 dump( ">>>   req=" + this.requests[key] + "\n" );
                 if( this.requests.hasOwnProperty( key ) ) {
                     dump( ">>>   processRequests: processing " + key + "\n" );
-                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( this.requests[key], key );
+                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( key, this.requests[key] );
                     delete this.requests[key];
                 }
             }
@@ -365,8 +404,6 @@ FBL.ns( function() { with( FBL ) {
                 if( Omnibug.Tools.chooseLogFile( this.win ) ) {
                     // successfully picked a log file
                     dump( ">>>   omnibugTools: logFileName=" + this.getPreference( "logFileName" ) + "\n" );
-
-                    //this.initPrefs();
                 }
             }
         },
@@ -408,42 +445,6 @@ FBL.ns( function() { with( FBL ) {
                 }
             }
             dump( ">>>   initPatterns: highlightKeys=" + objDump( this.highlightKeys ) + "\n" );
-        },
-
-
-        /**
-         * Preferences observer handler
-         */
-        observe: function( subject, topic, key ) {
-            dump( ">>>   observe: subject='" + subject + "'; topic='" + topic + "'; key='" + key + "'; value='" + this.getPreference( key ) + "'\n" );
-
-            if( topic !== "nsPref:changed" ) {
-                return;
-            }
-
-            var newValue = this.getPreference( key );
-
-            switch( key ) {
-                case "alwaysExpand":
-                    this.alwaysExpand = newValue;
-                    break;
-
-                case "showQuotes":
-                    this.showQuotes = newValue;
-                    break;
-
-                case "enableFileLogging":
-                case "logFileName":
-                    this.initLogging();
-                    break;
-
-                //case "defaultPattern":
-                case "userPattern":
-                case "usefulKeys":
-                case "highlightKeys":
-                    this.initPatterns();
-                    break;
-            }
         }
 
     } );
@@ -550,15 +551,15 @@ FBL.ns( function() { with( FBL ) {
             this.panelNode.appendChild( el );
         },
 
-        decodeUrl: function( req, key ) {
-            dump( ">>> decodeUrl: processing key=" + key + "\n" );
-            OmnibugPanel.cur = { request: req, key: key };
+        decodeUrl: function( key, data ) {
+            dump( ">>>   decodeUrl: processing key=" + key + "\n" );
+            OmnibugPanel.cur = { key: key, url: data[0], parentUrl: data[1] };
             OmnibugPanel.props = [];
             OmnibugPanel.other = [];
             OmnibugPanel.vars = [];
 
             var val,
-                u = new OmniUrl( req.name ),
+                u = new OmniUrl( data[0] ),
                 _omRef = this.omRef;
 
             u.getQueryNames().forEach( function( n ) {
@@ -583,7 +584,7 @@ FBL.ns( function() { with( FBL ) {
         },
 
         report: function() {
-            var i, el, cn, len, html, mf, expanderImage, expanderClass,
+            var i, el, cn, len, html, mf, expanderImage, expanderClass, pUrl,
                 tmp = "",
                 wt = "";
 
@@ -598,8 +599,13 @@ FBL.ns( function() { with( FBL ) {
             html  = "<table cellspacing='0' border='0' class='req'><tr>";
             html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='" + expanderImage + "' /></a></td>";
             html += "<td>";
-            html += "<p>" + OmnibugPanel.cur.request.name + "</p><div class='" + expanderClass + "'>";
+            html += "<p>" + OmnibugPanel.cur.url + "</p><div class='" + expanderClass + "'>";
             html += "<table class='ent'>";
+
+            // parent url
+            html += "<th colspan='2'>Omnibug</th>";
+            pUrl = "<span class='qq'>\"</span>" + OmnibugPanel.cur.parentUrl + "<span class='qq'>\"</span>";
+            html += "<tr><td>Parent URL</td><td>" + pUrl + "</td></tr>\n";
 
             // omniture props
             if( OmnibugPanel.props.length ) {
@@ -751,7 +757,11 @@ FBL.ns( function() { with( FBL ) {
             var key, file,
                 omRef = Firebug.Omnibug;
 
-            //dump( ">>>   onStateChange: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
+            // capture the originating URL (e.g. of the parent page)
+            if( flag & nsIWebProgressListener.STATE_IS_NETWORK ) {
+                this.that.parentUrl = request.name; // @TODO: still not sure that this is right
+            }
+
 
             // @TODO: is this the right order (default then user)?  Should we always be matching both?
             if( request.name.match( omRef.defaultRegex ) || ( omRef.userRegex && request.name.match( omRef.userRegex ) ) ) {
@@ -760,26 +770,28 @@ FBL.ns( function() { with( FBL ) {
                     this.seenReqs[request.name] = true;
 
                     key = Md5Impl.md5( request.name );
-                    dump( ">>>   onStateChange:\n>>>\tname=" + request.name.substring( 0, 100 ) + "\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n\n" );
+                    dump( ">>>   onStateChange:\n>>>\tname=" + request.name.substring( 0, 100 ) + "...\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n>>>\tparentUrl=" + this.that.parentUrl + "\n\n" );
 
                     // write the request to the panel.  must happen here so beacons will be called
-                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( request, key );
+                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( key, [ request.name, this.that.parentUrl ] );
 
                     // add to requests object only if the context has been loaded (e.g. dump requests added from the previous page)
                     if( omRef.contextLoaded ) {
                         dump( ">>>   onStateChange: adding request to request list: " + objDump( omRef.requests ) + "\n" );
-                        omRef.requests[key] = request;
+                        omRef.requests[key] = [ request.name, this.that.parentUrl ];
                     }
 
                     // write to file, if defined
                     file = omRef.outFile;
                     if( file !== null ) {
-                        FileIO.write( file, new Date() + "\t" + key + "\t" + request.name + "\n", "a" );
+                        FileIO.write( file, new Date() + "\t" + key + "\t" + request.name + "\t" + this.that.parentUrl + "\n", "a" );
                     }
                 }
             }
         },
 
+        that: this,
+        parentUrl: null,
         seenReqs: {},
         stateIsRequest: false,
         onLocationChange: function() {},
