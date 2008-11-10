@@ -28,11 +28,15 @@
 
  10  dump prefs?
 
- 12  names for known keys (e.g. pev2 -> "Page Event 2")
+ 12  names for known keys (e.g. pev2 -> "Page Event 2") (per-vendor)
 
  14  trim displayed full url and display in expanded version?
 
- 15  switch from innerHTML/appendHTML to DOM
+ 15  switch from innerHTML/appendHTML to DOM (via domplate?)
+
+ 16  submit to WA blogs/sites/etc?
+
+ 17  fix prob relayed by sophus (timing and requests staying in queue)
 
 ------
 
