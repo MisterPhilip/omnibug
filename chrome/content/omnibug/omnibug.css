@@ -73,9 +73,19 @@ table.ent td {
     border-width: 1px 0 0 0;
 }
 
+table.ent td.k {
+    white-space: nowrap;
+}
 table.ent td.k,
 table.ent td.v {
     padding-right: 10px;
+}
+
+table.load {
+    background-color: #b3ffc6;
+}
+table.click {
+    background-color: #ff99cc;
 }
 
 
