@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+ 
+<prefwindow id="omnibug-prefs"
+            title="Omnibug Options"
+            buttons="accept,cancel"
+            xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <prefpane id="omnibug-gen-pane" label="General Settings">
+        <preferences>
+            <preference id="pref-log" name="extensions.omnibug.enableFileLogging" type="bool"/>
+            <preference id="pref-exp" name="extensions.omnibug.alwaysExpand" type="bool"/>
+            <preference id="pref-quo" name="extensions.omnibug.showQuotes" type="bool"/>
+        </preferences>
+
+        <hbox align="center">
+            <checkbox label="Enable file logging" preference="pref-log" />
+        </hbox>
+        <hbox align="center">
+            <checkbox label="Always expand entries" preference="pref-exp" />
+        </hbox>
+        <hbox align="center">
+            <checkbox label="Surround values with quotes" preference="pref-quo" />
+        </hbox>
+    </prefpane>
+</prefwindow>
+
