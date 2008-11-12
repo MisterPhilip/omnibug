@@ -388,7 +388,7 @@ FBL.ns( function() { with( FBL ) {
                 dump( ">>>   req=" + this.requests[key] + "\n" );
                 if( this.requests.hasOwnProperty( key ) ) {
                     dump( ">>>   processRequests: processing " + key + "\n" );
-                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( key, this.requests[key] );
+                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( this.requests[key] );
                     delete this.requests[key];
                 }
             }
@@ -551,15 +551,16 @@ FBL.ns( function() { with( FBL ) {
             this.panelNode.appendChild( el );
         },
 
-        decodeUrl: function( key, data ) {
-            dump( ">>>   decodeUrl: processing key=" + key + "\n" );
-            OmnibugPanel.cur = { key: key, url: data[0], parentUrl: data[1] };
+        decodeUrl: function( data ) {
+            dump( ">>>   decodeUrl: processing key=" + data.key + "\n" );
+
+            OmnibugPanel.cur = data;
             OmnibugPanel.props = [];
             OmnibugPanel.other = [];
             OmnibugPanel.vars = [];
 
             var val,
-                u = new OmniUrl( data[0] ),
+                u = new OmniUrl( data.url ),
                 _quote = this.quote;
 
             u.getQueryNames().forEach( function( n ) {
@@ -591,8 +592,16 @@ FBL.ns( function() { with( FBL ) {
                         : str );
         },
 
+        /**
+         * Return a word that's camelCapped
+         */
+        camelCapser: function( str ) {
+            return str.replace( /\b(.)/, function( m, $1 ) { return $1.toUpperCase() } );
+        },
+
         report: function() {
             var i, el, cn, len, html, mf, expanderImage, expanderClass,
+                eventType = ( OmnibugPanel.cur.doneLoading ? "click" : "load" ),
                 tmp = "",
                 wt = "";
 
@@ -604,16 +613,18 @@ FBL.ns( function() { with( FBL ) {
                 expanderImage = "chrome://omnibug/skin/win/twistyClosed.png";
             }
 
-            html  = "<table cellspacing='0' border='0' class='req'><tr>";
+            html  = "<table cellspacing='0' border='0' class='req " + eventType + "'><tr>";
             html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='" + expanderImage + "' /></a></td>";
             html += "<td>";
-            html += "<p>" + OmnibugPanel.cur.url + "</p><div class='" + expanderClass + "'>";
+            html += "<p><strong>" + this.camelCapser( eventType ) + " event:</strong> " + OmnibugPanel.cur.url.substring( 0, 75 ) + "...</p><div class='" + expanderClass + "'>";
             html += "<table class='ent'>";
 
-            // parent url
+            // Omnibug values
             html += "<th colspan='2'>Omnibug</th>";
             html += "<tr><td>Key</td><td>" + this.quote( OmnibugPanel.cur.key ) + "</td></tr>\n";
+            html += "<tr><td>Event</td><td>" + this.quote( eventType ) + "</td></tr>\n";
             html += "<tr><td>Parent URL</td><td>" + this.quote( OmnibugPanel.cur.parentUrl ) + "</td></tr>\n";
+            html += "<tr><td>Full URL</td><td>" + this.quote( OmnibugPanel.cur.url ) + "</td></tr>\n";
 
             // omniture props
             if( OmnibugPanel.props.length ) {
@@ -749,6 +760,17 @@ FBL.ns( function() { with( FBL ) {
     }
 
     OmNetProgress.prototype = {
+        that: this,
+        seenReqs: {},
+        parentUrl: null,
+        doneLoading: false,
+        stateIsRequest: false,
+        onLocationChange: function() {},
+        onProgressChange: function() {},
+        onStatusChange : function() {},
+        onSecurityChange : function() {},
+        onLinkIconAvailable : function() {},
+
         QueryInterface: function( iid ) {
             if(    iid.equals( nsIWebProgressListener )
                 || iid.equals( nsISupportsWeakReference )
@@ -762,14 +784,24 @@ FBL.ns( function() { with( FBL ) {
         // nsIWebProgressListener
         onStateChange: function( progress, request, flag, status ) {
             //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
-            var key, file,
+            var key, file, obj,
                 omRef = Firebug.Omnibug;
 
+//dump( ">>>   oSC: " + request.name + " -> " + getStateDescription( flag ) + "\n" );
+
             // capture the originating URL (e.g. of the parent page)
-            if( flag & nsIWebProgressListener.STATE_IS_NETWORK ) {
+            if( ( flag & nsIWebProgressListener.STATE_IS_NETWORK ) &&
+                ( flag & nsIWebProgressListener.STATE_START ) ) {
                 this.that.parentUrl = request.name; // @TODO: still not sure that this is right
+                this.that.doneLoading = false;
             }
 
+            // notice when parent document load is complete // @TODO: what happens if user clicks a beacon link before this point??
+            if( ( flag & nsIWebProgressListener.STATE_IS_NETWORK ) &&
+                ( flag & nsIWebProgressListener.STATE_STOP ) &&
+                this.that.parentUrl === request.name ) {
+                this.that.doneLoading = true;
+            }
 
             // @TODO: is this the right order (default then user)?  Should we always be matching both?
             if( request.name.match( omRef.defaultRegex ) || ( omRef.userRegex && request.name.match( omRef.userRegex ) ) ) {
@@ -780,13 +812,21 @@ FBL.ns( function() { with( FBL ) {
                     key = Md5Impl.md5( request.name );
                     dump( ">>>   onStateChange:\n>>>\tname=" + request.name.substring( 0, 100 ) + "...\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n>>>\tparentUrl=" + this.that.parentUrl + "\n\n" );
 
-                    // write the request to the panel.  must happen here so beacons will be called
-                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( key, [ request.name, this.that.parentUrl ] );
+                    obj = {
+                        key: key,
+                        url: request.name,
+                        parentUrl: this.that.parentUrl,
+                        doneLoading: this.that.doneLoading
+                    };
+
+
+                    // write the request to the panel.  must happen here so beacons will be called (e.g., in realtime)
+                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( obj );
 
                     // add to requests object only if the context has been loaded (e.g. dump requests added from the previous page)
                     if( omRef.contextLoaded ) {
                         dump( ">>>   onStateChange: adding request to request list: " + objDump( omRef.requests ) + "\n" );
-                        omRef.requests[key] = [ request.name, this.that.parentUrl ];
+                        omRef.requests[key] = obj;
                     }
 
                     // write to file, if defined
@@ -796,17 +836,7 @@ FBL.ns( function() { with( FBL ) {
                     }
                 }
             }
-        },
-
-        that: this,
-        parentUrl: null,
-        seenReqs: {},
-        stateIsRequest: false,
-        onLocationChange: function() {},
-        onProgressChange: function() {},
-        onStatusChange : function() {},
-        onSecurityChange : function() {},
-        onLinkIconAvailable : function() {}
+        }
     };
 
 
