@@ -314,10 +314,32 @@ FBL.ns( function() { with( FBL ) {
         },
 
         /**
-         * Called when page is completely finished loading
+         * Called when ANY page is completely finished loading
          */
         loadedContext: function( context ) {
             dump( ">>>   loadedContext: context=" + context + "\n" );
+/*
+            try {
+                for( el in context ) {
+                    var val = context[el];
+                    if( ! context[el].toString().match( /^function/ ) ) {
+                        dump( "'" + el +"'='" + val + "'\n" );
+                    }
+                }
+            } catch( ex ) {}
+
+            dump( "---   window.loc='" + context.window.location + "'\n" );
+*/
+
+            /*
+             * this seems like a total hack, but it fixed the immediate problem (maybe due to timing?)
+             * loadedContext is called when any page is done loading, including pages in other tabs (weird).
+             * a page that was loading in another tab had a location of about:blank, which was causing processRequests() to fire and dump the request from the original tab (thereby duplicating the entry)
+             * this logic is probably not quite right (we shouldn't be paying attention to other tab's load events)
+             */
+            if( ! context.window.location.match( /^http/ ) ) {
+                return;
+            }
 
             // Makes detach work.
             if ( ! context.omnibugContext && this.latestOmnibugContext ) {
@@ -380,19 +402,23 @@ FBL.ns( function() { with( FBL ) {
         },
 
         /**
-         * Called to process the requests object and write to panel
+         * Called by loadedContext to process the requests object and write to panel
          */
         processRequests: function() {
-            dump( ">>>   processRequests: processing requests: " + objDump( this.requests ) + "\n" );
+            dump( ">>>   processRequests: processing " + Object.size( this.requests ) + " requests\n" );
             for( var key in this.requests ) {
-                dump( ">>>   req=" + this.requests[key] + "\n" );
+                //dump( "---   key=" + key + "\n" );
                 if( this.requests.hasOwnProperty( key ) ) {
-                    dump( ">>>   processRequests: processing " + key + "\n" );
-                    this.requests[key]["prev"] = true;
+                    dump( "---   processRequests: processing " + key + "\n" );
+                    this.requests[key]["src"] = "prev";
+                    dump( "---   processRequests: calling decodeUrl\n" );
                     FirebugContext.getPanel( "Omnibug" ).decodeUrl( this.requests[key] );
                     delete this.requests[key];
+                } else {
+                    dump( ">>>   processRequests: not my key!\n" );
                 }
             }
+            dump( "<<<   processRequests: done\n" );
         },
 
         /**
@@ -508,10 +534,11 @@ FBL.ns( function() { with( FBL ) {
         },
 
         printLine: function( msg ) {
-          var el = this.document.createElement( "p" );
-          el.className = "om";
-          el.innerHTML = msg;
-          this.panelNode.appendChild( el );
+            dump( ">>>   printLine: printing msg='" + msg + "'\n" );
+            var el = this.document.createElement( "p" );
+            el.className = "om";
+            el.innerHTML = msg;
+            this.panelNode.appendChild( el );
         },
 
         clear: function() {
@@ -553,7 +580,8 @@ FBL.ns( function() { with( FBL ) {
         },
 
         decodeUrl: function( data ) {
-            dump( ">>>   decodeUrl: processing key=" + data.key + "\n" );
+            dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + getFuncName( FirebugContext.getPanel( "Omnibug" ).decodeUrl.caller ) + ")\n" );
+            //dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + getFuncName( arguments.callee.caller ) + ")\n" );
 
             OmnibugPanel.cur = data;
             OmnibugPanel.props = [];
@@ -603,9 +631,9 @@ FBL.ns( function() { with( FBL ) {
         report: function() {
             var i, el, cn, len, html, mf, expanderImage, expanderClass,
                 eventType = ( OmnibugPanel.cur.doneLoading ? "click" : "load" ),
+                urlLength = OmnibugPanel.cur.url.length,
                 tmp = "",
-                wt = "",
-                urlLength = OmnibugPanel.cur.url.length;
+                wt = "";
 
             // workaround -- kill it when vendor-specific code in place
             var url = OmnibugPanel.cur.url,
@@ -628,11 +656,11 @@ FBL.ns( function() { with( FBL ) {
                 expanderImage = "chrome://omnibug/skin/win/twistyClosed.png";
             }
 
-            html  = "<table cellspacing='0' border='0' class='req " + eventType + ( OmnibugPanel.cur.prev ? " prev" : "" ) + "'><tr>";
+            html  = "<table cellspacing='0' border='0' class='req " + eventType + " " + OmnibugPanel.cur.src + "'><tr>";
             html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='" + expanderImage + "' /></a></td>";
             html += "<td>";
             //html += "<p><strong>" + this.camelCapser( eventType ) + " event:</strong> " + OmnibugPanel.cur.key + " &rarr; " + OmnibugPanel.cur.url.substring( 0, 75 ) + "...</p><div class='" + expanderClass + "'>";
-            html += "<p><strong>" + this.camelCapser( eventType ) + " event</strong> | "
+            html += "<p><strong>" + this.camelCapser( eventType ) + " event</strong>" + ( OmnibugPanel.cur.src === "prev" ? " (previous page)" : "" ) + " | "
                                   + provider + " | "
                                   + OmnibugPanel.cur.timeStamp + " | "
                                   + OmnibugPanel.cur.key + " | "
@@ -644,15 +672,12 @@ FBL.ns( function() { with( FBL ) {
             html += "<th colspan='2'>Summary</th>";
             html += "<tr><td>Key</td><td>" + this.quote( OmnibugPanel.cur.key ) + "</td></tr>\n";
             html += "<tr><td>Event</td><td>" + this.quote( eventType ) + "</td></tr>\n";
-            html += "<tr><td>Parent URL</td><td>" + this.quote( OmnibugPanel.cur.parentUrl ) + "</td></tr>\n";
-
-            html += "<tr><td>Full URL</td><td>" + this.quote( OmnibugPanel.cur.url ) + "<br/>(" + urlLength + " characters";
-            html += ( urlLength > 2083 ? ", <span class='imp'>*** too long for IE6/7! ***</span>" : "" ) + ")</td></tr>\n";
-
             html += "<tr><td>Timestamp</td><td>" + this.quote( OmnibugPanel.cur.timeStamp ) + "</td></tr>\n";
             html += "<tr><td>Provider</td><td>" + this.quote( provider ) + "</td></tr>\n";
-
-            html += "<tr><td>Source</td><td>" + this.quote( OmnibugPanel.cur.prev ? "Previous page" : "Current page" ) + "</td></tr>\n"; // not exactly working
+            html += "<tr><td>Source</td><td>" + this.quote( OmnibugPanel.cur.src === "prev" ? "Previous page" : "Current page" ) + "</td></tr>\n"; // might not be exactly working
+            html += "<tr><td>Parent URL</td><td>" + this.quote( OmnibugPanel.cur.parentUrl ) + "</td></tr>\n";
+            html += "<tr><td>Full URL</td><td>" + this.quote( OmnibugPanel.cur.url ) + "<br/>(" + urlLength + " characters";
+            html += ( urlLength > 2083 ? ", <span class='imp'>*** too long for IE6/7! ***</span>" : "" ) + ")</td></tr>\n";
 
             // omniture props
             if( OmnibugPanel.props.length ) {
@@ -852,6 +877,7 @@ FBL.ns( function() { with( FBL ) {
 
 
                     // write the request to the panel.  must happen here so beacons will be called (e.g., in realtime)
+                    dump( "---   onStateChange: calling decodeUrl\n" );
                     FirebugContext.getPanel( "Omnibug" ).decodeUrl( obj );
 
                     // add to requests object only if the context has been loaded (e.g. dump requests added from the previous page)
@@ -995,7 +1021,6 @@ FBL.ns( function() { with( FBL ) {
     } )();
 
 
-
     function objDump( obj ) {
         var str = "Object{ ";
         for( var key in obj ) {
@@ -1005,6 +1030,39 @@ FBL.ns( function() { with( FBL ) {
         }
         return str + "}";
     }
+
+    function recObjDump( obj ) {
+        try {
+            var str = "Object{ ";
+            for( var key in obj ) {
+                str += "\tkey" + "=" + obj[key] + "\n";
+                //if( obj[key].match( /\[Object\]/ ) ) {
+                    //str += recObjDump( obj[key] );
+                //}
+            }
+            return str + "}";
+        } catch( ex ) {
+            dump( "*** recObjDump: exception: " + ex + "\n" );
+        }
+    }
+
+
+    function getFuncName( func ) {
+        func = func.toString();
+        var s = func.indexOf( " " ) + 1,
+            e = func.indexOf( "(" ),
+            name = func.substr( s, ( e - s ) );
+        return( name ? name : "<anonymous>" );
+    }
+
+    Object.size = function(obj) {
+        var size = 0, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+    }
+
 
 
     Firebug.registerModule( Firebug.Omnibug );
