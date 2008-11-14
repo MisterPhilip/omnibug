@@ -388,6 +388,7 @@ FBL.ns( function() { with( FBL ) {
                 dump( ">>>   req=" + this.requests[key] + "\n" );
                 if( this.requests.hasOwnProperty( key ) ) {
                     dump( ">>>   processRequests: processing " + key + "\n" );
+                    this.requests[key]["prev"] = true;
                     FirebugContext.getPanel( "Omnibug" ).decodeUrl( this.requests[key] );
                     delete this.requests[key];
                 }
@@ -603,7 +604,21 @@ FBL.ns( function() { with( FBL ) {
             var i, el, cn, len, html, mf, expanderImage, expanderClass,
                 eventType = ( OmnibugPanel.cur.doneLoading ? "click" : "load" ),
                 tmp = "",
-                wt = "";
+                wt = "",
+                urlLength = OmnibugPanel.cur.url.length;
+
+            // workaround -- kill it when vendor-specific code in place
+            var url = OmnibugPanel.cur.url,
+                      provider = ( url.match( /(?:\/b\/ss|2o7)/ ) ? "Omniture" :
+                          ( url.match( /moniforce\.gif/ ) ? "Moniforce" :
+                              ( url.match( /dcs\.gif/ ) ? "WebTrends" :
+                                  ( url.match( /__utm\.gif/ ) ? "Urchin" :
+                                      "Unknown"
+                                  )
+                              )
+                          )
+                      );
+
 
             if( this.omRef.alwaysExpand ) {
                 expanderClass = "reg";
@@ -613,18 +628,31 @@ FBL.ns( function() { with( FBL ) {
                 expanderImage = "chrome://omnibug/skin/win/twistyClosed.png";
             }
 
-            html  = "<table cellspacing='0' border='0' class='req " + eventType + "'><tr>";
+            html  = "<table cellspacing='0' border='0' class='req " + eventType + ( OmnibugPanel.cur.prev ? " prev" : "" ) + "'><tr>";
             html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='" + expanderImage + "' /></a></td>";
             html += "<td>";
-            html += "<p><strong>" + this.camelCapser( eventType ) + " event:</strong> " + OmnibugPanel.cur.url.substring( 0, 75 ) + "...</p><div class='" + expanderClass + "'>";
+            //html += "<p><strong>" + this.camelCapser( eventType ) + " event:</strong> " + OmnibugPanel.cur.key + " &rarr; " + OmnibugPanel.cur.url.substring( 0, 75 ) + "...</p><div class='" + expanderClass + "'>";
+            html += "<p><strong>" + this.camelCapser( eventType ) + " event</strong> | "
+                                  + provider + " | "
+                                  + OmnibugPanel.cur.timeStamp + " | "
+                                  + OmnibugPanel.cur.key + " | "
+                                  + OmnibugPanel.cur.url.substring( 0, 75 ) + "...</p><div class='" + expanderClass + "'>";
+
             html += "<table class='ent'>";
 
             // Omnibug values
-            html += "<th colspan='2'>Omnibug</th>";
+            html += "<th colspan='2'>Summary</th>";
             html += "<tr><td>Key</td><td>" + this.quote( OmnibugPanel.cur.key ) + "</td></tr>\n";
             html += "<tr><td>Event</td><td>" + this.quote( eventType ) + "</td></tr>\n";
             html += "<tr><td>Parent URL</td><td>" + this.quote( OmnibugPanel.cur.parentUrl ) + "</td></tr>\n";
-            html += "<tr><td>Full URL</td><td>" + this.quote( OmnibugPanel.cur.url ) + "</td></tr>\n";
+
+            html += "<tr><td>Full URL</td><td>" + this.quote( OmnibugPanel.cur.url ) + "<br/>(" + urlLength + " characters";
+            html += ( urlLength > 2083 ? ", <span class='imp'>*** too long for IE6/7! ***</span>" : "" ) + ")</td></tr>\n";
+
+            html += "<tr><td>Timestamp</td><td>" + this.quote( OmnibugPanel.cur.timeStamp ) + "</td></tr>\n";
+            html += "<tr><td>Provider</td><td>" + this.quote( provider ) + "</td></tr>\n";
+
+            html += "<tr><td>Source</td><td>" + this.quote( OmnibugPanel.cur.prev ? "Previous page" : "Current page" ) + "</td></tr>\n"; // not exactly working
 
             // omniture props
             if( OmnibugPanel.props.length ) {
@@ -686,6 +714,8 @@ FBL.ns( function() { with( FBL ) {
 
             for( el in otherOther ) {
                 if( otherOther.hasOwnProperty( el ) ) {
+                    if( el === "[AQB]" || el === "[AQE]" ) { continue; } // skip Omniture's [AQB] and [AQE] elements
+
                     cn = this.isHighlightable( el ) ? "hilite" : "";
                     if( el.match( /^mfinfo/ ) ) {
                         mf += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "</td><td class='v'>" + otherOther[el] + "</td></tr>\n";
@@ -784,10 +814,8 @@ FBL.ns( function() { with( FBL ) {
         // nsIWebProgressListener
         onStateChange: function( progress, request, flag, status ) {
             //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
-            var key, file, obj,
+            var key, file, obj, now,
                 omRef = Firebug.Omnibug;
-
-//dump( ">>>   oSC: " + request.name + " -> " + getStateDescription( flag ) + "\n" );
 
             // capture the originating URL (e.g. of the parent page)
             if( ( flag & nsIWebProgressListener.STATE_IS_NETWORK ) &&
@@ -806,6 +834,8 @@ FBL.ns( function() { with( FBL ) {
             // @TODO: is this the right order (default then user)?  Should we always be matching both?
             if( request.name.match( omRef.defaultRegex ) || ( omRef.userRegex && request.name.match( omRef.userRegex ) ) ) {
                 //dump( ">>>   onStateChange pattern match: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
+
+                now = new Date();
                 if( ! this.seenReqs[request.name] ) {
                     this.seenReqs[request.name] = true;
 
@@ -816,7 +846,8 @@ FBL.ns( function() { with( FBL ) {
                         key: key,
                         url: request.name,
                         parentUrl: this.that.parentUrl,
-                        doneLoading: this.that.doneLoading
+                        doneLoading: this.that.doneLoading,
+                        timeStamp: now
                     };
 
 
@@ -832,7 +863,7 @@ FBL.ns( function() { with( FBL ) {
                     // write to file, if defined
                     file = omRef.outFile;
                     if( file !== null ) {
-                        FileIO.write( file, new Date() + "\t" + key + "\t" + request.name + "\t" + this.that.parentUrl + "\n", "a" );
+                        FileIO.write( file, now + "\t" + key + "\t" + request.name + "\t" + this.that.parentUrl + "\n", "a" );
                     }
                 }
             }
