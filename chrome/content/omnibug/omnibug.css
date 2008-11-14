@@ -51,6 +51,9 @@ p.om {
 table.req span.qq {
     color: #f00;
 }
+table.req span.imp {
+    color: #f00;
+}
 
 /* entry tables */
 table.ent,
@@ -81,11 +84,16 @@ table.ent td.v {
     padding-right: 10px;
 }
 
+/* table highlight colors (@TODO: move to config props) */
 table.load {
-    background-color: #b3ffc6;
+    background-color: #dbedff;
 }
 table.click {
-    background-color: #ff99cc;
+    background-color: #f1ffdb;
+}
+table.prev {
+    /*background-color: #ceffb6;*/
+    background-color: #ffd5de;
 }
 
 
