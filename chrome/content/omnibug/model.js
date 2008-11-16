@@ -84,22 +84,21 @@ FBL.ns( function() { with( FBL ) {
 
 
     Firebug.Omnibug = extend( Firebug.Module, {
-        requests: {},
-        messages: [],
-        contextLoaded: false,
-        outFile: null,
-        latestOmnibugContext: null,
-        win: null,
-        defaultRegex: null,
-        userRegex: null,
-        usefulKeys: {},
-        highlightKeys: {},
-        alwaysExpand: false,
-        prefsService: null,
-        showQuotes: false,
-
-        // @TODO: move to a config obj instead of all these props
-        cfg: { },
+        cfg: {
+            requests: {},
+            messages: [],
+            contextLoaded: false,
+            latestOmnibugContext: null,
+            defaultRegex: null,
+            userRegex: null,
+            usefulKeys: {},
+            highlightKeys: {},
+            alwaysExpand: false,
+            showQuotes: false,
+            outFile: null,
+            prefsService: null,
+            win: null
+        },
 
         /**
          * Called when the browser exits
@@ -145,14 +144,14 @@ FBL.ns( function() { with( FBL ) {
          */
         initPrefsService: function() {
             try {
-                this.prefsService = CC( '@mozilla.org/preferences-service;1' )
+                this.cfg.prefsService = CC( '@mozilla.org/preferences-service;1' )
                                       .getService( CI( "nsIPrefService" ) )
                                       .getBranch( "extensions.omnibug." );
 
-                this.prefsService.QueryInterface( CI( "nsIPrefBranchInternal" ) );
+                this.cfg.prefsService.QueryInterface( CI( "nsIPrefBranchInternal" ) );
 
                 // add prefs observer
-                this.prefsService.addObserver( "", this, false );
+                this.cfg.prefsService.addObserver( "", this, false );
             } catch( ex ) {
                 dump( ">>>   initPrefsService: error getting prefs service: " + ex + "\n" );
             }
@@ -162,13 +161,13 @@ FBL.ns( function() { with( FBL ) {
          * Gets a preference from the preference service
          */
         getPreference: function( key ) {
-            switch( this.prefsService.getPrefType( key ) ) {
+            switch( this.cfg.prefsService.getPrefType( key ) ) {
                 case Components.interfaces.nsIPrefBranch.PREF_STRING:
-                    return this.prefsService.getCharPref( key );
+                    return this.cfg.prefsService.getCharPref( key );
                 case Components.interfaces.nsIPrefBranch.PREF_INT:
-                    return this.prefsService.getIntPref( key );
+                    return this.cfg.prefsService.getIntPref( key );
                 case Components.interfaces.nsIPrefBranch.PREF_BOOL:
-                    return this.prefsService.getBoolPref( key );
+                    return this.cfg.prefsService.getBoolPref( key );
             }
         },
 
@@ -176,20 +175,20 @@ FBL.ns( function() { with( FBL ) {
          * Sets a preference
          */
         setPreference: function( key, val ) {
-            switch( this.prefsService.getPrefType( key ) ) {
+            switch( this.cfg.prefsService.getPrefType( key ) ) {
                 /*
                 case Components.interfaces.nsIPrefBranch.PREF_STRING:
-                    this.prefsService.setCharPref( key, val);
+                    this.cfg.prefsService.setCharPref( key, val);
                     break;
                 */
                 case Components.interfaces.nsIPrefBranch.PREF_INT:
-                    this.prefsService.setIntPref( key, val );
+                    this.cfg.prefsService.setIntPref( key, val );
                     break;
                 case Components.interfaces.nsIPrefBranch.PREF_BOOL:
-                    this.prefsService.setBoolPref( key, val );
+                    this.cfg.prefsService.setBoolPref( key, val );
                     break;
                 default:
-                    this.prefsService.setCharPref( key, val);
+                    this.cfg.prefsService.setCharPref( key, val);
                     break;
             }
         },
@@ -205,8 +204,8 @@ FBL.ns( function() { with( FBL ) {
             this.initPrefsService();
 
             // set default pref
-            if( this.prefsService.prefHasUserValue( "defaultPattern" ) ) {
-                this.prefsService.clearUserPref( "defaultPattern" );
+            if( this.cfg.prefsService.prefHasUserValue( "defaultPattern" ) ) {
+                this.cfg.prefsService.clearUserPref( "defaultPattern" );
             }
 
             // initialize prefs
@@ -286,23 +285,23 @@ FBL.ns( function() { with( FBL ) {
                 try {
                     if( prefFile ) {
                         dump( ">>>   initLogging: enabling logging to " + prefFile + "\n" );
-                        this.outFile = FileIO.open( prefFile );
+                        this.cfg.outFile = FileIO.open( prefFile );
                     } else {
                         dump( ">>>   initLogging: enabling logging to default log file\n" );
                         var path = FileIO.getTmpDir();
                         var fn = "omnibug.log";
-                        this.outFile = FileIO.append( path, fn );
+                        this.cfg.outFile = FileIO.append( path, fn );
                     }
 
-                    var msg = "File logging enabled; requests will be written to " + this.outFile.path;
+                    var msg = "File logging enabled; requests will be written to " + this.cfg.outFile.path;
                     dump( ">>>   initLogging: " + msg + "\n" );
-                    this.messages.push( msg );
+                    this.cfg.messages.push( msg );
                 } catch( ex ) {
                     dump( ">>>   initLogging: unable to create output file: " + ex + "\n" );
                 }
             } else {
                 dump( ">>>   initLogging: logging is disabled.\n" );
-                this.outFile = null;
+                this.cfg.outFile = null;
             }
         },
 
@@ -312,10 +311,10 @@ FBL.ns( function() { with( FBL ) {
          */
         initGeneralPrefs: function() {
             // always expand preference
-            this.alwaysExpand = this.getPreference( "alwaysExpand" );
+            this.cfg.alwaysExpand = this.getPreference( "alwaysExpand" );
 
             // quotes around values pref
-            this.showQuotes = this.getPreference( "showQuotes" );
+            this.cfg.showQuotes = this.getPreference( "showQuotes" );
 
             // colors
             this.cfg.color_load = this.getPreference( "color_load" );
@@ -342,8 +341,8 @@ FBL.ns( function() { with( FBL ) {
         destroyContext: function( context ) {
             dump( ">>>   destroyContext: context=" + context + "\n" );
 
-            this.latestOmnibugContext = undefined;
-            this.contextLoaded = false;
+            this.cfg.latestOmnibugContext = undefined;
+            this.cfg.contextLoaded = false;
             if( context.omNetProgress ) {
                 this.unmonitorContext( context );
             }
@@ -379,15 +378,15 @@ FBL.ns( function() { with( FBL ) {
             }
 
             // Makes detach work.
-            if ( ! context.omnibugContext && this.latestOmnibugContext ) {
-                context.omnibugContext = this.latestOmnibugContext;
+            if ( ! context.omnibugContext && this.cfg.latestOmnibugContext ) {
+                context.omnibugContext = this.cfg.latestOmnibugContext;
             }
 
-            this.contextLoaded = true;
+            this.cfg.contextLoaded = true;
 
             // dump any messages waiting
-            while( this.messages.length ) {
-                FirebugContext.getPanel("Omnibug").printLine( this.messages.shift() );
+            while( this.cfg.messages.length ) {
+                FirebugContext.getPanel("Omnibug").printLine( this.cfg.messages.shift() );
             }
 
             //dump( ">>>   loadedContext: calling processRequests\n" );
@@ -456,7 +455,7 @@ FBL.ns( function() { with( FBL ) {
          */
         unwatchWindow: function( context, win ) {
             dump( ">>>   unwatchWindow: context=" + context + "; win=" + win + "\n" );
-            this.win = null;
+            this.cfg.win = null;
         },
 
         /**
@@ -465,22 +464,22 @@ FBL.ns( function() { with( FBL ) {
          */
         watchWindow: function( context, win ) {
             dump( ">>>   watchWindow: win=" + win + "; context=" + context + "\n" );
-            this.win = win; // @TODO: not sure 'this' is the right place for the window reference
+            this.cfg.win = win; // @TODO: not sure 'this' is the right place for the window reference
         },
 
         /**
          * Called by loadedContext to process the requests object and write to panel
          */
         processRequests: function() {
-            dump( ">>>   processRequests: processing " + Object.size( this.requests ) + " requests\n" );
-            for( var key in this.requests ) {
+            dump( ">>>   processRequests: processing " + Object.size( this.cfg.requests ) + " requests\n" );
+            for( var key in this.cfg.requests ) {
                 //dump( "---   key=" + key + "\n" );
-                if( this.requests.hasOwnProperty( key ) ) {
+                if( this.cfg.requests.hasOwnProperty( key ) ) {
                     dump( "---   processRequests: processing " + key + "\n" );
-                    this.requests[key]["src"] = "prev";
+                    this.cfg.requests[key]["src"] = "prev";
                     dump( "---   processRequests: calling decodeUrl\n" );
-                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( this.requests[key] );
-                    delete this.requests[key];
+                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( this.cfg.requests[key] );
+                    delete this.cfg.requests[key];
                 } else {
                     dump( ">>>   processRequests: not my key!\n" );
                 }
@@ -495,7 +494,7 @@ FBL.ns( function() { with( FBL ) {
             dump( ">>>   omnibugTools: label=" + menuitem.label + "\n" );
 
             if( menuitem.label === "Choose log file" ) {
-                if( Omnibug.Tools.chooseLogFile( this.win ) ) {
+                if( Omnibug.Tools.chooseLogFile( this.cfg.win ) ) {
                     // successfully picked a log file
                     dump( ">>>   omnibugTools: logFileName=" + this.getPreference( "logFileName" ) + "\n" );
                 }
@@ -510,10 +509,10 @@ FBL.ns( function() { with( FBL ) {
             var defaultPattern = this.getPreference( "defaultPattern" ),
                 userPattern = this.getPreference( "userPattern" );
 
-            this.defaultRegex = new RegExp( defaultPattern );
+            this.cfg.defaultRegex = new RegExp( defaultPattern );
 
             if( userPattern ) {
-                this.userRegex = new RegExp( userPattern );
+                this.cfg.userRegex = new RegExp( userPattern );
             }
 
             // init useful keys
@@ -522,11 +521,11 @@ FBL.ns( function() { with( FBL ) {
                 var parts = keyList.split( "," );
                 for( var part in parts ) {
                     if( parts.hasOwnProperty( part ) ) {
-                        this.usefulKeys[parts[part]] = 1;
+                        this.cfg.usefulKeys[parts[part]] = 1;
                     }
                 }
             }
-            dump( ">>>   initPatterns: usefulKeys=" + Omnibug.Tools.objDump( this.usefulKeys ) + "\n" );
+            dump( ">>>   initPatterns: usefulKeys=" + Omnibug.Tools.objDump( this.cfg.usefulKeys ) + "\n" );
 
             // init highlight keys
             keyList = this.getPreference( "highlightKeys" );
@@ -534,11 +533,11 @@ FBL.ns( function() { with( FBL ) {
                 var parts = keyList.split( "," );
                 for( var part in parts ) {
                     if( parts.hasOwnProperty( part ) ) {
-                        this.highlightKeys[parts[part]] = 1;
+                        this.cfg.highlightKeys[parts[part]] = 1;
                     }
                 }
             }
-            dump( ">>>   initPatterns: highlightKeys=" + Omnibug.Tools.objDump( this.highlightKeys ) + "\n" );
+            dump( ">>>   initPatterns: highlightKeys=" + Omnibug.Tools.objDump( this.cfg.highlightKeys ) + "\n" );
         }
 
     } );
@@ -600,7 +599,7 @@ FBL.ns( function() { with( FBL ) {
             }
 
             // @TODO: is this the right order (default then user)?  Should we always be matching both?
-            if( request.name.match( omRef.defaultRegex ) || ( omRef.userRegex && request.name.match( omRef.userRegex ) ) ) {
+            if( request.name.match( omRef.cfg.defaultRegex ) || ( omRef.cfg.userRegex && request.name.match( omRef.cfg.userRegex ) ) ) {
                 //dump( ">>>   onStateChange pattern match: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
 
                 now = new Date();
@@ -624,13 +623,13 @@ FBL.ns( function() { with( FBL ) {
                     FirebugContext.getPanel( "Omnibug" ).decodeUrl( obj );
 
                     // add to requests object only if the context has been loaded (e.g. dump requests added from the previous page)
-                    if( omRef.contextLoaded ) {
-                        dump( ">>>   onStateChange: adding request to request list: " + Omnibug.Tools.objDump( omRef.requests ) + "\n" );
-                        omRef.requests[key] = obj;
+                    if( omRef.cfg.contextLoaded ) {
+                        dump( ">>>   onStateChange: adding request to request list: " + Omnibug.Tools.objDump( omRef.cfg.requests ) + "\n" );
+                        omRef.cfg.requests[key] = obj;
                     }
 
                     // write to file, if defined
-                    file = omRef.outFile;
+                    file = omRef.cfg.outFile;
                     if( file !== null ) {
                         FileIO.write( file, now + "\t" + key + "\t" + request.name + "\t" + this.that.parentUrl + "\n", "a" );
                     }

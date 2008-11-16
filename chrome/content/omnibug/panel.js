@@ -194,7 +194,7 @@ FBL.ns( function() { with( FBL ) {
          * Return a quoted string (if the pref is set)
          */
         quote: function( str ) {
-            return( Firebug.Omnibug.showQuotes
+            return( Firebug.Omnibug.cfg.showQuotes
                         ? "<span class='qq'>\"</span>" + str + "<span class='qq'>\"</span>"
                         : str );
         },
@@ -226,7 +226,7 @@ FBL.ns( function() { with( FBL ) {
                       );
 
 
-            if( this.omRef.alwaysExpand ) {
+            if( this.omRef.cfg.alwaysExpand ) {
                 expanderClass = "reg";
                 expanderImage = "twistyOpen.png";
             } else {
@@ -288,7 +288,7 @@ FBL.ns( function() { with( FBL ) {
             if( OmnibugPanel.other.length ) {
                 for( i = 0, len = OmnibugPanel.other.length; i < len; ++i ) {
                     if( OmnibugPanel.other[i] ) {
-                        if( this.omRef.usefulKeys[OmnibugPanel.other[i][0]] ) {
+                        if( this.omRef.cfg.usefulKeys[OmnibugPanel.other[i][0]] ) {
                             otherNamed[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
                         } else {
                             otherOther[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
@@ -355,7 +355,7 @@ FBL.ns( function() { with( FBL ) {
 
         // returns true when the given name is in the highlightKeys list
         isHighlightable: function( elName ) {
-            return this.omRef.highlightKeys[elName];
+            return this.omRef.cfg.highlightKeys[elName];
         },
 
 
