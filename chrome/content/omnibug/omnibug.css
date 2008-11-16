@@ -3,23 +3,12 @@
  * $URL$
  */
 
-table.req .hilite {
-    background-color: #ff0;
-}
-
-/*
-table.req dt {
-    font-weight: bold;
-}
-*/
-
-table.req p {
+table.req p.summary {
     margin: 0;
     line-height: 16px;
 }
 
 table.req div.hid {
-    background-color: #ccc;
     display: none;
 }
 
@@ -48,9 +37,6 @@ p.om {
     margin: 0;
 }
 
-table.req span.qq {
-    color: #f00;
-}
 table.req span.imp {
     color: #f00;
 }
@@ -82,18 +68,6 @@ table.ent td.k {
 table.ent td.k,
 table.ent td.v {
     padding-right: 10px;
-}
-
-/* table highlight colors (@TODO: move to config props) */
-table.load {
-    background-color: #dbedff;
-}
-table.click {
-    background-color: #f1ffdb;
-}
-table.prev {
-    /*background-color: #ceffb6;*/
-    background-color: #ffd5de;
 }
 
 
