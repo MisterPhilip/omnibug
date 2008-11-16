@@ -9,7 +9,8 @@
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
     <script type="application/x-javascript" src="chrome://omnibug/content/omnibugContext.js"/>
-    <script type="application/x-javascript" src="chrome://omnibug/content/FirebugPanel.js"/>
+    <script type="application/x-javascript" src="chrome://omnibug/content/model.js"/>
+    <script type="application/x-javascript" src="chrome://omnibug/content/panel.js"/>
     <script type="application/x-javascript" src="chrome://omnibug/content/md5.js"/>
     <script type="application/x-javascript" src="chrome://omnibug/content/io.js"/>
 
