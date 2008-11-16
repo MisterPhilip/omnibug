@@ -6,7 +6,7 @@
       Omniture (√)
       Moniforce (√)
       WebTrends (√)
-      GoogleAnalytics
+      GoogleAnalytics (√)
       Sophus3?
       Custom
     - add a vendor-specific logo to the displayo, perhaps?
@@ -14,6 +14,8 @@
  3  add pattern preference input box (how does this work with #2?)
 
  4  fix clear button weirdness
+ 
+ 4.5  changes to follow patterns from http://www.softwareishard.com/blog/firebug-tutorial/extending-firebug-hello-world-part-i/
 
  5  platform-specific images (not just win)
 
@@ -31,8 +33,6 @@
 
  12  names for known keys (e.g. pev2 -> "Page Event 2") (per-vendor)
 
- 14  trim displayed full url and display in expanded version?
-
  15  switch from innerHTML/appendHTML to DOM (via domplate?)
 
  16  submit to WA blogs/sites/etc?
@@ -46,3 +46,5 @@
  11  instead of calling initPrefs(), add prefs observer service to call it (or something like it)
 
  13  table-ize data
+
+ 14  trim displayed full url and display in expanded version?
