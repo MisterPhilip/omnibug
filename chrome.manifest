@@ -1,5 +1,5 @@
 # content   packagename   uri/to/files               flags
-content     omnibug       chrome/content/omnibug/    xpcnativewrappers=no
+content     omnibug       chrome/content/omnibug/
 
 # skin   packagename   skinname      /path/to/files            flags
 skin     omnibug       macskin       chrome/skin/classic/mac/   os=Darwin
