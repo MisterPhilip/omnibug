@@ -98,6 +98,9 @@ FBL.ns( function() { with( FBL ) {
         prefsService: null,
         showQuotes: false,
 
+        // @TODO: move to a config obj instead of all these props
+        cfg: { },
+
         /**
          * Called when the browser exits
          * @override
@@ -125,6 +128,16 @@ FBL.ns( function() { with( FBL ) {
          */
         clearPanel: function() {
             FirebugContext.getPanel("Omnibug").clear();
+        },
+
+        /**
+         * Show the prefs menu
+         */
+        showMenu: function() {
+            openDialog( "chrome://omnibug/content/options.xul",
+                        "",
+                        "centerscreen,dialog=no,chrome,resizable,dependent,modal"
+            );
         },
 
         /**
@@ -207,14 +220,11 @@ FBL.ns( function() { with( FBL ) {
         initPrefs: function() {
             dump( ">>>   initPrefs: (re)initializing preferences\n" );
 
-            // always expand preference
-            this.alwaysExpand = this.getPreference( "alwaysExpand" );
-
-            // quotes around values pref
-            this.showQuotes = this.getPreference( "showQuotes" );
-
-            // init logging
+            // logging
             this.initLogging();
+
+            // general prefs
+            this.initGeneralPrefs();
 
             // init request-matching patterns
             this.initPatterns();
@@ -231,15 +241,17 @@ FBL.ns( function() { with( FBL ) {
                 return;
             }
 
-            var newValue = this.getPreference( key );
+            //var newValue = this.getPreference( key );
 
             switch( key ) {
                 case "alwaysExpand":
-                    this.alwaysExpand = newValue;
-                    break;
-
                 case "showQuotes":
-                    this.showQuotes = newValue;
+                case "color_load":
+                case "color_click":
+                case "color_prev":
+                case "color_quotes":
+                case "color_hilite":
+                    this.initGeneralPrefs();
                     break;
 
                 case "enableFileLogging":
@@ -293,6 +305,26 @@ FBL.ns( function() { with( FBL ) {
                 this.outFile = null;
             }
         },
+
+
+        /**
+         * Init general prefs
+         */
+        initGeneralPrefs: function() {
+            // always expand preference
+            this.alwaysExpand = this.getPreference( "alwaysExpand" );
+
+            // quotes around values pref
+            this.showQuotes = this.getPreference( "showQuotes" );
+
+            // colors
+            this.cfg.color_load = this.getPreference( "color_load" );
+            this.cfg.color_click = this.getPreference( "color_click" );
+            this.cfg.color_prev = this.getPreference( "color_prev" );
+            this.cfg.color_quotes = this.getPreference( "color_quotes" );
+            this.cfg.color_hilite = this.getPreference( "color_hilite" );
+        },
+
 
         /**
          * Called when new page is going to be rendered
