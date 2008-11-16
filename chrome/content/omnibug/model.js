@@ -44,22 +44,21 @@ if( typeof FBL === "undefined" ) {
     FBL = { ns: function() {} }
 }
 
-// Components.classes helper
-if( typeof( "CC" ) !== "function" ) {
-    function CC( className ) {
-        return Components.classes[className];
-    }
-}
-
-// Components.interfaces helper
-if( typeof( "CI" ) !== "function" ) {
-    function CI( ifaceName ) {
-        return Components.interfaces[ifaceName];
-    }
-}
-
-
 FBL.ns( function() { with( FBL ) {
+
+    // Components.classes helper
+    if( typeof( "CC" ) !== "function" ) {
+        function CC( className ) {
+            return Components.classes[className];
+        }
+    }
+
+    // Components.interfaces helper
+    if( typeof( "CI" ) !== "function" ) {
+        function CI( ifaceName ) {
+            return Components.interfaces[ifaceName];
+        }
+    }
 
     // ************************************************************************************************
     // Constants
@@ -101,6 +100,7 @@ FBL.ns( function() { with( FBL ) {
 
         /**
          * Called when the browser exits
+         * @override
          */
         shutdown: function() {
             dump( ">>>   shutdown\n" );
@@ -111,6 +111,7 @@ FBL.ns( function() { with( FBL ) {
 
         /**
          * Called when panels are selected
+         * @override
          */
         showPanel: function( browser, panel ) {
             dump( ">>>   showPanel: browser=" + browser + "; panel=" + panel + "\n" );
@@ -132,8 +133,8 @@ FBL.ns( function() { with( FBL ) {
         initPrefsService: function() {
             try {
                 this.prefsService = CC( '@mozilla.org/preferences-service;1' )
-                                              .getService( CI( "nsIPrefService" ) )
-                                              .getBranch( "extensions.omnibug." );
+                                      .getService( CI( "nsIPrefService" ) )
+                                      .getBranch( "extensions.omnibug." );
 
                 this.prefsService.QueryInterface( CI( "nsIPrefBranchInternal" ) );
 
@@ -183,6 +184,7 @@ FBL.ns( function() { with( FBL ) {
 
         /**
          * Called once, at browser startup
+         * @override
          */
         initialize: function() {
             dump( ">>>   initialize: arguments=" + arguments + "\n" );
@@ -294,14 +296,16 @@ FBL.ns( function() { with( FBL ) {
 
         /**
          * Called when new page is going to be rendered
+         * @override
          */
         initContext: function( context ) {
             dump( ">>>   initContext: context=" + context + "\n" );
-            monitorContext( context );
+            this.monitorContext( context );
         },
 
         /**
          * Called just before old page is thrown away;
+         * @override
          */
         destroyContext: function( context ) {
             dump( ">>>   destroyContext: context=" + context + "\n" );
@@ -309,12 +313,13 @@ FBL.ns( function() { with( FBL ) {
             this.latestOmnibugContext = undefined;
             this.contextLoaded = false;
             if( context.omNetProgress ) {
-                unmonitorContext( context );
+                this.unmonitorContext( context );
             }
         },
 
         /**
          * Called when ANY page is completely finished loading
+         * @override
          */
         loadedContext: function( context ) {
             dump( ">>>   loadedContext: context=" + context + "\n" );
@@ -359,6 +364,7 @@ FBL.ns( function() { with( FBL ) {
 
         /**
          * ?
+         * @override
          */
         reattachContext: function( context ) {
             dump( ">>>   reattachContext: context=" + context + "\n" );
@@ -373,6 +379,7 @@ FBL.ns( function() { with( FBL ) {
 
         /**
          * Called as page is rendering (?)
+         * @override
          */
         showContext: function( browser, context ) {
             dump( ">>>   showContext: browser=" + browser + "; context=" + context + "\n" );
@@ -380,13 +387,40 @@ FBL.ns( function() { with( FBL ) {
 
         /**
          * ?
+         * @override
          */
         watchContext: function( win, context, isSystem ) {
             dump( ">>>   watchContext: win=" + win + "; context=" + context + "; isSystem=" + isSystem + "\n" );
         },
 
         /**
+         * not override
+         */
+        monitorContext: function( context ) {
+            dump( ">>>   monitorContext: context=" + context + "\n" );
+            if( !context.omNetProgress ) {
+                context.omNetProgress = new OmNetProgress( context );
+                context.browser.addProgressListener( context.omNetProgress, NOTIFY_ALL );
+            }
+        },
+
+        /**
+         * not override
+         */
+        unmonitorContext: function( context ) {
+            //dump( ">>>   unmonitorContext: context=" + context + "\n" );
+            if( context.omNetProgress ) {
+                if( context.browser.docShell ) {
+                    context.browser.removeProgressListener( context.omNetProgress, NOTIFY_ALL );
+                }
+
+                delete context.omNetProgress;
+            }
+        },
+
+        /**
          * Called when navigating away from a page
+         * @override
          */
         unwatchWindow: function( context, win ) {
             dump( ">>>   unwatchWindow: context=" + context + "; win=" + win + "\n" );
@@ -395,6 +429,7 @@ FBL.ns( function() { with( FBL ) {
 
         /**
          * Called when a new page is going to be watched (?)
+         * @override
          */
         watchWindow: function( context, win ) {
             dump( ">>>   watchWindow: win=" + win + "; context=" + context + "\n" );
@@ -459,7 +494,7 @@ FBL.ns( function() { with( FBL ) {
                     }
                 }
             }
-            dump( ">>>   initPatterns: usefulKeys=" + objDump( this.usefulKeys ) + "\n" );
+            dump( ">>>   initPatterns: usefulKeys=" + Omnibug.Tools.objDump( this.usefulKeys ) + "\n" );
 
             // init highlight keys
             keyList = this.getPreference( "highlightKeys" );
@@ -471,16 +506,19 @@ FBL.ns( function() { with( FBL ) {
                     }
                 }
             }
-            dump( ">>>   initPatterns: highlightKeys=" + objDump( this.highlightKeys ) + "\n" );
+            dump( ">>>   initPatterns: highlightKeys=" + Omnibug.Tools.objDump( this.highlightKeys ) + "\n" );
         }
 
     } );
+    Firebug.registerModule( Firebug.Omnibug );
 
 
     /**
      * NetProgress
+     * @TODO: put in another file, but how to reference?
      */
     function OmNetProgress( context ) {
+        dump( ">>>   OmNetProgress: instantiated\n" );
         this.context = context;
     }
 
@@ -506,7 +544,10 @@ FBL.ns( function() { with( FBL ) {
             throw Components.results.NS_NOINTERFACE;
         },
 
-        // nsIWebProgressListener
+        /**
+         * nsIWebProgressListener
+         * @override
+         */
         onStateChange: function( progress, request, flag, status ) {
             //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
             var key, file, obj, now,
@@ -552,7 +593,7 @@ FBL.ns( function() { with( FBL ) {
 
                     // add to requests object only if the context has been loaded (e.g. dump requests added from the previous page)
                     if( omRef.contextLoaded ) {
-                        dump( ">>>   onStateChange: adding request to request list: " + objDump( omRef.requests ) + "\n" );
+                        dump( ">>>   onStateChange: adding request to request list: " + Omnibug.Tools.objDump( omRef.requests ) + "\n" );
                         omRef.requests[key] = obj;
                     }
 
@@ -566,26 +607,6 @@ FBL.ns( function() { with( FBL ) {
         }
     };
 
-
-    function monitorContext( context ) {
-        //dump( ">>>   monitorContext: context=" + context + "\n" );
-        if( !context.omNetProgress ) {
-            context.omNetProgress = new OmNetProgress( context );
-
-            context.browser.addProgressListener( context.omNetProgress, NOTIFY_ALL );
-        }
-    }
-
-    function unmonitorContext( context ) {
-        //dump( ">>>   unmonitorContext: context=" + context + "\n" );
-        if( context.omNetProgress ) {
-            if( context.browser.docShell ) {
-                context.browser.removeProgressListener( context.omNetProgress, NOTIFY_ALL );
-            }
-
-            delete context.omNetProgress;
-        }
-    }
 
     /*
      * local helpers
@@ -619,79 +640,59 @@ FBL.ns( function() { with( FBL ) {
         return state;
     }
 
-    var OmniUrl = function( url ) {
-        this.url = url;
-        this.parseUrl();
-    };
-
-    OmniUrl.prototype = (function() {
-        var U = {
-            hasQueryValue: function( key ) {
-                return typeof this.query[key] !== 'undefined';
-            },
-            getFirstQueryValue: function( key ) {
-                return this.query[key] ? this.query[key][0] : '';
-            },
-            getQueryValues: function( key ) {
-                return this.query[key] ? this.query[key] : [];
-            },
-            getQueryNames: function() {
-                var i, a = [];
-                for( i in this.query ) {
-                    a.push( i );
-                }
-                return a;
-            },
-            getLocation: function() {
-                return this.location;
-            },
-            getParamString: function() {
-                return this.paramString;
-            },
-            addQueryValue: function( key ) {
-                if( ! this.hasQueryValue( key ) ) {
-                    this.query[key] = [];
-                }
-                for( var i=1; i<arguments.length; ++i ) {
-                    this.query[key].push( arguments[i] );
-                }
-            },
-            decode: function( val ) {
-                var retVal;
-                try {
-                    return val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : '';
-                } catch( e ) {
-                    return val;
-                }
-            },
-            parseUrl: function() {
-                var url = this.url;
-                var pieces = url.split( '?' );
-                var p2 = pieces[0].split( ';' );
-                this.query = {};
-                this.queryString = '';
-                this.anchor = '';
-                this.location = p2[0];
-                this.paramString = ( p2[1] ? p2[1] : '' );
-                if( pieces[1] ) {
-                    var p3 = pieces[1].split( '#' );
-                    this.queryString = p3[0];
-                    this.anchor = ( p3[1] ? p3[1] : '' );
-                }
-                if( this.queryString ) {
-                    var kvPairs = this.queryString.split( /&/ );
-                    for( var i=0; i<kvPairs.length; ++i ) {
-                        var kv = kvPairs[i].split( '=' );
-                        this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
-                    }
-                }
-            }
-        };
-        return U;
-    } )();
+    /**
+     * Object.size: implement Array-like length getter for Objects
+     */
+    Object.size = function(obj) {
+        var size = 0, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+    }
 
 
-    function objDump( obj ) {
+
+    /*
+     * Omnibug.Tools
+     * @TODO: move elsewhere? own file?
+     */
+    if( typeof Omnibug.Tools == "undefined" ) {
+        Omnibug.Tools = {};
+    }
+
+    Omnibug.Tools.chooseLogFile = function( win ) {
+        dump( ">>>   chooseLogFile: win=" + win + "\n" );
+
+        const nsIFilePicker = Components.interfaces.nsIFilePicker;
+        var fp = CC( "@mozilla.org/filepicker;1" ).createInstance( nsIFilePicker );
+        fp.init( win, "Choose log file location", nsIFilePicker.modeSave );
+        fp.defaultString = "omnibug.log";
+
+        var rv = fp.show();
+        if( rv == nsIFilePicker.returnOK || rv == nsIFilePicker.returnReplace ) {
+            var path = fp.file.path;
+            dump( ">>>   chooseLogFile: new path = " + path + "\n" );
+
+            Firebug.Omnibug.setPreference( "logFileName", path );
+            Firebug.Omnibug.setPreference( "enableFileLogging", true );
+
+            dump( ">>>   chooseLogFile: set new path; get=" + Firebug.Omnibug.getPreference( "logFileName" ) + "\n" );
+
+            return true;
+        }
+        return false;
+    }
+
+    Omnibug.Tools.getFuncName = function( func ) {
+        func = func.toString();
+        var s = func.indexOf( " " ) + 1,
+            e = func.indexOf( "(" ),
+            name = func.substr( s, ( e - s ) );
+        return( name ? name : "<anonymous>" );
+    }
+
+    Omnibug.Tools.objDump = function( obj ) {
         var str = "Object{ ";
         for( var key in obj ) {
             if( obj.hasOwnProperty( key ) ) {
@@ -701,7 +702,7 @@ FBL.ns( function() { with( FBL ) {
         return str + "}";
     }
 
-    function recObjDump( obj ) {
+    Omnibug.Tools.recObjDump = function( obj ) {
         try {
             var str = "Object{ ";
             for( var key in obj ) {
@@ -716,58 +717,4 @@ FBL.ns( function() { with( FBL ) {
         }
     }
 
-
-    function getFuncName( func ) {
-        func = func.toString();
-        var s = func.indexOf( " " ) + 1,
-            e = func.indexOf( "(" ),
-            name = func.substr( s, ( e - s ) );
-        return( name ? name : "<anonymous>" );
-    }
-
-    Object.size = function(obj) {
-        var size = 0, key;
-        for (key in obj) {
-            if (obj.hasOwnProperty(key)) size++;
-        }
-        return size;
-    }
-
-
-
-    Firebug.registerModule( Firebug.Omnibug );
-    Firebug.registerPanel( OmnibugPanel );
-
 }} );
-
-
-/*
- * Omnibug.Tools
- */
-if( typeof Omnibug.Tools == "undefined" ) {
-    Omnibug.Tools = {};
-}
-
-Omnibug.Tools.chooseLogFile = function( win ) {
-    dump( ">>>   chooseLogFile: win=" + win + "\n" );
-
-    const nsIFilePicker = Components.interfaces.nsIFilePicker;
-    var fp = CC( "@mozilla.org/filepicker;1" ).createInstance( nsIFilePicker );
-    fp.init( win, "Choose log file location", nsIFilePicker.modeSave );
-    fp.defaultString = "omnibug.log";
-
-    var rv = fp.show();
-    if( rv == nsIFilePicker.returnOK || rv == nsIFilePicker.returnReplace ) {
-        var path = fp.file.path;
-        dump( ">>>   chooseLogFile: new path = " + path + "\n" );
-
-        Firebug.Omnibug.setPreference( "logFileName", path );
-        Firebug.Omnibug.setPreference( "enableFileLogging", true );
-
-        dump( ">>>   chooseLogFile: set new path; get=" + Firebug.Omnibug.getPreference( "logFileName" ) + "\n" );
-
-        return true;
-    }
-    return false;
-}
-
