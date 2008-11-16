@@ -133,7 +133,19 @@ FBL.ns( function() { with( FBL ) {
             //var elType = "<div>";
 
             // @TODO: figure out if html has already been output, and only send the link tag if not.
-            str = "<head><link rel='stylesheet' type='text/css' href='chrome://omnibug/content/omnibug.css' /></head><body>\n";
+            str = "<head><link rel='stylesheet' type='text/css' href='chrome://omnibug/content/omnibug.css' />";
+
+            // dynamic styles (e.g., from prefs)
+            str += "<style type='text/css'>\n";
+                // @TODO: iterate instead of listing manually?
+                str += "table.load { background-color: " + this.omRef.cfg.color_load + "; }\n";
+                str += "table.click { background-color: " + this.omRef.cfg.color_click + "; }\n";
+                str += "table.prev { background-color: " + this.omRef.cfg.color_prev + "; }\n";
+                str += "table.req .hilite { background-color: " + this.omRef.cfg.color_hilite + "; }\n";
+                str += "table.req span.qq { color: " + this.omRef.cfg.color_quotes + "; }\n";
+            str += "</style>\n";
+
+            str += "</head><body>\n";
 
             elType = "html";
             OmnibugPanel.htmlOutput = true;
@@ -224,14 +236,14 @@ FBL.ns( function() { with( FBL ) {
 
             html  = "<table cellspacing='0' border='0' class='req " + eventType + " " + OmnibugPanel.cur.src + "'><tr>";
             html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='chrome://omnibug/skin/" + expanderImage + "' /></a></td>";
-            html += "<td>";
-            html += "<p><strong>" + this.camelCapser( eventType ) + " event</strong>" + ( OmnibugPanel.cur.src === "prev" ? " (previous page)" : "" ) + " | "
-                                  + provider + " | "
-                                  + OmnibugPanel.cur.timeStamp + " | "
-                                  + OmnibugPanel.cur.key + " | "
-                                  + OmnibugPanel.cur.url.substring( 0, 75 ) + "...</p><div class='" + expanderClass + "'>";
+            html += "<td class='summ'>";
+            html += "<p class='summary'><strong>" + this.camelCapser( eventType ) + " event</strong>" + ( OmnibugPanel.cur.src === "prev" ? " (previous page)" : "" ) + " | "
+                        + provider + " | "
+                        + OmnibugPanel.cur.timeStamp + " | "
+                        + OmnibugPanel.cur.key + "</p>";
+                        //+ OmnibugPanel.cur.url + "</p>"; // @TODO: find a good way to fill the rest of the screen with the url, but don't add scrollbars!
 
-            html += "<table class='ent'>";
+            html += "<div class='" + expanderClass + "'><table class='ent'>";
 
             // Omnibug values
             html += "<th colspan='2'>Summary</th>";
