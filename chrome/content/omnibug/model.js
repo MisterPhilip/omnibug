@@ -394,7 +394,7 @@ FBL.ns( function() { with( FBL ) {
         },
 
         /**
-         * not override
+         * Called from initContext()
          */
         monitorContext: function( context ) {
             dump( ">>>   monitorContext: context=" + context + "\n" );
@@ -405,7 +405,7 @@ FBL.ns( function() { with( FBL ) {
         },
 
         /**
-         * not override
+         * Called from destroyContext()
          */
         unmonitorContext: function( context ) {
             //dump( ">>>   unmonitorContext: context=" + context + "\n" );
