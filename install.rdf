@@ -11,7 +11,7 @@
                    em:version="0.5.250"
                    em:type="2"
                    em:name="Omnibug"
-                   em:description="Firebug Extension for Omniture testing"
+                   em:description="Firebug Extension for web metrics testing and debugging"
                    em:creator="Ross Simpson"
                    em:homepageURL="http://www.rosssimpson.com/dev/omnibug.html"
                    em:updateURL="http://www.rosssimpson.com/dev/update.rdf"
