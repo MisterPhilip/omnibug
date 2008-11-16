@@ -39,6 +39,7 @@
  * $URL$
  */
 
+
 if( typeof FBL === "undefined" ) {
     FBL = { ns: function() {} }
 }
@@ -61,8 +62,7 @@ FBL.ns( function() { with( FBL ) {
         /**
          * Initialize the panel. This is called when the Panel is activated and
          * whenever the browser document changes (new URL, reload).
-         *
-         * (this must override a method in Firebug)
+         * @override
          */
         initialize: function( context, doc ) {
             this.context = context;
@@ -87,6 +87,7 @@ FBL.ns( function() { with( FBL ) {
 
         /*
          * Called whenever the panel comes into view. Like toggling between browser tabs.
+         * @override
          */
         show: function() {
             dump( ">>>   show: arguments=" + arguments + "\n" );
@@ -145,8 +146,8 @@ FBL.ns( function() { with( FBL ) {
         },
 
         decodeUrl: function( data ) {
-            dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + getFuncName( FirebugContext.getPanel( "Omnibug" ).decodeUrl.caller ) + ")\n" );
-            //dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + getFuncName( arguments.callee.caller ) + ")\n" );
+            dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + Omnibug.Tools.getFuncName( FirebugContext.getPanel( "Omnibug" ).decodeUrl.caller ) + ")\n" );
+            //dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + Omnibug.Tools.getFuncName( arguments.callee.caller ) + ")\n" );
 
             OmnibugPanel.cur = data;
             OmnibugPanel.props = [];
@@ -349,7 +350,10 @@ FBL.ns( function() { with( FBL ) {
 
         // Options menu
 
-        // Called every time the options menu is opened
+        /**
+         * Called every time the options menu is opened
+         * @override
+         */
         getOptionsMenuItems: function() {
             return [
                 this.optionMenu( "Enable File Logging", "enableFileLogging" ),
@@ -358,7 +362,10 @@ FBL.ns( function() { with( FBL ) {
             ];
         },
 
-        // Return an option menu item
+        /**
+         * Return an option menu item
+         * @override
+         */
         optionMenu: function( label, option ) {
             var value = this.omRef.getPreference( option ),
                 _omRef = this.omRef,
@@ -367,9 +374,85 @@ FBL.ns( function() { with( FBL ) {
             };
             // bindFixed is from Firebug. It helps to pass the args along.
             return { label: label, nol10n: true, type: "checkbox", checked: value, command: bindFixed( updatePref, Firebug, option, !value ) }
-        }
+        },
 
     } );
-
     Firebug.registerPanel( OmnibugPanel );
+
+
+    /**
+     * OmniUrl
+     */
+    var OmniUrl = function( url ) {
+        this.url = url;
+        this.parseUrl();
+    };
+
+    OmniUrl.prototype = (function() {
+        var U = {
+            hasQueryValue: function( key ) {
+                return typeof this.query[key] !== 'undefined';
+            },
+            getFirstQueryValue: function( key ) {
+                return this.query[key] ? this.query[key][0] : '';
+            },
+            getQueryValues: function( key ) {
+                return this.query[key] ? this.query[key] : [];
+            },
+            getQueryNames: function() {
+                var i, a = [];
+                for( i in this.query ) {
+                    a.push( i );
+                }
+                return a;
+            },
+            getLocation: function() {
+                return this.location;
+            },
+            getParamString: function() {
+                return this.paramString;
+            },
+            addQueryValue: function( key ) {
+                if( ! this.hasQueryValue( key ) ) {
+                    this.query[key] = [];
+                }
+                for( var i=1; i<arguments.length; ++i ) {
+                    this.query[key].push( arguments[i] );
+                }
+            },
+            decode: function( val ) {
+                var retVal;
+                try {
+                    return val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : '';
+                } catch( e ) {
+                    return val;
+                }
+            },
+            parseUrl: function() {
+                var url = this.url;
+                var pieces = url.split( '?' );
+                var p2 = pieces[0].split( ';' );
+                this.query = {};
+                this.queryString = '';
+                this.anchor = '';
+                this.location = p2[0];
+                this.paramString = ( p2[1] ? p2[1] : '' );
+                if( pieces[1] ) {
+                    var p3 = pieces[1].split( '#' );
+                    this.queryString = p3[0];
+                    this.anchor = ( p3[1] ? p3[1] : '' );
+                }
+                if( this.queryString ) {
+                    var kvPairs = this.queryString.split( /&/ );
+                    for( var i=0; i<kvPairs.length; ++i ) {
+                        var kv = kvPairs[i].split( '=' );
+                        this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
+                    }
+                }
+            }
+        };
+        return U;
+    } )();
+
 }} );
+
