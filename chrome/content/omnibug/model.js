@@ -201,6 +201,9 @@ FBL.ns( function() { with( FBL ) {
         initialize: function() {
             dump( ">>>   initialize: arguments=" + arguments + "\n" );
 
+            // call parent's init method
+            Firebug.Module.initialize.apply( this, arguments );
+
             this.initPrefsService();
 
             // set default pref

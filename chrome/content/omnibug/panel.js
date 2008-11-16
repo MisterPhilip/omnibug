@@ -65,6 +65,8 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         initialize: function( context, doc ) {
+            Firebug.Panel.initialize.apply(this, arguments);
+
             this.context = context;
             this.document = doc;
             this.panelNode = doc.createElement( "div" );
