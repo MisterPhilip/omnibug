@@ -37,6 +37,10 @@
 
  17  fix prob relayed by sophus (timing and requests staying in queue)
 
+ 18  file format -> quoted csv (need to escape quotes inside?)
+
+ 20  add new summary fields to file output (talk to Powers first)
+
 ------
 
 @DONE:
