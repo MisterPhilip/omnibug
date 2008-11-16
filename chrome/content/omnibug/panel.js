@@ -216,16 +216,15 @@ FBL.ns( function() { with( FBL ) {
 
             if( this.omRef.alwaysExpand ) {
                 expanderClass = "reg";
-                expanderImage = "chrome://omnibug/skin/win/twistyOpen.png";
+                expanderImage = "twistyOpen.png";
             } else {
                 expanderClass = "hid";
-                expanderImage = "chrome://omnibug/skin/win/twistyClosed.png";
+                expanderImage = "twistyClosed.png";
             }
 
             html  = "<table cellspacing='0' border='0' class='req " + eventType + " " + OmnibugPanel.cur.src + "'><tr>";
-            html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='" + expanderImage + "' /></a></td>";
+            html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='chrome://omnibug/skin/" + expanderImage + "' /></a></td>";
             html += "<td>";
-            //html += "<p><strong>" + this.camelCapser( eventType ) + " event:</strong> " + OmnibugPanel.cur.key + " &rarr; " + OmnibugPanel.cur.url.substring( 0, 75 ) + "...</p><div class='" + expanderClass + "'>";
             html += "<p><strong>" + this.camelCapser( eventType ) + " event</strong>" + ( OmnibugPanel.cur.src === "prev" ? " (previous page)" : "" ) + " | "
                                   + provider + " | "
                                   + OmnibugPanel.cur.timeStamp + " | "

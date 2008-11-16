@@ -17,7 +17,7 @@ Omnibug.OmnibugContext = function( panel ) {
  * @param {HTMLElement} el link clicked to toggle
  */
 Omnibug.OmnibugContext.prototype.toggle = function( el ) {
-    dump( ">>>   OmnibugContext: toggle, el=" + el + "\n" );
+    //dump( ">>>   OmnibugContext: toggle, el=" + el + "\n" );
 
     var i, img,
         tr = el.parentNode.parentNode,
@@ -29,7 +29,7 @@ Omnibug.OmnibugContext.prototype.toggle = function( el ) {
         if( td[i].className.match( /exp/ ) ) {
            img = td[i].getElementsByTagName( "img" )[0];
            if( img ) {
-               img.src = "chrome://omnibug/skin/win/twisty" + ( img.src.match( /Closed/ ) ? "Open" : "Closed" ) + ".png";
+               img.src = "chrome://omnibug/skin/twisty" + ( img.src.match( /Closed/ ) ? "Open" : "Closed" ) + ".png";
            }
         }
     }
