@@ -15,13 +15,11 @@
 
  4  fix clear button weirdness
  
- 4.5  changes to follow patterns from http://www.softwareishard.com/blog/firebug-tutorial/extending-firebug-hello-world-part-i/
-
- 5  platform-specific images (not just win)
+ 4.5  changes to follow patterns from http://www.softwareishard.com/blog/firebug-tutorial/extending-firebug-hello-world-part-i/ (i√, ii, iii, iv,v )
 
  6  icon (not just puzzle piece)
 
- 7  real prefs screen (to support #2 above)
+ 7  real prefs screen (to support #2,3 above)
 
  8  hosted by moz?
 
@@ -48,3 +46,6 @@
  13  table-ize data
 
  14  trim displayed full url and display in expanded version?
+
+ 5  platform-specific images (not just win)
+
