@@ -9,19 +9,63 @@
     <prefpane id="omnibug-gen-pane" label="General Settings">
         <preferences>
             <preference id="pref-log" name="extensions.omnibug.enableFileLogging" type="bool"/>
+            <preference id="pref-log-name" name="extensions.omnibug.logFileName" type="string"/>
+
             <preference id="pref-exp" name="extensions.omnibug.alwaysExpand" type="bool"/>
             <preference id="pref-quo" name="extensions.omnibug.showQuotes" type="bool"/>
+
+            <preference id="pref-color-quotes" name="extensions.omnibug.color_quotes" type="string"/>
+            <preference id="pref-color-hilite" name="extensions.omnibug.color_hilite" type="string"/>
+            <preference id="pref-color-load" name="extensions.omnibug.color_load" type="string"/>
+            <preference id="pref-color-click" name="extensions.omnibug.color_click" type="string"/>
+            <preference id="pref-color-prev" name="extensions.omnibug.color_prev" type="string"/>
         </preferences>
 
-        <hbox align="center">
-            <checkbox label="Enable file logging" preference="pref-log" />
-        </hbox>
+        <!-- file logging -->
+        <groupbox flex="1">
+            <caption>
+                <checkbox label="Enable file logging" preference="pref-log" />
+            </caption>
+            <hbox align="center">
+                <label control="log-file-name" value="Log file:" />
+                <textbox id="log-file-name" preference="pref-log-name" flex="1" />
+            </hbox>
+        </groupbox>
+
+
         <hbox align="center">
             <checkbox label="Always expand entries" preference="pref-exp" />
         </hbox>
         <hbox align="center">
             <checkbox label="Surround values with quotes" preference="pref-quo" />
         </hbox>
+
+
+        <!-- colors -->
+        <groupbox>
+            <caption label="Colors" />
+            <hbox align="center">
+                <label control="color-quotes-box" value="Quote color:" />
+                <textbox id="color-quotes-box" preference="pref-color-quotes" size="7" maxlegth="7" />
+            </hbox>
+            <hbox align="center">
+                <label control="color-hilite-box" value="Hilite color:" />
+                <textbox id="color-hilite-box" preference="pref-color-hilite" size="7" maxlegth="7" />
+            </hbox>
+            <hbox align="center">
+                <label control="color-load-box" value="Load event background:" />
+                <textbox id="color-load-box" preference="pref-color-load" size="7" maxlegth="7" />
+            </hbox>
+            <hbox align="center">
+                <label control="color-click-box" value="Click event background:" />
+                <textbox id="color-click-box" preference="pref-color-click" size="7" maxlegth="7" />
+            </hbox>
+            <hbox align="center">
+                <label control="color-prev-box" value="Previous page event background:" />
+                <textbox id="color-prev-box" preference="pref-color-prev" size="7" maxlegth="7" />
+            </hbox>
+        </groupbox>
+
     </prefpane>
 </prefwindow>
 
