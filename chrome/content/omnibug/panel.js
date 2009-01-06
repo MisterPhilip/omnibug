@@ -52,10 +52,6 @@ FBL.ns( function() { with( FBL ) {
         title: "Omnibug",
         searchable: false,
         editable: false,
-        cur: {},
-        other: [],
-        props: [],
-        vars: [],
         htmlOutput: false,
         omRef: Firebug.Omnibug,
 
@@ -74,7 +70,7 @@ FBL.ns( function() { with( FBL ) {
             this.panelNode.className = "panelNode panelNode-omnibug";
             doc.body.appendChild( this.panelNode );
 
-            dump( ">>>   panel initialize: arguments=" + arguments + "\n" );
+            //dump( ">>>   panel initialize: arguments=" + arguments + "\n" );
             if ( FirebugContext.omnibugContext ) {
                 dump( ">>>   initialize: context already exists\n" );
                 return;
@@ -92,7 +88,7 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         show: function() {
-            dump( ">>>   show: arguments=" + arguments + "\n" );
+            //dump( ">>>   show: arguments=" + arguments + "\n" );
 
             this.latestOmnibugContext = FirebugContext.omnibugContext;  // save this to make detach work
 
@@ -159,18 +155,23 @@ FBL.ns( function() { with( FBL ) {
             this.panelNode.appendChild( el );
         },
 
+
+        /**
+         * Receives a data object from the model, decodes it, and passes it on to report()
+         */
         decodeUrl: function( data ) {
             dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + Omnibug.Tools.getFuncName( FirebugContext.getPanel( "Omnibug" ).decodeUrl.caller ) + ")\n" );
             //dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + Omnibug.Tools.getFuncName( arguments.callee.caller ) + ")\n" );
 
-            OmnibugPanel.cur = data;
-            OmnibugPanel.props = [];
-            OmnibugPanel.other = [];
-            OmnibugPanel.vars = [];
-
             var val,
                 u = new OmniUrl( data.url ),
-                _quote = this.quote;
+                _quote = this.quote,
+                obj = {
+                    state: data,
+                    vars: [],
+                    props: [],
+                    other: []
+                };
 
             u.getQueryNames().forEach( function( n ) {
                 if( n ) {
@@ -180,17 +181,19 @@ FBL.ns( function() { with( FBL ) {
                     val = _quote( val );
 
                     if( n.match( /^c(\d+)$/ ) ) {
-                        OmnibugPanel.props[RegExp.$1] = val;
+                        obj.props[RegExp.$1] = val;
                     } else if( n.match( /^v(\d+)$/ ) ) {
-                        OmnibugPanel.vars[RegExp.$1] = val;
+                        obj.vars[RegExp.$1] = val;
                     } else {
-                        OmnibugPanel.other.push( [ n, val ] );
+                        obj.other.push( [ n, val ] );
                     }
                 }
             } );
 
-            this.report();
+
+            this.report( obj );
         },
+
 
         /**
          * Return a quoted string (if the pref is set)
@@ -208,15 +211,17 @@ FBL.ns( function() { with( FBL ) {
             return str.replace( /\b(.)/, function( m, $1 ) { return $1.toUpperCase() } );
         },
 
-        report: function() {
+        report: function( data ) {
+            //dump( ">>>   report: data=" + data + "\n" );
+
             var i, el, cn, len, html, mf, expanderImage, expanderClass,
-                eventType = ( OmnibugPanel.cur.doneLoading ? "click" : "load" ),
-                urlLength = OmnibugPanel.cur.url.length,
+                eventType = ( data.state.doneLoading ? "click" : "load" ),
+                urlLength = data.state.url.length,
                 tmp = "",
                 wt = "";
 
             // workaround -- kill it when vendor-specific code in place
-            var url = OmnibugPanel.cur.url,
+            var url = data.state.url,
                       provider = ( url.match( /(?:\/b\/ss|2o7)/ ) ? "Omniture" :
                           ( url.match( /moniforce\.gif/ ) ? "Moniforce" :
                               ( url.match( /dcs\.gif/ ) ? "WebTrends" :
@@ -236,48 +241,48 @@ FBL.ns( function() { with( FBL ) {
                 expanderImage = "twistyClosed.png";
             }
 
-            html  = "<table cellspacing='0' border='0' class='req " + eventType + " " + OmnibugPanel.cur.src + "'><tr>";
+            html  = "<table cellspacing='0' border='0' class='req " + eventType + " " + data.state.src + "'><tr>";
             html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='chrome://omnibug/skin/" + expanderImage + "' /></a></td>";
             html += "<td class='summ'>";
-            html += "<p class='summary'><strong>" + this.camelCapser( eventType ) + " event</strong>" + ( OmnibugPanel.cur.src === "prev" ? " (previous page)" : "" ) + " | "
+            html += "<p class='summary'><strong>" + this.camelCapser( eventType ) + " event</strong>" + ( data.state.src === "prev" ? " (previous page)" : "" ) + " | "
                         + provider + " | "
-                        + OmnibugPanel.cur.timeStamp + " | "
-                        + OmnibugPanel.cur.key + "</p>";
-                        //+ OmnibugPanel.cur.url + "</p>"; // @TODO: find a good way to fill the rest of the screen with the url, but don't add scrollbars!
+                        + data.state.timeStamp + " | "
+                        + data.state.key + "</p>";
+                        //+ data.state.url + "</p>"; // @TODO: find a good way to fill the rest of the screen with the url, but don't add scrollbars!
 
             html += "<div class='" + expanderClass + "'><table class='ent'>";
 
             // Omnibug values
             html += "<th colspan='2'>Summary</th>";
-            html += "<tr><td>Key</td><td>" + this.quote( OmnibugPanel.cur.key ) + "</td></tr>\n";
+            html += "<tr><td>Key</td><td>" + this.quote( data.state.key ) + "</td></tr>\n";
             html += "<tr><td>Event</td><td>" + this.quote( eventType ) + "</td></tr>\n";
-            html += "<tr><td>Timestamp</td><td>" + this.quote( OmnibugPanel.cur.timeStamp ) + "</td></tr>\n";
+            html += "<tr><td>Timestamp</td><td>" + this.quote( data.state.timeStamp ) + "</td></tr>\n";
             html += "<tr><td>Provider</td><td>" + this.quote( provider ) + "</td></tr>\n";
-            html += "<tr><td>Source</td><td>" + this.quote( OmnibugPanel.cur.src === "prev" ? "Previous page" : "Current page" ) + "</td></tr>\n"; // might not be exactly working
-            html += "<tr><td>Parent URL</td><td>" + this.quote( OmnibugPanel.cur.parentUrl ) + "</td></tr>\n";
-            html += "<tr><td>Full URL</td><td>" + this.quote( OmnibugPanel.cur.url ) + "<br/>(" + urlLength + " characters";
+            html += "<tr><td>Source</td><td>" + this.quote( data.state.src === "prev" ? "Previous page" : "Current page" ) + "</td></tr>\n"; // might not be exactly working
+            html += "<tr><td>Parent URL</td><td>" + this.quote( data.state.parentUrl ) + "</td></tr>\n";
+            html += "<tr><td>Full URL</td><td>" + this.quote( data.state.url ) + "<br/>(" + urlLength + " characters";
             html += ( urlLength > 2083 ? ", <span class='imp'>*** too long for IE6/7! ***</span>" : "" ) + ")</td></tr>\n";
 
             // omniture props
-            if( OmnibugPanel.props.length ) {
+            if( data.props.length ) {
                 //html += "<dt>Props</dt>";
                 html += "<th colspan='2'>Props</th>";
-                for( i = 0, len = OmnibugPanel.props.length; i < len; ++i ) {
-                    if( OmnibugPanel.props[i] ) {
+                for( i = 0, len = data.props.length; i < len; ++i ) {
+                    if( data.props[i] ) {
                         cn = this.isHighlightable( "prop" + i ) ? "hilite" : "";
-                        html += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>prop" + i + "</td><td class='v'>" + OmnibugPanel.props[i] + "</td></tr>\n";
+                        html += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>prop" + i + "</td><td class='v'>" + data.props[i] + "</td></tr>\n";
                     }
                 }
             }
 
             // omniture eVars
-            if( OmnibugPanel.vars.length ) {
+            if( data.vars.length ) {
                 //html += "<dt>eVars</dt>";
                 html += "<th colspan='2'>eVars</th>";
-                for( i = 0, len = OmnibugPanel.vars.length; i < len; ++i ) {
-                    if( OmnibugPanel.vars[i] ) {
+                for( i = 0, len = data.vars.length; i < len; ++i ) {
+                    if( data.vars[i] ) {
                         cn = this.isHighlightable( "eVar" + i ) ? "hilite" : "";
-                        html += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>eVar" + i + "</td><td class='v'>" + OmnibugPanel.vars[i] + "</td></tr>\n";
+                        html += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>eVar" + i + "</td><td class='v'>" + data.vars[i] + "</td></tr>\n";
                     }
                 }
             }
@@ -287,13 +292,13 @@ FBL.ns( function() { with( FBL ) {
             var otherNamed = {},
                 otherOther = {};
 
-            if( OmnibugPanel.other.length ) {
-                for( i = 0, len = OmnibugPanel.other.length; i < len; ++i ) {
-                    if( OmnibugPanel.other[i] ) {
-                        if( this.omRef.cfg.usefulKeys[OmnibugPanel.other[i][0]] ) {
-                            otherNamed[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
+            if( data.other.length ) {
+                for( i = 0, len = data.other.length; i < len; ++i ) {
+                    if( data.other[i] ) {
+                        if( this.omRef.cfg.usefulKeys[data.other[i][0]] ) {
+                            otherNamed[data.other[i][0]] = data.other[i][1];
                         } else {
-                            otherOther[OmnibugPanel.other[i][0]] = OmnibugPanel.other[i][1];
+                            otherOther[data.other[i][0]] = data.other[i][1];
                         }
                     }
                 }
@@ -353,6 +358,8 @@ FBL.ns( function() { with( FBL ) {
 
             //dump( ">>>   output html:\n\n\n" + html + "\n\n\n" );
             FirebugContext.getPanel("Omnibug").appendHtml( html );
+
+            dump( "<<<   report: wrote entry for " + data.state.key + "\n" );
         },
 
         // returns true when the given name is in the highlightKeys list
