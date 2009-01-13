@@ -386,29 +386,6 @@ FBL.ns( function() { with( FBL ) {
         loadedContext: function( context ) {
             _dump( "loadedContext: context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
 
-            /*
-             * @FIXME
-             * this seems like a total hack, but it fixed the immediate problem (maybe due to timing?)
-             * loadedContext is called when any page is done loading, including pages in other tabs (weird).
-             * a page that was loading in another tab had a location of about:blank, which was causing processRequests() to fire and dump the request from the original tab (thereby duplicating the entry)
-             * this logic is probably not quite right (we shouldn't be paying attention to other tab's load events)
-             *
-             * sigh.  i forget what the "immediate problem" was above, but adding this code breaks the ability to display the previous
-             * page's events (e.g. click events on the previous page that sent us to the current page
-             * not sure how to address, or what the issue was.  need to look through svn logs to see.
-             *
-             * says svn:
-             * "added hack to loadedContext to suppress double click event entries when loading the BE website link in another tab (still has problems)"
-             *
-             * seems that we are dumping results to the panel in tab X when loadedContext is called because tab Y finished loading.
-             * should probably correct that somehow -- tab-specific list?  detect when loadedContext is for "current" tab?
-             *
-
-            if( ! context.window.location.match( /^http/ ) ) {
-                return;
-            }
-             */
-
             // Makes detach work.
             if ( ! context.omnibugContext && this.cfg.latestOmnibugContext ) {
                 context.omnibugContext = this.cfg.latestOmnibugContext;
@@ -652,7 +629,6 @@ FBL.ns( function() { with( FBL ) {
     }
 
     OmNetProgress.prototype = {
-        that: this,
         seenReqs: {},
         stateIsRequest: false,
         onLocationChange: function() {},
