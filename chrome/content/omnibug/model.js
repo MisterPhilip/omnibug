@@ -60,6 +60,12 @@ FBL.ns( function() { with( FBL ) {
         }
     }
 
+    function _dump( str ) {
+        var d = new Date();
+        dump( d.toLocaleTimeString() + "." + d.getMilliseconds() + ":  " + str );
+    }
+
+
     // ************************************************************************************************
     // Constants
 
@@ -69,7 +75,7 @@ FBL.ns( function() { with( FBL ) {
         const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
         const nsISupports = CI( "nsISupports" );
     } catch( ex ) {
-        dump( ">>>   Error instantiating component interfaces: " + ex + "\n" );
+        _dump( "Error instantiating component interfaces: " + ex + "\n" );
     }
 
     const NOTIFY_STATE_DOCUMENT = nsIWebProgress.NOTIFY_STATE_DOCUMENT;
@@ -87,7 +93,6 @@ FBL.ns( function() { with( FBL ) {
         cfg: {
             requests: {},
             messages: [],
-            contextLoaded: false,
             latestOmnibugContext: null,
             defaultRegex: null,
             userRegex: null,
@@ -105,22 +110,38 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         shutdown: function() {
-            dump( ">>>   shutdown\n" );
+            //_dump( "shutdown\n" );
             if( Firebug.getPref( 'defaultPanelName' ) === 'Omnibug' ) {
                 Firebug.setPref( 'defaultPanelName', 'console' );
             }
         },
+
+
+        /**
+         * ?
+         * @override
+        initializeUI: function( detachArgs ) {
+        },
+         */
+
 
         /**
          * Called when panels are selected
          * @override
          */
         showPanel: function( browser, panel ) {
-            dump( ">>>   showPanel: browser=" + browser + "; panel=" + panel + "\n" );
+            //_dump( "showPanel: browser=" + browser + "; panel=" + panel + "\n" );
             var isOmnibug = panel && panel.name === "Omnibug";
             var OmnibugButtons = browser.chrome.$( "fbOmnibugButtons" );
             collapse( OmnibugButtons, !isOmnibug );
         },
+
+        /**
+         * ?
+         * @override
+        showSidePanel: function( browser, panel ) {
+        },
+         */
 
         /**
          * Called when the clear button is pushed
@@ -153,7 +174,7 @@ FBL.ns( function() { with( FBL ) {
                 // add prefs observer
                 this.cfg.prefsService.addObserver( "", this, false );
             } catch( ex ) {
-                dump( ">>>   initPrefsService: error getting prefs service: " + ex + "\n" );
+                _dump( "initPrefsService: error getting prefs service: " + ex + "\n" );
             }
         },
 
@@ -199,7 +220,7 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         initialize: function() {
-            dump( ">>>   initialize: arguments=" + arguments + "\n" );
+            _dump( "initialize: arguments=" + arguments + "\n" );
 
             // call parent's init method
             Firebug.Module.initialize.apply( this, arguments );
@@ -220,7 +241,7 @@ FBL.ns( function() { with( FBL ) {
          *   this is called by initialize(), as well by the prefs observer service
          */
         initPrefs: function() {
-            dump( ">>>   initPrefs: (re)initializing preferences\n" );
+            _dump( "initPrefs: (re)initializing preferences\n" );
 
             // logging
             this.initLogging();
@@ -237,7 +258,7 @@ FBL.ns( function() { with( FBL ) {
          * Preferences observer handler
          */
         observe: function( subject, topic, key ) {
-            dump( ">>>   observe: subject='" + subject + "'; topic='" + topic + "'; key='" + key + "'; value='" + this.getPreference( key ) + "'\n" );
+            _dump( "observe: subject='" + subject + "'; topic='" + topic + "'; key='" + key + "'; value='" + this.getPreference( key ) + "'\n" );
 
             if( topic !== "nsPref:changed" ) {
                 return;
@@ -275,10 +296,10 @@ FBL.ns( function() { with( FBL ) {
          * Init logging behavior
          */
         initLogging: function() {
-            dump( ">>>   initLogging: arguments=" + arguments + "\n" );
+            _dump( "initLogging: arguments=" + arguments + "\n" );
 
             var fileOutput = this.getPreference( "enableFileLogging" );
-            dump( ">>>   initLogging: fileOutput=" + fileOutput + "\n" );
+            _dump( "initLogging: fileOutput=" + fileOutput + "\n" );
             if( fileOutput ) {
                 var prefFile;
                 try {
@@ -287,23 +308,23 @@ FBL.ns( function() { with( FBL ) {
 
                 try {
                     if( prefFile ) {
-                        dump( ">>>   initLogging: enabling logging to " + prefFile + "\n" );
+                        _dump( "initLogging: enabling logging to " + prefFile + "\n" );
                         this.cfg.outFile = FileIO.open( prefFile );
                     } else {
-                        dump( ">>>   initLogging: enabling logging to default log file\n" );
+                        _dump( "initLogging: enabling logging to default log file\n" );
                         var path = FileIO.getTmpDir();
                         var fn = "omnibug.log";
                         this.cfg.outFile = FileIO.append( path, fn );
                     }
 
                     var msg = "File logging enabled; requests will be written to " + this.cfg.outFile.path;
-                    dump( ">>>   initLogging: " + msg + "\n" );
+                    _dump( "initLogging: " + msg + "\n" );
                     this.cfg.messages.push( msg );
                 } catch( ex ) {
-                    dump( ">>>   initLogging: unable to create output file: " + ex + "\n" );
+                    _dump( "initLogging: unable to create output file: " + ex + "\n" );
                 }
             } else {
-                dump( ">>>   initLogging: logging is disabled.\n" );
+                _dump( "initLogging: logging is disabled.\n" );
                 this.cfg.outFile = null;
             }
         },
@@ -333,8 +354,15 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         initContext: function( context ) {
-            dump( ">>>   initContext: context=" + context + "\n" );
+            if( ! context.browser.uid ) {
+                context.browser.uid = FBL.getUniqueId();
+            }
+            _dump( "initContext: context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
+
             this.monitorContext( context );
+
+            // expire old requests
+            this.expireRequests( context );
         },
 
         /**
@@ -342,10 +370,10 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         destroyContext: function( context ) {
-            dump( ">>>   destroyContext: context=" + context + "\n" );
+            _dump( "destroyContext: context[" + context.uid + "]\n\n\n" );
 
             this.cfg.latestOmnibugContext = undefined;
-            this.cfg.contextLoaded = false;
+            context.loaded = false;
             if( context.omNetProgress ) {
                 this.unmonitorContext( context );
             }
@@ -356,44 +384,45 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         loadedContext: function( context ) {
-            dump( ">>>   loadedContext: context=" + context + "\n" );
-/*
-            try {
-                for( el in context ) {
-                    var val = context[el];
-                    if( ! context[el].toString().match( /^function/ ) ) {
-                        dump( "'" + el +"'='" + val + "'\n" );
-                    }
-                }
-            } catch( ex ) {}
-
-            dump( "---   window.loc='" + context.window.location + "'\n" );
-*/
+            _dump( "loadedContext: context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
 
             /*
+             * @FIXME
              * this seems like a total hack, but it fixed the immediate problem (maybe due to timing?)
              * loadedContext is called when any page is done loading, including pages in other tabs (weird).
              * a page that was loading in another tab had a location of about:blank, which was causing processRequests() to fire and dump the request from the original tab (thereby duplicating the entry)
              * this logic is probably not quite right (we shouldn't be paying attention to other tab's load events)
-             */
+             *
+             * sigh.  i forget what the "immediate problem" was above, but adding this code breaks the ability to display the previous
+             * page's events (e.g. click events on the previous page that sent us to the current page
+             * not sure how to address, or what the issue was.  need to look through svn logs to see.
+             *
+             * says svn:
+             * "added hack to loadedContext to suppress double click event entries when loading the BE website link in another tab (still has problems)"
+             *
+             * seems that we are dumping results to the panel in tab X when loadedContext is called because tab Y finished loading.
+             * should probably correct that somehow -- tab-specific list?  detect when loadedContext is for "current" tab?
+             *
+
             if( ! context.window.location.match( /^http/ ) ) {
                 return;
             }
+             */
 
             // Makes detach work.
             if ( ! context.omnibugContext && this.cfg.latestOmnibugContext ) {
                 context.omnibugContext = this.cfg.latestOmnibugContext;
             }
 
-            this.cfg.contextLoaded = true;
+            context.loaded = true;
 
             // dump any messages waiting
             while( this.cfg.messages.length ) {
                 FirebugContext.getPanel("Omnibug").printLine( this.cfg.messages.shift() );
             }
 
-            //dump( ">>>   loadedContext: calling processRequests\n" );
-            this.processRequests();
+            // dump any requests waiting
+            this.processRequests( context );
         },
 
         /**
@@ -401,7 +430,7 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         reattachContext: function( context ) {
-            dump( ">>>   reattachContext: context=" + context + "\n" );
+            _dump( "reattachContext: context[" + context.uid + "]\n" );
 
             // Makes detach work.
             if ( ! FirebugContext.getPanel( "Omnibug" ).document.omnibugContext ) {
@@ -414,24 +443,24 @@ FBL.ns( function() { with( FBL ) {
         /**
          * Called as page is rendering (?)
          * @override
-         */
         showContext: function( browser, context ) {
-            dump( ">>>   showContext: browser=" + browser + "; context=" + context + "\n" );
+            _dump( "showContext: context[" + context.uid + "]; browser[" + browser.uid + "]\n" );
         },
+         */
 
         /**
          * ?
          * @override
          */
         watchContext: function( win, context, isSystem ) {
-            dump( ">>>   watchContext: win=" + win + "; context=" + context + "; isSystem=" + isSystem + "\n" );
+            _dump( "watchContext: context[" + context.uid + "]; win=" + win + "; isSystem=" + isSystem + "\n" );
         },
 
         /**
          * Called from initContext()
          */
         monitorContext: function( context ) {
-            dump( ">>>   monitorContext: context=" + context + "\n" );
+            //_dump( "monitorContext: context=" + context + "\n" );
             if( !context.omNetProgress ) {
                 context.omNetProgress = new OmNetProgress( context );
                 context.browser.addProgressListener( context.omNetProgress, NOTIFY_ALL );
@@ -442,7 +471,7 @@ FBL.ns( function() { with( FBL ) {
          * Called from destroyContext()
          */
         unmonitorContext: function( context ) {
-            //dump( ">>>   unmonitorContext: context=" + context + "\n" );
+            //_dump( "unmonitorContext: context=" + context + "\n" );
             if( context.omNetProgress ) {
                 if( context.browser.docShell ) {
                     context.browser.removeProgressListener( context.omNetProgress, NOTIFY_ALL );
@@ -457,7 +486,7 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         unwatchWindow: function( context, win ) {
-            dump( ">>>   unwatchWindow: context=" + context + "; win=" + win + "\n" );
+            //_dump( "unwatchWindow: context[" + context.uid + "]; win[" + win.uid + "]\n" );
             this.cfg.win = null;
         },
 
@@ -466,49 +495,116 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         watchWindow: function( context, win ) {
-            dump( ">>>   watchWindow: win=" + win + "; context=" + context + "\n" );
+            if( ! win.uid ) {
+                win.uid = FBL.getUniqueId();
+            }
+            //_dump( "watchWindow: context[" + context.uid + "]; win[" + win.uid + "]\n" );
             this.cfg.win = win; // @TODO: not sure 'this' is the right place for the window reference
         },
 
         /**
          * Called by loadedContext to process the requests object and write to panel
          */
-        processRequests: function() {
-            dump( ">>>   processRequests: processing " + Object.size( this.cfg.requests ) + " requests\n" );
-            for( var key in this.cfg.requests ) {
-                //dump( "---   key=" + key + "\n" );
-                if( this.cfg.requests.hasOwnProperty( key ) ) {
-                    dump( "---   processRequests: processing " + key + "\n" );
-                    this.cfg.requests[key]["src"] = "prev";
-                    dump( "---   processRequests: calling decodeUrl\n" );
-                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( this.cfg.requests[key] );
-                    delete this.cfg.requests[key];
-                } else {
-                    dump( ">>>   processRequests: not my key!\n" );
+        processRequests: function( context ) {
+            var age,
+                requests = Firebug.Omnibug.cfg.requests;
+
+            _dump( "processRequests: processing " + Object.size( requests ) + " requests; context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
+
+            try {
+                for( var key in requests ) {
+                    if( requests.hasOwnProperty( key ) ) {
+                        age = ( new Date() - requests[key].timeStamp ) / 1000;
+                        _dump( "processRequests: processing " + key + " (browser[" + requests[key]["browser"].uid + "]; age=" + age + "): " );
+
+                        // only process the requests if they are for "our" browser (the one that generated the request)
+                        if( context.browser === requests[key]["browser"] ) {
+                            requests[key]["src"] = "prev";
+                            _dump( "valid for this browser; calling decodeUrl\n" );
+                            FirebugContext.getPanel( "Omnibug" ).decodeUrl( requests[key] );
+                            delete requests[key];
+                        } else {
+                            _dump( "invalid for this browser; skipping\n" );
+                        }
+                    }
                 }
+            } catch( ex ) {
+                _dump( "processRequests: caught exception: " + ex + "\n" );
             }
-            dump( "<<<   processRequests: done\n" );
+            _dump( "processRequests: done (" + Object.size( requests ) + " remaining)\n" );
         },
+
+
+        /**
+         * Called by initContext to expire old requests
+         *
+         * The point of requests[] is to keep track of requests that need to be shown from the previous page load (e.g. a link to
+         * another page with a web beacon).  When run from initContext, valid requests would have just been generated moments ago,
+         * while invalid requests (those generated from a previous page and are no longer applicable) have a much older date
+         */
+        expireRequests: function( context ) {
+            var age,
+                requests = Firebug.Omnibug.cfg.requests;
+
+            _dump( "expireRequests: processing " + Object.size( requests ) + " requests; context[" + context.uid + "]\n" );
+
+            try {
+                for( var key in requests ) {
+                    if( requests.hasOwnProperty( key ) ) {
+                        age = ( new Date() - requests[key].timeStamp ) / 1000;
+                        _dump( "expireRequests: processing " + key + " (browser[" + requests[key]["browser"].uid + "]; age=" + age + "): " );
+
+                        if( age > 3 ) { // 3s seems like a reasonable starting point
+                            // request is old, throw it out
+                            _dump( "expired; removing entry\n" );
+                            delete requests[key];
+                        } else {
+                            _dump( "no expiration needed\n" );
+                        }
+                    }
+                }
+            } catch( ex ) {
+                _dump( "expireRequests: caught exception: " + ex + "\n" );
+            }
+            _dump( "expireRequests: done (" + Object.size( requests ) + " remaining)\n" );
+        },
+
 
         /**
          * Tools menu handler
          */
         omnibugTools: function( menuitem ) {
-            dump( ">>>   omnibugTools: label=" + menuitem.label + "\n" );
+            //_dump( "omnibugTools: label=" + menuitem.label + "\n" );
 
             if( menuitem.label === "Choose log file" ) {
                 if( Omnibug.Tools.chooseLogFile( this.cfg.win ) ) {
                     // successfully picked a log file
-                    dump( ">>>   omnibugTools: logFileName=" + this.getPreference( "logFileName" ) + "\n" );
+                    _dump( "omnibugTools: logFileName=" + this.getPreference( "logFileName" ) + "\n" );
                 }
             }
         },
+
+
+        /**
+         * ?
+         * @override
+        updateOption: function( name, value ) {
+        },
+         */
+
+        /**
+         * ?
+         * @override
+        getObjectByURL: function( context, url ) {
+        },
+         */
+
 
         /**
          * Init and compile regex patterns for matching requests
          */
         initPatterns: function() {
-            dump( ">>>   initPatterns: initing patterns from prefs\n" );
+            _dump( "initPatterns: initing patterns from prefs\n" );
             var defaultPattern = this.getPreference( "defaultPattern" ),
                 userPattern = this.getPreference( "userPattern" );
 
@@ -528,7 +624,7 @@ FBL.ns( function() { with( FBL ) {
                     }
                 }
             }
-            dump( ">>>   initPatterns: usefulKeys=" + Omnibug.Tools.objDump( this.cfg.usefulKeys ) + "\n" );
+            _dump( "initPatterns: usefulKeys=" + Omnibug.Tools.objDump( this.cfg.usefulKeys ) + "\n" );
 
             // init highlight keys
             keyList = this.getPreference( "highlightKeys" );
@@ -540,9 +636,8 @@ FBL.ns( function() { with( FBL ) {
                     }
                 }
             }
-            dump( ">>>   initPatterns: highlightKeys=" + Omnibug.Tools.objDump( this.cfg.highlightKeys ) + "\n" );
+            _dump( "initPatterns: highlightKeys=" + Omnibug.Tools.objDump( this.cfg.highlightKeys ) + "\n" );
         }
-
     } );
     Firebug.registerModule( Firebug.Omnibug );
 
@@ -552,15 +647,13 @@ FBL.ns( function() { with( FBL ) {
      * @TODO: put in another file, but how to reference?
      */
     function OmNetProgress( context ) {
-        dump( ">>>   OmNetProgress: instantiated\n" );
+        //_dump( "OmNetProgress: instantiated\n" );
         this.context = context;
     }
 
     OmNetProgress.prototype = {
         that: this,
         seenReqs: {},
-        parentUrl: null,
-        doneLoading: false,
         stateIsRequest: false,
         onLocationChange: function() {},
         onProgressChange: function() {},
@@ -583,59 +676,64 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         onStateChange: function( progress, request, flag, status ) {
-            //dump( ">>>   onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
+            //_dump( "onStateChange: name=" + request.name + "; progress=" + progress + "; request=" + request + "; flag=" + flag + "; status=" + status + "\n" );
+
             var key, file, obj, now,
                 omRef = Firebug.Omnibug;
 
             // capture the originating URL (e.g. of the parent page)
             if( ( flag & nsIWebProgressListener.STATE_IS_NETWORK ) &&
                 ( flag & nsIWebProgressListener.STATE_START ) ) {
-                this.that.parentUrl = request.name; // @TODO: still not sure that this is right
-                this.that.doneLoading = false;
+                this.context._doneLoading = false;
             }
 
             // notice when parent document load is complete // @TODO: what happens if user clicks a beacon link before this point??
             if( ( flag & nsIWebProgressListener.STATE_IS_NETWORK ) &&
                 ( flag & nsIWebProgressListener.STATE_STOP ) &&
-                this.that.parentUrl === request.name ) {
-                this.that.doneLoading = true;
+                this.context.browser.currentURI.spec === request.name ) {
+                this.context._doneLoading = true;
             }
+
 
             // @TODO: is this the right order (default then user)?  Should we always be matching both?
             if( request.name.match( omRef.cfg.defaultRegex ) || ( omRef.cfg.userRegex && request.name.match( omRef.cfg.userRegex ) ) ) {
-                //dump( ">>>   onStateChange pattern match: key=" + Md5Impl.md5( request.name ) + " (" + request.name.substring( 0, 75 ) + ")" + "\n" );
 
                 now = new Date();
+                key = Md5Impl.md5( request.name );
+
                 if( ! this.seenReqs[request.name] ) {
                     this.seenReqs[request.name] = true;
 
-                    key = Md5Impl.md5( request.name );
-                    dump( ">>>   onStateChange:\n>>>\tname=" + request.name.substring( 0, 100 ) + "...\n>>>\tflags=" + getStateDescription( flag ) + "\n>>>\tmd5=" + key + "\n>>>\tparentUrl=" + this.that.parentUrl + "\n\n" );
+                    _dump( "onStateChange (context[" + this.context.uid + "]; browser[" + this.context.browser.uid + "]):\n\tname=" + request.name.substring( 0, 100 ) + "...\n\tflags=" + getStateDescription( flag ) + "\n\tkey=" + key + "\n\tparentUrl=" + this.context.browser.currentURI.spec + "\n\n" );
 
                     obj = {
                         key: key,
                         url: request.name,
-                        parentUrl: this.that.parentUrl,
-                        doneLoading: this.that.doneLoading,
-                        timeStamp: now
+                        parentUrl: this.context.browser.currentURI.spec,
+                        doneLoading: this.context._doneLoading,
+                        timeStamp: now,
+                        browser: this.context.browser
                     };
 
-
-                    // write the request to the panel.  must happen here so beacons will be called (e.g., in realtime)
-                    dump( "---   onStateChange: calling decodeUrl\n" );
+                    // write the request to the panel.  must happen here so beacons will be shown (e.g., in realtime)
                     FirebugContext.getPanel( "Omnibug" ).decodeUrl( obj );
 
-                    // add to requests object only if the context has been loaded (e.g. dump requests added from the previous page)
-                    if( omRef.cfg.contextLoaded ) {
-                        dump( ">>>   onStateChange: adding request to request list: " + Omnibug.Tools.objDump( omRef.cfg.requests ) + "\n" );
+                    /* Save requests in requests[] that need to be dumped on the next page (e.g. web beacons).  Only click events
+                     * are candidates for saving, so only start saving after the context has loaded
+                     * @TODO: investigate doneLoading vs. context.loaded
+                     */
+                    if( this.context.loaded ) {
+                        _dump( "onStateChange: adding request (key=" + obj.key + ") to module\n" );
                         omRef.cfg.requests[key] = obj;
                     }
 
                     // write to file, if defined
                     file = omRef.cfg.outFile;
                     if( file !== null ) {
-                        FileIO.write( file, now + "\t" + key + "\t" + request.name + "\t" + this.that.parentUrl + "\n", "a" );
+                        FileIO.write( file, now + "\t" + key + "\t" + request.name + "\t" + this.context.browser.currentURI.spec + "\n", "a" );
                     }
+                } else {
+                    _dump( "onStateChange: already seen request with key " + key + "\n" );
                 }
             }
         }
@@ -696,7 +794,7 @@ FBL.ns( function() { with( FBL ) {
     }
 
     Omnibug.Tools.chooseLogFile = function( win ) {
-        dump( ">>>   chooseLogFile: win=" + win + "\n" );
+        dump( "chooseLogFile: win=" + win + "\n" );
 
         const nsIFilePicker = Components.interfaces.nsIFilePicker;
         var fp = CC( "@mozilla.org/filepicker;1" ).createInstance( nsIFilePicker );
@@ -706,12 +804,12 @@ FBL.ns( function() { with( FBL ) {
         var rv = fp.show();
         if( rv == nsIFilePicker.returnOK || rv == nsIFilePicker.returnReplace ) {
             var path = fp.file.path;
-            dump( ">>>   chooseLogFile: new path = " + path + "\n" );
+            dump( "chooseLogFile: new path = " + path + "\n" );
 
             Firebug.Omnibug.setPreference( "logFileName", path );
             Firebug.Omnibug.setPreference( "enableFileLogging", true );
 
-            dump( ">>>   chooseLogFile: set new path; get=" + Firebug.Omnibug.getPreference( "logFileName" ) + "\n" );
+            dump( "chooseLogFile: set new path; get=" + Firebug.Omnibug.getPreference( "logFileName" ) + "\n" );
 
             return true;
         }
