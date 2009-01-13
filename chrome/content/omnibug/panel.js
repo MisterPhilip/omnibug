@@ -44,7 +44,13 @@ if( typeof FBL === "undefined" ) {
     FBL = { ns: function() {} }
 }
 
+
 FBL.ns( function() { with( FBL ) {
+    // @TODO: use version in model.js?
+    function _dump( str ) {
+        var d = new Date();
+        dump( d.toLocaleTimeString() + "." + d.getMilliseconds() + ":  " + str );
+    }
 
     function OmnibugPanel() {}
     OmnibugPanel.prototype = extend( Firebug.Panel, {
@@ -54,6 +60,8 @@ FBL.ns( function() { with( FBL ) {
         editable: false,
         htmlOutput: false,
         omRef: Firebug.Omnibug,
+
+
 
         /**
          * Initialize the panel. This is called when the Panel is activated and
@@ -70,9 +78,9 @@ FBL.ns( function() { with( FBL ) {
             this.panelNode.className = "panelNode panelNode-omnibug";
             doc.body.appendChild( this.panelNode );
 
-            //dump( ">>>   panel initialize: arguments=" + arguments + "\n" );
+            //_dump( "panel initialize: arguments=" + arguments + "\n" );
             if ( FirebugContext.omnibugContext ) {
-                dump( ">>>   initialize: context already exists\n" );
+                _dump( "panel initialize: context already exists\n" );
                 return;
             }
 
@@ -88,7 +96,7 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         show: function() {
-            //dump( ">>>   show: arguments=" + arguments + "\n" );
+            //_dump( "show: arguments=" + arguments + "\n" );
 
             this.latestOmnibugContext = FirebugContext.omnibugContext;  // save this to make detach work
 
@@ -98,7 +106,7 @@ FBL.ns( function() { with( FBL ) {
         },
 
         printLine: function( msg ) {
-            dump( ">>>   printLine: printing msg='" + msg + "'\n" );
+            _dump( "printLine: printing msg='" + msg + "'\n" );
             var el = this.document.createElement( "p" );
             el.className = "om";
             el.innerHTML = msg;
@@ -126,7 +134,7 @@ FBL.ns( function() { with( FBL ) {
         },
 
         appendHtml: function( data ) {
-            //dump( ">>>   htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
+            //_dump( "htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
             var str = "";
             //var elType = "<div>";
 
@@ -148,7 +156,7 @@ FBL.ns( function() { with( FBL ) {
             elType = "html";
             OmnibugPanel.htmlOutput = true;
 
-            //dump( ">>> dumping html:\n\n>>>" + data + "\n\n" );
+            //_dump( "dumping html:\n\n>>>" + data + "\n\n" );
 
             var el = this.document.createElement( elType );
             el.innerHTML = str + data;
@@ -160,8 +168,8 @@ FBL.ns( function() { with( FBL ) {
          * Receives a data object from the model, decodes it, and passes it on to report()
          */
         decodeUrl: function( data ) {
-            dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + Omnibug.Tools.getFuncName( FirebugContext.getPanel( "Omnibug" ).decodeUrl.caller ) + ")\n" );
-            //dump( ">>>   decodeUrl: processing key=" + data.key + " (caller: " + Omnibug.Tools.getFuncName( arguments.callee.caller ) + ")\n" );
+            _dump( "decodeUrl: processing key=" + data.key + " (doneLoading=" + data.doneLoading + ")\n" );
+            //_dump( "decodeUrl: processing key=" + data.key + " (caller: " + Omnibug.Tools.getFuncName( arguments.callee.caller ) + ")\n" );
 
             var val,
                 u = new OmniUrl( data.url ),
@@ -212,7 +220,7 @@ FBL.ns( function() { with( FBL ) {
         },
 
         report: function( data ) {
-            //dump( ">>>   report: data=" + data + "\n" );
+            //_dump( "report: data=" + data + "\n" );
 
             var i, el, cn, len, html, mf, expanderImage, expanderClass,
                 eventType = ( data.state.doneLoading ? "click" : "load" ),
@@ -356,10 +364,10 @@ FBL.ns( function() { with( FBL ) {
 
             html += "</table></div></td></tr></table>\n";
 
-            //dump( ">>>   output html:\n\n\n" + html + "\n\n\n" );
+            //_dump( "output html:\n\n\n" + html + "\n\n\n" );
             FirebugContext.getPanel("Omnibug").appendHtml( html );
 
-            dump( "<<<   report: wrote entry for " + data.state.key + "\n" );
+            _dump( "report: wrote entry for " + data.state.key + "\n" );
         },
 
         // returns true when the given name is in the highlightKeys list
