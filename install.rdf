@@ -8,7 +8,7 @@
                    em:maxVersion="3.0.*" />
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="Omnibug@rosssimpson.com"
-                   em:version="0.5.250"
+                   em:version="0.5.286"
                    em:type="2"
                    em:name="Omnibug"
                    em:description="Firebug Extension for web metrics testing and debugging"
