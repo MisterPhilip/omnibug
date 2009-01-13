@@ -14,7 +14,7 @@
  3  add pattern preference input box (how does this work with #2?)
 
  4  fix clear button weirdness
- 
+
  4.5  changes to follow patterns from http://www.softwareishard.com/blog/firebug-tutorial/extending-firebug-hello-world-part-i/ (1√, 2√, 3√, 4, 5 )
 
  6  icon (not just puzzle piece)
@@ -39,7 +39,11 @@
 
  18  file format -> quoted csv (need to escape quotes inside?)
 
- 20  add new summary fields to file output (talk to Powers first)
+ 20  add new summary fields to file output (talk to Powers first) (18 and 20 okay by Powers)
+
+ 21  Use 'workspace' variables (e.g. context.omnibug.requests, not context.requests), so it plays nice with other extensions
+
+ 22  Investigate global use of context.loaded vs. onStateChange's doneLoading flags.  Are they different?  Do we need both?
 
 ------
 
@@ -51,5 +55,10 @@
 
  14  trim displayed full url and display in expanded version?
 
- 5  platform-specific images (not just win)
+  5  platform-specific images (not just win)
+
+
+------
+
+FBTrace.dumpProperties( "browser", context.browser );
 
