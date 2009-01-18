@@ -359,6 +359,9 @@ FBL.ns( function() { with( FBL ) {
             }
             _dump( "initContext: context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
 
+            context.omnibug = {};
+            context.omnibug.doneLoading = false;
+
             this.monitorContext( context );
 
             // expire old requests
@@ -373,7 +376,7 @@ FBL.ns( function() { with( FBL ) {
             _dump( "destroyContext: context[" + context.uid + "]\n\n\n" );
 
             this.cfg.latestOmnibugContext = undefined;
-            context.loaded = false;
+            context.omnibug.loaded = false;
             if( context.omNetProgress ) {
                 this.unmonitorContext( context );
             }
@@ -391,7 +394,7 @@ FBL.ns( function() { with( FBL ) {
                 context.omnibugContext = this.cfg.latestOmnibugContext;
             }
 
-            context.loaded = true;
+            context.omnibug.loaded = true;
 
             // dump any messages waiting
             while( this.cfg.messages.length ) {
@@ -660,14 +663,14 @@ FBL.ns( function() { with( FBL ) {
             // capture the originating URL (e.g. of the parent page)
             if( ( flag & nsIWebProgressListener.STATE_IS_NETWORK ) &&
                 ( flag & nsIWebProgressListener.STATE_START ) ) {
-                this.context._doneLoading = false;
+                this.context.omnibug.doneLoading = false;
             }
 
             // notice when parent document load is complete // @TODO: what happens if user clicks a beacon link before this point??
             if( ( flag & nsIWebProgressListener.STATE_IS_NETWORK ) &&
                 ( flag & nsIWebProgressListener.STATE_STOP ) &&
                 this.context.browser.currentURI.spec === request.name ) {
-                this.context._doneLoading = true;
+                this.context.omnibug.doneLoading = true;
             }
 
 
@@ -686,7 +689,7 @@ FBL.ns( function() { with( FBL ) {
                         key: key,
                         url: request.name,
                         parentUrl: this.context.browser.currentURI.spec,
-                        doneLoading: this.context._doneLoading,
+                        doneLoading: this.context.omnibug.doneLoading,
                         timeStamp: now,
                         browser: this.context.browser
                     };
@@ -698,7 +701,7 @@ FBL.ns( function() { with( FBL ) {
                      * are candidates for saving, so only start saving after the context has loaded
                      * @TODO: investigate doneLoading vs. context.loaded
                      */
-                    if( this.context.loaded ) {
+                    if( this.context.omnibug.loaded ) {
                         _dump( "onStateChange: adding request (key=" + obj.key + ") to module\n" );
                         omRef.cfg.requests[key] = obj;
                     }
