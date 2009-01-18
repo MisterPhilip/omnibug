@@ -27,21 +27,15 @@
 
  9.5 private build process, for developing
 
- 10  dump prefs?
-
  12  names for known keys (e.g. pev2 -> "Page Event 2") (per-vendor)
 
  15  switch from innerHTML/appendHTML to DOM (via domplate?)
 
  16  submit to WA blogs/sites/etc?
 
- 17  fix prob relayed by sophus (timing and requests staying in queue)
-
  18  file format -> quoted csv (need to escape quotes inside?)
 
  20  add new summary fields to file output (talk to Powers first) (18 and 20 okay by Powers)
-
- 21  Use 'workspace' variables (e.g. context.omnibug.requests, not context.requests), so it plays nice with other extensions
 
  22  Investigate global use of context.loaded vs. onStateChange's doneLoading flags.  Are they different?  Do we need both?
 
@@ -57,6 +51,9 @@
 
   5  platform-specific images (not just win)
 
+ 21  Use 'workspace' variables (e.g. context.omnibug.requests, not context.requests), so it plays nice with other extensions
+
+ 17  fix prob relayed by sophus (timing and requests staying in queue)
 
 ------
 
