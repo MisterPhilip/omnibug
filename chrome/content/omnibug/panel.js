@@ -47,9 +47,12 @@ if( typeof FBL === "undefined" ) {
 
 FBL.ns( function() { with( FBL ) {
     // @TODO: use version in model.js?
+    function pad( n ) {
+        return '' + ( n <= 9 ? "00" : n <= 99 ? "0" : '' ) + n;
+    }
     function _dump( str ) {
         var d = new Date();
-        dump( d.toLocaleTimeString() + "." + d.getMilliseconds() + ":  " + str );
+        dump( d.toLocaleTimeString() + "." + pad( d.getMilliseconds() ) + ":  " + str );
     }
 
     function OmnibugPanel() {}
@@ -249,14 +252,16 @@ FBL.ns( function() { with( FBL ) {
                 expanderImage = "twistyClosed.png";
             }
 
-            html  = "<table cellspacing='0' border='0' class='req " + eventType + " " + data.state.src + "'><tr>";
+            html  = "<table cellspacing='0' border='0' class='req " + eventType + " " + data.state.src + "' id='ob_" + data.state.key + "'><tr>";
             html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='chrome://omnibug/skin/" + expanderImage + "' /></a></td>";
             html += "<td class='summ'>";
             html += "<p class='summary'><strong>" + this.camelCapser( eventType ) + " event</strong>" + ( data.state.src === "prev" ? " (previous page)" : "" ) + " | "
                         + provider + " | "
                         + data.state.timeStamp + " | "
-                        + data.state.key + "</p>";
+                        + data.state.key
+                        + ( data.state.statusText != null ? " | " + data.state.statusText : "" )
                         //+ data.state.url + "</p>"; // @TODO: find a good way to fill the rest of the screen with the url, but don't add scrollbars!
+                        + "</p>";
 
             html += "<div class='" + expanderClass + "'><table class='ent'>";
 
@@ -369,6 +374,30 @@ FBL.ns( function() { with( FBL ) {
 
             _dump( "report: wrote entry for " + data.state.key + "\n" );
         },
+
+
+        /**
+         * Update an entry for the given key in the panel with status text received from the model
+         * @param key  request key
+         * @param statusText  new status text
+         *
+         * @TODO: will it ever happen that the status field is already written at this point?
+         */
+        updateEntryState: function( key, statusText ) {
+            var p,
+                span,
+                tbl = this.document.getElementById( "ob_" + key );
+
+            if( tbl ) {
+                p = tbl.getElementsByTagName( "p" );
+                if( p ) {
+                    span = this.document.createElement( "span" );
+                    span.appendChild( this.document.createTextNode( " | " + statusText ) );
+                    p[0].appendChild( span );
+                }
+            }
+        },
+
 
         // returns true when the given name is in the highlightKeys list
         isHighlightable: function( elName ) {
