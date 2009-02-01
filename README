@@ -39,6 +39,10 @@
 
  22  Investigate global use of context.loaded vs. onStateChange's doneLoading flags.  Are they different?  Do we need both?
 
+ 23  add try/catch around some/everything?
+
+ 24  define release test criteria and stick to it
+
 ------
 
 @DONE:
