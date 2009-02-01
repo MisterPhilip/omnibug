@@ -81,6 +81,7 @@ FBL.ns( function() { with( FBL ) {
         const nsIWebProgressListener = CI( "nsIWebProgressListener" );
         const nsIWebProgress = CI( "nsIWebProgress" );
         const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
+        const nsIObserverService = CI( "nsIObserverService" );
         const nsISupports = CI( "nsISupports" );
     } catch( ex ) {
         _dump( "Error instantiating component interfaces: " + ex + "\n" );
@@ -242,7 +243,53 @@ FBL.ns( function() { with( FBL ) {
 
             // initialize prefs
             this.initPrefs();
+
+            // register observers -- once for the entire extension
+            try {
+                this.observerService = CC( "@mozilla.org/observer-service;1" ).getService( nsIObserverService );
+                //this.observerService.addObserver( this.requestObserver, "http-on-modify-request", false );
+                this.observerService.addObserver( this.responseObserver, "http-on-examine-response", false );
+            } catch( ex ) {
+                _dump( "initialize: exception registering HTTP observers: " + ex + "\n" );
+            }
+            // @TODO: should we ever removeObserver?
         },
+
+
+        /**
+         * called for topic of http-on-examine-response (after response is available)
+         * subject may be: [xpconnect wrapped nsIHttpChannel] (also maybe nsISupports, nsIRequest, nsIChannel)
+         * @TODO: not handling redirects right
+         * @TODO: for some reason, not catching beacons on links that change the page. (timing issue; works with an alert)
+         *        not due to cache, maybe this? http://forums.mozillazine.org/viewtopic.php?f=19&t=643636
+         *        TD doesn't see those responses either
+         */
+        responseObserver: {
+            observe: function( subject, topic, data ) {
+                var key, statusStr,
+                    omRef = Firebug.Omnibug;
+
+                //key = Md5Impl.md5( subject.name ); // @TODO: remove
+                //_dump( "responseObserver: subj=" + subject + "; topic=" + topic + "; key=" + key + "\n" );
+
+                if( subject.name.match( omRef.cfg.defaultRegex ) || ( omRef.cfg.userRegex && subject.name.match( omRef.cfg.userRegex ) ) ) {
+                    key = Md5Impl.md5( subject.name );
+                    _dump( "responseObserver: key=" + key + "; sc=" + subject.responseStatus + "; st=" + subject.responseStatusText + "\n" );
+
+                    statusStr = subject.responseStatus + " " + subject.responseStatusText;
+
+                    // update panel
+                    FirebugContext.getPanel( "Omnibug" ).updateEntryState( key, statusStr ); // in updateEntryState, also add to summary section?
+
+                    // update request list
+                    if( omRef.cfg.requests[key] ) {
+                        omRef.cfg.requests[key]["statusText"] = statusStr;
+                        dump( "responseObserver: updating request in list for key=" + key + "; obj=" + Omnibug.Tools.objDump( omRef.cfg.requests[key] ) + "\n" );
+                    }
+                }
+            }
+        },
+
 
         /**
          * Initialize prefs
@@ -640,7 +687,6 @@ FBL.ns( function() { with( FBL ) {
     }
 
     OmNetProgress.prototype = {
-        seenReqs: {},
         stateIsRequest: false,
         onLocationChange: function() {},
         onProgressChange: function() {},
@@ -688,9 +734,7 @@ FBL.ns( function() { with( FBL ) {
                 now = new Date();
                 key = Md5Impl.md5( request.name );
 
-                if( ! this.seenReqs[request.name] ) {
-                    this.seenReqs[request.name] = true;
-
+                if( flag & nsIWebProgressListener.STATE_START ) {
                     _dump( "onStateChange (context[" + this.context.uid + "]; browser[" + this.context.browser.uid + "]):\n\tname=" + request.name.substring( 0, 100 ) + "...\n\tflags=" + getStateDescription( flag ) + "\n\tkey=" + key + "\n\tparentUrl=" + this.context.browser.currentURI.spec + "\n\n" );
 
                     obj = {
@@ -699,7 +743,8 @@ FBL.ns( function() { with( FBL ) {
                         parentUrl: this.context.browser.currentURI.spec,
                         doneLoading: this.context.omnibug.doneLoading,
                         timeStamp: now,
-                        browser: this.context.browser
+                        browser: this.context.browser,
+                        statusText: null
                     };
 
                     // write the request to the panel.  must happen here so beacons will be shown (e.g., in realtime)
@@ -720,9 +765,10 @@ FBL.ns( function() { with( FBL ) {
                         FileIO.write( file, now + "\t" + key + "\t" + request.name + "\t" + this.context.browser.currentURI.spec + "\n", "a" );
                     }
                 } else {
-                    _dump( "onStateChange: already seen request with key " + key + "\n" );
+                    _dump( "onStateChange: not start (" + getStateDescription( flag ) + "); key=" + key + "\n" );
                 }
             }
+            return 0;
         }
     };
 
