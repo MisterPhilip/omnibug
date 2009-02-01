@@ -1,6 +1,6 @@
 @TODOs:
 
- 1  Rename (to? WAbug?)
+ 1  Rename (to? WAbug?) (* Move to httpdocs/wabug/ when doing rename!)
 
  2  Vendor-specific rules, chooser, and pref entries (and new logic model)
       Omniture (√)
