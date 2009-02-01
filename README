@@ -43,6 +43,10 @@
 
  24  define release test criteria and stick to it
 
+ 25  switch to observers instead of onStateChange?
+
+ 26  http status thinger
+
 ------
 
 @DONE:
