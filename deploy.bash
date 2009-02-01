@@ -38,10 +38,10 @@ echo "Comitting updated install.rdf (as ${VER})"
 svn commit -m"[$0] Incrementing revision for build" install.rdf
 echo ""
 
-XPI=omnibug-${VER}.xpi
-cp omnibug.xpi $XPI
+XPI=${APP}-${VER}.xpi
+cp ${APP}.xpi $XPI
 
-echo "Adding updated install.rdf to omnibug.xpi"
+echo "Adding updated install.rdf to ${APP}.xpi"
 zip -u $XPI
 echo ""
 
@@ -66,9 +66,9 @@ if [[ "x$1" == "x" || "$1" == "ross" ]]; then
     echo ""
 
     echo "Updating symlink"
-    ssh rosssimpson@galactica.7mph.com "ln -sf $XPI httpdocs/dev/${extrapath}omnibug-current.xpi"
+    ssh rosssimpson@galactica.7mph.com "ln -sf $XPI httpdocs/dev/${extrapath}${APP}-current.xpi"
 
-    echo "Done.  URL is https://rosssimpson.com/dev/${extrapath}omnibug-current.xpi"
+    echo "Done.  URL is https://rosssimpson.com/dev/${extrapath}${APP}-current.xpi"
 else
     echo "Done.  Did not deploy to galactica."
 fi
