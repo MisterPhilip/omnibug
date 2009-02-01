@@ -65,6 +65,11 @@ FBL.ns( function() { with( FBL ) {
         dump( d.toLocaleTimeString() + "." + d.getMilliseconds() + ":  " + str );
     }
 
+    // from FB's lib.js (not present in older versions)
+    function _getUniqueId() {
+        return Math.floor(Math.random() * (65535 - 0 + 1) + 0);
+    }
+
 
     // ************************************************************************************************
     // Constants
@@ -355,7 +360,7 @@ FBL.ns( function() { with( FBL ) {
          */
         initContext: function( context ) {
             if( ! context.browser.uid ) {
-                context.browser.uid = FBL.getUniqueId();
+                context.browser.uid = _getUniqueId();
             }
             _dump( "initContext: context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
 
@@ -476,7 +481,7 @@ FBL.ns( function() { with( FBL ) {
          */
         watchWindow: function( context, win ) {
             if( ! win.uid ) {
-                win.uid = FBL.getUniqueId();
+                win.uid = _getUniqueId();
             }
             //_dump( "watchWindow: context[" + context.uid + "]; win[" + win.uid + "]\n" );
             this.cfg.win = win; // @TODO: not sure 'this' is the right place for the window reference
