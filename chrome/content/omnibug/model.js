@@ -60,9 +60,12 @@ FBL.ns( function() { with( FBL ) {
         }
     }
 
+    function pad( n ) {
+        return '' + ( n <= 9 ? "00" : n <= 99 ? "0" : '' ) + n;
+    }
     function _dump( str ) {
         var d = new Date();
-        dump( d.toLocaleTimeString() + "." + d.getMilliseconds() + ":  " + str );
+        dump( d.toLocaleTimeString() + "." + pad( d.getMilliseconds() ) + ":  " + str );
     }
 
     // from FB's lib.js (not present in older versions)
