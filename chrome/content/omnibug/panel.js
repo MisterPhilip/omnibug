@@ -243,6 +243,14 @@ FBL.ns( function() { with( FBL ) {
                           )
                       );
 
+            // hacky: sometimes load events are being reported as click events.  For Omniture, detect 
+            // the event type (pe= means a click event), and reset eventType accordingly.
+            if( provider === "Omniture" ) {
+                var oldEventType = eventType;
+                eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
+                _dump( "report: found Omniture 'pe' parameter; resetting eventType (was=" + oldEventType + "; now=" + eventType + ")\n" );
+            }
+
 
             if( this.omRef.cfg.alwaysExpand ) {
                 expanderClass = "reg";
