@@ -262,7 +262,7 @@ FBL.ns( function() { with( FBL ) {
          * @TODO: not handling redirects right
          * @TODO: for some reason, not catching beacons on links that change the page. (timing issue; works with an alert)
          *        not due to cache, maybe this? http://forums.mozillazine.org/viewtopic.php?f=19&t=643636
-         *        TD doesn't see those responses either
+         *        TamperData doesn't see those responses either, so maybe nothing we can do
          */
         responseObserver: {
             observe: function( subject, topic, data ) {
@@ -279,7 +279,11 @@ FBL.ns( function() { with( FBL ) {
                     statusStr = subject.responseStatus + " " + subject.responseStatusText;
 
                     // update panel
-                    FirebugContext.getPanel( "Omnibug" ).updateEntryState( key, statusStr ); // in updateEntryState, also add to summary section?
+                    if( FirebugContext ) {
+                        FirebugContext.getPanel( "Omnibug" ).updateEntryState( key, statusStr ); // in updateEntryState, also add to summary section?
+                    } else {
+                        _dump( "responseObserver: FirebugContext is null!\n" );
+                    }
 
                     // update request list
                     if( omRef.cfg.requests[key] ) {
