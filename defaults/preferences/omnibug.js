@@ -16,3 +16,4 @@ pref( "extensions.omnibug.color_click", "#f1ffdb" );
 pref( "extensions.omnibug.color_prev", "#ffd5de" );
 pref( "extensions.omnibug.color_quotes", "#f00" );
 pref( "extensions.omnibug.color_hilite", "#ff0" );
+pref( "extensions.omnibug.color_hover", "#ccc" );
