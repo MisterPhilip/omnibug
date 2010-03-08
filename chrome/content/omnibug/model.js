@@ -107,6 +107,7 @@ FBL.ns( function() { with( FBL ) {
             userRegex: null,
             usefulKeys: {},
             highlightKeys: {},
+            watchKeys: {},
             alwaysExpand: false,
             showQuotes: false,
             outFile: null,
@@ -165,7 +166,7 @@ FBL.ns( function() { with( FBL ) {
         showMenu: function() {
             openDialog( "chrome://omnibug/content/options.xul",
                         "",
-                        "centerscreen,dialog=no,chrome,resizable,dependent,modal"
+                        "centerscreen,dialog=no,chrome,resizable,dependent,modal,toolbar"
             );
         },
 
@@ -333,6 +334,7 @@ FBL.ns( function() { with( FBL ) {
                 case "color_prev":
                 case "color_quotes":
                 case "color_hilite":
+                case "color_hover":
                     this.initGeneralPrefs();
                     break;
 
@@ -345,6 +347,7 @@ FBL.ns( function() { with( FBL ) {
                 case "userPattern":
                 case "usefulKeys":
                 case "highlightKeys":
+                case "watchKeys":
                     this.initPatterns();
                     break;
             }
@@ -405,6 +408,7 @@ FBL.ns( function() { with( FBL ) {
             this.cfg.color_prev = this.getPreference( "color_prev" );
             this.cfg.color_quotes = this.getPreference( "color_quotes" );
             this.cfg.color_hilite = this.getPreference( "color_hilite" );
+            this.cfg.color_hover = this.getPreference( "color_hover" );
         },
 
 
@@ -471,7 +475,11 @@ FBL.ns( function() { with( FBL ) {
         reattachContext: function( context ) {
             _dump( "reattachContext: context[" + context.uid + "]\n" );
 
+            var panel = context.getPanel( panelName );
+            this.addStyleSheet( panel.document );
+
             // Makes detach work.
+            // @TODO: can we use the panel var instead of FirebugContext.getPanel()?
             if ( ! FirebugContext.getPanel( "Omnibug" ).document.omnibugContext ) {
                 // Save a pointer back to this object from the iframe's document:
                 FirebugContext.getPanel( "Omnibug" ).document.omnibugPanel = FirebugContext.getPanel( "Omnibug" );
@@ -560,8 +568,12 @@ FBL.ns( function() { with( FBL ) {
                         if( context.browser === requests[key]["browser"] ) {
                             requests[key]["src"] = "prev";
                             _dump( "valid for this browser; calling decodeUrl\n" );
-                            FirebugContext.getPanel( "Omnibug" ).decodeUrl( requests[key] );
-                            delete requests[key];
+                            try {
+                                FirebugContext.getPanel( "Omnibug" ).decodeUrl( requests[key] );
+                                delete requests[key];
+                            } catch( ex ) {
+                                _dump( "processRequests: exception in decodeUrl(): " + e );
+                            }
                         } else {
                             _dump( "invalid for this browser; skipping\n" );
                         }
@@ -655,6 +667,7 @@ FBL.ns( function() { with( FBL ) {
 
             // init useful keys
             var keyList = this.getPreference( "usefulKeys" );
+            this.cfg.usefulKeys = {}; // reset
             if( keyList ) {
                 var parts = keyList.split( "," );
                 for( var part in parts ) {
@@ -667,6 +680,7 @@ FBL.ns( function() { with( FBL ) {
 
             // init highlight keys
             keyList = this.getPreference( "highlightKeys" );
+            this.cfg.highlightKeys = {};
             if( keyList ) {
                 var parts = keyList.split( "," );
                 for( var part in parts ) {
@@ -676,7 +690,36 @@ FBL.ns( function() { with( FBL ) {
                 }
             }
             _dump( "initPatterns: highlightKeys=" + Omnibug.Tools.objDump( this.cfg.highlightKeys ) + "\n" );
+
+            // init watch keys
+            keyList = this.getPreference( "watchKeys" );
+            this.cfg.watchKeys = {};
+            if( keyList ) {
+                var parts = keyList.split( "," );
+                for( var part in parts ) {
+                    if( parts.hasOwnProperty( part ) ) {
+                        this.cfg.watchKeys[parts[part]] = 1;
+                    }
+                }
+            }
+            _dump( "initPatterns: watchKeys=" + Omnibug.Tools.objDump( this.cfg.watchKeys ) + "\n" );
+        },
+
+        /**
+         * Add the stylesheet
+         * createStyleSheet() and addStyleSheet() are from Firebug
+         */
+        addStyleSheet: function( doc ) {
+            // Make sure the stylesheet isn't appended twice.
+            if( $( "omnibuStyles", doc ) ) {
+                return;
+            }
+
+            var styleSheet = createStyleSheet( doc, "chrome://omnibug/skin/omnibug.css" );
+            styleSheet.setAttribute( "id", "omnibugStyles" );
+            addStyleSheet( doc, styleSheet );
         }
+
     } );
     Firebug.registerModule( Firebug.Omnibug );
 
