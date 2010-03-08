@@ -55,16 +55,116 @@ FBL.ns( function() { with( FBL ) {
         dump( d.toLocaleTimeString() + "." + pad( d.getMilliseconds() ) + ":  " + str );
     }
 
+
+    /*
+     * Common functions for use in panel
+     * Note: call these functions like:
+     *    func.call( this, arg1, arg2 );
+     */
+
+    // returns true when the given name is in the wachKeys list
+    function _isWatched( elName ) {
+        return this.omRef.cfg.watchKeys[elName];
+    }
+
+    // returns true when the given name is in the highlightKeys list
+    function _isHighlightable( elName ) {
+        return this.omRef.cfg.highlightKeys[elName];
+    }
+
+    /**
+     * Returns a style block of dynamic styles
+     * @return the style string
+     */
+    function _getDynamicStyles() {
+        // dynamic styles (e.g., from prefs)
+        return "<style type='text/css'>\n"
+               + "table.load { background-color: " + this.omRef.cfg.color_load + "; }\n"
+               + "table.click { background-color: " + this.omRef.cfg.color_click + "; }\n"
+               + "table.prev { background-color: " + this.omRef.cfg.color_prev + "; }\n"
+               + "table.req .hilite { background-color: " + this.omRef.cfg.color_hilite + "; }\n"
+               + "table.req span.qq { color: " + this.omRef.cfg.color_quotes + "; }\n"
+               + "table.ent tr:hover { background-color: " + this.omRef.cfg.color_hover + "; }\n"
+               + "</style>\n";
+    }
+
+    function _appendHtml( data ) {
+        //_dump( "htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
+        var str = "";
+
+        elType = "div";
+
+        if( ! this.dataSent ) {
+            str += _getDynamicStyles.call( this );
+        }
+        this.dataSent = true;
+
+        var el = this.document.createElement( elType );
+        el.innerHTML = str + data;
+        this.panelNode.appendChild( el );
+    }
+
+    function _printLine( msg ) {
+        _dump( "printLine: printing msg='" + msg + "'\n" );
+        var el = this.document.createElement( "p" );
+        el.className = "om";
+        el.innerHTML = msg;
+        this.panelNode.appendChild( el );
+    }
+
+    /**
+     * Return a quoted string (if the pref is set)
+     */
+    function _quote( str ) {
+        return( this.omRef.cfg.showQuotes
+                    ? "<span class='qq'>\"</span><span class='v'>" +str + "</span><span class='qq'>\"</span>"
+                    : str );
+    }
+
+    /**
+     * Given a delimited string, return a map of key => 1
+     * @param str the delimited string
+     * @return the map
+     */
+    function _delimStringToObj( str ) {
+        var obj = {},
+            keys = str.split( /, ?/ );
+        for( var idx in keys ) {
+            obj[keys[idx]] = 1;
+        }
+        return obj;
+    }
+
+    /**
+     * Given an object, return a delimited string of the keys
+     * @param obj the object
+     * @return the delimited string
+     */
+    function _objToDelimString( obj ) {
+        var str = "";
+        for( var key in obj ) {
+            if( obj.hasOwnProperty( key ) ) {
+                str += key + ",";
+            }
+        }
+        return str.replace( /,$/, "" );
+    }
+
+
+
+    /**
+     * The panel object
+     */
     function OmnibugPanel() {}
     OmnibugPanel.prototype = extend( Firebug.Panel, {
         name: "Omnibug",
         title: "Omnibug",
         searchable: false,
         editable: false,
-        htmlOutput: false,
+        htmlOutput: true,
+        dataSent: false,
+        dependents: [ "OmnibugSide" ],
         omRef: Firebug.Omnibug,
-
-
 
         /**
          * Initialize the panel. This is called when the Panel is activated and
@@ -72,13 +172,14 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         initialize: function( context, doc ) {
-            Firebug.Panel.initialize.apply(this, arguments);
+            Firebug.Panel.initialize.apply( this, arguments );
+            Firebug.Omnibug.addStyleSheet( this.document );
 
             this.context = context;
             this.document = doc;
             this.panelNode = doc.createElement( "div" );
             this.panelNode.ownerPanel = this;
-            this.panelNode.className = "panelNode panelNode-omnibug";
+            this.panelNode.className = "panelNode";
             doc.body.appendChild( this.panelNode );
 
             //_dump( "panel initialize: arguments=" + arguments + "\n" );
@@ -108,14 +209,6 @@ FBL.ns( function() { with( FBL ) {
             this.document.omnibugContext = FirebugContext.omnibugContext;
         },
 
-        printLine: function( msg ) {
-            _dump( "printLine: printing msg='" + msg + "'\n" );
-            var el = this.document.createElement( "p" );
-            el.className = "om";
-            el.innerHTML = msg;
-            this.panelNode.appendChild( el );
-        },
-
         clear: function() {
             /*
             var tables = this.panelNode.getElementsByTagName( "table" );
@@ -136,36 +229,6 @@ FBL.ns( function() { with( FBL ) {
             }
         },
 
-        appendHtml: function( data ) {
-            //_dump( "htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
-            var str = "";
-            //var elType = "<div>";
-
-            // @TODO: figure out if html has already been output, and only send the link tag if not.
-            str = "<head><link rel='stylesheet' type='text/css' href='chrome://omnibug/content/omnibug.css' />";
-
-            // dynamic styles (e.g., from prefs)
-            str += "<style type='text/css'>\n";
-                // @TODO: iterate instead of listing manually?
-                str += "table.load { background-color: " + this.omRef.cfg.color_load + "; }\n";
-                str += "table.click { background-color: " + this.omRef.cfg.color_click + "; }\n";
-                str += "table.prev { background-color: " + this.omRef.cfg.color_prev + "; }\n";
-                str += "table.req .hilite { background-color: " + this.omRef.cfg.color_hilite + "; }\n";
-                str += "table.req span.qq { color: " + this.omRef.cfg.color_quotes + "; }\n";
-            str += "</style>\n";
-
-            str += "</head><body>\n";
-
-            elType = "html";
-            OmnibugPanel.htmlOutput = true;
-
-            //_dump( "dumping html:\n\n>>>" + data + "\n\n" );
-
-            var el = this.document.createElement( elType );
-            el.innerHTML = str + data;
-            this.panelNode.appendChild( el );
-        },
-
 
         /**
          * Receives a data object from the model, decodes it, and passes it on to report()
@@ -176,44 +239,110 @@ FBL.ns( function() { with( FBL ) {
 
             var val,
                 u = new OmniUrl( data.url ),
-                _quote = this.quote,
                 obj = {
-                    state: data,
-                    vars: [],
-                    props: [],
-                    other: []
+                    state: data,    // raw data from the browser event
+                    raw: {},        // ungrouped object of all props
+                    vars: {},       // omniture evars
+                    props: {},      // omniture props
+                    other: {},      // any other values
+                    useful: {},     // values marked as useful
+                    moniforce: {},  // moniforce values
+                    webtrends: {},  // webtrends values
+                    toString: function() {
+                        return "Obj{\n\tvars=" + this.vars + "\n\tprops=" + this.props + "\n\tother=" + this.other + "}";
+                    }
                 };
 
+            var that = this;
             u.getQueryNames().forEach( function( n ) {
                 if( n ) {
                     val = u.getFirstQueryValue( n ).replace( "<", "&lt;" );  // escape HTML in output HTML
 
-                    // add surrounding quotes, if necessary
-                    val = _quote( val );
-
-                    if( n.match( /^c(\d+)$/ ) ) {
-                        obj.props[RegExp.$1] = val;
-                    } else if( n.match( /^v(\d+)$/ ) ) {
-                        obj.vars[RegExp.$1] = val;
+                    if( n.match( /^c(\d+)$/ ) || n.match( /^prop(\d+)$/i ) ) {
+                        // omniture props
+                        obj.props["prop"+RegExp.$1] = val;
+                        obj.raw["prop"+RegExp.$1] = val;
+                    } else if( n.match( /^v(\d+)$/ ) || n.match( /^evar(\d+)$/i ) ) {
+                        // omniture evars
+                        obj.vars["eVar"+RegExp.$1] = val;
+                        obj.raw["eVar"+RegExp.$1] = val;
+                    } else if( that.omRef.cfg.usefulKeys[n] ) {
+                        // 'useful' keys
+                        obj.useful[n] = val;
+                        obj.raw[n] = val;
+                    } else if( n.match( /^\[?AQB\]?$/ ) || n.match( /^\[?AQE\]?$/ ) ) {
+                        // noop; skip Omniture's [AQB] and [AQE] elements
+                    } else if( n.match( /^mfinfo/ ) ) {
+                        // moniforce
+                        obj.moniforce[n] = val;
+                        obj.raw[n] = val;
+                    } else if( n.match( /^WT\./ ) ) {
+                        // webtrends
+                        obj.webtrends[n] = val;
+                        obj.raw[n] = val;
                     } else {
-                        obj.other.push( [ n, val ] );
+                        // everything else
+                        obj.other[n] = val;
+                        obj.raw[n] = val;
                     }
                 }
             } );
 
-
-            this.report( obj );
+            obj = this.augmentData( obj );
+            try {
+                this.report( obj );
+            } catch( ex ) {
+                _dump( "decodeUrl: exception in report(): " + ex + "\n" );
+            }
         },
 
 
         /**
-         * Return a quoted string (if the pref is set)
+         * Augments the data object with summary data
+         * @param data the data object
+         * @return the augmented data object
          */
-        quote: function( str ) {
-            return( Firebug.Omnibug.cfg.showQuotes
-                        ? "<span class='qq'>\"</span>" + str + "<span class='qq'>\"</span>"
-                        : str );
+        augmentData: function( data ) {
+            data["omnibug"] = {};
+
+            // workaround -- kill it when vendor-specific code in place
+            var eventType = ( data.state.doneLoading ? "click" : "load" ),
+                url = data.state.url,
+                urlLength = data.state.url.length,
+                provider = ( url.match( /(?:\/b\/ss|2o7)/ ) ? "Omniture" :
+                    ( url.match( /moniforce\.gif/ ) ? "Moniforce" :
+                        ( url.match( /dcs\.gif/ ) ? "WebTrends" :
+                            ( url.match( /__utm\.gif/ ) ? "Urchin" :
+                                "Unknown"
+                            )
+                        )
+                    )
+                );
+
+            // hacky: sometimes load events are being reported as click events.  For Omniture, detect
+            // the event type (pe= means a click event), and reset eventType accordingly.
+            if( provider === "Omniture" ) {
+                var oldEventType = eventType;
+                eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
+                _dump( "report: found Omniture 'pe' parameter; resetting eventType (was=" + oldEventType + "; now=" + eventType + ")\n" );
+            }
+
+            data.omnibug["Key"]        = data.raw["Key"]        = data.state.key;
+            data.omnibug["Event"]      = data.raw["Event"]      = eventType;
+            data.omnibug["Timestamp"]  = data.raw["Timestamp"]  = data.state.timeStamp;
+            data.omnibug["Provider"]   = data.raw["Provider"]   = provider;
+            data.omnibug["Source"]     = data.raw["Source"]     = ( data.state.src === "prev" ? "Previous page" : "Current page" ); // might not be exactly working
+            data.omnibug["Parent URL"] = data.raw["Parent URL"] = data.state.parentUrl;
+            data.omnibug["Full URL"]   = data.raw["Full URL"]   = data.state.url
+                                                                  + "<br/>(" + urlLength + " characters"
+                                                                  + ( urlLength > 2083
+                                                                      ? ", <span class='imp'>*** too long for IE6/7! ***</span>"
+                                                                      : "" )
+                                                                  + ")";
+
+            return data;
         },
+
 
         /**
          * Return a word that's camelCapped
@@ -222,35 +351,17 @@ FBL.ns( function() { with( FBL ) {
             return str.replace( /\b(.)/, function( m, $1 ) { return $1.toUpperCase() } );
         },
 
+
+        /**
+         * Generate and output an event report in HTML format
+         * @param data the data object to report on
+         */
         report: function( data ) {
-            //_dump( "report: data=" + data + "\n" );
+            //_dump( "report: data=" + data.toString() + "\n" );
 
             var i, el, cn, len, html, mf, expanderImage, expanderClass,
-                eventType = ( data.state.doneLoading ? "click" : "load" ),
-                urlLength = data.state.url.length,
                 tmp = "",
                 wt = "";
-
-            // workaround -- kill it when vendor-specific code in place
-            var url = data.state.url,
-                      provider = ( url.match( /(?:\/b\/ss|2o7)/ ) ? "Omniture" :
-                          ( url.match( /moniforce\.gif/ ) ? "Moniforce" :
-                              ( url.match( /dcs\.gif/ ) ? "WebTrends" :
-                                  ( url.match( /__utm\.gif/ ) ? "Urchin" :
-                                      "Unknown"
-                                  )
-                              )
-                          )
-                      );
-
-            // hacky: sometimes load events are being reported as click events.  For Omniture, detect 
-            // the event type (pe= means a click event), and reset eventType accordingly.
-            if( provider === "Omniture" ) {
-                var oldEventType = eventType;
-                eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
-                _dump( "report: found Omniture 'pe' parameter; resetting eventType (was=" + oldEventType + "; now=" + eventType + ")\n" );
-            }
-
 
             if( this.omRef.cfg.alwaysExpand ) {
                 expanderClass = "reg";
@@ -260,127 +371,69 @@ FBL.ns( function() { with( FBL ) {
                 expanderImage = "twistyClosed.png";
             }
 
-            html  = "<table cellspacing='0' border='0' class='req " + eventType + " " + data.state.src + "' id='ob_" + data.state.key + "'><tr>";
+            html  = "<table cellspacing='0' border='0' class='req "
+                  + data.omnibug.Event + " "
+                  + ( data.state.src ? data.state.src : "" )
+                  + "' id='ob_" + data.state.key + "'><tr>";
+
             html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='chrome://omnibug/skin/" + expanderImage + "' /></a></td>";
             html += "<td class='summ'>";
-            html += "<p class='summary'><strong>" + this.camelCapser( eventType ) + " event</strong>" + ( data.state.src === "prev" ? " (previous page)" : "" ) + " | "
-                        + provider + " | "
-                        + data.state.timeStamp + " | "
-                        + data.state.key
-                        + ( data.state.statusText != null ? " | " + data.state.statusText : "" )
-                        //+ data.state.url + "</p>"; // @TODO: find a good way to fill the rest of the screen with the url, but don't add scrollbars!
-                        + "</p>";
+            html += "<p class='summary'><strong>" + this.camelCapser( data.omnibug.Event ) + " event</strong>"
+                 + ( data.state.src === "prev" ? " (previous page)" : "" ) + " | "
+                 + data.omnibug.Provider + " | "
+                 + data.state.timeStamp + " | "
+                 + data.state.key
+                 + ( data.state.statusText != null ? " | " + data.state.statusText : "" )
+                 + "</p>";
 
             html += "<div class='" + expanderClass + "'><table class='ent'>";
 
-            // Omnibug values
-            html += "<th colspan='2'>Summary</th>";
-            html += "<tr><td>Key</td><td>" + this.quote( data.state.key ) + "</td></tr>\n";
-            html += "<tr><td>Event</td><td>" + this.quote( eventType ) + "</td></tr>\n";
-            html += "<tr><td>Timestamp</td><td>" + this.quote( data.state.timeStamp ) + "</td></tr>\n";
-            html += "<tr><td>Provider</td><td>" + this.quote( provider ) + "</td></tr>\n";
-            html += "<tr><td>Source</td><td>" + this.quote( data.state.src === "prev" ? "Previous page" : "Current page" ) + "</td></tr>\n"; // might not be exactly working
-            html += "<tr><td>Parent URL</td><td>" + this.quote( data.state.parentUrl ) + "</td></tr>\n";
-            html += "<tr><td>Full URL</td><td>" + this.quote( data.state.url ) + "<br/>(" + urlLength + " characters";
-            html += ( urlLength > 2083 ? ", <span class='imp'>*** too long for IE6/7! ***</span>" : "" ) + ")</td></tr>\n";
-
-            // omniture props
-            if( data.props.length ) {
-                //html += "<dt>Props</dt>";
-                html += "<th colspan='2'>Props</th>";
-                for( i = 0, len = data.props.length; i < len; ++i ) {
-                    if( data.props[i] ) {
-                        cn = this.isHighlightable( "prop" + i ) ? "hilite" : "";
-                        html += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>prop" + i + "</td><td class='v'>" + data.props[i] + "</td></tr>\n";
-                    }
-                }
-            }
-
-            // omniture eVars
-            if( data.vars.length ) {
-                //html += "<dt>eVars</dt>";
-                html += "<th colspan='2'>eVars</th>";
-                for( i = 0, len = data.vars.length; i < len; ++i ) {
-                    if( data.vars[i] ) {
-                        cn = this.isHighlightable( "eVar" + i ) ? "hilite" : "";
-                        html += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( i % 2 === 0 ? 'even' : 'odd' ) + "'>eVar" + i + "</td><td class='v'>" + data.vars[i] + "</td></tr>\n";
-                    }
-                }
-            }
-
-
-            // everything else
-            var otherNamed = {},
-                otherOther = {};
-
-            if( data.other.length ) {
-                for( i = 0, len = data.other.length; i < len; ++i ) {
-                    if( data.other[i] ) {
-                        if( this.omRef.cfg.usefulKeys[data.other[i][0]] ) {
-                            otherNamed[data.other[i][0]] = data.other[i][1];
-                        } else {
-                            otherOther[data.other[i][0]] = data.other[i][1];
-                        }
-                    }
-                }
-            }
-
-            i = 0;
-
-            // useful omniture params
-            for( el in otherNamed ) {
-                if( otherNamed.hasOwnProperty( el ) ) {
-                    cn = this.isHighlightable( el ) ? "hilite" : "";
-                    tmp += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( ++i % 2 === 0 ? 'even' : 'odd' ) + "'>" + el + "</td><td class='v'>" + otherNamed[el] + "</td></tr>\n";
-                }
-            }
-            if( !! tmp ) {
-                html += "<th colspan='2'>Useful</th>";
-                html += tmp;
-            }
-
-            i = 0;
-            tmp = "";
-
-            for( el in otherOther ) {
-                if( otherOther.hasOwnProperty( el ) ) {
-                    if( el === "[AQB]" || el === "[AQE]" ) { continue; } // skip Omniture's [AQB] and [AQE] elements
-
-                    cn = this.isHighlightable( el ) ? "hilite" : "";
-                    if( el.match( /^mfinfo/ ) ) {
-                        mf += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "</td><td class='v'>" + otherOther[el] + "</td></tr>\n";
-                    } else if( el.match( /^WT\./ ) ) {
-                        wt += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "</td><td class='v'>" + otherOther[el] + "</td></tr>\n";
-                    } else {
-                        tmp += "<tr" + ( !! cn ? " class='" + cn + "'" : "" ) + "><td class='k " + ( ++i % 2 === 0 ? "even" : "odd" ) + "'>" + el + "</td><td class='v'>" + otherOther[el] + "</td></tr>\n";
-                    }
-                }
-            }
-
-            // moniforce
-            if( !! mf ) {
-                html += "<th colspan='2'>Moniforce</th>";
-                html += mf;
-            }
-
-            // WebTrends
-            if( !! wt ) {
-                html += "<th colspan='2'>WebTrends</th>";
-                html += wt;
-            }
-
-            // everything else, really
-            if( !! tmp ) {
-                html += "<th colspan='2'>Other</th>";
-                html += tmp;
-            }
+            html += this.generateReportFragment( data.omnibug, "Summary" );      // summary values
+            html += this.generateReportFragment( data.props, "Props" );          // omniture props
+            html += this.generateReportFragment( data.vars, "eVars" );           // omniture eVars
+            html += this.generateReportFragment( data.useful, "Useful" );        // useful params
+            html += this.generateReportFragment( data.moniforce, "Moniforce" );  // moniforce params
+            html += this.generateReportFragment( data.webtrends, "WebTrends" );  // webtrends params
+            html += this.generateReportFragment( data.other, "Other" );          // everything else
 
             html += "</table></div></td></tr></table>\n";
 
             //_dump( "output html:\n\n\n" + html + "\n\n\n" );
-            FirebugContext.getPanel("Omnibug").appendHtml( html );
+            _appendHtml.call( this, html );
+
+            var sp = FirebugContext.getPanel("OmnibugSide");
+            sp.updateWatches( data );
 
             _dump( "report: wrote entry for " + data.state.key + "\n" );
+        },
+
+
+        /**
+         * Generate an HTML report fragment for the given object
+         */
+        generateReportFragment: function( data, title ) {
+            var cn,
+                i = 0,
+                html = "";
+
+            for( var el in data ) {
+                if( data.hasOwnProperty( el ) && !! data[el] ) {
+                    cn = _isHighlightable.call( this, el ) ? "hilite" : "";
+                    html += "<tr"
+                         + ( !! cn ? " class='" + cn + "'" : "" )
+                         + "><td class='k " + ( i++ % 2 === 0 ? 'even' : 'odd' ) + "'>"
+                         + el
+                         + "</td><td class='v'>"
+                         + _quote.call( this, data[el] )
+                         + "</td></tr>\n";
+                }
+            }
+
+            if( !! html ) {
+                return "<thead><tr><th colspan='2'>" + title + "</th><tr></thead>" + html;
+            } else {
+                return "";
+            }
         },
 
 
@@ -407,12 +460,6 @@ FBL.ns( function() { with( FBL ) {
         },
 
 
-        // returns true when the given name is in the highlightKeys list
-        isHighlightable: function( elName ) {
-            return this.omRef.cfg.highlightKeys[elName];
-        },
-
-
         // Options menu
 
         /**
@@ -435,14 +482,166 @@ FBL.ns( function() { with( FBL ) {
             var value = this.omRef.getPreference( option ),
                 _omRef = this.omRef,
                 updatePref = function( key, val ) {
-                _omRef.setPreference( key, val );
-            };
+                    _omRef.setPreference( key, val );
+                };
             // bindFixed is from Firebug. It helps to pass the args along.
             return { label: label, nol10n: true, type: "checkbox", checked: value, command: bindFixed( updatePref, Firebug, option, !value ) }
         },
 
+        getContextMenuItems: function( style, target ) {
+            //_dump( "getContextMenuItems: style='" + style + "'; target='" + target + "'\n" );
+            //_dump( "getContextMenuItems: itt='" + this.infoTipType + "'; sel='" + this.selection + "'\n" );
+
+            var val,
+                node = target,
+                items = [];
+
+            while( node && node.tagName.toUpperCase() !== "TR" ) {
+                _dump( "getContextMenuItems: node='" + node + "'; tagName='" + node.tagName.toUpperCase() + "'\n" );
+                node = node.parentNode;
+            }
+            node = node.getElementsByTagName( "td" )[0];
+            if( node ) {
+                val = node.firstChild.nodeValue;
+                if( val ) {
+                    _dump( "getContextMenuItems: found node='" + node + "; val='" + val + "'\n" );
+                    items.push( "-", { label: "Watch '" + val + "'", command: bind( this.addToWatches, this, val ) } );
+                }
+            }
+
+            return items;
+        },
+
+        addToWatches: function( ctx, key ) {
+            //_dump( "addToWatches: ctx='" + ctx + "'; key='" + key + "'\n" );
+
+            var currWatches = _delimStringToObj( this.omRef.getPreference( "watchKeys" ) );
+            currWatches[key] = 1;
+            this.omRef.setPreference( "watchKeys", _objToDelimString( currWatches ) );
+
+            // refresh watch winder?
+        }
+
     } );
     Firebug.registerPanel( OmnibugPanel );
+
+
+    function OmnibugSidePanel() {}
+    OmnibugSidePanel.prototype = extend( Firebug.Panel, {
+        name: "OmnibugSide",
+        title: "Watches",
+        searchable: false,
+        editable: false,
+        htmlOutput: true,
+        dataSent: false,
+        omRef: Firebug.Omnibug,
+        parentPanel: "Omnibug",
+
+        initialize: function( context, doc ) {
+            Firebug.Panel.initialize.apply(this, arguments);
+            Firebug.Omnibug.addStyleSheet( this.document );
+
+            this.document = doc;
+            this.panelNode = doc.createElement( "div" );
+            this.panelNode.ownerPanel = this;
+            this.panelNode.className = "panelNode";
+            doc.body.appendChild( this.panelNode );
+
+            _dump( "OmnibugSidePanel: inited\n" );
+        },
+
+        getContextMenuItems: function( style, target ) {
+            //_dump( "getContextMenuItems: style='" + style + "'; target='" + target + "'\n" );
+            //_dump( "getContextMenuItems: itt='" + this.infoTipType + "'; sel='" + this.selection + "'\n" );
+
+            var val,
+                node = target,
+                items = [];
+
+            while( node && node.tagName.toUpperCase() !== "TR" ) {
+                //_dump( "getContextMenuItems: node='" + node + "'; tagName='" + node.tagName.toUpperCase() + "'\n" );
+                node = node.parentNode;
+            }
+            node = node.getElementsByTagName( "td" )[0];
+            if( node ) {
+                val = node.firstChild.nodeValue;
+                if( val ) {
+                    //_dump( "getContextMenuItems: found node='" + node + "; val='" + val + "'\n" );
+                    items.push( "-", { label: "Unwatch '" + val + "'", command: bind( this.removeFromWatches, this, val ) } );
+                }
+            }
+
+            return items;
+        },
+
+        removeFromWatches: function( ctx, key ) {
+            //_dump( "removeFromWatches: ctx='" + ctx + "'; key='" + key + "'\n" );
+
+            var currWatches = _delimStringToObj( this.omRef.getPreference( "watchKeys" ) );
+            //currWatches[key] = 1;
+            delete( currWatches[key] );
+            this.omRef.setPreference( "watchKeys", _objToDelimString( currWatches ) );
+
+            // refresh watch winder?
+        },
+
+
+        /**
+         * Update the values (if any) in the watches side-panel
+         * @param data the data object
+         */
+        updateWatches: function( data ) {
+            var html,
+                existingVals = {},
+                tbl = this.document.getElementById( "watchTbl" );
+
+            if( tbl ) {
+                //_dump( "updateWatches: found existing table (" + tbl + ")\n" );
+
+                // create a map of existing values
+                var cells, keyCell, valCell, key, val,
+                    rows = tbl.getElementsByTagName( "tr" );
+                for( row in rows ) {
+                    if( rows.hasOwnProperty( row ) ) {
+                        cells = rows[row].getElementsByTagName( "td" );
+                        keyCell = rows[row].getElementsByClassName( "k" )[0];
+                        valCell = rows[row].getElementsByClassName( "v" )[0];
+
+                        if( keyCell && valCell ) {
+                            key = keyCell.firstChild.nodeValue;
+                            val = valCell.getElementsByClassName( "v" )[0];
+                            if( val ) {
+                                val = val.firstChild.nodeValue
+                                if( val ) {
+                                    existingVals[key] = val;
+                                }
+                            }
+                        }
+                    }
+                }
+                tbl.parentNode.removeChild( tbl );
+            }
+
+            // no existing table; write it out
+            html  = "<table cellspacing='0' border='0' class='req ent' id='watchTbl'>";
+            html += "<thead><tr><th class='k'>Key</th><th class='v'>Value</th><th class='p'>Prev</th></tr></thead>";
+            for( key in data.raw ) {
+                if(    data.raw.hasOwnProperty( key )
+                    && _isWatched.call( this, key ) ) {
+                    //_dump( "updateWatches: found watched key=" + key + "\n" );
+                    html += "<tr><td class='k'>" + key + "</td>"
+                          + "<td class='v'>" + _quote.call( this, data.raw[key] ) + "</td>"
+                          + "<td>" + ( existingVals[key] ? _quote.call( this, existingVals[key] ) : "" ) + "</td>"
+                          + "</tr>";
+                }
+            }
+            html += "</table>";
+
+            _appendHtml.call( this, html );
+        }
+
+    } );
+    Firebug.registerPanel( OmnibugSidePanel );
 
 
     /**
