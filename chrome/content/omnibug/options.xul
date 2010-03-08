@@ -19,6 +19,7 @@
             <preference id="pref-color-load" name="extensions.omnibug.color_load" type="string"/>
             <preference id="pref-color-click" name="extensions.omnibug.color_click" type="string"/>
             <preference id="pref-color-prev" name="extensions.omnibug.color_prev" type="string"/>
+            <preference id="pref-color-hover" name="extensions.omnibug.color_hover" type="string"/>
         </preferences>
 
         <!-- file logging -->
@@ -64,8 +65,36 @@
                 <label control="color-prev-box" value="Previous page event background:" />
                 <textbox id="color-prev-box" preference="pref-color-prev" size="7" maxlegth="7" />
             </hbox>
+            <hbox align="center">
+                <label control="color-hover-box" value="Table entry hover background:" />
+                <textbox id="color-hover-box" preference="pref-color-hover" size="7" maxlegth="7" />
+            </hbox>
         </groupbox>
-
     </prefpane>
+
+    <prefpane id="omnibug-pat-pane" label="Pattern Settings">
+        <preferences>
+            <preference id="pref-useful" name="extensions.omnibug.usefulKeys" type="string"/>
+            <preference id="pref-highlight" name="extensions.omnibug.highlightKeys" type="string"/>
+            <preference id="pref-watch" name="extensions.omnibug.watchKeys" type="string"/>
+        </preferences>
+
+        <groupbox>
+            <caption label="Keys (comma-separated)" />
+            <hbox align="center">
+                <label control="watch-useful-box" value="Useful keys:" />
+                <textbox id="watch-useful-box" preference="pref-useful" flex="1" />
+            </hbox>
+            <hbox align="center">
+                <label control="watch-highlight-box" value="Highlight keys:" />
+                <textbox id="watch-highlight-box" preference="pref-highlight" flex="1" />
+            </hbox>
+            <hbox align="center">
+                <label control="watch-keys-box" value="Watch keys:" />
+                <textbox id="watch-keys-box" preference="pref-watch" flex="1" />
+            </hbox>
+        </groupbox>
+    </prefpane>
+
 </prefwindow>
 
