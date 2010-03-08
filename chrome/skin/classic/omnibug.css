@@ -1,6 +1,9 @@
 /*
  * $Id$
  * $URL$
+ *
+ * panelNode-Omnibug
+ * panelNode-OmnibugSide
  */
 
 table.req p.summary {
@@ -40,6 +43,9 @@ p.om {
 table.req span.imp {
     color: #f00;
 }
+table.req thead tr:hover {
+    background-color: transparent;
+}
 
 /* entry tables */
 table.ent,
@@ -68,6 +74,20 @@ table.ent td.k {
 table.ent td.k,
 table.ent td.v {
     padding-right: 10px;
+}
+
+#watchTbl thead tr:hover {
+    background-color: transparent;
+}
+#watchTbl th {
+    padding-top: 0;
+}
+#watchTbl th.k {
+    width: 14%;
+}
+#watchTbl th.v,
+#watchTbl th.p {
+    width: 43%;
 }
 
 
