@@ -72,6 +72,11 @@ FBL.ns( function() { with( FBL ) {
         return this.omRef.cfg.highlightKeys[elName];
     }
 
+    // returns true when the given name is in the usefulKeys list
+    function _isUseful( elName ) {
+        return this.omRef.cfg.usefulKeys[elName];
+    }
+
     /**
      * Returns a style block of dynamic styles
      * @return the style string
@@ -117,7 +122,7 @@ FBL.ns( function() { with( FBL ) {
      */
     function _quote( str ) {
         return( this.omRef.cfg.showQuotes
-                    ? "<span class='qq'>\"</span><span class='v'>" +str + "</span><span class='qq'>\"</span>"
+                    ? "<span class='qq'>\"</span><span class='v'>" + str + "</span><span class='qq'>\"</span>"
                     : str );
     }
 
@@ -128,6 +133,7 @@ FBL.ns( function() { with( FBL ) {
      */
     function _delimStringToObj( str ) {
         var obj = {},
+            str = ( str ? str : "" ),
             keys = str.split( /, ?/ );
         for( var idx in keys ) {
             obj[keys[idx]] = 1;
@@ -143,11 +149,37 @@ FBL.ns( function() { with( FBL ) {
     function _objToDelimString( obj ) {
         var str = "";
         for( var key in obj ) {
-            if( obj.hasOwnProperty( key ) ) {
+            if( obj.hasOwnProperty( key ) && !! key ) {
                 str += key + ",";
             }
         }
         return str.replace( /,$/, "" );
+    }
+
+    /**
+     * Remove the given key from the given pref list
+     * @param key key to remove
+     * @param pref pref list to remove from
+     */
+    function _removeFromPrefList( key, pref ) {
+        _dump( "removeFromWatches: key='" + key + "'; pref='" + pref + "'\n" );
+        var currPrefs = _delimStringToObj( this.omRef.getPreference( pref ) );
+        delete( currPrefs[key] );
+        this.omRef.setPreference( pref, _objToDelimString( currPrefs ) );
+    }
+
+    /**
+     * Add the given key to the given pref list
+     * @param key the key to add
+     * @param pref the pref list to add to
+     */
+    function _addToPrefList( key, pref ) {
+        //_dump( "addToWatches: ctx='" + ctx + "'; key='" + key + "'; pref='" + pref + "'\n" );
+        var currPrefs = _delimStringToObj( this.omRef.getPreference( pref ) );
+        currPrefs[key] = 1;
+        this.omRef.setPreference( pref, _objToDelimString( currPrefs ) );
+
+        // refresh?
     }
 
 
@@ -258,7 +290,11 @@ FBL.ns( function() { with( FBL ) {
                 if( n ) {
                     val = u.getFirstQueryValue( n ).replace( "<", "&lt;" );  // escape HTML in output HTML
 
-                    if( n.match( /^c(\d+)$/ ) || n.match( /^prop(\d+)$/i ) ) {
+                    if( that.omRef.cfg.usefulKeys[n] ) {
+                        // 'useful' keys
+                        obj.useful[n] = val;
+                        obj.raw[n] = val;
+                    } else if( n.match( /^c(\d+)$/ ) || n.match( /^prop(\d+)$/i ) ) {
                         // omniture props
                         obj.props["prop"+RegExp.$1] = val;
                         obj.raw["prop"+RegExp.$1] = val;
@@ -266,10 +302,6 @@ FBL.ns( function() { with( FBL ) {
                         // omniture evars
                         obj.vars["eVar"+RegExp.$1] = val;
                         obj.raw["eVar"+RegExp.$1] = val;
-                    } else if( that.omRef.cfg.usefulKeys[n] ) {
-                        // 'useful' keys
-                        obj.useful[n] = val;
-                        obj.raw[n] = val;
                     } else if( n.match( /^\[?AQB\]?$/ ) || n.match( /^\[?AQE\]?$/ ) ) {
                         // noop; skip Omniture's [AQB] and [AQE] elements
                     } else if( n.match( /^mfinfo/ ) ) {
@@ -430,7 +462,8 @@ FBL.ns( function() { with( FBL ) {
             }
 
             if( !! html ) {
-                return "<thead><tr><th colspan='2'>" + title + "</th><tr></thead>" + html;
+                return   "<thead><tr><th colspan='2'>" + title + "</th><tr></thead>"
+                       + "<tbody class='" + title.toLowerCase() + "'>" + html + "</tbody>"
             } else {
                 return "";
             }
@@ -492,34 +525,95 @@ FBL.ns( function() { with( FBL ) {
             //_dump( "getContextMenuItems: style='" + style + "'; target='" + target + "'\n" );
             //_dump( "getContextMenuItems: itt='" + this.infoTipType + "'; sel='" + this.selection + "'\n" );
 
-            var val,
+            var val, tr,
                 node = target,
                 items = [];
 
             while( node && node.tagName.toUpperCase() !== "TR" ) {
-                _dump( "getContextMenuItems: node='" + node + "'; tagName='" + node.tagName.toUpperCase() + "'\n" );
+                //_dump( "getContextMenuItems: node='" + node + "'; tagName='" + node.tagName.toUpperCase() + "'\n" );
                 node = node.parentNode;
             }
+            tr = node;
+
+            // get a handle to the tbody element, so we can use the className element later
+            tbody = node;
+            while( tbody && tbody.tagName.toUpperCase() !== "TBODY" ) {
+                tbody = tbody.parentNode;
+            }
+
             node = node.getElementsByTagName( "td" )[0];
             if( node ) {
                 val = node.firstChild.nodeValue;
                 if( val ) {
-                    _dump( "getContextMenuItems: found node='" + node + "; val='" + val + "'\n" );
-                    items.push( "-", { label: "Watch '" + val + "'", command: bind( this.addToWatches, this, val ) } );
+                    //_dump( "getContextMenuItems: found node='" + node + "; val='" + val + "'\n" );
+
+                    // watch
+                    if( _isWatched.call( this, val ) ) {
+                        items.push( "-", { label: "Unwatch '" + val + "'", command: bind( this.removePrefAndUpdateWatches, this, val, "watchKeys" ) } );
+                    } else {
+                        items.push( "-", { label: "Watch '" + val + "'", command: bind( this.addPref, this, val, "watchKeys" ) } );
+                    }
+
+                    // highlight
+                    if( _isHighlightable.call( this, val ) ) {
+                        items.push( "-", { label: "Unhighlight '" + val + "'", command: bind( this.removePref, this, val, "highlightKeys", tr ) } );
+                    } else {
+                        items.push( "-", { label: "Highlight '" + val + "'", command: bind( this.addPref, this, val, "highlightKeys", tr ) } );
+                    }
+
+                    // useful
+                    if( tbody && tbody.className && ! tbody.className.match( /\bsummary\b/ ) ) {
+                        if( _isUseful.call( this, val ) ) {
+                            items.push( "-", { label: "Remove '" + val + "' from Useful group", command: bind( this.removePref, this, val, "usefulKeys" ) } );
+                        } else {
+                            items.push( "-", { label: "Add '" + val + "' to Useful group", command: bind( this.addPref, this, val, "usefulKeys" ) } );
+                        }
+                    }
                 }
             }
 
             return items;
         },
 
-        addToWatches: function( ctx, key ) {
-            //_dump( "addToWatches: ctx='" + ctx + "'; key='" + key + "'\n" );
+        /**
+         * Helper function to remove a pref and update the watches panel
+         * @param ctx context from ctx menu helper
+         * @param key key to remove
+         * @param pref pref list to remove from
+         */
+        removePrefAndUpdateWatches: function( ctx, key, pref ) {
+            _removeFromPrefList.call( this, key, pref );
+            var sp = FirebugContext.getPanel("OmnibugSide");
+            sp.updateWatches( null, "remove", key );
+        },
 
-            var currWatches = _delimStringToObj( this.omRef.getPreference( "watchKeys" ) );
-            currWatches[key] = 1;
-            this.omRef.setPreference( "watchKeys", _objToDelimString( currWatches ) );
+        /**
+         * Helper function to remove a pref
+         * @param ctx context from ctx menu helper
+         * @param key key to remove
+         * @param pref pref list to remove from
+         * @param el optional element to modify
+         */
+        removePref: function( ctx, key, pref, el ) {
+            _removeFromPrefList.call( this, key, pref );
+            // unhighlight
+            if( pref === "highlightKeys" && el && el.className ) {
+                el.className = el.className.replace( "hilite", "" );
+            }
+        },
 
-            // refresh watch winder?
+        /**
+         * Helper function to add a pref
+         * @param ctx context from ctx menu helper
+         * @param key key to add
+         * @param pref pref list to add to
+         * @param el optional element to modify
+         */
+        addPref: function( ctx, key, pref, el ) {
+            _addToPrefList.call( this, key, pref );
+            if( pref === "highlightKeys" && el ) {
+                el.className += ( el.className ? " " : "" ) + "hilite";
+            }
         }
 
     } );
@@ -567,30 +661,31 @@ FBL.ns( function() { with( FBL ) {
                 val = node.firstChild.nodeValue;
                 if( val ) {
                     //_dump( "getContextMenuItems: found node='" + node + "; val='" + val + "'\n" );
-                    items.push( "-", { label: "Unwatch '" + val + "'", command: bind( this.removeFromWatches, this, val ) } );
+                    items.push( "-", { label: "Unwatch '" + val + "'", command: bind( this.removePrefAndUpdateWatches, this, val, "watchKeys" ) } );
                 }
             }
 
             return items;
         },
 
-        removeFromWatches: function( ctx, key ) {
-            //_dump( "removeFromWatches: ctx='" + ctx + "'; key='" + key + "'\n" );
-
-            var currWatches = _delimStringToObj( this.omRef.getPreference( "watchKeys" ) );
-            //currWatches[key] = 1;
-            delete( currWatches[key] );
-            this.omRef.setPreference( "watchKeys", _objToDelimString( currWatches ) );
-
-            // refresh watch winder?
+        /**
+         * Helper function to remove a pref, then update the watch window
+         */
+        removePrefAndUpdateWatches: function( ctx, key, pref ) {
+            _removeFromPrefList.call( this, key, pref );
+            this.updateWatches( null, "remove", key );
         },
+
 
 
         /**
          * Update the values (if any) in the watches side-panel
          * @param data the data object
+         * @param mode if mode=remove, just remove 'key' from the table
+         *             otherwise operate in add/update mode:
+         * @param remKey the key to remove when mode=remove
          */
-        updateWatches: function( data ) {
+        updateWatches: function( data, mode, remKey ) {
             var html,
                 existingVals = {},
                 tbl = this.document.getElementById( "watchTbl" );
@@ -610,7 +705,10 @@ FBL.ns( function() { with( FBL ) {
                         if( keyCell && valCell ) {
                             key = keyCell.firstChild.nodeValue;
                             val = valCell.getElementsByClassName( "v" )[0];
-                            if( val ) {
+
+                            if( mode === "remove" && remKey === key ) {
+                                rows[row].parentNode.removeChild( rows[row] );
+                            } else if( val ) {
                                 val = val.firstChild.nodeValue
                                 if( val ) {
                                     existingVals[key] = val;
@@ -619,25 +717,30 @@ FBL.ns( function() { with( FBL ) {
                         }
                     }
                 }
-                tbl.parentNode.removeChild( tbl );
-            }
 
-            // no existing table; write it out
-            html  = "<table cellspacing='0' border='0' class='req ent' id='watchTbl'>";
-            html += "<thead><tr><th class='k'>Key</th><th class='v'>Value</th><th class='p'>Prev</th></tr></thead>";
-            for( key in data.raw ) {
-                if(    data.raw.hasOwnProperty( key )
-                    && _isWatched.call( this, key ) ) {
-                    //_dump( "updateWatches: found watched key=" + key + "\n" );
-                    html += "<tr><td class='k'>" + key + "</td>"
-                          + "<td class='v'>" + _quote.call( this, data.raw[key] ) + "</td>"
-                          + "<td>" + ( existingVals[key] ? _quote.call( this, existingVals[key] ) : "" ) + "</td>"
-                          + "</tr>";
+                if( mode !== "remove" ) {
+                    tbl.parentNode.removeChild( tbl );
                 }
             }
-            html += "</table>";
 
-            _appendHtml.call( this, html );
+            if( mode !== "remove" ) {
+                // no existing table; write it out
+                html  = "<table cellspacing='0' border='0' class='req ent' id='watchTbl'>";
+                html += "<thead><tr><th class='k'>Key</th><th class='v'>Value</th><th class='p'>Prev</th></tr></thead>";
+
+                var currWatches = _delimStringToObj( this.omRef.getPreference( "watchKeys" ) );
+                for( key in currWatches ) {
+                    if( currWatches.hasOwnProperty( key ) ) {
+                        html += "<tr><td class='k'>" + key + "</td>"
+                              + "<td class='v'>" + ( !! data.raw[key] ? _quote.call( this, data.raw[key] ) : "" ) + "</td>"
+                              + "<td>" + ( !! existingVals[key] ? _quote.call( this, existingVals[key] ) : "" ) + "</td>"
+                              + "</tr>";
+                    }
+                }
+                html += "</table>";
+
+                _appendHtml.call( this, html );
+            }
         }
 
     } );
