@@ -72,6 +72,7 @@
         </groupbox>
     </prefpane>
 
+<!--
     <prefpane id="omnibug-pat-pane" label="Pattern Settings">
         <preferences>
             <preference id="pref-useful" name="extensions.omnibug.usefulKeys" type="string"/>
@@ -95,6 +96,7 @@
             </hbox>
         </groupbox>
     </prefpane>
+-->
 
 </prefwindow>
 
