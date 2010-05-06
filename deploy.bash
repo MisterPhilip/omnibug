@@ -58,18 +58,18 @@ read foo
 
 
 #
-# Deploy (or not) to galactica
+# Deploy (or not)
 #
 if [[ "x$1" == "x" || "$1" == "ross" ]]; then
-    echo "Sending update.rdf and xpi to galactica"
-    scp update.rdf $XPI rosssimpson@galactica.7mph.com:httpdocs/dev/${extrapath}
+    echo "Sending update.rdf and xpi"
+    scp update.rdf $XPI rosssimpson.com:www/dev/${extrapath}
     echo ""
 
     echo "Updating symlink"
-    ssh rosssimpson@galactica.7mph.com "ln -sf $XPI httpdocs/dev/${extrapath}${APP}-current.xpi"
+    ssh rosssimpson.com "ln -sf $XPI www/dev/${extrapath}${APP}-current.xpi"
 
     echo "Done.  URL is https://rosssimpson.com/dev/${extrapath}${APP}-current.xpi"
 else
-    echo "Done.  Did not deploy to galactica."
+    echo "Done.  Did not deploy."
 fi
 
