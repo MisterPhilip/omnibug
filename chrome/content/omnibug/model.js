@@ -112,7 +112,77 @@ FBL.ns( function() { with( FBL ) {
             showQuotes: false,
             outFile: null,
             prefsService: null,
-            win: null
+            win: null,
+
+            keyTitles: {
+                // @TODO: these belong elsewhere
+                // GA/Urchin:
+                  utmac:  "Account string"
+                , utmcc:  "Cookie values"
+                , utmcn:  "New campaign session?"
+                , utmcr:  "Repeat campaign visit?"
+                , utmcs:  "Browser language encoding"
+                , utmdt:  "Page title"
+                , utme:   "Extensible parameter"
+                , utmfl:  "Flash version"
+                , utmhn:  "Host name"
+                , utmipc: "Product code"
+                , utmipn: "Product name"
+                , utmipr: "Unit price"
+                , utmiqt: "Quantity"
+                , utmiva: "Item variations"
+                , utmje:  "Java-enabled browser?"
+                , utmn:   "Unique ID"
+                , utmp:   "Page request"
+                , utmr:   "Referrer URL"
+                , utmsc:  "Screen color depth"
+                , utmsr:  "Screen resolution"
+                , utmt:   "Request type"
+                , utmtci: "Billing city"
+                , utmtco: "Billing country"
+                , utmtid: "Order ID"
+                , utmtrg: "Billing region"
+                , utmtsp: "Shipping cost"
+                , utmtst: "Affiliation"
+                , utmtto: "Total"
+                , utmttx: "Tax"
+                , utmul:  "Browser language"
+                , utmwv:  "Tracking code version"
+                , utmhid: "AdSense HID"
+
+                // SiteCatalyst:
+                , ns:     "Visitor namespace"
+                , ndh:    "Image sent from JS?"
+                , ch:     "Channel"
+                , v0:     "Campaign"
+                , r:      "Referrer URL"
+                , ce:     "Character set"
+                , cc:     "Currency code"
+                , cl:     "Cookie lifetime"
+                , g:      "Current URL"
+                , t:      "Browser time"
+                , v:      "Java-enabled browser?"
+                , j:      "JavaScript version"
+                , bw:     "Browser width"
+                , bh:     "Browser height"
+                , s:      "Screen resolution"
+                , c:      "Screen color depth"
+                , ct:     "Connection type"
+                , p:      "Netscape plugins"
+                , k:      "Cookies enabled?"
+                , hp:     "Home page?"
+                , pid:    "Page ID"
+                , pidt:   "Page ID type"
+                , oid:    "Object ID"
+                , oidt:   "Object ID type"
+                , ot:     "Object tag name"
+                , pe:     "Link type"
+                , pev1:   "Link URL"
+                , pev2:   "Link name"
+                , c1:     "Prop1"
+                , h1:     "Hier1"
+                , v1:     "EVar1"
+            },
         },
 
         /**
