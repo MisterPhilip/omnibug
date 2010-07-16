@@ -77,6 +77,11 @@ FBL.ns( function() { with( FBL ) {
         return this.omRef.cfg.usefulKeys[elName];
     }
 
+    // returns the title (if any) for a given key
+    function _getTitleForKey( elName ) {
+        return this.omRef.cfg.keyTitles[elName];
+    }
+
     /**
      * Returns a style block of dynamic styles
      * @return the style string
@@ -444,16 +449,19 @@ FBL.ns( function() { with( FBL ) {
          * Generate an HTML report fragment for the given object
          */
         generateReportFragment: function( data, title ) {
-            var cn,
+            var cn, kt,
                 i = 0,
                 html = "";
 
             for( var el in data ) {
                 if( data.hasOwnProperty( el ) && !! data[el] ) {
                     cn = _isHighlightable.call( this, el ) ? "hilite" : "";
+                    kt = _getTitleForKey.call( this, el );
+
                     html += "<tr"
                          + ( !! cn ? " class='" + cn + "'" : "" )
-                         + "><td class='k " + ( i++ % 2 === 0 ? 'even' : 'odd' ) + "'>"
+                         + "><td class='k " + ( i++ % 2 === 0 ? 'even' : 'odd' ) + "'"
+                         + ( !! kt ? " title='" + kt + "'" : "" ) + ">"
                          + el
                          + "</td><td class='v'>"
                          + _quote.call( this, data[el] )
@@ -697,7 +705,7 @@ FBL.ns( function() { with( FBL ) {
                 var cells, keyCell, valCell, key, val,
                     rows = tbl.getElementsByTagName( "tr" );
                 for( row in rows ) {
-                    if( rows.hasOwnProperty( row ) ) {
+                    if( !! row && rows.hasOwnProperty( row ) ) {
                         cells = rows[row].getElementsByTagName( "td" );
                         keyCell = rows[row].getElementsByClassName( "k" )[0];
                         valCell = rows[row].getElementsByClassName( "v" )[0];
@@ -729,9 +737,11 @@ FBL.ns( function() { with( FBL ) {
                 html += "<thead><tr><th class='k'>Key</th><th class='v'>Value</th><th class='p'>Prev</th></tr></thead>";
 
                 var currWatches = _delimStringToObj( this.omRef.getPreference( "watchKeys" ) );
+
                 for( key in currWatches ) {
                     if( currWatches.hasOwnProperty( key ) ) {
-                        html += "<tr><td class='k'>" + key + "</td>"
+                        var kt = _getTitleForKey.call( this, key );
+                        html += "<tr><td class='k'" + ( !! kt ? " title='" + kt + "'" : "" ) + ">" + key + "</td>"
                               + "<td class='v'>" + ( !! data.raw[key] ? _quote.call( this, data.raw[key] ) : "" ) + "</td>"
                               + "<td>" + ( !! existingVals[key] ? _quote.call( this, existingVals[key] ) : "" ) + "</td>"
                               + "</tr>";
