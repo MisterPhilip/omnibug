@@ -74,6 +74,7 @@ table.ent td.k {
 table.ent td.k,
 table.ent td.v {
     padding-right: 10px;
+    cursor: default;
 }
 
 #watchTbl thead tr:hover {
