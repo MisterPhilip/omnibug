@@ -308,9 +308,11 @@ FBL.ns( function() { with( FBL ) {
             this.initPrefsService();
 
             // set default pref
+            /* i don't see the point in doing this any longer
             if( this.cfg.prefsService.prefHasUserValue( "defaultPattern" ) ) {
                 this.cfg.prefsService.clearUserPref( "defaultPattern" );
             }
+            */
 
             // initialize prefs
             this.initPrefs();
