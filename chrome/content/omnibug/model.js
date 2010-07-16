@@ -415,7 +415,7 @@ FBL.ns( function() { with( FBL ) {
                     this.initLogging();
                     break;
 
-                //case "defaultPattern":
+                case "defaultPattern":
                 case "userPattern":
                 case "usefulKeys":
                 case "highlightKeys":
