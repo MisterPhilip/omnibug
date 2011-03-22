@@ -339,29 +339,31 @@ FBL.ns( function() { with( FBL ) {
          */
         responseObserver: {
             observe: function( subject, topic, data ) {
-                var key, statusStr,
-                    omRef = Firebug.Omnibug;
+                if( typeof Firebug !== "undefined" ) {
+                    var key, statusStr,
+                        omRef = Firebug.Omnibug;
 
-                //key = Md5Impl.md5( subject.name ); // @TODO: remove
-                //_dump( "responseObserver: subj=" + subject + "; topic=" + topic + "; key=" + key + "\n" );
+                    //key = Md5Impl.md5( subject.name ); // @TODO: remove
+                    //_dump( "responseObserver: subj=" + subject + "; topic=" + topic + "; key=" + key + "\n" );
 
-                if( subject.name.match( omRef.cfg.defaultRegex ) || ( omRef.cfg.userRegex && subject.name.match( omRef.cfg.userRegex ) ) ) {
-                    key = Md5Impl.md5( subject.name );
-                    _dump( "responseObserver: key=" + key + "; sc=" + subject.responseStatus + "; st=" + subject.responseStatusText + "\n" );
+                    if( subject.name.match( omRef.cfg.defaultRegex ) || ( omRef.cfg.userRegex && subject.name.match( omRef.cfg.userRegex ) ) ) {
+                        key = Md5Impl.md5( subject.name );
+                        _dump( "responseObserver: key=" + key + "; sc=" + subject.responseStatus + "; st=" + subject.responseStatusText + "\n" );
 
-                    statusStr = subject.responseStatus + " " + subject.responseStatusText;
+                        statusStr = subject.responseStatus + " " + subject.responseStatusText;
 
-                    // update panel
-                    if( FirebugContext ) {
-                        FirebugContext.getPanel( "Omnibug" ).updateEntryState( key, statusStr ); // in updateEntryState, also add to summary section?
-                    } else {
-                        _dump( "responseObserver: FirebugContext is null!\n" );
-                    }
+                        // update panel
+                        if( FirebugContext ) {
+                            FirebugContext.getPanel( "Omnibug" ).updateEntryState( key, statusStr ); // in updateEntryState, also add to summary section?
+                        } else {
+                            _dump( "responseObserver: FirebugContext is null!\n" );
+                        }
 
-                    // update request list
-                    if( omRef.cfg.requests[key] ) {
-                        omRef.cfg.requests[key]["statusText"] = statusStr;
-                        dump( "responseObserver: updating request in list for key=" + key + "; obj=" + Omnibug.Tools.objDump( omRef.cfg.requests[key] ) + "\n" );
+                        // update request list
+                        if( omRef.cfg.requests[key] ) {
+                            omRef.cfg.requests[key]["statusText"] = statusStr;
+                            dump( "responseObserver: updating request in list for key=" + key + "; obj=" + Omnibug.Tools.objDump( omRef.cfg.requests[key] ) + "\n" );
+                        }
                     }
                 }
             }
