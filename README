@@ -27,8 +27,6 @@
 
  9.5 private build process, for developing
 
- 12  names for known keys (e.g. pev2 -> "Page Event 2") (per-vendor)
-
  15  switch from innerHTML/appendHTML to DOM (via domplate?)
 
  16  submit to WA blogs/sites/etc?
@@ -44,10 +42,6 @@
  24  define release test criteria and stick to it
 
  25  switch to observers instead of onStateChange?
-
- 26  http status thinger
-
- 27  get added to http://getfirebug.com/extensions/
 
 ------
 
@@ -65,7 +59,13 @@
 
  17  fix prob relayed by sophus (timing and requests staying in queue)
 
+ 12  names for known keys (e.g. pev2 -> "Page Event 2") (per-vendor)
+
+ 27  get added to http://getfirebug.com/extensions/
+
+ 26  http status thinger
+
 ------
 
 FBTrace.dumpProperties( "browser", context.browser );
-
+Firebug.Console.log( ... );
