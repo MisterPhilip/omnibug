@@ -227,7 +227,7 @@ FBL.ns( function() { with( FBL ) {
          * Called when the clear button is pushed
          */
         clearPanel: function() {
-            FirebugContext.getPanel("Omnibug").clear();
+            this.getContext().getPanel("Omnibug").clear();
         },
 
         /**
@@ -346,18 +346,15 @@ FBL.ns( function() { with( FBL ) {
                     //key = Md5Impl.md5( subject.name ); // @TODO: remove
                     //_dump( "responseObserver: subj=" + subject + "; topic=" + topic + "; key=" + key + "\n" );
 
-                    if( subject.name.match( omRef.cfg.defaultRegex ) || ( omRef.cfg.userRegex && subject.name.match( omRef.cfg.userRegex ) ) ) {
+                    if(    ( subject && subject.name && subject.name.match( omRef.cfg.defaultRegex ) )
+                        || ( subject && subject.name && omRef.cfg.userRegex && subject.name.match( omRef.cfg.userRegex ) ) ) {
                         key = Md5Impl.md5( subject.name );
                         _dump( "responseObserver: key=" + key + "; sc=" + subject.responseStatus + "; st=" + subject.responseStatusText + "\n" );
 
                         statusStr = subject.responseStatus + " " + subject.responseStatusText;
 
                         // update panel
-                        if( FirebugContext ) {
-                            FirebugContext.getPanel( "Omnibug" ).updateEntryState( key, statusStr ); // in updateEntryState, also add to summary section?
-                        } else {
-                            _dump( "responseObserver: FirebugContext is null!\n" );
-                        }
+                        omRef.getContext().getPanel( "Omnibug" ).updateEntryState( key, statusStr ); // in updateEntryState, also add to summary section?
 
                         // update request list
                         if( omRef.cfg.requests[key] ) {
@@ -491,6 +488,9 @@ FBL.ns( function() { with( FBL ) {
          * @override
          */
         initContext: function( context ) {
+            // keep a private copy around for ourselves
+            this.context = context;
+
             if( ! context.browser.uid ) {
                 context.browser.uid = _getUniqueId();
             }
@@ -503,6 +503,13 @@ FBL.ns( function() { with( FBL ) {
 
             // expire old requests
             this.expireRequests( context );
+        },
+
+        /**
+         * Private to get at the context (instead of using global FirebugContext)
+         */
+        getContext: function() {
+            return this.context;
         },
 
         /**
@@ -535,7 +542,7 @@ FBL.ns( function() { with( FBL ) {
 
             // dump any messages waiting
             while( this.cfg.messages.length ) {
-                FirebugContext.getPanel("Omnibug").printLine( this.cfg.messages.shift() );
+                context.getPanel("Omnibug").printLine( this.cfg.messages.shift() );
             }
 
             // dump any requests waiting
@@ -553,11 +560,10 @@ FBL.ns( function() { with( FBL ) {
             this.addStyleSheet( panel.document );
 
             // Makes detach work.
-            // @TODO: can we use the panel var instead of FirebugContext.getPanel()?
-            if ( ! FirebugContext.getPanel( "Omnibug" ).document.omnibugContext ) {
+            if ( ! context.getPanel( "Omnibug" ).document.omnibugContext ) {
                 // Save a pointer back to this object from the iframe's document:
-                FirebugContext.getPanel( "Omnibug" ).document.omnibugPanel = FirebugContext.getPanel( "Omnibug" );
-                FirebugContext.getPanel( "Omnibug" ).document.omnibugContext = FirebugContext.omnibugContext;
+                context.getPanel( "Omnibug" ).document.omnibugPanel = context.getPanel( "Omnibug" );
+                context.getPanel( "Omnibug" ).document.omnibugContext = context.omnibugContext;
             }
         },
 
@@ -582,6 +588,7 @@ FBL.ns( function() { with( FBL ) {
          */
         monitorContext: function( context ) {
             //_dump( "monitorContext: context=" + context + "\n" );
+
             if( !context.omNetProgress ) {
                 context.omNetProgress = new OmNetProgress( context );
                 context.browser.addProgressListener( context.omNetProgress, NOTIFY_ALL );
@@ -643,7 +650,7 @@ FBL.ns( function() { with( FBL ) {
                             requests[key]["src"] = "prev";
                             _dump( "valid for this browser; calling decodeUrl\n" );
                             try {
-                                FirebugContext.getPanel( "Omnibug" ).decodeUrl( requests[key] );
+                                context.getPanel( "Omnibug" ).decodeUrl( requests[key] );
                                 delete requests[key];
                             } catch( ex ) {
                                 _dump( "processRequests: exception in decodeUrl(): " + e );
@@ -869,7 +876,7 @@ FBL.ns( function() { with( FBL ) {
                     };
 
                     // write the request to the panel.  must happen here so beacons will be shown (e.g., in realtime)
-                    FirebugContext.getPanel( "Omnibug" ).decodeUrl( obj );
+                    this.context.getPanel( "Omnibug" ).decodeUrl( obj );
 
                     /* Save requests in requests[] that need to be dumped on the next page (e.g. web beacons).  Only click events
                      * are candidates for saving, so only start saving after the context has loaded
@@ -886,7 +893,7 @@ FBL.ns( function() { with( FBL ) {
                         FileIO.write( file, now + "\t" + key + "\t" + request.name + "\t" + this.context.browser.currentURI.spec + "\n", "a" );
                     }
                 } else {
-                    _dump( "onStateChange: not start (" + getStateDescription( flag ) + "); key=" + key + "\n" );
+                    //_dump( "onStateChange: not start (" + getStateDescription( flag ) + "); key=" + key + "\n" );
                 }
             }
             return 0;

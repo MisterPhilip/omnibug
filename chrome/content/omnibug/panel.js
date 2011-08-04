@@ -220,16 +220,20 @@ FBL.ns( function() { with( FBL ) {
             doc.body.appendChild( this.panelNode );
 
             //_dump( "panel initialize: arguments=" + arguments + "\n" );
-            if ( FirebugContext.omnibugContext ) {
+            if ( context.omnibugContext ) {
                 _dump( "panel initialize: context already exists\n" );
                 return;
             }
 
             // Create a context for this instance.
-            FirebugContext.omnibugContext = new Omnibug.OmnibugContext( this );
+            context.omnibugContext = new Omnibug.OmnibugContext( this );
 
             this.document.omnibugPanel = this;
-            this.document.omnibugContext = FirebugContext.omnibugContext;
+            this.document.omnibugContext = context.omnibugContext;
+        },
+
+        getContext: function() {
+            return this.context;
         },
 
         /*
@@ -239,11 +243,11 @@ FBL.ns( function() { with( FBL ) {
         show: function() {
             //_dump( "show: arguments=" + arguments + "\n" );
 
-            this.latestOmnibugContext = FirebugContext.omnibugContext;  // save this to make detach work
+            this.latestOmnibugContext = this.getContext().omnibugContext;  // save this to make detach work
 
             // There is only ONE DOCUMENT shared by all browser tabs. So if the user opens two
             // browser tabs, we have to restore the appropriate context when switching between tabs.
-            this.document.omnibugContext = FirebugContext.omnibugContext;
+            this.document.omnibugContext = this.getContext().omnibugContext;
         },
 
         clear: function() {
@@ -438,7 +442,7 @@ FBL.ns( function() { with( FBL ) {
             //_dump( "output html:\n\n\n" + html + "\n\n\n" );
             _appendHtml.call( this, html );
 
-            var sp = FirebugContext.getPanel("OmnibugSide");
+            var sp = this.getContext().getPanel("OmnibugSide");
             sp.updateWatches( data );
 
             _dump( "report: wrote entry for " + data.state.key + "\n" );
@@ -591,7 +595,7 @@ FBL.ns( function() { with( FBL ) {
          */
         removePrefAndUpdateWatches: function( ctx, key, pref ) {
             _removeFromPrefList.call( this, key, pref );
-            var sp = FirebugContext.getPanel("OmnibugSide");
+            var sp = this.getContext().getPanel("OmnibugSide");
             sp.updateWatches( null, "remove", key );
         },
 
@@ -710,7 +714,7 @@ FBL.ns( function() { with( FBL ) {
                         keyCell = rows[row].getElementsByClassName( "k" )[0];
                         valCell = rows[row].getElementsByClassName( "v" )[0];
 
-                        if( keyCell && valCell ) {
+                        if( keyCell && keyCell.firstChild && valCell ) {
                             key = keyCell.firstChild.nodeValue;
                             val = valCell.getElementsByClassName( "v" )[0];
 
