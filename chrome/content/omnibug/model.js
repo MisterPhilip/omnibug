@@ -343,7 +343,6 @@ FBL.ns( function() { with( FBL ) {
                     var key, statusStr,
                         omRef = Firebug.Omnibug;
 
-                    //key = Md5Impl.md5( subject.name ); // @TODO: remove
                     //_dump( "responseObserver: subj=" + subject + "; topic=" + topic + "; key=" + key + "\n" );
 
                     if(    ( subject && subject.name && subject.name.match( omRef.cfg.defaultRegex ) )
@@ -354,7 +353,9 @@ FBL.ns( function() { with( FBL ) {
                         statusStr = subject.responseStatus + " " + subject.responseStatusText;
 
                         // update panel
-                        omRef.getContext().getPanel( "Omnibug" ).updateEntryState( key, statusStr ); // in updateEntryState, also add to summary section?
+                        if( omRef != null && omRef.getContext() != null && omRef.getContext().getPanel( "Omnibug" ) != null ) {
+                            omRef.getContext().getPanel( "Omnibug" ).updateEntryState( key, statusStr ); // in updateEntryState, also add to summary section?
+                        }
 
                         // update request list
                         if( omRef.cfg.requests[key] ) {
