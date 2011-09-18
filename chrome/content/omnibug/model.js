@@ -149,6 +149,8 @@ FBL.ns( function() { with( FBL ) {
                 , utmul:  "Browser language"
                 , utmwv:  "Tracking code version"
                 , utmhid: "AdSense HID"
+                , utms:   "Internal use (counter)"
+                , utmu:   "Internal use"
 
                 // SiteCatalyst:
                 , ns:     "Visitor namespace"
