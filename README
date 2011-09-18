@@ -1,5 +1,7 @@
 @TODOs:
 
+ 0  Switch to jetpack?
+
  1  Rename (to? WAbug?) (* Move to httpdocs/wabug/ when doing rename!)
 
  2  Vendor-specific rules, chooser, and pref entries (and new logic model)
@@ -21,9 +23,11 @@
 
  7  real prefs screen (to support #2,3 above)
 
- 8  hosted by moz?
+ 8  hosted by amo?
 
  9  update build process to use svn rev as build #, not version #
+
+ 9.1 svn -> git
 
  9.5 private build process, for developing
 
