@@ -8,7 +8,7 @@
   <RDF:Description RDF:about="rdf:#$OdUzy3"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="1.5"
-                   em:maxVersion="8.*"
+                   em:maxVersion="10.*"
                    em:updateLink="http://www.rosssimpson.com/dev/omnibug-TOK_VER.xpi"
                    em:updateHash="sha1:TOK_HASH"
                    em:updateInfoURL="http://www.rosssimpson.com/dev/omnibug_rel_notes.xhtml" />
