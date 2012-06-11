@@ -1,11 +1,16 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 /*
  * JS I/O in Firefox; fetched and modified slightly on 17-July-2008 from:
  *     http://kb.mozillazine.org/Io.js
+ * License:
+ *     http://kb.mozillazine.org/MozillaZine_Knowledge_Base:Copyrights
  *
  * $Id$
  * $URL$
  */
-
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////

@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 /*
  * Native MD5 in Firefox; fetched and modified slightly on 17-July-2008 from:
  *     http://rcrowley.org/2007/11/15/md5-in-xulrunner-or-firefox-extensions/
@@ -5,8 +9,6 @@
  * $Id$
  * $URL$
  */
-
-
 
 FBL.ns( function() { with( FBL ) {
     Md5Impl = ( function() {
