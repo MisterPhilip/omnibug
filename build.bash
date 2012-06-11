@@ -10,13 +10,6 @@ XPIFILE=${APP}.xpi
 #find . -name "*.jar" -exec rm {} \;
 find . -name "*.xpi" -exec rm {} \;
 
-#echo "Creating chrome jar"
-#cd chrome
-#files=`find . -type f|egrep -v "(\.svn|\.jar)"`
-#zip ${APP}.jar $files
-#cd ..
-#echo ""
-
 echo "Creating xpi"
 chrome_files=`find chrome -type f|grep -v \.svn`
 defaults_files=`find defaults -type f|grep -v \.svn`
