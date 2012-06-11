@@ -46,7 +46,7 @@ zip -u $XPI
 echo ""
 
 # Don't generate hash until after adding the updated install.rdf
-HASH=`sha1sum ${XPI} | awk '{ print $1 }'`
+HASH=`openssl sha1 ${XPI} | awk '{ print $2 }'`
 
 cat update.rdf.tpl | sed "s/TOK_VER/${VER}/g" | sed "s/TOK_HASH/${HASH}/g" > update.rdf
 
