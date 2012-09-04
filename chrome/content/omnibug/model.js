@@ -181,7 +181,7 @@ FBL.ns( function() { with( FBL ) {
         showPanel: function( browser, panel ) {
             //_dump( "showPanel: browser=" + browser + "; panel=" + panel + "\n" );
             var isOmnibug = panel && panel.name === "Omnibug";
-            var OmnibugButtons = browser.chrome.$( "fbOmnibugButtons" );
+            var OmnibugButtons = Firebug.chrome.$( "fbOmnibugButtons" );
             collapse( OmnibugButtons, !isOmnibug );
         },
 
