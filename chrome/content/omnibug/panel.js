@@ -321,7 +321,9 @@ FBL.ns( function() { with( FBL ) {
                     ( url.match( /moniforce\.gif/ ) ? "Moniforce" :
                         ( url.match( /dcs\.gif/ ) ? "WebTrends" :
                             ( url.match( /__utm\.gif/ ) ? "Urchin" :
-                                "Unknown"
+                                ( url.match( /\/collect\?/ ) ? "UniversalAnalytics" :
+                                    "Unknown"
+                                )
                             )
                         )
                     )
