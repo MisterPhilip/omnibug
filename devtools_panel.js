@@ -12,9 +12,9 @@ window.Chromnibug = ( function() {
         var table = document.getElementById( "chr_table" );
         if( !! table ) {
             var td1 = document.createElement( "td" );
-            td1.textContent = msg.requestId;
+            td1.textContent = msg.omnibug["RequestId"];
             var td2 = document.createElement( "td" );
-            td2.textContent = msg.url + " (" + localStorage["favorite_color"] + ")"
+            td2.textContent = msg.omnibug["Full URL"];
             var tr = document.createElement( "tr" );
             tr.appendChild( td1 );
             tr.appendChild( td2 );

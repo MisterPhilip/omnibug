@@ -109,7 +109,7 @@ for now,
     var respStartedCallback = function( details ) {
         if( details.tabId > -1 && shouldProcess( details.url ) ) {
             //console.debug( "matching requestId ", details.requestId, ", tab ", details.tabId );
-            sendToDevToolsForTab( details.tabId, { "type" : "webEvent", "payload" : details } );
+            sendToDevToolsForTab( details.tabId, { "type" : "webEvent", "payload" : decodeUrl( details ) } );
         }
     };
 
@@ -175,6 +175,200 @@ for now,
         });
     }
     */
+
+    /**
+     * Receives a data object from the model, decodes it, and passes it on to report()
+     */
+    function decodeUrl( data ) {
+        var val,
+            u = new OmniUrl( data.url ),
+            obj = {
+                state: data,    // raw data from the browser event
+                raw: {},        // ungrouped object of all props
+                vars: {},       // omniture evars
+                props: {},      // omniture props
+                other: {},      // any other values
+                useful: {},     // values marked as useful
+                moniforce: {},  // moniforce values
+                webtrends: {},  // webtrends values
+                toString: function() {
+                    return "Obj{\n\tvars=" + this.vars + "\n\tprops=" + this.props + "\n\tother=" + this.other + "}";
+                }
+            };
+
+        var that = this;
+        u.getQueryNames().forEach( function( n ) {
+            if( n ) {
+                val = u.getFirstQueryValue( n ).replace( "<", "&lt;" );  // escape HTML in output HTML
+
+                if( that.prefs.usefulKeys[n] ) {
+                    // 'useful' keys
+                    obj.useful[n] = val;
+                    obj.raw[n] = val;
+                } else if( n.match( /^c(\d+)$/ ) || n.match( /^prop(\d+)$/i ) ) {
+                    // omniture props
+                    obj.props["prop"+RegExp.$1] = val;
+                    obj.raw["prop"+RegExp.$1] = val;
+                } else if( n.match( /^v(\d+)$/ ) || n.match( /^evar(\d+)$/i ) ) {
+                    // omniture evars
+                    obj.vars["eVar"+RegExp.$1] = val;
+                    obj.raw["eVar"+RegExp.$1] = val;
+                } else if( n.match( /^\[?AQB\]?$/ ) || n.match( /^\[?AQE\]?$/ ) ) {
+                    // noop; skip Omniture's [AQB] and [AQE] elements
+                } else if( n.match( /^mfinfo/ ) ) {
+                    // moniforce
+                    obj.moniforce[n] = val;
+                    obj.raw[n] = val;
+                } else if( n.match( /^WT\./ ) ) {
+                    // webtrends
+                    obj.webtrends[n] = val;
+                    obj.raw[n] = val;
+                } else {
+                    // everything else
+                    obj.other[n] = val;
+                    obj.raw[n] = val;
+                }
+            }
+        } );
+
+        obj = augmentData( obj );
+        /*
+        try {
+            this.report( obj );
+        } catch( ex ) {
+            _dump( "decodeUrl: exception in report(): " + ex + "\n" );
+        }
+        */
+
+        return obj;
+    }
+
+    /**
+     * Augments the data object with summary data
+     * @param data the data object
+     * @return the augmented data object
+     */
+    function augmentData( data ) {
+        data["omnibug"] = {};
+
+        // workaround -- kill it when vendor-specific code in place
+        var eventType = "load", // ( data.state.doneLoading ? "click" : "load" ),
+            url = data.state.url,
+            urlLength = data.state.url.length,
+            provider = ( url.match( /(?:\/b\/ss|2o7)/ ) ? "Omniture" :
+                ( url.match( /moniforce\.gif/ ) ? "Moniforce" :
+                    ( url.match( /dcs\.gif/ ) ? "WebTrends" :
+                        ( url.match( /__utm\.gif/ ) ? "Urchin" :
+                            ( url.match( /\/collect\?/ ) ? "UniversalAnalytics" :
+                                "Unknown"
+                            )
+                        )
+                    )
+                )
+            );
+
+        // hacky: sometimes load events are being reported as click events.  For Omniture, detect
+        // the event type (pe= means a click event), and reset eventType accordingly.
+        if( provider === "Omniture" ) {
+            var oldEventType = eventType;
+            eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
+            //_dump( "report: found Omniture 'pe' parameter; resetting eventType (was=" + oldEventType + "; now=" + eventType + ")\n" );
+        }
+
+        data.omnibug["Key"]         = data.raw["Key"]         = "TODO_REAL_KEY", // data.state.key;
+        data.omnibug["Event"]       = data.raw["Event"]       = eventType;
+        data.omnibug["Timestamp"]   = data.raw["Timestamp"]   = data.state.timeStamp;
+        data.omnibug["Provider"]    = data.raw["Provider"]    = provider;
+        //data.omnibug["Source"]     = data.raw["Source"]     = ( data.state.src === "prev" ? "Previous page" : "Current page" ); // might not be exactly working
+        data.omnibug["Parent URL"]  = data.raw["Parent URL"]  = "TODO_GET_PARENT_URL", // data.state.parentUrl;
+        data.omnibug["Full URL"]    = data.raw["Full URL"]    = data.state.url
+                                                              + "<br/>(" + urlLength + " characters"
+                                                              + ( urlLength > 2083
+                                                                  ? ", <span class='imp'>*** too long for IE6/7! ***</span>"
+                                                                  : "" )
+                                                              + ")";
+        data.omnibug["RequestId"]   = data.raw["RequestId"]   = data.state.requestId;
+        data.omnibug["StatusLine"]  = data.raw["StatusLine"]  = data.state.statusLine;
+        data.omnibug["RequestType"] = data.raw["RequestType"] = data.state.type;
+
+        return data;
+    }
+
+
+    /**
+     * OmniUrl: class to parse a URL into component pieces
+     */
+    var OmniUrl = function( url ) {
+        this.url = url;
+        this.parseUrl();
+    };
+
+    OmniUrl.prototype = (function() {
+        var U = {
+            hasQueryValue: function( key ) {
+                return typeof this.query[key] !== 'undefined';
+            },
+            getFirstQueryValue: function( key ) {
+                return this.query[key] ? this.query[key][0] : '';
+            },
+            getQueryValues: function( key ) {
+                return this.query[key] ? this.query[key] : [];
+            },
+            getQueryNames: function() {
+                var i, a = [];
+                for( i in this.query ) {
+                    a.push( i );
+                }
+                return a;
+            },
+            getLocation: function() {
+                return this.location;
+            },
+            getParamString: function() {
+                return this.paramString;
+            },
+            addQueryValue: function( key ) {
+                if( ! this.hasQueryValue( key ) ) {
+                    this.query[key] = [];
+                }
+                for( var i=1; i<arguments.length; ++i ) {
+                    this.query[key].push( arguments[i] );
+                }
+            },
+            decode: function( val ) {
+                var retVal;
+                try {
+                    return val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : '';
+                } catch( e ) {
+                    return val;
+                }
+            },
+            parseUrl: function() {
+                var url = this.url;
+                var pieces = url.split( '?' );
+                var p2 = pieces[0].split( ';' );
+                this.query = {};
+                this.queryString = '';
+                this.anchor = '';
+                this.location = p2[0];
+                this.paramString = ( p2[1] ? p2[1] : '' );
+                if( pieces[1] ) {
+                    var p3 = pieces[1].split( '#' );
+                    this.queryString = p3[0];
+                    this.anchor = ( p3[1] ? p3[1] : '' );
+                }
+                if( this.queryString ) {
+                    var kvPairs = this.queryString.split( /&/ );
+                    for( var i=0; i<kvPairs.length; ++i ) {
+                        var kv = kvPairs[i].split( '=' );
+                        this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
+                    }
+                }
+            }
+        };
+        return U;
+    } )();
+
 
     // public
     return {};
