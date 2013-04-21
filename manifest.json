@@ -11,11 +11,11 @@
 
   "background": {
     "scripts": [ "eventPage.js" ],
-    // must be persistent to use WebRequest!
-    "persistent": true
+    "persistent": true // must be persistent to use WebRequest!
   },
 
   "permissions": [
+    "storage",
     "webRequest",
     "*://*/*"
   ]

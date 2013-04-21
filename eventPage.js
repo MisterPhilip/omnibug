@@ -14,10 +14,17 @@ for now,
 - ignore logfile
 - ignore watches
 - ignore expandy
+
+@TODO:
+-prefs change listener
+-options page to do our prefs
+
 */
 
 (function() {
-    var ports = {};
+    var ports = {},
+        prefs,
+        that = this;
 
     /**
      * Installation callback
@@ -25,16 +32,60 @@ for now,
     function onInit() {
         // logged to DevTools console only
         console.debug( 'eventPage onInit' );
+        initPrefs();
     }
     chrome.runtime.onInstalled.addListener( onInit );
 
-    // pref( "extensions.omnibug.defaultPattern", "/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif|\/collect\?" );
-    var defaultPattern = "/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif|\/collect\?",
-        defaultRegex   = new RegExp( defaultPattern );
+    /**
+     * Store preferences (on extension installation)
+     */
+    function initPrefs() {
+        var prefs = {
+            // pattern to match in request url
+            defaultPattern : "/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif|\/collect\?",
+            usefulKeys     : [ "pageName", "ch", "h1", "purchaseID", "events", "products", "pev2" ],
+            highlightKeys  : [ "events", "products" ],
+            //enableFileLogging : false,
+
+            // show entries expanded?
+            alwaysExpand : false,
+
+            // surround values with quotes?
+            showQuotes : true,
+
+            // colors
+            color_load   : "#dbedff",
+            color_click  : "#f1ffdb",
+            color_prev   : "#ffd5de",
+            color_quotes : "#f00",
+            color_hilite : "#ff0",
+            color_hover  : "#ccc"
+        };
+
+        chrome.storage.local.set( { "chromnibug" : prefs }, function() {
+            if( !! chrome.runtime.lastError ) {
+                console.error( "Error setting prefs: ", chrome.runtime.lastError );
+            }
+        } );
+
+        // force a (re)load of prefs, now that they may have changed:w
+        loadPrefsFromStorage();
+    }
+
+    /**
+     * Grab prefs data from storage
+     */
+    function loadPrefsFromStorage() {
+        chrome.storage.local.get( "chromnibug", function( prefData ) {
+            that.prefs = prefData.chromnibug;
+            that.prefs.defaultRegex = new RegExp( that.prefs.defaultPattern );
+        } );
+    }
+    loadPrefsFromStorage();
+
 
     function shouldProcess( url ) {
-        return url.match( defaultRegex );
-        //return true;
+        return url.match( this.prefs.defaultRegex );
     }
 
 
