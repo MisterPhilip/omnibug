@@ -3,7 +3,7 @@
  * Intermediary between eventPage and devTools panel
  * used for message passing only
  */
-(function() {
+( function() {
 
     /**
      * Callback for panelCreated event
