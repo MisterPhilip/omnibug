@@ -1,0 +1,4 @@
+chromnibug
+==========
+
+Omnibug, for Chrome
