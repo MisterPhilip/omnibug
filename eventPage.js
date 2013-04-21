@@ -275,7 +275,7 @@ for now,
             //_dump( "report: found Omniture 'pe' parameter; resetting eventType (was=" + oldEventType + "; now=" + eventType + ")\n" );
         }
 
-        data.omnibug["Key"]         = data.raw["Key"]         = "TODO_REAL_KEY", // data.state.key;
+        data.omnibug["Key"]         = data.raw["Key"]         = data.state.requestId; // data.state.key;
         data.omnibug["Event"]       = data.raw["Event"]       = eventType;
         data.omnibug["Timestamp"]   = data.raw["Timestamp"]   = data.state.timeStamp;
         data.omnibug["Provider"]    = data.raw["Provider"]    = provider;
