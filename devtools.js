@@ -20,7 +20,7 @@
          */
         port.onMessage.addListener( function( msg ) {
             if( panelWindow ) {
-                panelWindow.Chromnibug.show_message( msg );
+                panelWindow.Chromnibug.receive_message( msg );
             } else {
                 queuedMessages.push( msg );
             }
@@ -36,15 +36,13 @@
             // Release queued messages
             var msg;
             while( msg = queuedMessages.shift() )  {
-                panelWindow.Chromnibug.show_message( msg );
+                panelWindow.Chromnibug.receive_message( msg );
             }
 
-            // Pass a message back to the eventPage
-            /*
-                panelWindow.respond = function(msg) {
-                    port.postMessage(msg);
-                };
-            */
+            // Inject a reply mechanism into the caller
+            panelWindow.Chromnibug.send_message = function( msg ) {
+                port.postMessage( msg );
+            };
         } );
     }
 
@@ -56,7 +54,6 @@
                                    "devtools_panel.html",
                                    panelCreated
                                  );
-
     // public
     return {};
 

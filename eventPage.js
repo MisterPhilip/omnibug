@@ -109,7 +109,7 @@ for now,
     var respStartedCallback = function( details ) {
         if( details.tabId > -1 && shouldProcess( details.url ) ) {
             //console.debug( "matching requestId ", details.requestId, ", tab ", details.tabId );
-            sendToDevToolsForTab( details.tabId, details );
+            sendToDevToolsForTab( details.tabId, { "type" : "webEvent", "payload" : details } );
         }
     };
 
@@ -133,7 +133,11 @@ for now,
         if( port.name.substring( 0,10 ) !== "chromnibug" ) return;
         console.debug( "Registered port ", port.name, "; id ", port.portId_ );
 
-        ports[getTabId( port )] = port;
+        var tabId = getTabId( port );
+        ports[tabId] = port;
+
+        // respond immediately with prefs data
+        sendToDevToolsForTab( tabId, { "type" : "prefs", "payload" : this.prefs } );
 
         // Remove port when destroyed (e.g. when devtools instance is closed)
         port.onDisconnect.addListener( function( port ) {
@@ -141,12 +145,9 @@ for now,
             delete ports[getTabId( port )];
         } );
 
-        /*
         port.onMessage.addListener( function( msg ) {
-            // Whatever you wish
-            //console.debug(msg);
+            console.log( "Message from port[" + tabId + "]: ", msg );
         } );
-        */
     } );
 
     /**
@@ -155,7 +156,7 @@ for now,
      */
     function sendToDevToolsForTab( tabId, object ) {
         if( tabId in ports ) {
-            console.debug( "sending requestId ", object.requestId, " to tabId: ", tabId, ": ", object );
+            console.debug( "sending ", object.type, " message to tabId: ", tabId, ": ", object );
             try {
                 ports[tabId].postMessage( object );
             } catch( ex ) {
