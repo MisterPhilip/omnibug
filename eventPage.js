@@ -14,6 +14,7 @@ for now,
 -options page to do our prefs
 -load vs click events? how to tell
 -highlightKeys
+-clear button
 
 */
 

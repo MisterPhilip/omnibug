@@ -63,8 +63,6 @@ window.Chromnibug = ( function() {
         //var sp = this.getContext().getPanel("OmnibugSide");
         //sp.updateWatches( data );
 
-        //_dump( "report: wrote entry for " + data.state.key + "\n" );
-        //alert( "wrote report: " + html );
         parent_log( { "generated html" : html } );
     }
 
@@ -247,13 +245,5 @@ window.Chromnibug = ( function() {
         }
     };
 
-    /*
-    // for click events (?)
-    document.documentElement.onclick = function() {
-        // No need to check for the existence of `respond`, because
-        // the panel can only be clicked when it's visible...
-        //respond('Another stupid example!');
-    };
-    */
 }() );
 
