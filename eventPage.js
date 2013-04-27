@@ -4,20 +4,16 @@
  */
 
 /*
-possible workflow;
-1) receive request here (event page)
-2) filter only analytics urls
-3) parse and create object
-4) send parsed object back to devtools panel for specific tab
 
 for now,
 - ignore logfile
 - ignore watches
-- ignore expandy
 
 @TODO:
 -prefs change listener
 -options page to do our prefs
+-load vs click events? how to tell
+-highlightKeys
 
 */
 
@@ -30,11 +26,11 @@ for now,
      * Installation callback
      */
     function onInit() {
-        // logged to DevTools console only
         console.debug( 'eventPage onInit' );
         initPrefs();
     }
     chrome.runtime.onInstalled.addListener( onInit );
+
 
     /**
      * Store preferences (on extension installation)
@@ -68,9 +64,10 @@ for now,
             }
         } );
 
-        // force a (re)load of prefs, now that they may have changed:w
+        // force a (re)load of prefs, now that they may have changed
         loadPrefsFromStorage();
     }
+
 
     /**
      * Grab prefs data from storage
@@ -106,18 +103,33 @@ for now,
      *   type: "xmlhttprequest"
      *   url: "https://0-act.channel.facebook.com/pull?cha...
      */
-    var respStartedCallback = function( details ) {
+    var responseStartedCallback = function( details ) {
         if( details.tabId > -1 && shouldProcess( details.url ) ) {
             //console.debug( "matching requestId ", details.requestId, ", tab ", details.tabId );
+            chrome.tabs.get( details.tabId, detailsProcessingCallbackFactory( details ) );
+        }
+    };
+
+
+    /**
+     * Factory function returning a function which has access to details *and* tab
+     */
+    var detailsProcessingCallbackFactory = function( details ) {
+        return function( tab ) {
+            // save the tab's current URL into the details object
+            details.tabUrl = tab.url;
+
             sendToDevToolsForTab( details.tabId, { "type" : "webEvent", "payload" : decodeUrl( details ) } );
         }
     };
 
+
     chrome.webRequest.onResponseStarted.addListener(
-        respStartedCallback,
-        {urls: ["<all_urls>"]}
+        responseStartedCallback,
+        { urls: ["<all_urls>"] }
         // @TODO: filter these based on static patterns/config ?
     );
+
 
     /**
      * Return the tabId associated with a port
@@ -125,6 +137,7 @@ for now,
     function getTabId( port ) {
         return port.name.substring( port.name.indexOf( "-" ) + 1 );
     }
+
 
     /**
      * Accept connections from our devtools panels
@@ -149,6 +162,7 @@ for now,
             console.log( "Message from port[" + tabId + "]: ", msg );
         } );
     } );
+
 
     /**
      * Send a message to the devtools panel on a given tab
@@ -232,16 +246,9 @@ for now,
         } );
 
         obj = augmentData( obj );
-        /*
-        try {
-            this.report( obj );
-        } catch( ex ) {
-            _dump( "decodeUrl: exception in report(): " + ex + "\n" );
-        }
-        */
-
         return obj;
     }
+
 
     /**
      * Augments the data object with summary data
@@ -272,15 +279,14 @@ for now,
         if( provider === "Omniture" ) {
             var oldEventType = eventType;
             eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
-            //_dump( "report: found Omniture 'pe' parameter; resetting eventType (was=" + oldEventType + "; now=" + eventType + ")\n" );
         }
 
-        data.omnibug["Key"]         = data.raw["Key"]         = data.state.requestId; // data.state.key;
+        data.omnibug["Key"]         = data.raw["Key"]         = data.state.requestId;
         data.omnibug["Event"]       = data.raw["Event"]       = eventType;
         data.omnibug["Timestamp"]   = data.raw["Timestamp"]   = data.state.timeStamp;
         data.omnibug["Provider"]    = data.raw["Provider"]    = provider;
         //data.omnibug["Source"]     = data.raw["Source"]     = ( data.state.src === "prev" ? "Previous page" : "Current page" ); // might not be exactly working
-        data.omnibug["Parent URL"]  = data.raw["Parent URL"]  = "TODO_GET_PARENT_URL", // data.state.parentUrl;
+        data.omnibug["Parent URL"]  = data.raw["Parent URL"]  = data.state.tabUrl;
         data.omnibug["Full URL"]    = data.raw["Full URL"]    = data.state.url
                                                               + "<br/>(" + urlLength + " characters"
                                                               + ( urlLength > 2083
