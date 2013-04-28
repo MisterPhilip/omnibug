@@ -62,8 +62,6 @@ window.Chromnibug = ( function() {
 
         //var sp = this.getContext().getPanel("OmnibugSide");
         //sp.updateWatches( data );
-
-        parent_log( { "generated html" : html } );
     }
 
     var dataSent = false;
@@ -203,9 +201,6 @@ window.Chromnibug = ( function() {
     }
 
 
-
-
-    
     /**
      * Save the prefs object from the eventPage locally
      */
@@ -227,7 +222,7 @@ window.Chromnibug = ( function() {
         }
     }
 
-    
+
     // public
     return {
         /**
