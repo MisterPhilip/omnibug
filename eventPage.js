@@ -177,7 +177,7 @@ for now,
                     tabs[_tabId].loading = true;
                 } else {
                     // give a little breathing room before marking the load as complete
-                    window.setTimeout( function() { tabs[_tabId].loading = false; }, 1000 );
+                    window.setTimeout( function() { tabs[_tabId].loading = false; }, 500 );
                 }
             } else {
                 console.error( "onUpdated status change for unknown tab ", _tabId );
