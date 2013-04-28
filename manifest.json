@@ -1,18 +1,25 @@
 {
+  "name": "Chromnibug",
+  "version": "0.1",
   "manifest_version": 2,
 
-  "name": "Chromnibug",
   "description": "Omnibug for Chrome",
-  "version": "0.1",
-
-  "devtools_page": "devtools.html",
-
-  "options_page": "options.html",
+  /* commented out for now
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  */
 
   "background": {
     "scripts": [ "eventPage.js" ],
     "persistent": true // must be persistent to use WebRequest!
   },
+
+  "devtools_page": "devtools.html",
+
+  "options_page": "options.html",
 
   "permissions": [
     "tabs",
