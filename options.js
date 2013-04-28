@@ -3,6 +3,7 @@ function save_options() {
   var select = document.getElementById("color");
   var color = select.children[select.selectedIndex].value;
   localStorage["favorite_color"] = color;
+  chrome.storage.local.set( { "list" : [ "a", "b", "c" ], "obj" : { "foo" : 1 } } );
 
   // Update status to let user know options were saved.
   var status = document.getElementById("status");

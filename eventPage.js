@@ -13,7 +13,6 @@ for now,
 -prefs change listener
 -options page to do our prefs
 -highlightKeys
--clear button
 
 */
 
@@ -104,15 +103,18 @@ for now,
      *   url: "https://0-act.channel.facebook.com/pull?cha...
      */
     var responseStartedCallback = function( details ) {
-        if( details.tabId > -1 && shouldProcess( details.url ) ) {
-            // store the current tab's loading state into the details object
-            if( details.tabId in tabs ) {
-                details.chromnibugLoading = tabs[details.tabId].loading;
-            }
+        // ignore chrome:// requests and non-metrics URLs
+        if( details.tabId == -1 || !shouldProcess( details.url ) ) return;
 
-            //console.debug( "matching requestId ", details.requestId, ", tab ", details.tabId );
-            chrome.tabs.get( details.tabId, detailsProcessingCallbackFactory( details ) );
+        if( !( details.tabId in tabs ) ) {
+            console.error( "Request for unknown tabId ", details.tabId );
+            return;
         }
+
+        // store the current tab's loading state into the details object
+        details.chromnibugLoading = tabs[details.tabId].loading;
+
+        chrome.tabs.get( details.tabId, detailsProcessingCallbackFactory( details ) );
     };
 
 
@@ -191,15 +193,11 @@ for now,
      * Assumes the port is already connected
      */
     function sendToDevToolsForTab( tabId, object ) {
-        if( tabId in tabs ) {
-            console.debug( "sending ", object.type, " message to tabId: ", tabId, ": ", object );
-            try {
-                tabs[tabId].port.postMessage( object );
-            } catch( ex ) {
-                console.error( "error calling postMessage: ", ex );
-            }
-        } else {
-            console.error( "tried to send to invalid tabId: ", tabId );
+        console.debug( "sending ", object.type, " message to tabId: ", tabId, ": ", object );
+        try {
+            tabs[tabId].port.postMessage( object );
+        } catch( ex ) {
+            console.error( "error calling postMessage: ", ex );
         }
     }
 
