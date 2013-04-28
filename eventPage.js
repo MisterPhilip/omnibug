@@ -12,15 +12,14 @@ for now,
 @TODO:
 -prefs change listener
 -options page to do our prefs
--load vs click events? how to tell
 -highlightKeys
 -clear button
 
 */
 
 (function() {
-    var ports = {},
-        prefs,
+    var prefs,
+        tabs = {},
         that = this;
 
     /**
@@ -106,6 +105,11 @@ for now,
      */
     var responseStartedCallback = function( details ) {
         if( details.tabId > -1 && shouldProcess( details.url ) ) {
+            // store the current tab's loading state into the details object
+            if( details.tabId in tabs ) {
+                details.chromnibugLoading = tabs[details.tabId].loading;
+            }
+
             //console.debug( "matching requestId ", details.requestId, ", tab ", details.tabId );
             chrome.tabs.get( details.tabId, detailsProcessingCallbackFactory( details ) );
         }
@@ -148,7 +152,8 @@ for now,
         console.debug( "Registered port ", port.name, "; id ", port.portId_ );
 
         var tabId = getTabId( port );
-        ports[tabId] = port;
+        tabs[tabId] = {};
+        tabs[tabId].port = port;
 
         // respond immediately with prefs data
         sendToDevToolsForTab( tabId, { "type" : "prefs", "payload" : this.prefs } );
@@ -156,11 +161,27 @@ for now,
         // Remove port when destroyed (e.g. when devtools instance is closed)
         port.onDisconnect.addListener( function( port ) {
             console.debug( "Disconnecting port ", port.name );
-            delete ports[getTabId( port )];
+            delete tabs[getTabId( port )];
         } );
 
         port.onMessage.addListener( function( msg ) {
             console.log( "Message from port[" + tabId + "]: ", msg );
+        } );
+
+        /**
+         * Monitor for page load/complete events in tabs
+         */
+        chrome.tabs.onUpdated.addListener( function( _tabId, changeInfo, tab ) {
+            if( _tabId in tabs ) {
+                if( changeInfo.status == "loading" ) {
+                    tabs[_tabId].loading = true;
+                } else {
+                    // give a little breathing room before marking the load as complete
+                    window.setTimeout( function() { tabs[_tabId].loading = false; }, 1000 );
+                }
+            } else {
+                console.error( "onUpdated status change for unknown tab ", _tabId );
+            }
         } );
     } );
 
@@ -170,10 +191,10 @@ for now,
      * Assumes the port is already connected
      */
     function sendToDevToolsForTab( tabId, object ) {
-        if( tabId in ports ) {
+        if( tabId in tabs ) {
             console.debug( "sending ", object.type, " message to tabId: ", tabId, ": ", object );
             try {
-                ports[tabId].postMessage( object );
+                tabs[tabId].port.postMessage( object );
             } catch( ex ) {
                 console.error( "error calling postMessage: ", ex );
             }
@@ -185,8 +206,8 @@ for now,
     /*
     // Function to send a message to all devtool.html views:
     function notifyDevtools(msg) {
-        Object.keys(ports).forEach(function(portId_) {
-            ports[portId_].postMessage(msg);
+        Object.keys(tabs).forEach(function(portId_) {
+            tabs[portId_].postMessage(msg);
         });
     }
     */
@@ -260,7 +281,7 @@ for now,
         data["omnibug"] = {};
 
         // workaround -- kill it when vendor-specific code in place
-        var eventType = "load", // ( data.state.doneLoading ? "click" : "load" ),
+        var eventType = ( data.state.chromnibugLoading ? "load" : "click" ),
             url = data.state.url,
             urlLength = data.state.url.length,
             provider = ( url.match( /(?:\/b\/ss|2o7)/ ) ? "Omniture" :
