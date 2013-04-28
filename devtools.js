@@ -11,6 +11,7 @@
     var panelCreated = function( panel ) {
         var queuedMessages = [],
             panelWindow,  // reference to devtools_panel.html's `window` object
+            clearButton,
             port;
 
         port = chrome.extension.connect( { name: "chromnibug-" + chrome.devtools.inspectedWindow.tabId } );
@@ -44,7 +45,23 @@
                 port.postMessage( msg );
             };
         } );
+
+
+        // add a clear button
+        clearBtn = panel.createStatusBarButton( "foo.png", "Clear events.", false );
+        clearBtn.onClicked.addListener( function() {
+            var tables = panelWindow.document.getElementsByTagName( "table" );
+            while( tables.length > 0 ) {
+                for( i=0; i<tables.length; ++i ) {
+                    if( tables[i].className.match( /req/ ) ) {
+                        tables[i].parentNode.removeChild( tables[i] );
+                    }
+                }
+                tables = panelWindow.document.getElementsByTagName( "table" );
+            }
+        } );
     }
+
 
     /**
      * Create the panel
@@ -54,6 +71,7 @@
                                    "devtools_panel.html",
                                    panelCreated
                                  );
+
     // public
     return {};
 
