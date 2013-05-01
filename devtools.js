@@ -48,7 +48,7 @@
 
 
         // add a clear button
-        clearBtn = panel.createStatusBarButton( "foo.png", "Clear events.", false );
+        clearBtn = panel.createStatusBarButton( "images/clear_button.png", "Clear events.", false );
         clearBtn.onClicked.addListener( function() {
             var tables = panelWindow.document.getElementsByTagName( "table" );
             while( tables.length > 0 ) {
@@ -67,7 +67,7 @@
      * Create the panel
      */
     chrome.devtools.panels.create( "Omnibug",
-                                   "icon.png",
+                                   "images/x/o-32-24.png",
                                    "devtools_panel.html",
                                    panelCreated
                                  );
