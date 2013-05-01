@@ -2,7 +2,7 @@ html, body {
     border: 0;
     padding: 0;
     margin: 0;
-    font-size: 12px !important;
+    font-size: 12px;
     font-family: arial, helvetica, clean, sans-serif;
 }
 
@@ -11,17 +11,6 @@ table.req p.summary {
     line-height: 16px;
 }
 
-/*
-p.summary::before,
-.blob::before {
-    content: url(chrome-devtools://devtools/Images/treeRightTriangleBlack.png) !important;
-}
-
-p.expandedFoo::before {
-    content: url(chrome-devtools://devtools/Images/treeDownTriangleBlack.png) !important;
-}
-*/
-
 table.req div.hid {
     display: none;
 }
@@ -29,7 +18,6 @@ table.req div.hid {
 table.req {
     width: 100%;
 }
-
 
 table.req td {
     vertical-align: top;
