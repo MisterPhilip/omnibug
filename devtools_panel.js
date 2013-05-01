@@ -36,7 +36,7 @@ window.Omnibug = ( function() {
         html  = "<table cellspacing='0' border='0' class='req "
               + data.omnibug.Event + " "
               + ( data.state.src ? data.state.src : "" )
-              + "' id='ob_" + data.state.key + "'><tr>";
+              + "' id='ob_" + data.state.requestId + "'><tr>";
 
         html += "<td class='exp'><a href='#' class='foo'><img src='images/" + expanderImage + "' /></a></td>";
         html += "<td class='summ'>";
@@ -44,7 +44,7 @@ window.Omnibug = ( function() {
              + ( data.state.src === "prev" ? " (previous page)" : "" ) + " | "
              + data.omnibug.Provider + " | "
              + new Date( data.state.timeStamp ) + " | "
-             + data.state.requestId //+ data.state.key
+             + data.state.requestId
              + ( data.state.statusLine != null ? " | " + data.state.statusLine : "" )
              + "</p>";
 
