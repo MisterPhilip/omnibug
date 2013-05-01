@@ -1,5 +1,5 @@
 /*
- * Chromnibug
+ * Omnibug
  * Intermediary between eventPage and devTools panel
  * used for message passing only
  */
@@ -14,14 +14,14 @@
             clearButton,
             port;
 
-        port = chrome.extension.connect( { name: "chromnibug-" + chrome.devtools.inspectedWindow.tabId } );
+        port = chrome.extension.connect( { name: "omnibug-" + chrome.devtools.inspectedWindow.tabId } );
 
         /**
          * Receieves messages from the eventPage
          */
         port.onMessage.addListener( function( msg ) {
             if( panelWindow ) {
-                panelWindow.Chromnibug.receive_message( msg );
+                panelWindow.Omnibug.receive_message( msg );
             } else {
                 queuedMessages.push( msg );
             }
@@ -37,11 +37,11 @@
             // Release queued messages
             var msg;
             while( msg = queuedMessages.shift() )  {
-                panelWindow.Chromnibug.receive_message( msg );
+                panelWindow.Omnibug.receive_message( msg );
             }
 
             // Inject a reply mechanism into the caller
-            panelWindow.Chromnibug.send_message = function( msg ) {
+            panelWindow.Omnibug.send_message = function( msg ) {
                 port.postMessage( msg );
             };
         } );
@@ -66,7 +66,7 @@
     /**
      * Create the panel
      */
-    chrome.devtools.panels.create( "Chromnibug",
+    chrome.devtools.panels.create( "Omnibug",
                                    "icon.png",
                                    "devtools_panel.html",
                                    panelCreated

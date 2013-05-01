@@ -1,8 +1,8 @@
 /*
- * Chromnibug
+ * Omnibug
  * DevTools panel code (view)
  */
-window.Chromnibug = ( function() {
+window.Omnibug = ( function() {
     var prefs;
 
     function show_message( msg ) {
@@ -213,9 +213,9 @@ window.Chromnibug = ( function() {
      * send_message() is injected here by devtools.js
      */
     function parent_log( msg ) {
-        if( typeof( window.Chromnibug.send_message ) === "function" ) {
+        if( typeof( window.Omnibug.send_message ) === "function" ) {
             try {
-                window.Chromnibug.send_message( msg );
+                window.Omnibug.send_message( msg );
             } catch( ex ) {
                 alert( "exception sending: " + ex );
             }

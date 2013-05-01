@@ -1,5 +1,5 @@
 /*
- * Chromnibug
+ * Omnibug
  * Persistent event page, running in background (controller)
  */
 
@@ -57,7 +57,7 @@ for now,
             color_hover  : "#ccc"
         };
 
-        chrome.storage.local.set( { "chromnibug" : prefs }, function() {
+        chrome.storage.local.set( { "omnibug" : prefs }, function() {
             if( !! chrome.runtime.lastError ) {
                 console.error( "Error setting prefs: ", chrome.runtime.lastError );
             }
@@ -72,8 +72,8 @@ for now,
      * Grab prefs data from storage
      */
     function loadPrefsFromStorage() {
-        chrome.storage.local.get( "chromnibug", function( prefData ) {
-            that.prefs = prefData.chromnibug;
+        chrome.storage.local.get( "omnibug", function( prefData ) {
+            that.prefs = prefData.omnibug;
             that.prefs.defaultRegex = new RegExp( that.prefs.defaultPattern );
         } );
     }
@@ -112,7 +112,7 @@ for now,
         }
 
         // store the current tab's loading state into the details object
-        details.chromnibugLoading = tabs[details.tabId].loading;
+        details.omnibugLoading = tabs[details.tabId].loading;
 
         chrome.tabs.get( details.tabId, detailsProcessingCallbackFactory( details ) );
     };
@@ -150,7 +150,7 @@ for now,
      * Accept connections from our devtools panels
      */
     chrome.extension.onConnect.addListener( function( port ) {
-        if( port.name.substring( 0,10 ) !== "chromnibug" ) return;
+        if( port.name.substring( 0,10 ) !== "omnibug" ) return;
         console.debug( "Registered port ", port.name, "; id ", port.portId_ );
 
         var tabId = getTabId( port );
@@ -279,7 +279,7 @@ for now,
         data["omnibug"] = {};
 
         // workaround -- kill it when vendor-specific code in place
-        var eventType = ( data.state.chromnibugLoading ? "load" : "click" ),
+        var eventType = ( data.state.omnibugLoading ? "load" : "click" ),
             url = data.state.url,
             urlLength = data.state.url.length,
             provider = ( url.match( /(?:\/b\/ss|2o7)/ ) ? "Omniture" :
