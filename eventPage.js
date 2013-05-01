@@ -101,8 +101,7 @@
 
         if( !( details.tabId in tabs ) ) {
             /* disable this error message -- too numerous!
-            console.error( "Request for unknown tabId ", details.tabId );
-            */
+            console.error( "Request for unknown tabId ", details.tabId ); */
             return;
         }
 
@@ -177,7 +176,8 @@
                     window.setTimeout( function() { tabs[_tabId].loading = false; }, 500 );
                 }
             } else {
-                console.error( "onUpdated status change for unknown tab ", _tabId );
+                /* disable this error message -- too numerous!
+                console.error( "onUpdated status change for unknown tab ", _tabId ); */
             }
         } );
     } );
