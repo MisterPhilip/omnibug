@@ -73,7 +73,7 @@
      * Create the panel
      */
     chrome.devtools.panels.create( "Omnibug",
-                                   "images/x/o-32-24.png",
+                                   "images/o-32-24.png",
                                    "devtools_panel.html",
                                    panelCreated
                                  );
