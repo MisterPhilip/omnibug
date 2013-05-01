@@ -100,7 +100,9 @@
         if( details.tabId == -1 || !shouldProcess( details.url ) ) return;
 
         if( !( details.tabId in tabs ) ) {
+            /* disable this error message -- too numerous!
             console.error( "Request for unknown tabId ", details.tabId );
+            */
             return;
         }
 
