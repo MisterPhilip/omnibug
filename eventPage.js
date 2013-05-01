@@ -145,7 +145,7 @@
      * Accept connections from our devtools panels
      */
     chrome.extension.onConnect.addListener( function( port ) {
-        if( port.name.substring( 0,10 ) !== "omnibug" ) return;
+        if( port.name.indexOf( "omnibug-" ) !== 0 ) return;
         console.debug( "Registered port ", port.name, "; id ", port.portId_ );
 
         var tabId = getTabId( port );
