@@ -1,16 +1,14 @@
 {
-  "name": "Chromnibug",
+  "name": "Omnibug",
   "version": "0.1",
   "manifest_version": 2,
 
   "description": "Omnibug for Chrome",
-  /* commented out for now
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "16": "images/o-16.png",
+    "48": "images/o-48.png",
+    "128": "images/o-128.png"
   },
-  */
 
   "background": {
     "scripts": [ "eventPage.js" ],
