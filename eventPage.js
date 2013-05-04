@@ -41,6 +41,9 @@
             // surround values with quotes?
             showQuotes : true,
 
+            // show full variable names?
+            showFullNames : true,
+
             // colors
             color_load   : "#dbedff",
             color_click  : "#f1ffdb",
@@ -134,7 +137,7 @@
                     , h5:     "Hierarchy var5"
                     , v1:     "EVar1"
                     , cc:     "Currency code"
-                    , t:      "Browser time"
+                    , t:      "Browser time"  // "[d/m/yyyy]   [hh:mm:ss]  [weekday]  [time zone offset]"
                     , v:      "Javascript-enabled browser?"
                     , v0:     "Campaign variable"
                     , pccr:   "Prevent infinite redirects"
@@ -392,6 +395,7 @@
                 props: {},      // omniture props
                 other: {},      // any other values
                 useful: {},     // values marked as useful
+                urchin: {},     // urchin/GA values
                 moniforce: {},  // moniforce values
                 webtrends: {},  // webtrends values
                 toString: function() {
@@ -425,6 +429,9 @@
                 } else if( n.match( /^WT\./ ) ) {
                     // webtrends
                     obj.webtrends[n] = val;
+                    obj.raw[n] = val;
+                } else if( n.match( /^utm.*/ ) ) {
+                    obj.urchin[n] = val;
                     obj.raw[n] = val;
                 } else {
                     // everything else
@@ -471,11 +478,9 @@
             eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
         }
 
-        data.omnibug["Key"]         = data.raw["Key"]         = data.state.requestId;
         data.omnibug["Event"]       = data.raw["Event"]       = eventType;
         data.omnibug["Timestamp"]   = data.raw["Timestamp"]   = data.state.timeStamp;
         data.omnibug["Provider"]    = data.raw["Provider"]    = provider;
-        //data.omnibug["Source"]     = data.raw["Source"]     = ( data.state.src === "prev" ? "Previous page" : "Current page" ); // might not be exactly working
         data.omnibug["Parent URL"]  = data.raw["Parent URL"]  = data.state.tabUrl;
         data.omnibug["Full URL"]    = data.raw["Full URL"]    = data.state.url
                                                               + "<br/>(" + urlLength + " characters"
@@ -483,9 +488,9 @@
                                                                   ? ", <span class='imp'>*** too long for IE6/7! ***</span>"
                                                                   : "" )
                                                               + ")";
-        data.omnibug["RequestId"]   = data.raw["RequestId"]   = data.state.requestId;
-        data.omnibug["StatusLine"]  = data.raw["StatusLine"]  = data.state.statusLine;
-        data.omnibug["RequestType"] = data.raw["RequestType"] = data.state.type;
+        data.omnibug["Request ID"]   = data.raw["Request ID"]   = data.state.requestId;
+        data.omnibug["Status Line"]  = data.raw["Status Line"]  = data.state.statusLine;
+        data.omnibug["Request Type"] = data.raw["Request Type"] = data.state.type;
 
         return data;
     }
