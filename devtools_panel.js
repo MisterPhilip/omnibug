@@ -12,7 +12,6 @@ window.Omnibug = ( function() {
     var prefs;
 
     function show_message( msg ) {
-        //parent_log( { "Showing message" : msg } );
         report( msg );
     }
 
@@ -51,13 +50,14 @@ window.Omnibug = ( function() {
         html += "<div class='" + expanderClass + "'><table class='ent'>";
 
         try {
-        html += generateReportFragment( data.omnibug, "Summary", data );      // summary values
-        html += generateReportFragment( data.props, "Props", data );          // omniture props
-        html += generateReportFragment( data.vars, "eVars", data );           // omniture eVars
-        html += generateReportFragment( data.useful, "Useful", data );        // useful params
-        html += generateReportFragment( data.moniforce, "Moniforce", data );  // moniforce params
-        html += generateReportFragment( data.webtrends, "WebTrends", data );  // webtrends params
-        html += generateReportFragment( data.other, "Other", data );          // everything else
+        html += generateReportFragment( data.omnibug, "Summary", data );                // summary values
+        html += generateReportFragment( data.props, "Custom Traffic Variables", data ); // omniture props
+        html += generateReportFragment( data.vars, "Conversion Variables", data );      // omniture eVars
+        html += generateReportFragment( data.useful, "Useful", data );                  // useful params
+        html += generateReportFragment( data.moniforce, "Moniforce", data );            // moniforce params
+        html += generateReportFragment( data.webtrends, "WebTrends", data );            // webtrends params
+        html += generateReportFragment( data.urchin, "Google Analytics", data );        // urchin/GA params
+        html += generateReportFragment( data.other, "Other", data );                    // everything else
 
         } catch( ex ) {
             parent_log( { "Error in gRF" : ex.message } );
@@ -124,7 +124,7 @@ window.Omnibug = ( function() {
      * Generate an HTML report fragment for the given object
      */
     function generateReportFragment( data, title, fullData ) {
-        var cn, kt,
+        var cn, kt, text, hover, value,
             i = 0,
             html = "";
 
@@ -132,14 +132,17 @@ window.Omnibug = ( function() {
             if( data.hasOwnProperty( el ) && !! data[el] ) {
                 cn = isHighlightable( el ) ? "hilite" : "";
                 kt = getTitleForKey( el, fullData.omnibug.Provider );
+                text = ( this.prefs.showFullNames ? kt : el );
+                hover = ( this.prefs.showFullNames ? el : kt );
+                value = processValue( data[el] );
 
                 html += "<tr"
-                     + ( !! kt ? " title='" + kt + "'" : "" )
+                     + ( !! hover ? " title='" + hover + "'" : "" )
                      + ( !! cn ? " class='" + cn + "'" : "" )
                      + "><td class='k " + ( i++ % 2 === 0 ? 'even' : 'odd' ) + "'>"
-                     + el
+                     + text
                      + "</td><td class='v'>"
-                     + quote( data[el] )
+                     + quote( value )
                      + "</td></tr>\n";
             }
         }
@@ -152,6 +155,13 @@ window.Omnibug = ( function() {
         }
     }
 
+    function processValue( value ) {
+        var stringValue = new String( value );
+        if( stringValue.match( /^\d{13}(?:\.\d+)?$/ ) ) {
+            return new Date( parseInt( value ) ) + "&nbsp;&nbsp;[" + value + "]";
+        }
+        return value;
+    }
 
 
     // returns true when the given name is in the highlightKeys list
@@ -166,7 +176,8 @@ window.Omnibug = ( function() {
 
     // returns the title (if any) for a given key
     function getTitleForKey( elName, provider ) {
-        return this.prefs.keyTitles[provider][elName];
+        var title = this.prefs.keyTitles[provider][elName];
+        return( !! title ? title : elName );
     }
 
     /**
