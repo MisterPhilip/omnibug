@@ -51,13 +51,13 @@ window.Omnibug = ( function() {
         html += "<div class='" + expanderClass + "'><table class='ent'>";
 
         try {
-        html += generateReportFragment( data.omnibug, "Summary" );      // summary values
-        html += generateReportFragment( data.props, "Props" );          // omniture props
-        html += generateReportFragment( data.vars, "eVars" );           // omniture eVars
-        html += generateReportFragment( data.useful, "Useful" );        // useful params
-        html += generateReportFragment( data.moniforce, "Moniforce" );  // moniforce params
-        html += generateReportFragment( data.webtrends, "WebTrends" );  // webtrends params
-        html += generateReportFragment( data.other, "Other" );          // everything else
+        html += generateReportFragment( data.omnibug, "Summary", data );      // summary values
+        html += generateReportFragment( data.props, "Props", data );          // omniture props
+        html += generateReportFragment( data.vars, "eVars", data );           // omniture eVars
+        html += generateReportFragment( data.useful, "Useful", data );        // useful params
+        html += generateReportFragment( data.moniforce, "Moniforce", data );  // moniforce params
+        html += generateReportFragment( data.webtrends, "WebTrends", data );  // webtrends params
+        html += generateReportFragment( data.other, "Other", data );          // everything else
 
         } catch( ex ) {
             parent_log( { "Error in gRF" : ex.message } );
@@ -65,9 +65,6 @@ window.Omnibug = ( function() {
 
         html += "</table></div></td></tr></table>\n";
         appendHtml( html );
-
-        //var sp = this.getContext().getPanel("OmnibugSide");
-        //sp.updateWatches( data );
     }
 
     var dataSent = false;
@@ -126,7 +123,7 @@ window.Omnibug = ( function() {
     /**
      * Generate an HTML report fragment for the given object
      */
-    function generateReportFragment( data, title ) {
+    function generateReportFragment( data, title, fullData ) {
         var cn, kt,
             i = 0,
             html = "";
@@ -134,12 +131,12 @@ window.Omnibug = ( function() {
         for( var el in data ) {
             if( data.hasOwnProperty( el ) && !! data[el] ) {
                 cn = isHighlightable( el ) ? "hilite" : "";
-                kt = getTitleForKey.call( el );
+                kt = getTitleForKey( el, fullData.omnibug.Provider );
 
                 html += "<tr"
+                     + ( !! kt ? " title='" + kt + "'" : "" )
                      + ( !! cn ? " class='" + cn + "'" : "" )
-                     + "><td class='k " + ( i++ % 2 === 0 ? 'even' : 'odd' ) + "'"
-                     + ( !! kt ? " title='" + kt + "'" : "" ) + ">"
+                     + "><td class='k " + ( i++ % 2 === 0 ? 'even' : 'odd' ) + "'>"
                      + el
                      + "</td><td class='v'>"
                      + quote( data[el] )
@@ -168,10 +165,8 @@ window.Omnibug = ( function() {
     }
 
     // returns the title (if any) for a given key
-    function getTitleForKey( elName ) {
-        //return this.prefs.keyTitles[elName];
-        return elName;
-        // @TODO: fix
+    function getTitleForKey( elName, provider ) {
+        return this.prefs.keyTitles[provider][elName];
     }
 
     /**
