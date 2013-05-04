@@ -17,7 +17,11 @@ For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
 
 * Prefs change listener
 * Options page content
-* Key Titles
+
+# Nice to haves
+
+* Map provider name to URL pattern
+* Extract biz logic to common script file?
 
 
 # License
