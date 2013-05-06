@@ -50,15 +50,14 @@ window.Omnibug = ( function() {
         html += "<div class='" + expanderClass + "'><table class='ent'>";
 
         try {
-        html += generateReportFragment( data.omnibug, "Summary", data );                // summary values
-        html += generateReportFragment( data.props, "Custom Traffic Variables", data ); // omniture props
-        html += generateReportFragment( data.vars, "Conversion Variables", data );      // omniture eVars
-        html += generateReportFragment( data.useful, "Useful", data );                  // useful params
-        html += generateReportFragment( data.moniforce, "Moniforce", data );            // moniforce params
-        html += generateReportFragment( data.webtrends, "WebTrends", data );            // webtrends params
-        html += generateReportFragment( data.urchin, "Google Analytics", data );        // urchin/GA params
-        html += generateReportFragment( data.other, "Other", data );                    // everything else
-
+            html += generateReportFragment( data.omnibug, "Summary", data );                // summary values
+            html += generateReportFragment( data.props, "Custom Traffic Variables", data ); // omniture props
+            html += generateReportFragment( data.vars, "Conversion Variables", data );      // omniture eVars
+            html += generateReportFragment( data.useful, "Useful", data );                  // useful params
+            html += generateReportFragment( data.moniforce, "Moniforce", data );            // moniforce params
+            html += generateReportFragment( data.webtrends, "WebTrends", data );            // webtrends params
+            html += generateReportFragment( data.urchin, "Google Analytics", data );        // urchin/GA params
+            html += generateReportFragment( data.other, "Other", data );                    // everything else
         } catch( ex ) {
             parent_log( { "Error in gRF" : ex.message } );
         }
@@ -118,8 +117,6 @@ window.Omnibug = ( function() {
     }
 
 
-
-
     /**
      * Generate an HTML report fragment for the given object
      */
@@ -159,6 +156,8 @@ window.Omnibug = ( function() {
         var stringValue = new String( value );
         if( stringValue.match( /^\d{13}(?:\.\d+)?$/ ) ) {
             return new Date( parseInt( value ) ) + "&nbsp;&nbsp;[" + value + "]";
+        } else if( stringValue.match( /^\d{10}$/ ) && stringValue.indexOf( 1 ) == 0 ) {
+            return new Date( parseInt( value * 1000 ) ) + "&nbsp;&nbsp;[" + value + "]";
         }
         return value;
     }
@@ -176,7 +175,12 @@ window.Omnibug = ( function() {
 
     // returns the title (if any) for a given key
     function getTitleForKey( elName, provider ) {
-        var title = this.prefs.keyTitles[provider][elName];
+        var title;
+        try {
+            title = this.prefs.keyTitles[provider][elName];
+        } catch( ex ) {
+            // noop -- catch missing provider OR missing elName in keyTitles
+        }
         return( !! title ? title : elName );
     }
 
