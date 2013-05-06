@@ -18,12 +18,19 @@ For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
 * Prefs change listener
 * Options page content
 * One-click provider test page
+* CoreMetrics (titles, docs, decode vals)
+* AT Internet (http://www.atinternet.com/en/produits/web-analytics/)
+* KISSmetrics (https://www.kissmetrics.com/)
 
 # Nice to haves
 
 * Map provider name to URL pattern
 * Extract biz logic to common script file?
 * Decode WT.dl values
+
+# Notes
+
+* http://www.akravitz.com/coremetrics-vs-omniture-vs-google-analytics/
 
 
 # License
