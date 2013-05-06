@@ -17,6 +17,7 @@ For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
 
 * Prefs change listener
 * Options page content
+* One-click provider test page
 
 # Nice to haves
 
