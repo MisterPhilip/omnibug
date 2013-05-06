@@ -30,7 +30,7 @@
     function initPrefs() {
         var prefs = {
             // pattern to match in request url
-            defaultPattern : "/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif|\/collect\/?\?",
+            defaultPattern : "/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif|\/collect\/?\?|eluminate\/?\?.*tid=|hit\.xiti",
             usefulKeys     : [ "pageName", "ch", "h1", "purchaseID", "events", "products", "pev2" ],
             highlightKeys  : [ "events", "products" ],
             //enableFileLogging : false,
@@ -527,7 +527,11 @@
                     ( url.match( /dcs\.gif/ ) ? "WebTrends" :
                         ( url.match( /__utm\.gif/ ) ? "Urchin" :
                             ( url.match( /\/collect\/?\?/ ) ? "UniversalAnalytics" :
-                                "Unknown"
+                                ( url.match( /eluminate\/?\?/ ) ? "CoreMetrics" :
+                                    ( url.match( /hit\.xiti/ ) ? "AT Internet" :
+                                        "Unknown"
+                                    )
+                                )
                             )
                         )
                     )
