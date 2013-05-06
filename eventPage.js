@@ -223,6 +223,69 @@
                     , a:      "?"
                     , _v:     "?"
                     , _u:     "?"
+                },
+
+                WebTrends : {
+                      "WT.vt_tlv":   "Time of last visit (SDC)"
+                    , "WT.vt_f_tlv": "Time of last visit (cookie)"
+                    , "WT.vt_f_tlh": "Time of last hit"
+                    , "WT.vt_d":     "First visitor hit today (EA)"
+                    , "WT.vt_a_d":   "First visitor hit today (ARDS)"
+                    , "WT.vt_f_d":   "First visitor hit today (cookie)"
+                    , "WT.vt_s":     "First visitor hit this session"
+                    , "WT.vt_a_s":   "First visitor hit this account"
+                    , "WT.vt_f_s":   "First visitor hit this session (cookie)"
+                    , "WT.vt_f":     "First visitor hit (cookie)"
+                    , "WT.vt_f_a":   "First visitor hit this account (cookie)"
+                    , "WT.vt_sid":   "Session ID (deprecated)"
+                    , "WT.vtid":     "Session ID"
+                    , "WT.vtvs":     "Visitor session (timestamp)"
+                    , "WT.co":       "Client accepting cookies?"
+                    , "WT.co_d":     "Session stitching ID"
+                    , "WT.co_a":     "Multi account rollup ID"
+                    , "WT.co_f":     "Visitor session ID"
+                    , "WT.tu":       "Metrics URL truncated?"
+                    , "WT.hdr":      "Custom HTTP header tracking"
+                    , "WT.tv":       "Webtrends JS tag version"
+                    , "WT.site":     "Site ID"
+                    , "WT.tsrc":     "Custom traffic source"
+                    , "WT.dl":       "Event type" // http://help.webtrends.com/en/analytics9admin/event_tracking.html
+                    , "WT.nv":       "Parent element ID/class"
+                    , "WT.es":       "Event source"
+                    , "WT.dcs_id":   "DCS ID"
+                    , "WT.ti":       "Page title"
+                    , "WT.sp":       "Parent/child split"
+                    , "WT.srch":     "Search engine type"
+                    , "WT.tz":       "Time zone"
+                    , "WT.bh":       "Browsing hour"
+                    , "WT.ul":       "User language"
+                    , "WT.cd":       "Color depth"
+                    , "WT.sr":       "Screen resolution"
+                    , "WT.jo":       "Java enabled?"
+                    , "WT.js":       "Javascript enabled?"
+                    , "WT.jv":       "Javascript version"
+                    , "WT.ct":       "Connection type"
+                    , "WT.hp":       "Is home page?"
+                    , "WT.bs":       "Browser size"
+                    , "WT.fi":       "Flash installed?"
+                    , "WT.fv":       "Flash version"
+                    , "WT.le":       "Language encoding"
+                    , "WT.mle":      "Meta languate encoding"
+                    , "WT.em":       "Encoding method"
+                    , "WT.slv":      "Silverlight version"
+                    , "WT.ssl":      "SSL connection?"
+                    , "WT.dcsvid":   "Stored visitor"
+                    // more available here: http://www.webtrendstraining.net/content/data%20collection/documents/Webtrends%20Query%20Parameter%20Reference.pdf
+
+                    , "dcssip":      "Hostname"
+                    , "dcsuri":      "Source or destination URI"
+                    , "dcsqry":      "Query String"
+                    , "dcsdat":      "Timestamp"
+                    , "dcsaut":      "Authorized user?"
+                    , "dcsmet":      "Method"
+                    , "dcssta":      "HTTP Status code"
+                    , "dcsbyt":      "Bytes transferred"
+                    , "dcsref":      "Referrer URL"
                 }
             }
         };
@@ -426,7 +489,7 @@
                     // moniforce
                     obj.moniforce[n] = val;
                     obj.raw[n] = val;
-                } else if( n.match( /^WT\./ ) ) {
+                } else if( n.match( /^WT\./ ) || n.match( /^dcs/ ) ) {
                     // webtrends
                     obj.webtrends[n] = val;
                     obj.raw[n] = val;
