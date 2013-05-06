@@ -22,6 +22,7 @@ For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
 
 * Map provider name to URL pattern
 * Extract biz logic to common script file?
+* Decode WT.dl values
 
 
 # License
