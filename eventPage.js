@@ -30,7 +30,8 @@
     function initPrefs() {
         var prefs = {
             // pattern to match in request url
-            defaultPattern : "/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif|\/collect\/?\?|eluminate\/?\?.*tid=|hit\.xiti",
+            defaultPattern : OmnibugProvider.getDefaultPattern().source,
+
             usefulKeys     : [ "pageName", "ch", "h1", "purchaseID", "events", "products", "pev2" ],
             highlightKeys  : [ "events", "products" ],
             //enableFileLogging : false,
@@ -297,20 +298,20 @@
         } );
 
         // force a (re)load of prefs, now that they may have changed
-        loadPrefsFromStorage();
+        loadPrefsFromStorage( "initPrefs" );
     }
 
 
     /**
      * Grab prefs data from storage
      */
-    function loadPrefsFromStorage() {
+    function loadPrefsFromStorage( who ) {
         chrome.storage.local.get( "omnibug", function( prefData ) {
             that.prefs = prefData.omnibug;
             that.prefs.defaultRegex = new RegExp( that.prefs.defaultPattern );
         } );
     }
-    loadPrefsFromStorage();
+    loadPrefsFromStorage( "main" );
 
 
     function shouldProcess( url ) {
