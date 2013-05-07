@@ -9,14 +9,17 @@
  *
  */
 
-var OmnibugProvider = {
-    //defaultPattern : "/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif|\/collect\/?\?",
 
+
+var OmnibugProvider = {
+    /**
+     * Gathers each provider's pattern and concatenates (with alternation)
+     */
     getDefaultPattern: function() {
         var patterns = [];
         for( var key in this ) {
             if( this.hasOwnProperty( key ) && typeof( this[key] ) !== "function" ) {
-                patterns.push( this[key].pattern.valueOf() );
+                patterns.push( this[key].pattern.source );
             }
         }
         return new RegExp( patterns.join( "|" ) );
@@ -24,7 +27,7 @@ var OmnibugProvider = {
 
     URCHIN: {
           name: "Urchin"
-        , pattern: new RegExp( "__utm\.gif" )
+        , pattern: /__utm\.gif/
         , keys: {
               utmac:  "Account string"
             , utmcc:  "Cookie values"
@@ -77,7 +80,7 @@ var OmnibugProvider = {
 
     OMNITURE: {
           name: "Omniture"
-        , pattern: new RegExp( "/b/ss/|2o7" )
+        , pattern: /\/b\/ss\/|2o7/
         , keys: {
               ns:     "Visitor namespace"
             , ndh:    "Image sent from JS?"
@@ -136,19 +139,21 @@ var OmnibugProvider = {
 
     MONIFORCE: {
           name: "Moniforce"
-        , pattern: new RegExp( "moniforce\.gif" )
-        , keys: {}
+        , pattern: /moniforce\.gif/
+        , keys: {
+        }
     },
-    
+
     WEBTRENDS: {
           name: "WebTrends"
-        , pattern: new RegExp( "dcs\.gif" )
-        , keys: {}
+        , pattern: /dcs\.gif/
+        , keys: {
+        }
     },
 
     UNIVERSALANALYTICS : {
           name: "Universal Analytics"
-        , pattern: new RegExp( "\/collect\/?\?" )
+        , pattern: /\/collect\/?\?/
         , keys: {
               v:      "Protocol Version"
             , tid:    "Tracking ID"
@@ -215,6 +220,20 @@ var OmnibugProvider = {
             , a:      "?"
             , _v:     "?"
             , _u:     "?"
+        }
+    },
+
+    COREMETRICS : {
+          name: "Core Metrics"
+        , pattern: /eluminate\/?\?.*tid=/
+        , keys: {
+        }
+    },
+
+    ATINTERNET : {
+          name: "AT Internet"
+        , pattern: /hit\.xiti/
+        , keys: {
         }
     }
 };
