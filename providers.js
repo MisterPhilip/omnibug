@@ -25,6 +25,18 @@ var OmnibugProvider = {
         return new RegExp( patterns.join( "|" ) );
     },
 
+    /**
+     * Return the provider for a URL, if any
+     */
+    getProviderForUrl: function( url ) {
+        for( var key in this ) {
+            if( this.hasOwnProperty( key ) && typeof( this[key] ) !== "function" && url.match( this[key].pattern ) ) {
+                return this[key];
+            }
+        }
+       throw( "Unable to find provider for given URL" );
+    },
+
     URCHIN: {
           name: "Urchin"
         , pattern: /__utm\.gif/
