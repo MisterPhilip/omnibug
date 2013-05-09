@@ -21,6 +21,7 @@ window.Omnibug = ( function() {
      */
     function report( data ) {
         var i, el, cn, len, html, mf, expanderImage, expanderClass,
+            provider = data.state.omnibugProvider,
             tmp = "",
             wt = "";
 
@@ -41,7 +42,7 @@ window.Omnibug = ( function() {
         html += "<td class='summ'>";
         html += "<p class='summary'><strong>" + camelCapser( data.omnibug.Event ) + " event</strong>"
              + ( data.state.src === "prev" ? " (previous page)" : "" ) + " | "
-             + data.omnibug.Provider + " | "
+             + provider.name + " | "
              + new Date( data.state.timeStamp ) + " | "
              + data.state.requestId
              + ( data.state.statusLine != null ? " | " + data.state.statusLine : "" )
@@ -50,14 +51,14 @@ window.Omnibug = ( function() {
         html += "<div class='" + expanderClass + "'><table class='ent'>";
 
         try {
-            html += generateReportFragment( data.omnibug, "Summary", data );                // summary values
-            html += generateReportFragment( data.props, "Custom Traffic Variables", data ); // omniture props
-            html += generateReportFragment( data.vars, "Conversion Variables", data );      // omniture eVars
-            html += generateReportFragment( data.useful, "Useful", data );                  // useful params
-            html += generateReportFragment( data.moniforce, "Moniforce", data );            // moniforce params
-            html += generateReportFragment( data.webtrends, "WebTrends", data );            // webtrends params
-            html += generateReportFragment( data.urchin, "Google Analytics", data );        // urchin/GA params
-            html += generateReportFragment( data.other, "Other", data );                    // everything else
+            html += generateReportFragment( data.omnibug,   provider, "Summary" );                   // summary values
+            html += generateReportFragment( data.props,     provider, "Custom Traffic Variables" );  // omniture props
+            html += generateReportFragment( data.vars,      provider, "Conversion Variables" );      // omniture eVars
+            html += generateReportFragment( data.useful,    provider, "Useful" );                    // useful params
+            html += generateReportFragment( data.moniforce, provider, "Moniforce" );                 // moniforce params
+            html += generateReportFragment( data.webtrends, provider, "WebTrends" );                 // webtrends params
+            html += generateReportFragment( data.urchin,    provider, "Google Analytics" );          // urchin/GA params
+            html += generateReportFragment( data.other,     provider, "Other" );                     // everything else
         } catch( ex ) {
             parent_log( { "Error in gRF" : ex.message } );
         }
@@ -120,7 +121,7 @@ window.Omnibug = ( function() {
     /**
      * Generate an HTML report fragment for the given object
      */
-    function generateReportFragment( data, title, fullData ) {
+    function generateReportFragment( data, provider, title ) {
         var cn, kt, text, hover, value,
             i = 0,
             html = "";
@@ -128,7 +129,7 @@ window.Omnibug = ( function() {
         for( var el in data ) {
             if( data.hasOwnProperty( el ) && !! data[el] ) {
                 cn = isHighlightable( el ) ? "hilite" : "";
-                kt = getTitleForKey( el, fullData.omnibug.Provider );
+                kt = getTitleForKey( el, provider );
                 text = ( this.prefs.showFullNames ? kt : el );
                 hover = ( this.prefs.showFullNames ? el : kt );
                 value = processValue( data[el] );
@@ -177,7 +178,7 @@ window.Omnibug = ( function() {
     function getTitleForKey( elName, provider ) {
         var title;
         try {
-            title = this.prefs.keyTitles[provider][elName];
+            title = provider.keys[elName];
         } catch( ex ) {
             // noop -- catch missing provider OR missing elName in keyTitles
         }

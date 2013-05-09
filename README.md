@@ -22,11 +22,12 @@ For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
 * AT Internet (http://www.atinternet.com/en/produits/web-analytics/)
 * KISSmetrics (https://www.kissmetrics.com/)
 
+
 # Nice to haves
 
-* Map provider name to URL pattern
 * Extract biz logic to common script file?
 * Decode WT.dl values
+
 
 # Notes
 
