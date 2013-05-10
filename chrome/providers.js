@@ -274,6 +274,7 @@ var OmnibugProvider = {
             , "dcssta":      "HTTP Status code"
             , "dcsbyt":      "Bytes transferred"
             , "dcsref":      "Referrer URL"
+            , "dcsredirect": "Cookie detection (internal)"
         },
         handle: function( name, value, rv ) {
             if( name in this.keys || name.match( /^WT\./ ) || name.match( /^dcs/ ) ) {
@@ -495,6 +496,50 @@ var OmnibugProvider = {
         },
         handle: function( name, value, rv ) {
             if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    KISSMETRICS : {
+          key: "KISSMETRICS"
+        , name: "KISSmetrics"
+        , pattern: /api\.mixpanel\.com\/track\//
+        , keys: {
+        },
+        handle: function( name, value, rv ) {
+            if( name == "data" ) {
+                var obj = atob( value );
+                alert( obj );
+                try {
+                    var parsed = JSON.parse( obj );
+                    for( var k in parsed ) {
+                        if( parsed.hasOwnProperty( k ) ) {
+                            if( typeof( parsed[k] ) === "object" ) {
+                                for( var innerK in parsed[k] ) {
+                                    if( parsed[k].hasOwnProperty( innerK ) ) {
+                                        rv[this.key] = rv[this.key] || {};
+                                        rv[this.key][k] = rv[this.key][k] || {};
+                                        rv[this.key][k][innerK] = parsed[k][innerK];
+                                    }
+                                }
+                            } else {
+                                rv[this.key] = rv[this.key] || {};
+                                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                                rv[this.key][this.name][k] = parsed[k];
+                            }
+                        }
+                    }    
+                } catch( e ) {
+                    // noop
+                }
+                
+                return true;
+            } else if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
