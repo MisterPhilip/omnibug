@@ -522,7 +522,6 @@ var OmnibugProvider = {
         handle: function( name, value, rv ) {
             if( name == "data" ) {
                 var obj = atob( value );
-                alert( obj );
                 try {
                     var parsed = JSON.parse( obj );
                     for( var k in parsed ) {
@@ -548,6 +547,219 @@ var OmnibugProvider = {
                 
                 return true;
             } else if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    FBLIKE : {
+          key: "FBLIKE"
+        , name: "Facebook"
+        , pattern: /facebook.*\/like\.php/
+        , keys: {
+              api_key:     "api_key"
+            , locale:      "locale"
+            , sdk:         "sdk"
+            , channel_url: "channel_url"
+            , href:        "href"
+            , node_type:   "node_type"
+            , width:       "width"
+            , font:        "Font"
+            , layout:      "Layout"
+            , colorscheme: "Color scheme"
+            , show_faces:  "Show faces?"
+            , send:        "send"
+            , extended_social_context: "Extended social context"
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    TORBIT : {
+          key: "TORBIT"
+        , name: "Torbit Insight"
+        , pattern: /insight-beacon\.torbit\.com/
+        , keys: {
+              onready: "onready"
+            , onload:    "onload"
+            , frontend: "frontend"
+            , total_load_time: "Total load time"
+            , red_t: "red_t"
+            , cache_t: "Cache time"
+            , dns_t: "DNS time"
+            , tcp_t: "TCP time"
+            , b_wait_t: "b_wait_t"
+            , b_tran_t: "b_tran_t"
+            , onready_t: "onready time"
+            , onload_t: "onload time"
+            , scr_proc_t: "scr_proc_t"
+            , src: "src"
+            , tbtim: "tbtim"
+            , conversion: "conversion"
+            , tags: "tags"
+            , v: "v"
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    QUANTSERVE : {
+          key: "QUANTSERVE"
+        , name: "Quantcast"
+        , pattern: /pixel\.quantserve\.com\/pixel/
+        , keys: {
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    MARKETO : {
+          key: "MARKETO"
+        , name: "Marketo"
+        , pattern: /mktoresp.com\/webevents\/visitWebPage/
+        , keys: {
+              _mchNc: "Timestamp"
+            , _mchCn: "_mchCn"
+            , _mchId: "ID"
+            , _mchTk: "_mchTk"
+            , _mchHo: "Hostname"
+            , _mchPo: "_mchPo"
+            , _mchRu: "Request URL"
+            , _mchPc: "Scheme"
+            , _mchHa: "_mchHa"
+            , _mchRe: "Referrer"
+            , _mchQp: "_mchQp"
+            , _mchVr: "_mchVr"
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    CROWDFACTORY : {
+          key: "CROWDFACTORY"
+        , name: "Marketo Crowdfactory"
+        , pattern: /\/tracker\/track\.gif/
+        , keys: {
+              cf_eventid:   "cf_eventid"
+            , cachebust:    "Cache buster"
+            , subscriber:   "Subscriber"
+            , product:      "Product"
+            , topcommunity: "topcommunity"
+            , cflog_unk:    "cflog_unk"
+            , html_escape:  "HTML escape?"
+            , session:      "Session"
+            , _mkto_trk:    "_mkto_trk"
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    NEWRELIC : {
+          key: "NEWRELIC"
+        , name: "NewRelic"
+        , pattern: /beacon.*\.newrelic\.com\//
+        , keys: {
+        },
+        handle: function( name, value, rv ) {
+            if( name == "perf" ) {
+                try {
+                    var parsed = JSON.parse( value );
+                    for( var k in parsed ) {
+                        if( parsed.hasOwnProperty( k ) ) {
+                            if( typeof( parsed[k] ) === "object" ) {
+                                for( var innerK in parsed[k] ) {
+                                    if( parsed[k].hasOwnProperty( innerK ) ) {
+                                        rv[this.key] = rv[this.key] || {};
+                                        rv[this.key][k] = rv[this.key][k] || {};
+                                        rv[this.key][k][innerK] = parsed[k][innerK];
+                                    }
+                                }
+                            } else {
+                                rv[this.key] = rv[this.key] || {};
+                                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                                rv[this.key][this.name][k] = parsed[k];
+                            }
+                        }
+                    }    
+                } catch( e ) {
+                    // noop
+                }
+                
+                return true;
+            } else if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    KRUX : {
+          key: "KRUX"
+        , name: "Krux"
+        , pattern: /beacon\.krxd\.net\/pixel\.gif/
+        , keys: {
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    OPTIMIZELY : {
+          key: "OPTIMIZELY"
+        , name: "Optimizely"
+        , pattern: /optimizely\.com\/event/
+        , keys: {
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
