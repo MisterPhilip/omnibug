@@ -166,7 +166,7 @@ window.Omnibug = ( function() {
 
     function processValue( value ) {
         var stringValue = new String( value );
-        if( stringValue.match( /^\d{13}(?:\.\d+)?$/ ) ) {
+        if( stringValue.match( /^\d{13}(?:\.\d+)?$/ ) && stringValue.indexOf( 1 ) == 0 ) {
             return new Date( parseInt( value ) ) + "&nbsp;&nbsp;[" + value + "]";
         } else if( stringValue.match( /^\d{10}$/ ) && stringValue.indexOf( 1 ) == 0 ) {
             return new Date( parseInt( value * 1000 ) ) + "&nbsp;&nbsp;[" + value + "]";
