@@ -1,0 +1,16 @@
+# Ignore chrome providers.js (need to create link yourself!)
+chrome/providers.js
+
+
+############
+## Windows
+############
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Mac crap
+.DS_Store
