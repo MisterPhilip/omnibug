@@ -226,15 +226,8 @@
 
         u.getQueryNames().forEach( function( n ) {
             if( n ) {
-                val = u.getFirstQueryValue( n ).replace( "<", "&lt;" );  // escape HTML in output HTML
-
-                if( provider.handle( n, val, processedKeys ) ) {
-                    // noop (processedKeys modified by provider's handle())
-                } else {
-                    // stick in `other'
-                    processedKeys["other"] = processedKeys["other"] || {};
-                    processedKeys["other"][n] = val;
-                }
+                vals = u.getQueryValues( n );
+                processEntry( n, vals, provider, processedKeys );
             }
         } );
 
@@ -247,6 +240,21 @@
 
         obj = augmentData( obj );
         return obj;
+    }
+
+
+    /**
+     * Takes a single name/value pair and delegates handling of it to the provider
+     * Otherwise, inserts into the `other' bucket
+     */
+    function processEntry( name, value, provider, container ) {
+        if( provider.handle( name, value, container ) ) {
+            // noop (processedKeys modified by provider's handle())
+        } else {
+            // stick in `other'
+            container["other"] = container["other"] || {};
+            container["other"][name] = value;
+        }
     }
 
 
@@ -328,13 +336,20 @@
                 }
             },
             decode: function( val ) {
-                var retVal;
+                var retVal = val;
                 try {
-                    return val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : '';
+                    retVal = val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : '';
                 } catch( e ) {
-                    return val;
+                    try {
+                        retVal = unescape( val.replace( /\+/g, "%20" ) );
+                    } catch( e ) {
+                        // noop
+                    }
+                    //return val;
                 }
+                return retVal.replace( "<", "&lt;" ); 
             },
+
             parseUrl: function() {
                 var url = this.url;
                 var pieces = url.split( '?' );
