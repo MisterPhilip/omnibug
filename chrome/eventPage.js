@@ -350,9 +350,20 @@
                 return retVal.replace( "<", "&lt;" ); 
             },
 
+            smartSplit: function( str, sep, limit) {
+                str = str.split( sep );
+                if( str.length > limit ) {
+                    var ret = str.splice( 0, limit );
+                    ret.push( str.join( sep ) );
+                    return ret;
+                }
+                return str;
+            },
+
             parseUrl: function() {
                 var url = this.url;
-                var pieces = url.split( '?' );
+                var sep = ( url.indexOf( "?" ) != -1 ? "?" : ";" );
+                var pieces = this.smartSplit( url, sep, 1 );
                 var p2 = pieces[0].split( ';' );
                 this.query = {};
                 this.queryString = '';
@@ -365,7 +376,8 @@
                     this.anchor = ( p3[1] ? p3[1] : '' );
                 }
                 if( this.queryString ) {
-                    var kvPairs = this.queryString.split( /&/ );
+                    var kvSep = ( this.queryString.indexOf( "&" ) != -1 ? "&" : ";" );
+                    var kvPairs = this.queryString.split( kvSep );
                     for( var i=0; i<kvPairs.length; ++i ) {
                         var kv = kvPairs[i].split( '=' );
                         this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
