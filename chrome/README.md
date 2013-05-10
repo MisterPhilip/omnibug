@@ -18,15 +18,12 @@ For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
 * Prefs change listener
 * Options page content
 * One-click provider test page
-* CoreMetrics (titles, docs, decode vals)
-* AT Internet (http://www.atinternet.com/en/produits/web-analytics/)
-* KISSmetrics (https://www.kissmetrics.com/)
+* Docs for all new providers
 
 
 # Nice to haves
 
-* Extract biz logic to common script file?
-* Decode WT.dl values
+* Decode some (e.g. WT.dl) values
 
 
 # Notes
