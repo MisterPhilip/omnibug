@@ -8,9 +8,6 @@
  * USA.
  *
  */
-
-
-
 var OmnibugProvider = {
     /**
      * Gathers each provider's pattern and concatenates (with alternation)
@@ -39,13 +36,16 @@ var OmnibugProvider = {
             , name: "Unknown"
             , pattern: /^5831c14e26a2ded99d98782c15e92d62f195d9bcf53869f4d412cff5a074e5246c99916ada7ad760$/
             , keys: {
+            },
+            handle: function( name, value, rv ) {
+                return false;
             }
         }
     },
 
     URCHIN: {
           key: "URCHIN"
-        , name: "Urchin"
+        , name: "Google Analytics"
         , pattern: /__utm\.gif/
         , keys: {
               utmac:  "Account string"
@@ -94,6 +94,15 @@ var OmnibugProvider = {
             , utmsid: "Social destination"
             , utmsn:  "Social network name"
             , utmht:  "Time dispatched"
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys || name.match( /^utm.*/ ) ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
         }
     },
 
@@ -154,6 +163,29 @@ var OmnibugProvider = {
             , vvp:    "Variable provider"
             , xact:   "Transaction ID"
             , zip:    "ZIP/Postal code"
+        },
+        handle: function( name, value, rv ) {
+            if( name.match( /^c(\d+)$/ ) || name.match( /^prop(\d+)$/i ) ) {
+                // props
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key]["Custom Traffic Variables"] = rv[this.key]["Custom Traffic Variables"] || {};
+                rv[this.key]["Custom Traffic Variables"]["prop"+RegExp.$1] = value;
+            } else if( name.match( /^v(\d+)$/ ) || name.match( /^evar(\d+)$/i ) ) {
+                // eVars
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key]["Conversion Variables"] = rv[this.key]["Conversion Variables"] || {};
+                rv[this.key]["Conversion Variables"]["eVar"+RegExp.$1] = value;
+            } else if( name.match( /^\[?AQB\]?$/ ) || name.match( /^\[?AQE\]?$/ ) ) {
+                // noop; skip Omniture's [AQB] and [AQE] elements
+            } else if( name in this.keys ) {
+                // anything else
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+            } else {
+                return false;
+            }
+            return true;
         }
     },
 
@@ -162,6 +194,15 @@ var OmnibugProvider = {
         , name: "Moniforce"
         , pattern: /moniforce\.gif/
         , keys: {
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys || name.match( /^mfinfo/ ) ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
         }
     },
 
@@ -230,6 +271,15 @@ var OmnibugProvider = {
             , "dcssta":      "HTTP Status code"
             , "dcsbyt":      "Bytes transferred"
             , "dcsref":      "Referrer URL"
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys || name.match( /^WT\./ ) || name.match( /^dcs/ ) ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
         }
     },
 
@@ -303,6 +353,15 @@ var OmnibugProvider = {
             , a:      "?"
             , _v:     "?"
             , _u:     "?"
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
         }
     },
 
@@ -311,6 +370,15 @@ var OmnibugProvider = {
         , name: "Core Metrics"
         , pattern: /eluminate\/?\?.*tid=/
         , keys: {
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
         }
     },
 
@@ -319,6 +387,15 @@ var OmnibugProvider = {
         , name: "AT Internet"
         , pattern: /hit\.xiti/
         , keys: {
+        },
+        handle: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
         }
     }
 };
