@@ -51,21 +51,27 @@ window.Omnibug = ( function() {
         html += "<div class='" + expanderClass + "'><table class='ent'>";
 
         try {
-            html += generateReportFragment( data.omnibug,   provider, "Summary" );                   // summary values
-            html += generateReportFragment( data.props,     provider, "Custom Traffic Variables" );  // omniture props
-            html += generateReportFragment( data.vars,      provider, "Conversion Variables" );      // omniture eVars
-            html += generateReportFragment( data.useful,    provider, "Useful" );                    // useful params
-            html += generateReportFragment( data.moniforce, provider, "Moniforce" );                 // moniforce params
-            html += generateReportFragment( data.webtrends, provider, "WebTrends" );                 // webtrends params
-            html += generateReportFragment( data.urchin,    provider, "Google Analytics" );          // urchin/GA params
-            html += generateReportFragment( data.other,     provider, "Other" );                     // everything else
+            html += generateReportSection( data.omnibug, provider, "Summary" );  // summary values
+
+            for( var providerKey in data ) {
+                if( data.hasOwnProperty( providerKey ) && providerKey in OmnibugProvider ) {
+                    for( var sectionKey in data[providerKey] ) {
+                        if( data[providerKey].hasOwnProperty( sectionKey ) ) {
+                            html += generateReportSection( data[providerKey][sectionKey], provider, sectionKey );  // provider-specific values
+                        }
+                    }
+                }
+            }
+
+            html += generateReportSection( data.other,     provider, "Other" );  // everything else
         } catch( ex ) {
-            parent_log( { "Error in gRF" : ex.message } );
+            parent_log( { "Error in gRS" : ex.message } );
         }
 
         html += "</table></div></td></tr></table>\n";
         appendHtml( html );
     }
+
 
     var dataSent = false;
     function appendHtml( data ) {
@@ -121,27 +127,13 @@ window.Omnibug = ( function() {
     /**
      * Generate an HTML report fragment for the given object
      */
-    function generateReportFragment( data, provider, title ) {
-        var cn, kt, text, hover, value,
-            i = 0,
+    function generateReportSection( data, provider, title ) {
+        var i = 0,
             html = "";
 
         for( var el in data ) {
             if( data.hasOwnProperty( el ) && !! data[el] ) {
-                cn = isHighlightable( el ) ? "hilite" : "";
-                kt = getTitleForKey( el, provider );
-                text = ( this.prefs.showFullNames ? kt : el );
-                hover = ( this.prefs.showFullNames ? el : kt );
-                value = processValue( data[el] );
-
-                html += "<tr"
-                     + ( !! hover ? " title='" + hover + "'" : "" )
-                     + ( !! cn ? " class='" + cn + "'" : "" )
-                     + "><td class='k " + ( i++ % 2 === 0 ? 'even' : 'odd' ) + "'>"
-                     + text
-                     + "</td><td class='v'>"
-                     + quote( value )
-                     + "</td></tr>\n";
+                html += generateReportRow( el, data[el], provider, i );
             }
         }
 
@@ -151,6 +143,25 @@ window.Omnibug = ( function() {
         } else {
             return "";
         }
+    }
+
+    function generateReportRow( key, value, provider, idx ) {
+        var cn = isHighlightable( key ) ? "hilite" : "",
+            keyTitle = getTitleForKey( key, provider ),
+            text = ( this.prefs.showFullNames ? keyTitle : key ),
+            hover = ( this.prefs.showFullNames ? key : keyTitle ),
+            value = processValue( value );
+
+        html = "<tr"
+             + ( !! hover ? " title='" + hover + "'" : "" )
+             + ( !! cn ? " class='" + cn + "'" : "" )
+             + "><td class='k " + ( idx++ % 2 === 0 ? 'even' : 'odd' ) + "'>"
+             + text
+             + "</td><td class='v'>"
+             + quote( value )
+             + "</td></tr>\n";
+
+        return html;
     }
 
     function processValue( value ) {
@@ -167,11 +178,6 @@ window.Omnibug = ( function() {
     // returns true when the given name is in the highlightKeys list
     function isHighlightable( elName ) {
         return this.prefs.highlightKeys[elName];
-    }
-
-    // returns true when the given name is in the usefulKeys list
-    function isUseful( elName ) {
-        return this.prefs.usefulKeys[elName];
     }
 
     // returns the title (if any) for a given key
@@ -204,6 +210,7 @@ window.Omnibug = ( function() {
     /**
      * Returns a style block of dynamic styles
      * @return the style string
+     * @TODO: move into style block in html page? or onshown method?
      */
     function getDynamicStyles() {
         // dynamic styles (e.g., from prefs)
