@@ -204,9 +204,9 @@ window.Omnibug = ( function() {
      */
     function quote( str ) {
         if( this.prefs.showQuotes ) {
-            return str.indexOf( "<span class='qq'>" ) === 0
+            return( ( typeof( str ) === "string" && str.indexOf( "<span class='qq'>" ) === 0 )
                 ? str
-                : "<span class='qq'>\"</span><span class='v'>" + str + "</span><span class='qq'>\"</span>"
+                : "<span class='qq'>\"</span><span class='v'>" + str + "</span><span class='qq'>\"</span>" )
         } else {
             return str;
         }
@@ -253,7 +253,7 @@ window.Omnibug = ( function() {
             try {
                 window.Omnibug.send_message( msg );
             } catch( ex ) {
-                alert( "exception sending: " + ex );
+                //alert( "exception sending: " + ex );
             }
         }
     }
