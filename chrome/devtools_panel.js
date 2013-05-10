@@ -170,6 +170,14 @@ window.Omnibug = ( function() {
             return new Date( parseInt( value ) ) + "&nbsp;&nbsp;[" + value + "]";
         } else if( stringValue.match( /^\d{10}$/ ) && stringValue.indexOf( 1 ) == 0 ) {
             return new Date( parseInt( value * 1000 ) ) + "&nbsp;&nbsp;[" + value + "]";
+        } else if( typeof( value ) === "object" && Object.keys( value ).length > 1 ) {
+            var parts = [];
+            for( var key in value ) {
+                if( value.hasOwnProperty( key ) ) {
+                    parts.push( quote( value[key] ) );
+                }
+            }
+            return parts.join( ",<br>" );
         }
         return value;
     }
@@ -195,9 +203,13 @@ window.Omnibug = ( function() {
      * Return a quoted string (if the pref is set)
      */
     function quote( str ) {
-        return( this.prefs.showQuotes
-                    ? "<span class='qq'>\"</span><span class='v'>" + str + "</span><span class='qq'>\"</span>"
-                    : str );
+        if( this.prefs.showQuotes ) {
+            return str.indexOf( "<span class='qq'>" ) === 0
+                ? str
+                : "<span class='qq'>\"</span><span class='v'>" + str + "</span><span class='qq'>\"</span>"
+        } else {
+            return str;
+        }
     }
 
     /**
