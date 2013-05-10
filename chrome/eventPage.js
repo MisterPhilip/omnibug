@@ -8,7 +8,6 @@
  * USA.
  *
  */
-
 (function() {
     var prefs,
         tabs = {},
@@ -31,10 +30,7 @@
         var prefs = {
             // pattern to match in request url
               defaultPattern : OmnibugProvider.getDefaultPattern().source
-
-            , usefulKeys     : [ "pageName", "ch", "h1", "purchaseID", "events", "products", "pev2" ]
-            , highlightKeys  : [ "events", "products" ]
-            //, enableFileLogging : false
+            , highlightKeys  : [ "pageName", "ch", "events", "products" ]
 
             // show entries expanded?
             , alwaysExpand : false
@@ -221,57 +217,33 @@
         var val,
             u = new OmniUrl( data.url ),
             obj = {
-                state: data,    // raw data from the browser event
-                raw: {},        // ungrouped object of all props
-                vars: {},       // omniture evars
-                props: {},      // omniture props
-                other: {},      // any other values
-                useful: {},     // values marked as useful
-                urchin: {},     // urchin/GA values
-                moniforce: {},  // moniforce values
-                webtrends: {},  // webtrends values
-                toString: function() {
-                    return "Obj{\n\tvars=" + this.vars + "\n\tprops=" + this.props + "\n\tother=" + this.other + "}";
-                }
+                state: data    // raw data from the browser event
             };
 
-        var that = this;
+        var that = this,
+            processedKeys = {},
+            provider = data.omnibugProvider;
+
         u.getQueryNames().forEach( function( n ) {
             if( n ) {
                 val = u.getFirstQueryValue( n ).replace( "<", "&lt;" );  // escape HTML in output HTML
 
-                if( that.prefs.usefulKeys[n] ) {
-                    // 'useful' keys
-                    obj.useful[n] = val;
-                    obj.raw[n] = val;
-                } else if( n.match( /^c(\d+)$/ ) || n.match( /^prop(\d+)$/i ) ) {
-                    // omniture props
-                    obj.props["prop"+RegExp.$1] = val;
-                    obj.raw["prop"+RegExp.$1] = val;
-                } else if( n.match( /^v(\d+)$/ ) || n.match( /^evar(\d+)$/i ) ) {
-                    // omniture evars
-                    obj.vars["eVar"+RegExp.$1] = val;
-                    obj.raw["eVar"+RegExp.$1] = val;
-                } else if( n.match( /^\[?AQB\]?$/ ) || n.match( /^\[?AQE\]?$/ ) ) {
-                    // noop; skip Omniture's [AQB] and [AQE] elements
-                } else if( n.match( /^mfinfo/ ) ) {
-                    // moniforce
-                    obj.moniforce[n] = val;
-                    obj.raw[n] = val;
-                } else if( n.match( /^WT\./ ) || n.match( /^dcs/ ) ) {
-                    // webtrends
-                    obj.webtrends[n] = val;
-                    obj.raw[n] = val;
-                } else if( n.match( /^utm.*/ ) ) {
-                    obj.urchin[n] = val;
-                    obj.raw[n] = val;
+                if( provider.handle( n, val, processedKeys ) ) {
+                    // noop (processedKeys modified by provider's handle())
                 } else {
-                    // everything else
-                    obj.other[n] = val;
-                    obj.raw[n] = val;
+                    // stick in `other'
+                    processedKeys["other"] = processedKeys["other"] || {};
+                    processedKeys["other"][n] = val;
                 }
             }
         } );
+
+        // merge processedKeys into obj
+        for( var key in processedKeys ) {
+            if( processedKeys.hasOwnProperty( key ) ) {
+                obj[key] = processedKeys[key];
+            } 
+        }
 
         obj = augmentData( obj );
         return obj;
@@ -297,19 +269,19 @@
             eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
         }
 
-        data.omnibug["Event"]       = data.raw["Event"]       = eventType;
-        data.omnibug["Timestamp"]   = data.raw["Timestamp"]   = data.state.timeStamp;
-        data.omnibug["Provider"]    = data.raw["Provider"]    = data.state.omnibugProvider.name;
-        data.omnibug["Parent URL"]  = data.raw["Parent URL"]  = data.state.tabUrl;
-        data.omnibug["Full URL"]    = data.raw["Full URL"]    = data.state.url
-                                                              + "<br/>(" + urlLength + " characters"
-                                                              + ( urlLength > 2083
-                                                                  ? ", <span class='imp'>*** too long for IE6/7! ***</span>"
-                                                                  : "" )
-                                                              + ")";
-        data.omnibug["Request ID"]   = data.raw["Request ID"]   = data.state.requestId;
-        data.omnibug["Status Line"]  = data.raw["Status Line"]  = data.state.statusLine;
-        data.omnibug["Request Type"] = data.raw["Request Type"] = data.state.type;
+        data.omnibug["Event"]       = eventType;
+        data.omnibug["Timestamp"]   = data.state.timeStamp;
+        data.omnibug["Provider"]    = data.state.omnibugProvider.name;
+        data.omnibug["Parent URL"]  = data.state.tabUrl;
+        data.omnibug["Full URL"]    = data.state.url
+                                          + "<br/>(" + urlLength + " characters"
+                                          + ( urlLength > 2083
+                                              ? ", <span class='imp'>*** too long for IE6/7! ***</span>"
+                                              : "" )
+                                          + ")";
+        data.omnibug["Request ID"]   = data.state.requestId;
+        data.omnibug["Status Line"]  = data.state.statusLine;
+        data.omnibug["Request Type"] = data.state.type;
 
         return data;
     }
