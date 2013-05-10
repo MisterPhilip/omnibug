@@ -491,8 +491,16 @@ var OmnibugProvider = {
     ATINTERNET : {
           key: "ATINTERNET"
         , name: "AT Internet"
-        , pattern: /hit\.xiti/
+        , pattern: /\.xiti/
         , keys: {
+              r:    "Screen resolution/depth"
+            , p:    "Page name"
+            , s:    "Site number"
+            , s2:   "Site level 2"
+            , lng:  "Language"
+            , ref:  "Referrer"
+            , re:   "Viewport resolution"
+            , dest: "Destination URL"
         },
         handle: function( name, value, rv ) {
             if( name in this.keys ) {
