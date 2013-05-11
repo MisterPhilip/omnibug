@@ -57,22 +57,54 @@
         } );
 
         // force a (re)load of prefs, now that they may have changed
-        loadPrefsFromStorage( "initPrefs" );
+        loadPrefsFromStorage();
     }
 
 
     /**
      * Grab prefs data from storage
      */
-    function loadPrefsFromStorage( who ) {
+    function loadPrefsFromStorage() {
         chrome.storage.local.get( "omnibug", function( prefData ) {
             that.prefs = prefData.omnibug;
             that.prefs.defaultRegex = new RegExp( that.prefs.defaultPattern );
         } );
     }
-    loadPrefsFromStorage( "main" );
+    loadPrefsFromStorage();
+
+    /**
+     * Fix broken types in prefs
+     * Tried this in options.js, but didn't work
+     */
+    function updatePrefValues( prefs ) {
+        if( "highlightKeys" in prefs ) {
+            prefs["highlightKeys"] = prefs["highlightKeys"].split( /,\s?/ );
+        }
+    }
+
+    /**
+     * Receive updates when prefs change and broadcast them out
+     */
+    chrome.storage.onChanged.addListener( function( changes, namespace ) {
+        if( "omnibug" in changes ) {
+            var newPrefs = changes["omnibug"].newValue;
+
+            updatePrefValues( newPrefs );
+            console.log( "Received updated prefs", newPrefs );
+
+            // update local (eventPage.js) prefs
+            that.prefs = newPrefs;
+            that.prefs.defaultRegex = new RegExp( that.prefs.defaultPattern );
+
+            // send new prefs to all connected devtools panels
+            sendToAllDevTools( { "type" : "prefs", "payload" : that.prefs } );
+        }
+    } );
 
 
+    /**
+     * Quickly determine if a URL is a candidate for us or now
+     */
     function shouldProcess( url ) {
         return url.match( this.prefs.defaultRegex );
     }
@@ -197,18 +229,18 @@
         try {
             tabs[tabId].port.postMessage( object );
         } catch( ex ) {
-            console.error( "error calling postMessage: ", ex );
+            console.error( "error calling postMessage: ", ex.message );
         }
     }
 
-    /*
-    // Function to send a message to all devtool.html views:
-    function notifyDevtools(msg) {
-        Object.keys(tabs).forEach(function(portId_) {
-            tabs[portId_].postMessage(msg);
-        });
+    /**
+     * Send a message to all connected devtools panels
+     */
+    function sendToAllDevTools( object ) {
+        Object.keys( tabs ).forEach( function( tabId ) {
+            sendToDevToolsForTab( tabId, object );
+        } );
     }
-    */
 
     /**
      * Receives a data object from the model, decodes it, and passes it on to report()
