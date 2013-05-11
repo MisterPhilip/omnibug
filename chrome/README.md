@@ -15,11 +15,9 @@ For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
 
 # @TODO
 
-* Prefs change listener
-* Options page content
 * One-click provider test page
 * Docs for all new providers
-
+* Unit tests in PhantomJS?
 
 # Nice to haves
 
@@ -29,6 +27,16 @@ For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
 # Notes
 
 * http://www.akravitz.com/coremetrics-vs-omniture-vs-google-analytics/
+
+# Examples
+
+* GUA: http://academicadvising.waldenu.edu/
+* WT: http://www.spirit.com/Default.aspx
+* CM: https://www.bankofamerica.com/
+* OM, QUA, KRUX, NR: http://www.realestate.com.au/buy
+* AT: http://www.atinternet.com/en/
+* TB, QUA, FB: http://torbit.com/blog/
+* KM, OPT, MRK: https://www.optimizely.com/
 
 
 # License
