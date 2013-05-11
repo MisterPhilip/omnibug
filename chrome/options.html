@@ -2,21 +2,137 @@
 <head>
     <title>Omnibug Options</title>
     <script src="options.js"></script>
+
+    <style type="text/css">
+        body { text-align: center; font-family: arial, helvetica, clean, sans-serif; }
+        body > * { text-align: left; }
+        form, div.header { display: inline-block; width: 50%; }
+        fieldset { margin: 1em 0; }
+
+        span.example { padding: 5px; margin-left: 2em; }
+        fieldset#submit { border: 0; }
+        fieldset.color input { width: 5em; font-family: monospace; }
+        #highlightKeys { width: 25em; }
+        p.hint { color: #999; font-size: smaller; margin: 0.5em 0 0 0; }
+        p.hint:hover { color: #000; }
+
+        div.header h3 {
+            display: inline-block;
+            margin: 0 0 0 1em;
+            padding: 0;
+            line-height: 64px;
+            vertical-align: top;
+        }
+
+        #status {
+            margin-left: 1.5em;
+            padding: 0.75em;
+            background-color: #afa;
+            font-size: larger;
+            font-weight: bold;
+            visibility: hidden;
+        }
+
+        .fadable {
+           opacity: 1;
+           transition: opacity 1.0s ease-out;
+           transition-delay: 1s;
+           -webkit-transition: opacity 1.0s ease-out;
+           -webkit-transition-delay: 1s;
+
+        }
+
+    </style>
 </head>
 
 <body>
-Favorite Color:
-<select id="color">
- <option value="red">red</option>
- <option value="green">green</option>
- <option value="blue">blue</option>
- <option value="yellow">yellow</option>
-</select>
+    <div class="header">
+        <img src="images/o-64.png" alt="O" />
+        <h3>Omnibug Options</h3>
+    </div>
+    <form action="">
+        <fieldset>
+            <legend>Highlight parameter names</legend>
+            <input type="text" id="highlightKeys" />
+            <p class="hint">Comma-separated list of parameter names to be highlighted</p>
+        </fieldset>
 
-<br>
-<div id="status"></div>
-<button id="save">Save</button>
+        <fieldset>
+            <legend>Expand entries?</legend>
+            <div>
+                <input type="radio" name="alwaysExpand" value="true" id="alwaysExpand" />
+                <label for="alwaysExpand">Yes</label>
+            </div>
+            <div>
+                <input type="radio" name="alwaysExpand" value="false" id="alwaysExpandFalse" />
+                <label for="alwaysExpandFalse">No</label>
+            </div>
+            <p class="hint">Automatically expand events in the Omnibug panel</p>
+        </fieldset>
+
+        <fieldset>
+            <legend>Quote values?</legend>
+            <div>
+                <input type="radio" name="showQuotes" value="true" id="showQuotes" />
+                <label for="showQuotes">Yes</label>
+            </div>
+            <div>
+                <input type="radio" name="showQuotes" value="false" id="showQuotesFalse" />
+                <label for="showQuotesFalse">No</label>
+            </div>
+            <p class="hint">Surround values in entries with quotes</p>
+        </fieldset>
+
+        <fieldset>
+            <legend>Parameter display style</legend>
+            <div>
+                <input type="radio" name="showFullNames" value="true" id="showFullNames" />
+                <label for="showFullNames">Descriptions</label>
+            </div>
+            <div>
+                <input type="radio" name="showFullNames" value="false" id="showFullNamesFalse" />
+                <label for="showFullNamesFalse">Names</label>
+            </div>
+            <p class="hint">Show parameter names (e.g. "sr") or their descriptions ("Screen resolution")</p>
+        </fieldset>
+
+        <fieldset class="color">
+            <legend>Background color for page load events</legend>
+            <input type="text" id="color_load" />
+            <span class="example">Example</span>
+        </fieldset>
+
+        <fieldset class="color">
+            <legend>Background color for click events</legend>
+            <input type="text" id="color_click" />
+            <span class="example">Example</span>
+        </fieldset>
+
+        <fieldset class="color">
+            <legend>Background color for highlight</legend>
+            <input type="text" id="color_hilite" />
+            <span class="example">Example</span>
+        </fieldset>
+
+        <fieldset class="color">
+            <legend>Background color for row hover</legend>
+            <input type="text" id="color_hover" />
+            <span class="example">Example</span>
+        </fieldset>
+
+        <fieldset class="color">
+            <legend>Color for quotes around values</legend>
+            <input type="text" id="color_quotes" />
+            <span class="example">Example</span>
+        </fieldset>
+
+        <fieldset id="submit">
+            <button id="save">Save</button>
+            <span id="status" class="fadable"></span>
+        </fieldset>
+
+    </form>
+
+
 </body>
-
-
 </html>
