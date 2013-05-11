@@ -133,7 +133,7 @@ window.Omnibug = ( function() {
 
         for( var el in data ) {
             if( data.hasOwnProperty( el ) && !! data[el] ) {
-                html += generateReportRow( el, data[el], provider, i );
+                html += generateReportRow( el, data[el], provider, i++ );
             }
         }
 
@@ -155,7 +155,7 @@ window.Omnibug = ( function() {
         html = "<tr"
              + ( !! hover ? " title='" + hover + "'" : "" )
              + ( !! cn ? " class='" + cn + "'" : "" )
-             + "><td class='k " + ( idx++ % 2 === 0 ? 'even' : 'odd' ) + "'>"
+             + "><td class='k " + ( idx % 2 === 0 ? 'even' : 'odd' ) + "'>"
              + text
              + "</td><td class='v'>"
              + quote( value )
@@ -185,7 +185,7 @@ window.Omnibug = ( function() {
 
     // returns true when the given name is in the highlightKeys list
     function isHighlightable( elName ) {
-        return this.prefs.highlightKeys[elName];
+        return( this.prefs.highlightKeys.indexOf( elName ) != -1 );
     }
 
     // returns the title (if any) for a given key
