@@ -13,6 +13,19 @@
         that = this;
 
     /**
+     * Cast values from the form to their correct type
+     */
+    function processFormValue( key, value ) {
+        if( value === "true" ) {
+            return true;
+        } else if( value === "false" ) {
+            return false;
+        } else {
+            return value;
+        }
+    }
+
+    /**
      * Save new prefs back to local storage
      */
     function saveOptions( evt ) {
@@ -28,7 +41,7 @@
                         prefs[key] = elem.value;
                     } else if( elem.type === "radio" ) {
                         var active = document.querySelector( "input[type='radio'][name='" + key + "']:checked" );
-                        prefs[key] = active.value;
+                        prefs[key] = processFormValue( key, active.value );
                     } else {
                         console.error( "Unknown options element type ", elem.type, " for option ", key );
                     }
