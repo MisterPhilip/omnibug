@@ -1,0 +1,10 @@
+# content   packagename   uri/to/files               flags
+content     omnibug       chrome/content/omnibug/
+
+# skin   packagename   skinname      /path/to/files            flags
+skin     omnibug       classic/1.0   chrome/skin/classic/mac/   os=Darwin
+skin     omnibug       classic/1.0   chrome/skin/classic/win/   os=WINNT
+skin     omnibug       classic/1.0   chrome/skin/classic/
+
+# overlay   chrome://uri-to-be-overlaid                   chrome://overlay-URI                   flags
+overlay     chrome://firebug/content/firebugOverlay.xul   chrome://omnibug/content/overlay.xul

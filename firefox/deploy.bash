@@ -1,0 +1,75 @@
+#!/bin/bash
+
+#
+# Extension deployment script
+#
+
+# Get most current revision
+PLACEHOLDER=ts
+echo "Updating revision number"
+echo `date` > ${PLACEHOLDER}
+svn commit -m"Revision placeholder" ${PLACEHOLDER}
+echo ""
+
+APP=omnibug
+MAJOR=0
+MINOR=5
+INC=`svn info ${PLACEHOLDER} |grep ^Revision|awk '{ print $2 }'`
+
+extrapath=""
+if [[ "$1" == "ross" ]]; then
+    extrapath=ross/
+    echo "Doing private deployment to ${extrapath}"
+fi
+
+./build.bash
+
+# update revision
+echo -n "$0: incrementing version: old=$INC; "
+INC=$((INC+1))
+VER="${MAJOR}.${MINOR}.${INC}"
+echo "new=${INC}"
+echo ""
+cat install.rdf | sed "s/em:version=\".*\"$/em:version=\"${VER}\"/" > install.rdf.$$
+mv install.rdf.$$  install.rdf
+
+echo "Comitting updated install.rdf (as ${VER})"
+# Commit modified install to svn
+svn commit -m"[$0] Incrementing revision for build" install.rdf
+echo ""
+
+XPI=${APP}-${VER}.xpi
+cp ${APP}.xpi $XPI
+
+echo "Adding updated install.rdf to ${APP}.xpi"
+zip -u $XPI
+echo ""
+
+# Don't generate hash until after adding the updated install.rdf
+HASH=`openssl sha1 ${XPI} | awk '{ print $2 }'`
+
+cat update.rdf.tpl | sed "s/TOK_VER/${VER}/g" | sed "s/TOK_HASH/${HASH}/g" > update.rdf
+
+#
+# Sign update.rdf
+#
+echo -n "Please sign `pwd`/update.rdf with McCoy now; press enter when done."
+read foo
+
+
+#
+# Deploy (or not)
+#
+if [[ "x$1" == "x" || "$1" == "ross" ]]; then
+    echo "Sending update.rdf and xpi"
+    scp update.rdf $XPI rosssimpson.com:www/dev/${extrapath}
+    echo ""
+
+    echo "Updating symlink"
+    ssh rosssimpson.com "ln -sf $XPI www/dev/${extrapath}${APP}-current.xpi"
+
+    echo "Done.  URL is https://rosssimpson.com/dev/${extrapath}${APP}-current.xpi"
+else
+    echo "Done.  Did not deploy."
+fi
+

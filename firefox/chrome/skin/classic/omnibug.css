@@ -1,0 +1,109 @@
+/*
+ * $Id$
+ * $URL$
+ *
+ * panelNode-Omnibug
+ * panelNode-OmnibugSide
+ */
+
+table.req p.summary {
+    margin: 0;
+    line-height: 16px;
+}
+
+table.req div.hid {
+    display: none;
+}
+
+table.req {
+    width: 100%;
+}
+
+
+table.req td {
+    vertical-align: top;
+    border-bottom: 1px solid #aaa;
+}
+
+table.req td.exp {
+    width: 1px;
+    text-align: center;
+    line-height: 20px;
+    padding: 0 5px;
+}
+
+table.req a img {
+    border: 0;
+}
+
+p.om {
+    margin: 0;
+}
+
+table.req span.imp {
+    color: #f00;
+}
+table.req thead tr:hover {
+    background-color: transparent;
+}
+
+/* entry tables */
+table.ent,
+table.ent tbody,
+table.ent tr,
+table.ent th,
+table.ent td {
+    border-collapse: collapse;
+}
+
+table.ent {
+    margin-bottom: 15px;
+}
+table.ent th {
+    text-align: left;
+    padding-top: 12px;
+}
+table.ent td {
+    border: 1px solid #aaa;
+    border-width: 1px 0 0 0;
+}
+
+table.ent td.k {
+    white-space: nowrap;
+}
+table.ent td.k,
+table.ent td.v {
+    padding-right: 10px;
+    cursor: default;
+}
+
+#watchTbl thead tr:hover {
+    background-color: transparent;
+}
+#watchTbl th {
+    padding-top: 0;
+}
+#watchTbl th.k {
+    width: 14%;
+}
+#watchTbl th.v,
+#watchTbl th.p {
+    width: 43%;
+}
+
+
+/* debugging only */
+/*
+table.req,
+table.req > tbody,
+table.req > tr,
+table.req > th,
+table.req > td {
+    border: 1px solid #f66;
+    border-collapse: collapse;
+}
+
+table.req p {
+    background-color: #afa;
+}
+*/

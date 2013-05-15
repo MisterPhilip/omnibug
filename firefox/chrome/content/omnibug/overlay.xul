@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet type="text/css" href="chrome://omnibug/content/omnibug.css"?>
+
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/.  -->
+
+<!--
+    $Id$
+    $URL$
+-->
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <script type="application/x-javascript" src="chrome://omnibug/content/omnibugContext.js"/>
+    <script type="application/x-javascript" src="chrome://omnibug/content/model.js"/>
+    <script type="application/x-javascript" src="chrome://omnibug/content/panel.js"/>
+    <script type="application/x-javascript" src="chrome://omnibug/content/md5.js"/>
+    <script type="application/x-javascript" src="chrome://omnibug/content/io.js"/>
+
+    <commandset id="mainCommandSet">
+        <command id="cmd_clear" oncommand="Firebug.Omnibug.clearPanel()"/>
+        <command id="cmd_menu" oncommand="Firebug.Omnibug.showMenu()"/>
+    </commandset>
+
+    <toolbar id="fbToolbar" align="center">
+        <hbox id="fbToolbarInner" insertbefore="fbDetachButton" flex="1" align="center">
+            <hbox id="fbOmnibugButtons" insertafter="fbNetButtons">
+                <toolbarseparator />
+                <toolbarbutton label="Clear" class="toolbar-text-button" tooltiptext="Clear console window" command="cmd_clear"/>
+                <toolbarbutton label="Prefs" class="toolbar-text-button" tooltiptext="Show preferences menu" command="cmd_menu" />
+                <toolbarbutton label="Tools" id="omnibugToolsMenu" type="menu">
+                    <menupopup>
+                        <menuitem label="Choose log file" oncommand="Firebug.Omnibug.omnibugTools( this )"/>
+                    </menupopup>
+                </toolbarbutton>
+            </hbox>
+        </hbox>
+    </toolbar>
+
+</overlay>
