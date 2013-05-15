@@ -4,17 +4,13 @@
 # Extension deployment script
 #
 
-# Get most current revision
-PLACEHOLDER=ts
-echo "Updating revision number"
-echo `date` > ${PLACEHOLDER}
-svn commit -m"Revision placeholder" ${PLACEHOLDER}
-echo ""
-
 APP=omnibug
 MAJOR=0
 MINOR=5
-INC=`svn info ${PLACEHOLDER} |grep ^Revision|awk '{ print $2 }'`
+
+# Get most current version
+PLACEHOLDER=version.txt
+PATCH=`cat ${PLACEHOLDER}`
 
 extrapath=""
 if [[ "$1" == "ross" ]]; then
@@ -24,18 +20,19 @@ fi
 
 ./build.bash
 
-# update revision
-echo -n "$0: incrementing version: old=$INC; "
-INC=$((INC+1))
-VER="${MAJOR}.${MINOR}.${INC}"
-echo "new=${INC}"
+# update version
+echo -n "$0: incrementing version: old=$PATCH; "
+PATCH=$((PATCH+1))
+VER="${MAJOR}.${MINOR}.${PATCH}"
+echo "new=${PATCH}"
 echo ""
+
 cat install.rdf | sed "s/em:version=\".*\"$/em:version=\"${VER}\"/" > install.rdf.$$
-mv install.rdf.$$  install.rdf
+mv install.rdf.$$ install.rdf
 
 echo "Comitting updated install.rdf (as ${VER})"
-# Commit modified install to svn
-svn commit -m"[$0] Incrementing revision for build" install.rdf
+# Commit modified install
+git commit install.rdf -m"[$0] Incrementing install.rdf version for build" && git push
 echo ""
 
 XPI=${APP}-${VER}.xpi
