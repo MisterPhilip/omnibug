@@ -1,8 +1,3 @@
-# Ignore chrome providers.js (need to create link yourself!)
-chrome/providers.js
-chrome\providers.js
-
-
 ############
 ## Windows
 ############
