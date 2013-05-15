@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>Omnibug for Chrome :: web metrics debugging tool</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta name="keywords" content="Omnibug Chrome extension debug develop web metrics analytics Omniture SiteCatalyst Moniforce WebTrends Google Urchin" />
+    <meta name="description" content="Omnibug is a tool for web developers to make the task of debugging web metrics tools (such as Omniture SiteCatalyst and Google Analytics) less painful." />
+    <meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+
+    <link rel='stylesheet' type='text/css' media='all' href='/ross.css' />
+    <link rel='stylesheet' type='text/css' media='all' href='omnibug.css' />
+
+    <script type="text/javascript" src="obf.js"></script>
+</head>
+
+<body>
+    <div class="oheader">
+        <img src="o-64.png" alt="O" />
+        <h3>Omnibug for Chrome</h3>
+    </div>
+
+    <div class="sec">
+        <p>I have created a Chrome version of the Omnibug extension.  It functions much like the Firefox version, with the following caveats:</p>
+        <ul>
+            <li>No logging to the filesystem</li>
+            <li>No "watches" sidebar</li>
+            <li>By default, shows parameter descriptions (parameter names are shown on hover)</li>
+            <li>All preferences available via the Options page</li>
+        </ul>
+
+        <p>It also includes lots more metrics providers, including:</p>
+        <ul>
+            <li><a href="http://www.google.com.au/analytics/">Urchin/Google Analytics</a></li>
+            <li><a href="https://support.google.com/analytics/answer/2790010?hl=en">Google Universal Analytics</a></li>
+            <li><a href="http://www.adobe.com/au/products/sitecatalyst.html">Adobe/Omniture SiteCatalyst</a></li>
+            <li><a href="http://www.oracle.com/us/corporate/acquisitions/moniforce/index.html">Moniforce</a> (deprecated)</li>
+            <li><a href="http://webtrends.com/">WebTrends</a></li>
+            <li><a href="https://welcome.coremetrics.com/analyticswebapp/jsp/login.jsp">IBM CoreMetrics</a></li>
+            <li><a href="http://www.atinternet.com/en/">AT Internet</a></li>
+            <li><a href="https://www.kissmetrics.com/">KISSmetrics</a></li>
+            <li><a href="http://developers.facebook.com/docs/reference/plugins/like/">Facebook "Like"</a></li>
+            <li><a href="http://torbit.com/">Torbit</a></li>
+            <li><a href="https://www.quantcast.com/">Quantcast</a></li>
+            <li><a href="http://www.marketo.com/">Marketo</a></li>
+            <li><a href="http://www.marketo.com/">Marketo CrowdFactory</a></li>
+            <li><a href="http://newrelic.com/">New Relic</a></li>
+            <li><a href="http://www.krux.com/">Krux</a></li>
+            <li><a href="https://www.optimizely.com/">Optimizely</a></li>
+        </ul>
+    </div>
+
+    <h3>Get It</h3>
+    <div class="sec changelog">
+        <ol>
+            <li>Right-click the following link; save it somewhere on your system: <!--#include virtual="chrome_dl_link.cgi" --></li>
+            <li>In Chrome, go to Tools &rarr; Extensions</li>
+            <li>Locate the .crx file downloaded in step 1 and drag it into the extensions menu.</li>
+            <li>Click "Add" at the prompt</li>
+            <li>Enjoy!</li>
+        </ol>
+    </div>
+
+    <h3>Compatibility</h3>
+    <div class="sec">
+        <ul>
+            <li>Chrome: tested with 26.0.1410.65, but should be backwards compatible several versions</li>
+            <li>OS: tested on OS X 10.7.4 and Windows 7 (should work on any platform that supports Chrome)</li>
+        </ul>
+    </div>
+
+    <h3>Source</h3>
+    <div class="sec">
+        <p>Omnibug is open-source software.  You can check out the source code on <a href="https://github.com/simpsora/omnibug/tree/master/chrome">GitHub</a>.<p>
+    </div>
+
+
+    <h3>Support</h3>
+    <div class="sec">
+        <p>To report a bug, please use the <a href="https://github.com/simpsora/omnibug/issues">issue tracker</a> on GitHub.</p>
+        <p>To request a feature, or for general comments and questions, feel free to <a class="e" rel="e_Ynphdm9odEBlYmZmZnZ6Y2ZiYS5wYno=" href="mailto:">email me</a>.</p>
+    </div>
+
+<!--
+    <h3>Donation</h3>
+    <div class="sec">
+        <p>If you find Omnibug useful, feel free to make a donation (via PayPal) by clicking on the button below.  There is no obligation, of course.</p>
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+            <fieldset>
+                <input type="hidden" name="cmd" value="_s-xclick">
+                <input type="hidden" name="hosted_button_id" value="WD264FHNK673U">
+                <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+            </fieldset>
+        </form>
+    </div>
+-->
+
+    <h3>Legal</h3>
+    <div class="sec">
+        <p><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Omnibug</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.</p>
+
+        <p>Company names referenced above are the property of their respective owners.</p>
+    </div>
+
+    <h3 class="foot">&nbsp;</h3>
+    <div class="foot">
+        Modified <!--#echo var="LAST_MODIFIED" -->
+    </div>
+
+<!--#include virtual="../urchin.html" -->
+
+</body>
+</html>

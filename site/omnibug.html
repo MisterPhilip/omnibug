@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>Omnibug :: web metrics debugging tool</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta name="keywords" content="Omnibug Firebug extension debug develop web metrics analytics Omniture SiteCatalyst Moniforce WebTrends Google Urchin" />
+    <meta name="description" content="Omnibug is a tool for web developers to make the task of debugging web metrics tools (such as Omniture SiteCatalyst and Google Analytics) less painful." />
+
+    <link rel='stylesheet' type='text/css' media='all' href='/ross.css' />
+    <link rel='stylesheet' type='text/css' media='all' href='omnibug.css' />
+
+    <script type="text/javascript" src="obf.js"></script>
+</head>
+
+<body>
+    <div class="oheader">
+        <img src="o-64.png" alt="O" />
+        <h3>Omnibug, a tool for web metrics debugging</h3>
+    </div>
+
+    <div class="sec">
+        <p>Omnibug is a plugin for <a href="http://getfirebug.com/">Firebug</a> to ease developing web metrics implementations.  Each outgoing request (sent by the browser) is checked for a pattern; if a match occurs, the URL is displayed in a Firebug panel, and decoded to show the details of the request.  In addition, requests can be logged to the filesystem.</p>
+
+        <p>Out of the "box", it supports Omniture, WebTrends, Google Analytics/Urchin and Moniforce.  Custom matching rules can be defined to support other systems.</p>
+    </div>
+
+    <h3>Get It</h3>
+    <div class="sec changelog">
+        <!--#include virtual="dl_link.cgi" -->
+
+        <p>Changes:</p>
+        <!--#include virtual="rel_notes.html" -->
+    </div>
+
+<!--
+    <h3>New: Firefox 5 Compatibility</h3>
+    <div class="sec">
+        <p>This release is compatible with Firefox 5 and Firebug 1.7.3.  There are no other changes.</p>
+    </div>
+-->
+
+    <h3>Twitter</h3>
+    <div class="sec">
+        <p>Omnibug has a Twitter account, where I'll tweet new releases and news.  Feel free to follow <a href="http://twitter.com/omnibug">@omnibug</a>!</p>
+    </div>
+
+    <h3>Preferences</h3>
+    <div class="sec">
+        <table summary="Preferences">
+            <thead>
+                <tr>
+                    <th>Pref name</th>
+                    <th>Default value</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td class="lit">extensions.omnibug.defaultPattern</td>
+                    <td class="lit">/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif</td>
+                    <td>This is the default regular expression to check URLs against.</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.userPattern</td>
+                    <td class="lit">[not set]</td>
+                    <td>If defined, requests will also be checked against this expression.  It should be used to add additional patterns.</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.enableFileLogging</td>
+                    <td class="lit">false</td>
+                    <td>If true, requests will also be logged to a file (see <span class="lit">logFileName</span>).  Can also be set in the UI via the Options menu</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.logFileName</td>
+                    <td class="lit">[not set]</td>
+                    <td>If <span class="lit">enableFileLogging</span> is true, requests will be logged to this file.  Can also be set in the UI via the Tools -&gt; Choose log file menu entry</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.usefulKeys</td>
+                    <td class="lit">pageName,ch,h1,purchaseID,events,products,pev2</td>
+                    <td>Comma-separated list of key names that are grouped under the 'Useful' section (see screenshot)</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.highlightKeys</td>
+                    <td class="lit">events,products</td>
+                    <td>Comma-separated list of key names that are highlighted with a background color (see <span class="lit">color_hilite</span>).  This list can contain keys from any section.</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.watchKeys</td>
+                    <td class="lit">[not set]</td>
+                    <td>Comma-separated list of key names that are active in the 'Watches' side panel.  This list can contain keys from any section.</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.alwaysExpand</td>
+                    <td class="lit">false</td>
+                    <td>If <span class="lit">true</span>, show entries on the Omnibug tab as expanded; otherwise shown as collapsed</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.showQuotes</td>
+                    <td class="lit">true</td>
+                    <td>If <span class="lit">true</span>, surround values with quote marks; otherwise don't surround.</td>
+                </tr>
+
+                 <!-- colors -->
+                <tr>
+                    <td class="lit">extensions.omnibug.color_load</td>
+                    <td class="lit">#dbedff<span class="exam" style="background-color: #dbedff">Example</span></td>
+                    <td>Background color for load events</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.color_click</td>
+                    <td class="lit">#f1ffdb<span class="exam" style="background-color: #f1ffdb">Example</span></td>
+                    <td>Background color for click events</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.color_prev</td>
+                    <td class="lit">#ffd5de<span class="exam" style="background-color: #ffd5de">Example</span></td>
+                    <td>Background color for events generated on the previous page</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.color_quotes</td>
+                    <td class="lit">#f00<span class="exam" style="background-color: #f00">Example</span></td>
+                    <td>Color for quotes surrounding values (see <span class="lit">showQuotes</span>)</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.color_hilite</td>
+                    <td class="lit">#ff0<span class="exam" style="background-color: #ff0">Example</span></td>
+                    <td>Background color for highlight (see <span class="lit">highlightKeys</span>)</td>
+                </tr>
+
+                <tr>
+                    <td class="lit">extensions.omnibug.color_hover</td>
+                    <td class="lit">#ccc<span class="exam" style="background-color: #ccc">Example</span></td>
+                    <td>Background color for row hover</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>A preferences screen is available ("Prefs", on the top of the panel, to the right of the Firebug icon).  Preferences can be changed there, via the "about:config" interface in Firefox, or by adding entries to user.js/prefs.js.  Changes to preferences take effect immediately.</p>
+    </div>
+
+    <h3>Log file</h3>
+    <div class="sec">
+        <p>The log file consists of four fields delimited by tabs: <span class="lit">date</span>, <span class="lit">md5 sum of metrics URL</span>, <span class="lit">metrics URL</span> and <span class="lit">originating URL</span>.</p>
+
+        <span class="lit">Sun Jan 18 2009 14:15:35 GMT+0100 (CET) <span class="reg">&rarr;</span> b01eaf09e85ce7debb76e0d8aff16175 <span class="reg">&rarr;</span> http://www.google-analytics.com/__utm.gif?utmwv=4.3&amp;utmn=1379150988&amp;utmhn=www.guidespot.com&amp;utmcs=UTF-8&amp;utmsr=1440x900&amp;utmsc=24-bit&amp;utmul=en-us&amp;utmje=1&amp;utmfl=10.0%20r12&amp;utmdt=Guidespot.com&amp;utmhid=444972883&amp;utmr=-&amp;utmp=/&amp;utmac=UA-2418780-2&amp;utmcc=__utma%3D169863095.2617619934608929300.1232283578.1232283578.1232284535.2%3B%2B__utmz%3D169863095.1232283578.1.1.utmcsr%3D(direct)%7Cutmccn%3D(direct)%7Cutmcmd%3D(none)%3B <span class="reg">&rarr;</span> http://www.guidespot.com/</span>
+    </div>
+
+    <h3>Compatibility</h3>
+    <div class="sec">
+        <ul>
+            <li>Firefox: tested with versions 1.5 through 20</li>
+            <li>Firebug: tested with versions 1.1 through 1.11</li>
+            <li>OS: tested on OS X (10.4 through 10.7) and Windows (XP and 7) (should work on any platform that supports Firefox and Firebug)</li>
+        </ul>
+    </div>
+
+    <h3>Screenshot <span>(click to enlarge)</span></h3>
+    <div class="sec">
+        <a href="ss_full.png"><img src="ss_thumb.png" alt="Omnibug screenshot" title="Click to enlarge"/></a>
+    </div>
+
+    <h3>Previous Versions</h3>
+    <div class="sec">
+        <!--#include virtual="oldver.cgi" -->
+    </div>
+
+    <h3>Support</h3>
+    <div class="sec">
+        <p>To report a bug, request a feature, or for general comments and questions, feel free to <a class="e" rel="e_Ynphdm9odEBlYmZmZnZ6Y2ZiYS5wYno=" href="mailto:">email me</a>.  I don't guarantee an answer, but I'll try.</p>
+    </div>
+
+    <h3>Donation</h3>
+    <div class="sec">
+        <p>If you find Omnibug useful, feel free to make a donation (via PayPal) by clicking on the button below.  There is no obligation, of course.</p>
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+            <fieldset>
+                <input type="hidden" name="cmd" value="_s-xclick">
+                <input type="hidden" name="hosted_button_id" value="WD264FHNK673U">
+                <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+            </fieldset>
+        </form>
+    </div>
+
+    <h3>Legal</h3>
+    <div class="sec">
+        <p>Omnibug is distributed under version 2.0 of the <a href="http://www.mozilla.org/MPL/">Mozilla Public License</a>.</p>
+        <p>
+            <a href="http://www.mozilla.com/firefox/">Firefox</a>,
+            <a href="http://getfirebug.com/">Firebug</a>,
+            <a href="http://www.omniture.com/">Omniture/SiteCatalyst</a>,
+            <a href="http://www.webtrends.com/">WebTrends</a>,
+            <a href="http://www.google.com/analytics/">Google Analytics</a>,
+            <a href="http://www.google.com/urchin/">Urchin</a>,
+            <a href="http://www.moniforce.com/">Moniforce</a> and
+            <a href="http://www.guidespot.com/">Guidespot.com</a>  are the property of their respective owners.</p>
+    </div>
+
+    <h3 class="foot">&nbsp;</h3>
+    <div class="foot">
+        Modified <!--#echo var="LAST_MODIFIED" -->
+    </div>
+
+<!--#include virtual="../urchin.html" -->
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+table,thead,tbody,tr,th,td {
+    border: 1px solid #999;
+    border-collapse: collapse;
+}
+table {
+    width: 85%;
+}
+th, td {
+    vertical-align: top;
+    padding: .5em;
+    text-align: left;
+    font-size: 13px;
+}
+h3 {
+    border-top: 2px dotted #009;
+    padding-top: .5em;
+    color: #009;
+}
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+.sec {
+    margin: 1em 0 0 2em;
+}
+.lit {
+    font-family: Courier New, Courier;
+    font-size: 12px;
+}
+.reg {
+    font-family: arial,helvetica,sans-serif;
+    font-size: 20px;
+}
+.exam {
+    margin-left: 10px;
+    padding: 0 10px;
+}
+h3 span {
+    font-size: 80%;
+    color: #000;
+}
+h3.foot {
+   height: 2px;
+}
+div.foot {
+    margin-top: 0;
+    font-style: italic;
+    font-size: 12px;
+}
+div.changelog p {
+    margin-bottom: 0.25em;
+    font-weight: bold;
+}
+div.changelog ul {
+    margin-top: 0;
+}
+div.changelog ul,
+div.changelog ul li {
+    list-style-image: none;
+}
+
+div.oheader { display: inline-block; }
+div.oheader h3 {
+    display: inline-block;
+    margin: 0 0 0 1em;
+    padding: 0;
+    line-height: 64px;
+    vertical-align: top;
+    border: 0;
+}
+
