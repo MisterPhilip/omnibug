@@ -42,12 +42,12 @@
             , showFullNames : true
 
             // colors
-            , color_load   : "#dbedff"
-            , color_click  : "#f1ffdb"
-            , color_prev   : "#ffd5de"
-            , color_quotes : "#f00"
-            , color_hilite : "#ff0"
-            , color_hover  : "#ccc"
+            , color_load   : "dbedff"
+            , color_click  : "f1ffdb"
+            , color_prev   : "ffd5de"
+            , color_quotes : "f00"
+            , color_hilite : "ff0"
+            , color_hover  : "ccc"
         };
 
         chrome.storage.local.set( { "omnibug" : prefs }, function() {
@@ -73,23 +73,11 @@
     loadPrefsFromStorage();
 
     /**
-     * Fix broken types in prefs
-     * Tried this in options.js, but didn't work
-     */
-    function updatePrefValues( prefs ) {
-        if( "highlightKeys" in prefs ) {
-            prefs["highlightKeys"] = prefs["highlightKeys"].split( /,\s?/ );
-        }
-    }
-
-    /**
      * Receive updates when prefs change and broadcast them out
      */
     chrome.storage.onChanged.addListener( function( changes, namespace ) {
         if( "omnibug" in changes ) {
             var newPrefs = changes["omnibug"].newValue;
-
-            updatePrefValues( newPrefs );
             console.log( "Received updated prefs", newPrefs );
 
             // update local (eventPage.js) prefs
