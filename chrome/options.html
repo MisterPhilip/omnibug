@@ -15,6 +15,7 @@
         #highlightKeys { width: 25em; }
         p.hint { color: #999; font-size: smaller; margin: 0.5em 0 0 0; }
         p.hint:hover { color: #000; }
+        #save { font-size: larger; }
 
         div.header h3 {
             display: inline-block;
@@ -39,7 +40,25 @@
            transition-delay: 1s;
            -webkit-transition: opacity 1.0s ease-out;
            -webkit-transition-delay: 1s;
+        }
 
+        fieldset ul {
+            margin: 0.5em 0 0.5em 2px;
+            padding: 0;
+        }
+
+        fieldset li {
+            border: 1px solid #ccc;
+            background-color: #ff0;
+            display: inline;
+            margin: 0 10px 0 0;
+            padding: 5px;
+        }
+
+        a.rem {
+            font-weight: bold;
+            text-decoration: none;
+            margin-left: 8px;
         }
 
     </style>
@@ -53,8 +72,11 @@
     <form action="">
         <fieldset>
             <legend>Highlight parameter names</legend>
-            <input type="text" id="highlightKeys" />
-            <p class="hint">Comma-separated list of parameter names to be highlighted</p>
+            <input type="text" />
+            <input type="button" value="Add" />
+            <input type="hidden" id="highlightKeys" />
+            <ul></ul>
+            <p class="hint">Parameter names to be highlighted (don't forget to save after changing!)</p>
         </fieldset>
 
         <fieldset>
@@ -98,31 +120,31 @@
 
         <fieldset class="color">
             <legend>Background color for page load events</legend>
-            <input type="text" id="color_load" />
+            #<input type="text" id="color_load" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
         <fieldset class="color">
             <legend>Background color for click events</legend>
-            <input type="text" id="color_click" />
+            #<input type="text" id="color_click" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
         <fieldset class="color">
             <legend>Background color for highlight</legend>
-            <input type="text" id="color_hilite" />
+            #<input type="text" id="color_hilite" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
         <fieldset class="color">
             <legend>Background color for row hover</legend>
-            <input type="text" id="color_hover" />
+            #<input type="text" id="color_hover" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
         <fieldset class="color">
             <legend>Color for quotes around values</legend>
-            <input type="text" id="color_quotes" />
+            #<input type="text" id="color_quotes" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 

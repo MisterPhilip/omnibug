@@ -26,6 +26,21 @@
     }
 
     /**
+     * Create an array from a list of LI values
+     */
+    function getVisualListValues( elem ) {
+        var vals = [],
+            list = elem.parentNode.querySelectorAll( "li" );
+
+        for( var key in list ) {
+            if( list.hasOwnProperty( key ) && list[key] instanceof HTMLLIElement ) {
+                vals.push( list[key].firstChild.nodeValue );
+            }
+        }
+        return vals;
+    }
+
+    /**
      * Save new prefs back to local storage
      */
     function saveOptions( evt ) {
@@ -42,6 +57,9 @@
                     } else if( elem.type === "radio" ) {
                         var active = document.querySelector( "input[type='radio'][name='" + key + "']:checked" );
                         prefs[key] = processFormValue( key, active.value );
+                    } else if( elem.type === "hidden" ) {
+                        var values = getVisualListValues( elem );
+                        prefs[key] = values;
                     } else {
                         console.error( "Unknown options element type ", elem.type, " for option ", key );
                     }
@@ -95,6 +113,49 @@
     }
 
     /**
+     * Creates a list item for the visual list, with a remove button
+     */
+    function createListItem( value ) {
+        var li = document.createElement( "li" );
+        li.textContent = value;
+        var rem = document.createElement( "a" );
+        rem.className = "rem";
+        rem.href="#";
+        rem.innerHTML = "x";
+        rem.title = "Remove item";
+        rem.addEventListener( "click", function( e ) {
+            e.preventDefault();
+            var elem = e.target.parentNode;
+            elem.parentNode.removeChild( elem );
+        } );
+        li.appendChild( rem );
+        return li;
+    }
+
+    /**
+     * Creates a visual list from an array
+     * Also adds behavior to add new entries
+     */
+    function makeHiddenList( key, value, elem ) {
+        var p = elem.parentNode;
+        var list = p.querySelector( "ul" );
+        value.forEach( function( v ) {
+            list.appendChild( createListItem( v ) );
+        } );
+
+        var add = p.querySelector( "input[type='button']" );
+        add.addEventListener( "click", function( e ) {
+            var p   = e.target.parentNode,
+                inp = p.querySelector( "input[type='text']" );
+
+            if( !! inp.value ) {
+                p.querySelector( "ul" ).appendChild( createListItem( inp.value ) );
+                inp.value = "";
+            }
+        } );
+    }
+
+    /**
      * Update a color's "example" text with new color
      */
     function updateExampleColor( elem, value ) {
@@ -120,10 +181,15 @@
 
                         if( key.substring( 0, 6 ) === "color_" ) {
                             updateExampleColor( elem, prefs[key] );
+                            elem.addEventListener( 'input', function( e ) {
+                                updateExampleColor( e.target, e.target.value );
+                            } );
                         }
 
                     } else if( elem.type === "radio" ) {
                         setRadioButton( key, prefs[key] );
+                    } else if( elem.type === "hidden" ) {
+                        makeHiddenList( key, prefs[key], elem );
                     } else {
                         console.error( "Unknown options element type ", elem.type, " for option ", key );
                     }
