@@ -14,7 +14,7 @@
                    em:description="Firebug Extension for web metrics testing and debugging"
                    em:creator="Ross Simpson"
                    em:homepageURL="http://www.rosssimpson.com/dev/omnibug.html"
-                   em:optionsURL="chrome://omnibug/content/options.xul"
+                   em:optionsURL="chrome://omnibug/content/options.xul">
     <em:targetApplication RDF:resource="rdf:#$AdUzy3"/>
   </RDF:Description>
 </RDF:RDF>
