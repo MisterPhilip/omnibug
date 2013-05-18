@@ -5,9 +5,6 @@
 /*
  * Native MD5 in Firefox; fetched and modified slightly on 17-July-2008 from:
  *     http://rcrowley.org/2007/11/15/md5-in-xulrunner-or-firefox-extensions/
- *
- * $Id$
- * $URL$
  */
 
 FBL.ns( function() { with( FBL ) {

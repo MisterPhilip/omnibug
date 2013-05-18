@@ -7,9 +7,6 @@
  *     http://kb.mozillazine.org/Io.js
  * License:
  *     http://kb.mozillazine.org/MozillaZine_Knowledge_Base:Copyrights
- *
- * $Id$
- * $URL$
  */
 
 /////////////////////////////////////////////////
