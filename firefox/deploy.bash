@@ -18,7 +18,8 @@ if [[ "$1" == "ross" ]]; then
     echo "Doing private deployment to ${extrapath}"
 fi
 
-./build.bash
+# build for site deploy
+./build.bash site
 
 # update version
 echo -n "$0: incrementing version: old=$PATCH; "
