@@ -8,6 +8,7 @@
  * USA.
  *
  */
+try {
 var OmnibugProvider = {
     /**
      * Gathers each provider's pattern and concatenates (with alternation)
@@ -163,6 +164,7 @@ var OmnibugProvider = {
             , vvp:    "Variable provider"
             , xact:   "Transaction ID"
             , zip:    "ZIP/Postal code"
+            , rsid:   "Report Suites"
         },
         handleQueryParam: function( name, value, rv ) {
             var _name;
@@ -190,8 +192,11 @@ var OmnibugProvider = {
             }
             return true;
         },
-        customHandler: function( url, container ) {
-            alert( "omni custom handler!" );
+        handleCustom: function( url, rv ) {
+            if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
+            }
         }
     },
 
@@ -776,5 +781,7 @@ var OmnibugProvider = {
             return false;
         }
     }
-
 };
+} catch( ex ) {
+    console.log( "Providers generated an exception: ", ex.message );
+}

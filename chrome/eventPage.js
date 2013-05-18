@@ -284,11 +284,8 @@
      * If the provider defines a custom URL handler, delegate to it
      */
     function delegateCustomProcessing( url, provider, container ) {
-        if( typeof( provider.customHandler ) === "function" ) {
-            alert( "handoff to custom handler" );
-            provider.customHandler( url, container );
-        } else {
-            alert( "no ch" );
+        if( typeof( provider.handleCustom ) === "function" ) {
+            provider.handleCustom( url, container );
         }
     }
 
