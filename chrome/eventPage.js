@@ -247,9 +247,11 @@
         u.getQueryNames().forEach( function( n ) {
             if( n ) {
                 vals = u.getQueryValues( n );
-                processEntry( n, vals, provider, processedKeys );
+                processQueryParam( n, vals, provider, processedKeys );
             }
         } );
+
+        delegateCustomProcessing( data.url, provider, processedKeys );
 
         // merge processedKeys into obj
         for( var key in processedKeys ) {
@@ -267,13 +269,26 @@
      * Takes a single name/value pair and delegates handling of it to the provider
      * Otherwise, inserts into the `other' bucket
      */
-    function processEntry( name, value, provider, container ) {
-        if( provider.handle( name, value, container ) ) {
-            // noop (processedKeys modified by provider's handle())
+    function processQueryParam( name, value, provider, container ) {
+        if( provider.handleQueryParam( name, value, container ) ) {
+            // noop (processedKeys modified by provider's method)
         } else {
             // stick in `other'
             container["other"] = container["other"] || {};
             container["other"][name] = value;
+        }
+    }
+
+
+    /**
+     * If the provider defines a custom URL handler, delegate to it
+     */
+    function delegateCustomProcessing( url, provider, container ) {
+        if( typeof( provider.customHandler ) === "function" ) {
+            alert( "handoff to custom handler" );
+            provider.customHandler( url, container );
+        } else {
+            alert( "no ch" );
         }
     }
 

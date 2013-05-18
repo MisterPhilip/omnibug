@@ -37,7 +37,7 @@ var OmnibugProvider = {
             , pattern: /^5831c14e26a2ded99d98782c15e92d62f195d9bcf53869f4d412cff5a074e5246c99916ada7ad760$/
             , keys: {
             },
-            handle: function( name, value, rv ) {
+            handleQueryParam: function( name, value, rv ) {
                 return false;
             }
         }
@@ -95,7 +95,7 @@ var OmnibugProvider = {
             , utmsn:  "Social network name"
             , utmht:  "Time dispatched"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys || name.match( /^utm.*/ ) ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -164,7 +164,7 @@ var OmnibugProvider = {
             , xact:   "Transaction ID"
             , zip:    "ZIP/Postal code"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             var _name;
             if( name.match( /^c(\d+)$/ ) || name.match( /^prop(\d+)$/i ) ) {
                 // props
@@ -189,6 +189,9 @@ var OmnibugProvider = {
                 return false;
             }
             return true;
+        },
+        customHandler: function( url, container ) {
+            alert( "omni custom handler!" );
         }
     },
 
@@ -198,7 +201,7 @@ var OmnibugProvider = {
         , pattern: /moniforce\.gif/
         , keys: {
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys || name.match( /^mfinfo/ ) ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -276,7 +279,7 @@ var OmnibugProvider = {
             , "dcsref":      "Referrer URL"
             , "dcsredirect": "Cookie detection (internal)"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys || name.match( /^WT\./ ) || name.match( /^dcs/ ) ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -352,7 +355,7 @@ var OmnibugProvider = {
             , exd:    "Exception description"
             , exf:    "Is exception fatal?"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -424,7 +427,7 @@ var OmnibugProvider = {
             , vn1:   "Coremetrics library version"
             , vn2:   "Coremetrics library version 2"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             var _name;
             if( name.match( /^rg(\d+)$/ ) ) {
                 _name = "Registration Tag Attributes"
@@ -502,7 +505,7 @@ var OmnibugProvider = {
             , re:   "Viewport resolution"
             , dest: "Destination URL"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -519,7 +522,7 @@ var OmnibugProvider = {
         , pattern: /api\.mixpanel\.com\/track\//
         , keys: {
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name == "data" ) {
                 var obj = atob( value );
                 try {
@@ -575,7 +578,7 @@ var OmnibugProvider = {
             , send:        "send"
             , extended_social_context: "Extended social context"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -610,7 +613,7 @@ var OmnibugProvider = {
             , tags: "tags"
             , v: "v"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -626,8 +629,13 @@ var OmnibugProvider = {
         , name: "Quantcast"
         , pattern: /pixel\.quantserve\.com\/pixel/
         , keys: {
+              ref: "Referrer"
+            , tzo: "Time zone offset"
+            , dst: "Daylight savings time active?"
+            , sr:  "Screen resolution"
+            , et:  "Timestamp"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -656,7 +664,7 @@ var OmnibugProvider = {
             , _mchQp: "_mchQp"
             , _mchVr: "_mchVr"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -682,7 +690,7 @@ var OmnibugProvider = {
             , session:      "Session"
             , _mkto_trk:    "_mkto_trk"
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -699,7 +707,7 @@ var OmnibugProvider = {
         , pattern: /beacon.*\.newrelic\.com\//
         , keys: {
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name == "perf" ) {
                 try {
                     var parsed = JSON.parse( value );
@@ -741,7 +749,7 @@ var OmnibugProvider = {
         , pattern: /beacon\.krxd\.net\/pixel\.gif/
         , keys: {
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -758,7 +766,7 @@ var OmnibugProvider = {
         , pattern: /optimizely\.com\/event/
         , keys: {
         },
-        handle: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
