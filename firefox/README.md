@@ -4,6 +4,11 @@ Omnibug
 Omnibug, for Firefox
 For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
 
+# AMO Page
+
+This add-on is pending review at AMO: https://addons.mozilla.org/en-US/firefox/addon/omnibug/
+
+
 # @TODO
 
 * Switch to provider model
