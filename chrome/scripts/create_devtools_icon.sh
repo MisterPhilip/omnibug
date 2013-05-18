@@ -15,31 +15,59 @@
 #     a = 24x24 inactive (docked)
 #     b = 24x24 clicked  (docked)
 #
-# Requires: ImageMagick tools
+# Requires: ImageMagick tools (http://www.imagemagick.org/)
 #
 
 BRIGHTNESS=0
 CONTRAST=-60
 
+
+
+#######################################
+
+command -v convert >/dev/null 2>&1 || {
+    echo "$0: ImageMagick \`convert' command not found.  Aborting." >&2; echo; exit 1;
+}
+
+SMALL_ICON=$1
+LARGE_ICON=$2
+
+if [[ ! -e "${SMALL_ICON}" || ! -e "${LARGE_ICON}" ]]; then
+    echo "Usage: $0 <small_icon> <large_icon>, where small_icon is 24x24px, and large_icon is 32x32px"
+    echo
+    exit 2
+fi
+
+DEST_ICON="$( basename ${SMALL_ICON} )_$( basename ${LARGE_ICON} )_sprite.png"
+if [[ -e "${DEST_ICON}" ]]; then
+    echo "Destination icon ${DEST_ICON} exists; please remove before continuing"
+    echo
+    exit 3
+fi
+
+
+
 # Vertical spacer between the 24px images
 convert -size 24x16 canvas:transparent -transparent-color white canvas.png
 
 # Darken the small inactive image
-convert -brightness-contrast "${BRIGHTNESS}x${CONTRAST}" o-24.png o-24-dark.png
+convert -brightness-contrast "${BRIGHTNESS}x${CONTRAST}" ${SMALL_ICON} ${SMALL_ICON}_dark
 
 # Create 24px vertical sprite
-convert -append o-24.png canvas.png o-24-dark.png o-24-2x.png
+convert -append ${SMALL_ICON} canvas.png ${SMALL_ICON}_dark ${SMALL_ICON}_sprite
 rm canvas.png
-rm o-24-dark.png
+rm ${SMALL_ICON}_dark
 
 # Darken the large inactive image
-convert -brightness-contrast "${BRIGHTNESS}x${CONTRAST}" o-32.png o-32-dark.png
+convert -brightness-contrast "${BRIGHTNESS}x${CONTRAST}" ${LARGE_ICON} ${LARGE_ICON}_dark
 
 # Create 32px vertical sprite
-convert -append o-32.png o-32-dark.png o-32-2x.png
-rm o-32-dark.png
+convert -append ${LARGE_ICON} ${LARGE_ICON}_dark ${LARGE_ICON}_sprite
+rm ${LARGE_ICON}_dark
 
 # Combine sprites horizontally
-convert +append o-32-2x.png o-24-2x.png o-32-24.png
-rm o-32-2x.png o-24-2x.png
+convert +append ${LARGE_ICON}_sprite ${SMALL_ICON}_sprite ${DEST_ICON}
+rm ${LARGE_ICON}_sprite ${SMALL_ICON}_sprite
+
+echo "Created ${DEST_ICON}"
 
