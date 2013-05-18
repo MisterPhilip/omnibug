@@ -2,7 +2,7 @@ Omnibug
 =======
 
 Omnibug, for Firefox
-For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
+For the time being, see here: http://omnibug.rosssimpson.com/
 
 # AMO Page
 
