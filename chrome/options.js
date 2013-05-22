@@ -26,7 +26,7 @@
     }
 
     /**
-     * Create an array from a list of LI values
+     * Create an array from a list of li values
      */
     function getVisualListValues( elem ) {
         var vals = [],
@@ -44,7 +44,9 @@
      * Save new prefs back to local storage
      */
     function saveOptions( evt ) {
-        evt.preventDefault();
+        if( !! evt ) {
+            evt.preventDefault();
+        }
 
         // update our prefs object with new values
         var prefs = that.prefs;
@@ -127,6 +129,7 @@
             e.preventDefault();
             var elem = e.target.parentNode;
             elem.parentNode.removeChild( elem );
+            saveOptions();
         } );
         li.appendChild( rem );
         return li;
@@ -152,6 +155,7 @@
                 p.querySelector( "ul" ).appendChild( createListItem( inp.value ) );
                 inp.value = "";
             }
+            saveOptions();
         } );
     }
 
@@ -200,7 +204,7 @@
         // attach save button handler
         document.querySelector( '#save' ).addEventListener( 'click', saveOptions );
     }
-    
+
     // load prefs and update the HTML
     document.addEventListener( 'DOMContentLoaded', function() {
         chrome.storage.local.get( "omnibug", restoreOptions );
