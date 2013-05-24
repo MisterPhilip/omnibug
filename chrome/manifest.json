@@ -15,8 +15,9 @@
     "persistent": true // must be persistent to use WebRequest!
   },
 
-  "devtools_page": "devtools.html",
+  "homepage_url": "http://omnibug.rosssimpson.com/chrome.html",
 
+  "devtools_page": "devtools.html",
   "options_page": "options.html",
 
   "permissions": [
