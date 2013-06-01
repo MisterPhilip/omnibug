@@ -8,7 +8,6 @@ if( typeof FBL === "undefined" ) {
 
 
 FBL.ns( function() { with( FBL ) {
-    // @TODO: use version in model.js?
     function pad( n ) {
         return '' + ( n <= 9 ? "00" : n <= 99 ? "0" : '' ) + n;
     }
@@ -45,53 +44,76 @@ FBL.ns( function() { with( FBL ) {
     }
 
     /**
-     * Returns a style block of dynamic styles
-     * @return the style string
+     * Adds dynamic style rules (from prefs) to the caller's document
      */
-    function _getDynamicStyles() {
-        // dynamic styles (e.g., from prefs)
-        return "<style type='text/css'>\n"
-               + "table.load { background-color: " + this.omRef.cfg.color_load + "; }\n"
-               + "table.click { background-color: " + this.omRef.cfg.color_click + "; }\n"
-               + "table.prev { background-color: " + this.omRef.cfg.color_prev + "; }\n"
-               + "table.req .hilite { background-color: " + this.omRef.cfg.color_hilite + "; }\n"
-               + "table.req span.qq { color: " + this.omRef.cfg.color_quotes + "; }\n"
-               + "table.ent tr:hover { background-color: " + this.omRef.cfg.color_hover + "; }\n"
-               + "</style>\n";
+    function _initDynamicStyles() {
+        var styleObject = this.document.styleSheets[this.document.styleSheets.length - 1];
+        styleObject.insertRule( "table.load { background-color: " + this.omRef.cfg.color_load + "}", styleObject.cssRules.length );
+        styleObject.insertRule( "table.click { background-color: " + this.omRef.cfg.color_click + "}", styleObject.cssRules.length );
+        styleObject.insertRule( "table.prev { background-color: " + this.omRef.cfg.color_prev + "}", styleObject.cssRules.length );
+        styleObject.insertRule( "table.req .hilite { background-color: " + this.omRef.cfg.color_hilite + "}", styleObject.cssRules.length );
+        styleObject.insertRule( "table.req span.qq { color: " + this.omRef.cfg.color_quotes + "}", styleObject.cssRules.length );
+        styleObject.insertRule( "table.ent tr:hover { background-color: " + this.omRef.cfg.color_hover + "}", styleObject.cssRules.length );
     }
 
-    function _appendHtml( data ) {
-        //_dump( "htmlOutput=" + OmnibugPanel.htmlOutput + "\n" );
-        var str = "";
-
-        elType = "div";
-
-        if( ! this.dataSent ) {
-            str += _getDynamicStyles.call( this );
-        }
-        this.dataSent = true;
-
-        var el = this.document.createElement( elType );
-        el.innerHTML = str + data;
-        this.panelNode.appendChild( el );
-    }
-
-    function _printLine( msg ) {
-        _dump( "printLine: printing msg='" + msg + "'\n" );
-        var el = this.document.createElement( "p" );
-        el.className = "om";
-        el.innerHTML = msg;
-        this.panelNode.appendChild( el );
-    }
 
     /**
-     * Return a quoted string (if the pref is set)
+     * Create an HTML element
+     *
+     * @param elType type of element to create
+     * @param attrs object of attibute:value pairs to set on element
+     * @param parentNode append created element to this element, if set
+     * @textChild text value to append to child, if any
      */
-    function _quote( str ) {
-        return( this.omRef.cfg.showQuotes
-                    ? "<span class='qq'>\"</span><span class='v'>" + str + "</span><span class='qq'>\"</span>"
-                    : str );
+    function _createElement( elType, attrs, parentNode, textChild ) {
+        var el = this.document.createElement( elType );
+        for( var attr in attrs ) {
+            if( attrs.hasOwnProperty( attr ) ) {
+                el.setAttribute( attr, attrs[attr] );
+            }
+        }
+
+        if( !! textChild ) {
+            el.appendChild( this.document.createTextNode( textChild ) );
+        }
+
+        if( !! parentNode ) {
+            parentNode.appendChild( el );
+        }
+
+        return el;
     }
+
+
+    /**
+     * Wrap a value in colored quotes
+     *
+     * @param val value to quote
+     */
+    function _quoteValue( val, parentNode ) {
+        elems = [];
+        if( this.omRef.cfg.showQuotes ) {
+            var os1 = _createElement.call( this, "span", { class: "qq" }, null, '"' );
+            elems.push( os1 );
+
+            var is = _createElement.call( this, "span", { class: "v" }, null, val );
+            elems.push( is );
+
+            var os2 = _createElement.call( this, "span", { class: "qq" }, null, '"' );
+            elems.push( os2 );
+        } else {
+            elems.push( this.document.createTextNode( val ) );
+        }
+
+        if( !! parentNode ) {
+            elems.forEach( function( el ) {
+                parentNode.appendChild( el );
+            } );
+        }
+
+        return elems;
+    }
+
 
     /**
      * Given a delimited string, return a map of key => 1
@@ -107,6 +129,7 @@ FBL.ns( function() { with( FBL ) {
         }
         return obj;
     }
+
 
     /**
      * Given an object, return a delimited string of the keys
@@ -135,6 +158,7 @@ FBL.ns( function() { with( FBL ) {
         this.omRef.setPreference( pref, _objToDelimString( currPrefs ) );
     }
 
+
     /**
      * Add the given key to the given pref list
      * @param key the key to add
@@ -148,7 +172,6 @@ FBL.ns( function() { with( FBL ) {
 
         // refresh?
     }
-
 
 
     /**
@@ -192,6 +215,8 @@ FBL.ns( function() { with( FBL ) {
 
             this.document.omnibugPanel = this;
             this.document.omnibugContext = context.omnibugContext;
+
+            _initDynamicStyles.call( this );
         },
 
         getContext: function() {
@@ -336,13 +361,11 @@ FBL.ns( function() { with( FBL ) {
             data.omnibug["Event"]      = data.raw["Event"]      = eventType;
             data.omnibug["Timestamp"]  = data.raw["Timestamp"]  = data.state.timeStamp;
             data.omnibug["Provider"]   = data.raw["Provider"]   = provider;
-            data.omnibug["Source"]     = data.raw["Source"]     = ( data.state.src === "prev" ? "Previous page" : "Current page" ); // might not be exactly working
+            data.omnibug["Source"]     = data.raw["Source"]     = ( data.state.src === "prev" ? "Previous page" : "Current page" );
             data.omnibug["Parent URL"] = data.raw["Parent URL"] = data.state.parentUrl;
             data.omnibug["Full URL"]   = data.raw["Full URL"]   = data.state.url
-                                                                  + "<br/>(" + urlLength + " characters"
-                                                                  + ( urlLength > 2083
-                                                                      ? ", <span class='imp'>*** too long for IE6/7! ***</span>"
-                                                                      : "" )
+                                                                  + " (" + urlLength + " characters"
+                                                                  + ( urlLength > 2083 ? ", *** too long for IE6/7! ***" : "" )
                                                                   + ")";
 
             return data;
@@ -364,7 +387,7 @@ FBL.ns( function() { with( FBL ) {
         report: function( data ) {
             //_dump( "report: data=" + data.toString() + "\n" );
 
-            var i, el, cn, len, html, mf, expanderImage, expanderClass,
+            var i, el, cn, len, mf, expanderImage, expanderClass,
                 tmp = "",
                 wt = "";
 
@@ -376,35 +399,60 @@ FBL.ns( function() { with( FBL ) {
                 expanderImage = "twistyClosed.png";
             }
 
-            html  = "<table cellspacing='0' border='0' class='req "
-                  + data.omnibug.Event + " "
-                  + ( data.state.src ? data.state.src : "" )
-                  + "' id='ob_" + data.state.key + "'><tr>";
+            var table = _createElement.call( this, "table", {
+                cellspacing: 0,
+                border: 0,
+                class: "req " + data.omnibug.Event + ( data.state.src ? " " + data.state.src : "" ),
+                id: "ob_" + data.state.key
+            }, this.panelNode );
 
-            html += "<td class='exp'><a href='#' onClick='document.omnibugContext.toggle( this )'><img src='chrome://omnibug/skin/" + expanderImage + "' /></a></td>";
-            html += "<td class='summ'>";
-            html += "<p class='summary'><strong>" + this.camelCapser( data.omnibug.Event ) + " event</strong>"
-                 + ( data.state.src === "prev" ? " (previous page)" : "" ) + " | "
-                 + data.omnibug.Provider + " | "
-                 + data.state.timeStamp + " | "
-                 + data.state.key
-                 + ( data.state.statusText != null ? " | " + data.state.statusText : "" )
-                 + "</p>";
+            var tr = _createElement.call( this, "tr", {}, table );
 
-            html += "<div class='" + expanderClass + "'><table class='ent'>";
+            var td = _createElement.call( this, "td", {
+                class: "exp"
+            }, tr );
 
-            html += this.generateReportFragment( data.omnibug, "Summary" );      // summary values
-            html += this.generateReportFragment( data.props, "Props" );          // omniture props
-            html += this.generateReportFragment( data.vars, "eVars" );           // omniture eVars
-            html += this.generateReportFragment( data.useful, "Useful" );        // useful params
-            html += this.generateReportFragment( data.moniforce, "Moniforce" );  // moniforce params
-            html += this.generateReportFragment( data.webtrends, "WebTrends" );  // webtrends params
-            html += this.generateReportFragment( data.other, "Other" );          // everything else
+            var a = _createElement.call( this, "a", {
+                href: "#"
+            }, td );
+            a.addEventListener( "click", this.document.omnibugContext.toggle );
 
-            html += "</table></div></td></tr></table>\n";
+            _createElement.call( this, "img", {
+                src: "chrome://omnibug/skin/" + expanderImage 
+            }, a );
 
-            //_dump( "output html:\n\n\n" + html + "\n\n\n" );
-            _appendHtml.call( this, html );
+            var std = _createElement.call( this, "td", {
+                class: "summ"
+            }, tr );
+
+            var p = _createElement.call( this, "p", {
+                class: "summary"
+            }, std );
+
+            _createElement.call( this, "strong", {}, p, this.camelCapser( data.omnibug.Event ) + " event" );
+
+            var str = ( data.state.src === "prev" ? " (previous page)" : "" ) + " | "
+                    + data.omnibug.Provider + " | "
+                    + data.state.timeStamp + " | "
+                    + data.state.key
+                    + ( data.state.statusText != null ? " | " + data.state.statusText : "" )
+            p.appendChild( this.document.createTextNode( str ) );
+
+            var exp = _createElement.call( this, "div", {
+                class: expanderClass
+            }, std );
+
+            var tblCont = _createElement.call( this, "table", {
+                class: "ent"
+            }, exp );
+
+            this.generateReportFragment( data.omnibug, "Summary", tblCont );      // summary values
+            this.generateReportFragment( data.props, "Props", tblCont );          // omniture props
+            this.generateReportFragment( data.vars, "eVars", tblCont );           // omniture eVars
+            this.generateReportFragment( data.useful, "Useful", tblCont );        // useful params
+            this.generateReportFragment( data.moniforce, "Moniforce", tblCont );  // moniforce params
+            this.generateReportFragment( data.webtrends, "WebTrends", tblCont );  // webtrends params
+            this.generateReportFragment( data.other, "Other", tblCont );          // everything else
 
             var sp = this.getContext().getPanel("OmnibugSide");
             sp.updateWatches( data );
@@ -414,34 +462,47 @@ FBL.ns( function() { with( FBL ) {
 
 
         /**
-         * Generate an HTML report fragment for the given object
+         * Generate an HTML report fragment for the given section
          */
-        generateReportFragment: function( data, title ) {
+        generateReportFragment: function( data, title, parent ) {
             var cn, kt,
                 i = 0,
-                html = "";
-
+                html = "",
+                rows = [];
+            
             for( var el in data ) {
                 if( data.hasOwnProperty( el ) && !! data[el] ) {
                     cn = _isHighlightable.call( this, el ) ? "hilite" : "";
                     kt = _getTitleForKey.call( this, el );
 
-                    html += "<tr"
-                         + ( !! cn ? " class='" + cn + "'" : "" )
-                         + "><td class='k " + ( i++ % 2 === 0 ? 'even' : 'odd' ) + "'"
-                         + ( !! kt ? " title='" + kt + "'" : "" ) + ">"
-                         + el
-                         + "</td><td class='v'>"
-                         + _quote.call( this, data[el] )
-                         + "</td></tr>\n";
+                    var tr = _createElement.call( this, "tr", { class: cn } );
+                    var td = _createElement.call( this, "td", {
+                         class: "k " + ( i++ % 2 === 0 ? 'even' : 'odd' ),
+                         title: ( !! kt ? kt : "" )
+                    }, tr, el );
+
+                    var tdVal = _createElement.call( this, "td", { class: "v" }, tr );
+
+                    _quoteValue.call( this, data[el], tdVal );
+
+                    rows.push( tr );
                 }
             }
 
-            if( !! html ) {
-                return   "<thead><tr><th colspan='2'>" + title + "</th><tr></thead>"
-                       + "<tbody class='" + title.toLowerCase() + "'>" + html + "</tbody>"
-            } else {
-                return "";
+            if( rows.length > 0 ) {
+                var thead = _createElement.call( this, "thead" );
+                var tr = _createElement.call( this, "tr", {}, thead );
+                var th = _createElement.call( this, "th", {
+                  colspan: 2
+                }, tr, title );
+
+                parent.appendChild( thead );
+
+                var tbody = _createElement.call( this, "tbody", { class: title.toLowerCase() } );
+                rows.forEach( function( row ) { 
+                    tbody.appendChild( row );
+                } );
+                parent.appendChild( tbody );
             }
         },
 
@@ -461,9 +522,7 @@ FBL.ns( function() { with( FBL ) {
             if( tbl ) {
                 p = tbl.getElementsByTagName( "p" );
                 if( p ) {
-                    span = this.document.createElement( "span" );
-                    span.appendChild( this.document.createTextNode( " | " + statusText ) );
-                    p[0].appendChild( span );
+                    span = _createElement.call( this, "span", {}, p[0], " | " + statusText );
                 }
             }
         },
@@ -498,15 +557,11 @@ FBL.ns( function() { with( FBL ) {
         },
 
         getContextMenuItems: function( style, target ) {
-            //_dump( "getContextMenuItems: style='" + style + "'; target='" + target + "'\n" );
-            //_dump( "getContextMenuItems: itt='" + this.infoTipType + "'; sel='" + this.selection + "'\n" );
-
             var val, tr,
                 node = target,
                 items = [];
 
             while( node && node.tagName.toUpperCase() !== "TR" ) {
-                //_dump( "getContextMenuItems: node='" + node + "'; tagName='" + node.tagName.toUpperCase() + "'\n" );
                 node = node.parentNode;
             }
             tr = node;
@@ -521,8 +576,6 @@ FBL.ns( function() { with( FBL ) {
             if( node ) {
                 val = node.firstChild.nodeValue;
                 if( val ) {
-                    //_dump( "getContextMenuItems: found node='" + node + "; val='" + val + "'\n" );
-
                     // watch
                     if( _isWatched.call( this, val ) ) {
                         items.push( "-", { label: "Unwatch '" + val + "'", command: bind( this.removePrefAndUpdateWatches, this, val, "watchKeys" ) } );
@@ -617,26 +670,23 @@ FBL.ns( function() { with( FBL ) {
             this.panelNode.className = "panelNode";
             doc.body.appendChild( this.panelNode );
 
+            _initDynamicStyles.call( this );
+
             _dump( "OmnibugSidePanel: inited\n" );
         },
 
         getContextMenuItems: function( style, target ) {
-            //_dump( "getContextMenuItems: style='" + style + "'; target='" + target + "'\n" );
-            //_dump( "getContextMenuItems: itt='" + this.infoTipType + "'; sel='" + this.selection + "'\n" );
-
             var val,
                 node = target,
                 items = [];
 
             while( node && node.tagName.toUpperCase() !== "TR" ) {
-                //_dump( "getContextMenuItems: node='" + node + "'; tagName='" + node.tagName.toUpperCase() + "'\n" );
                 node = node.parentNode;
             }
             node = node.getElementsByTagName( "td" )[0];
             if( node ) {
                 val = node.firstChild.nodeValue;
                 if( val ) {
-                    //_dump( "getContextMenuItems: found node='" + node + "; val='" + val + "'\n" );
                     items.push( "-", { label: "Unwatch '" + val + "'", command: bind( this.removePrefAndUpdateWatches, this, val, "watchKeys" ) } );
                 }
             }
@@ -701,23 +751,44 @@ FBL.ns( function() { with( FBL ) {
 
             if( mode !== "remove" ) {
                 // no existing table; write it out
-                html  = "<table cellspacing='0' border='0' class='req ent' id='watchTbl'>";
-                html += "<thead><tr><th class='k'>Key</th><th class='v'>Value</th><th class='p'>Prev</th></tr></thead>";
+                var table = _createElement.call( this, "table", {
+                    cellspacing: 0,
+                    border: 0,
+                    class: "req ent",
+                    id: "watchTbl"
+                }, this.panelNode );
+
+                var thead = _createElement.call( this, "thead", {}, table );
+                var tr = _createElement.call( this, "tr", {}, thead );
+                _createElement.call( this, "th", {
+                    class: "k"
+                }, tr, "Key" );
+                _createElement.call( this, "th", {
+                    class: "v"
+                }, tr, "Value" );
+                _createElement.call( this, "th", {
+                    class: "p"
+                }, tr, "Prev" );
 
                 var currWatches = _delimStringToObj( this.omRef.getPreference( "watchKeys" ) );
-
                 for( key in currWatches ) {
                     if( currWatches.hasOwnProperty( key ) ) {
                         var kt = _getTitleForKey.call( this, key );
-                        html += "<tr><td class='k'" + ( !! kt ? " title='" + kt + "'" : "" ) + ">" + key + "</td>"
-                              + "<td class='v'>" + ( !! data.raw[key] ? _quote.call( this, data.raw[key] ) : "" ) + "</td>"
-                              + "<td>" + ( !! existingVals[key] ? _quote.call( this, existingVals[key] ) : "" ) + "</td>"
-                              + "</tr>";
+
+                        var row = _createElement.call( this, "tr", {}, table );
+                        _createElement.call( this, "td", {
+                            class: "k",
+                            title: ( !! kt ? kt : "" )
+                        }, row, key );
+                        var cell = _createElement.call( this, "td", {
+                            class: "v"
+                        }, row );
+                        _quoteValue.call( this, !! data.raw[key] ? data.raw[key] : null, cell );
+
+                        var cell2 = _createElement.call( this, "td", {}, row );
+                        _quoteValue.call( this, !! existingVals[key] ? existingVals[key] : null, cell2 );
                     }
                 }
-                html += "</table>";
-
-                _appendHtml.call( this, html );
             }
         }
 
