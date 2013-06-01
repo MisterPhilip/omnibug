@@ -385,12 +385,7 @@ FBL.ns( function() { with( FBL ) {
          * @param data the data object to report on
          */
         report: function( data ) {
-            //_dump( "report: data=" + data.toString() + "\n" );
-
-            var i, el, cn, len, mf, expanderImage, expanderClass,
-                tmp = "",
-                wt = "";
-
+            var expanderImage, expanderClass;
             if( this.omRef.cfg.alwaysExpand ) {
                 expanderClass = "reg";
                 expanderImage = "twistyOpen.png";
@@ -467,7 +462,6 @@ FBL.ns( function() { with( FBL ) {
         generateReportFragment: function( data, title, parent ) {
             var cn, kt,
                 i = 0,
-                html = "",
                 rows = [];
             
             for( var el in data ) {
@@ -712,8 +706,7 @@ FBL.ns( function() { with( FBL ) {
          * @param remKey the key to remove when mode=remove
          */
         updateWatches: function( data, mode, remKey ) {
-            var html,
-                existingVals = {},
+            var existingVals = {},
                 tbl = this.document.getElementById( "watchTbl" );
 
             if( tbl ) {
