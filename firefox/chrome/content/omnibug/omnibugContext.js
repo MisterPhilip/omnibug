@@ -13,13 +13,14 @@ Omnibug.OmnibugContext = function( panel ) {
 
 /**
  * Toggle a row
- * @param {HTMLElement} el link clicked to toggle
+ * @param {Event} evt DOM event fired for the click
  */
-Omnibug.OmnibugContext.prototype.toggle = function( el ) {
-    //dump( ">>>   OmnibugContext: toggle, el=" + el + "\n" );
+Omnibug.OmnibugContext.prototype.toggle = function( evt ) {
+    //dump( ">>>   OmnibugContext: toggle, evt=" + evt + "\n" );
 
     var i, img,
-        tr = el.parentNode.parentNode,
+        el = evt.target,
+        tr = el.parentNode.parentNode.parentNode,
         td = tr.getElementsByTagName( "td" ),
         div = tr.getElementsByTagName( "div" )[0];
 
@@ -40,5 +41,4 @@ Omnibug.OmnibugContext.prototype.toggle = function( el ) {
         div.className = 'hid';
     }
 }
-
 
