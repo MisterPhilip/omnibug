@@ -72,151 +72,12 @@ FBL.ns( function() { with( FBL ) {
             watchKeys: {},
             alwaysExpand: false,
             showQuotes: false,
+            showFullNames: true,
             outFile: null,
             prefsService: null,
             win: null,
-
-            keyTitles: {
-                // @TODO: these belong elsewhere
-                // GA/Urchin:
-                  utmac:  "Account string"
-                , utmcc:  "Cookie values"
-                , utmcn:  "New campaign session?"
-                , utmcr:  "Repeat campaign visit?"
-                , utmcs:  "Browser language encoding"
-                , utmdt:  "Page title"
-                , utme:   "Extensible parameter"
-                , utmfl:  "Flash version"
-                , utmhn:  "Host name"
-                , utmipc: "Product code"
-                , utmipn: "Product name"
-                , utmipr: "Unit price"
-                , utmiqt: "Quantity"
-                , utmiva: "Item variations"
-                , utmje:  "Java-enabled browser?"
-                , utmn:   "Unique ID"
-                , utmp:   "Page request"
-                , utmr:   "Referrer URL"
-                , utmsc:  "Screen color depth"
-                , utmsr:  "Screen resolution"
-                , utmt:   "Request type"
-                , utmtci: "Billing city"
-                , utmtco: "Billing country"
-                , utmtid: "Order ID"
-                , utmtrg: "Billing region"
-                , utmtsp: "Shipping cost"
-                , utmtst: "Affiliation"
-                , utmtto: "Total"
-                , utmttx: "Tax"
-                , utmul:  "Browser language"
-                , utmwv:  "Tracking code version"
-                , utmhid: "AdSense HID"
-                , utms:   "Internal use (counter)"
-                , utmu:   "Internal use"
-
-                // SiteCatalyst:
-                , ns:     "Visitor namespace"
-                , ndh:    "Image sent from JS?"
-                , ch:     "Channel"
-                , v0:     "Campaign"
-                , r:      "Referrer URL"
-                , ce:     "Character set"
-                , cl:     "Cookie lifetime"
-                , g:      "Current URL"
-                , j:      "JavaScript version"
-                , bw:     "Browser width"
-                , bh:     "Browser height"
-                , s:      "Screen resolution"
-                , c:      "Screen color depth"
-                , ct:     "Connection type"
-                , p:      "Netscape plugins"
-                , k:      "Cookies enabled?"
-                , hp:     "Home page?"
-                , pid:    "Page ID"
-                , pidt:   "Page ID type"
-                , oid:    "Object ID"
-                , oidt:   "Object ID type"
-                , ot:     "Object tag name"
-                , pe:     "Link type"
-                , pev1:   "Link URL"
-                , pev2:   "Link name"
-                , c1:     "Prop1"
-                , h1:     "Hier1"
-                , v1:     "EVar1"
-
-                , cc:     "Currency code (or Campaign Content)"
-                , t:      "Browser time (or Hit Type)"
-                , v:      "Java-enabled browser? (or Protocol Version)"
-
-                // Google Ultimate Analytics
-                // @TODO: need to separate these by provider
-                // (see above) , v:      "Protocol Version"
-                , tid:    "Tracking ID"
-                , aip:    "Anonymize IP"
-                , qt:     "Queue Time"
-                , z:      "Cache Buster"
-                , cid:    "Client ID"
-                , sc:     "Session Control"
-                , dr:     "Document Referrer"
-                , cn:     "Campaign Name"
-                , cs:     "Campaign Source"
-                , cm:     "Campaign Medium"
-                , ck:     "Campaign Keyword"
-                // (see above) , cc:     "Campaign Content"
-                , ci:     "Campaign ID"
-                , gclid:  "Google AdWords ID"
-                , dclid:  "Google Display Ads ID"
-                , sr:     "Screen Resolution"
-                , vp:     "Viewport Size"
-                , de:     "Document Encoding"
-                , sd:     "Screen Colors"
-                , ul:     "User Language"
-                , je:     "Java Enabled"
-                , fl:     "Flash Version"
-                // (see above) , t:      "Hit Type"
-                , ni:     "Non-Interaction Hit"
-                , dl:     "Document location URL"
-                , dh:     "Document Host Name"
-                , dp:     "Document Path"
-                , dt:     "Document Title"
-                , cd:     "Content Description"
-                , an:     "Application Name"
-                , av:     "Application Version"
-                , ec:     "Event Category"
-                , ea:     "Event Action"
-                , el:     "Event Label"
-                , ev:     "Event Value"
-                , ti:     "Transaction ID"
-                , ta:     "Transaction Affiliation"
-                , tr:     "Transaction Revenue"
-                , ts:     "Transaction Shipping"
-                , tt:     "Transaction Tax"
-                , in:     "Item Name"
-                , ip:     "Item Price"
-                , iq:     "Item Quantity"
-                , ic:     "Item Code"
-                , iv:     "Item Category"
-                , cu:     "Currency Code"
-                , sn:     "Social Network"
-                , sa:     "Social Action"
-                , st:     "Social Action Target"
-                , utc:    "User timing category"
-                , utv:    "User timing variable name"
-                , utt:    "User timing time"
-                , utl:    "User timing label"
-                , plt:    "Page Load Time"
-                , dns:    "DNS Time"
-                , pdt:    "Page Download Time"
-                , rrt:    "Redirect Response Time"
-                , tcp:    "TCP Connect Time"
-                , srt:    "Server Response Time"
-                , exd:    "Exception Description"
-                , exf:    "Is Exception Fatal?"
-                , a:      "?"
-                , _v:     "?"
-                , _u:     "?"
-            },
         },
+
 
         /**
          * Called when the browser exits
@@ -340,13 +201,6 @@ FBL.ns( function() { with( FBL ) {
 
             this.initPrefsService();
 
-            // set default pref
-            /* i don't see the point in doing this any longer
-            if( this.cfg.prefsService.prefHasUserValue( "defaultPattern" ) ) {
-                this.cfg.prefsService.clearUserPref( "defaultPattern" );
-            }
-            */
-
             // initialize prefs
             this.initPrefs();
 
@@ -434,6 +288,7 @@ FBL.ns( function() { with( FBL ) {
             switch( key ) {
                 case "alwaysExpand":
                 case "showQuotes":
+                case "showFullNames":
                 case "color_load":
                 case "color_click":
                 case "color_prev":
@@ -506,6 +361,9 @@ FBL.ns( function() { with( FBL ) {
 
             // quotes around values pref
             this.cfg.showQuotes = this.getPreference( "showQuotes" );
+
+            // descriptions instead of keys
+            this.cfg.showFullNames = this.getPreference( "showFullNames" );
 
             // colors
             this.cfg.color_load = this.getPreference( "color_load" );
@@ -771,10 +629,10 @@ FBL.ns( function() { with( FBL ) {
          */
         initPatterns: function() {
             _dump( "initPatterns: initing patterns from prefs\n" );
-            var defaultPattern = this.getPreference( "defaultPattern" ),
-                userPattern = this.getPreference( "userPattern" );
+            var userPattern = this.getPreference( "userPattern" );
 
-            this.cfg.defaultRegex = new RegExp( defaultPattern );
+            this.cfg.defaultPattern = OmnibugProvider.getDefaultPattern().source;
+            this.cfg.defaultRegex = new RegExp( this.cfg.defaultPattern );
 
             if( userPattern ) {
                 this.cfg.userRegex = new RegExp( userPattern );
@@ -906,7 +764,8 @@ FBL.ns( function() { with( FBL ) {
                         doneLoading: this.context.omnibug.doneLoading,
                         timeStamp: now,
                         browser: this.context.browser,
-                        statusText: null
+                        statusText: null,
+                        omnibugProvider: OmnibugProvider.getProviderForUrl( request.name )
                     };
 
                     // write the request to the panel.  must happen here so beacons will be shown (e.g., in realtime)
@@ -1027,21 +886,6 @@ FBL.ns( function() { with( FBL ) {
             }
         }
         return str + "}";
-    }
-
-    Omnibug.Tools.recObjDump = function( obj ) {
-        try {
-            var str = "Object{ ";
-            for( var key in obj ) {
-                str += "\tkey" + "=" + obj[key] + "\n";
-                //if( obj[key].match( /\[Object\]/ ) ) {
-                    //str += recObjDump( obj[key] );
-                //}
-            }
-            return str + "}";
-        } catch( ex ) {
-            dump( "*** recObjDump: exception: " + ex + "\n" );
-        }
     }
 
 }} );
