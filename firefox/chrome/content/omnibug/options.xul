@@ -17,6 +17,7 @@
 
             <preference id="pref-exp" name="extensions.omnibug.alwaysExpand" type="bool"/>
             <preference id="pref-quo" name="extensions.omnibug.showQuotes" type="bool"/>
+            <preference id="pref-dsc" name="extensions.omnibug.showFullNames" type="bool"/>
 
             <preference id="pref-color-quotes" name="extensions.omnibug.color_quotes" type="string"/>
             <preference id="pref-color-hilite" name="extensions.omnibug.color_hilite" type="string"/>
@@ -43,6 +44,9 @@
         </hbox>
         <hbox align="center">
             <checkbox label="Surround values with quotes" preference="pref-quo" />
+        </hbox>
+        <hbox align="center">
+            <checkbox label="Show element descriptions instead of keys" preference="pref-dsc" />
         </hbox>
 
 
