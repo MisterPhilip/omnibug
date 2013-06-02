@@ -39,9 +39,16 @@ FBL.ns( function() { with( FBL ) {
     }
 
     // returns the title (if any) for a given key
-    function _getTitleForKey( elName ) {
-        return this.omRef.cfg.keyTitles[elName];
+    function _getTitleForKey( elName, provider ) {
+        var title;
+        try {
+            title = provider.keys[elName];
+        } catch( ex ) {
+            // noop -- catch missing provider OR missing elName in keyTitles
+        }
+        return( !! title ? title : elName );
     }
+
 
     /**
      * Adds dynamic style rules (from prefs) to the caller's document
@@ -239,15 +246,6 @@ FBL.ns( function() { with( FBL ) {
 
         clear: function() {
             /*
-            var tables = this.panelNode.getElementsByTagName( "table" );
-            for( var i=0; i<tables.length; ++i ) {
-                //tables[i].parentNode.removeChild( tables[i] ); // doesn't work for some reason
-                // @TODO: really should remove these for memory's sake
-                tables[i].style.display = "none";
-            }
-            */
-
-            /*
              * works better than the above.  still have to click clear more than once occasionally.. not sure why this is.
              * using this.panelNode.parentNode removes too much; subsequent requests without a page refresh won't get logged.
              */
@@ -263,64 +261,88 @@ FBL.ns( function() { with( FBL ) {
          */
         decodeUrl: function( data ) {
             _dump( "decodeUrl: processing key=" + data.key + " (doneLoading=" + data.doneLoading + ")\n" );
-            //_dump( "decodeUrl: processing key=" + data.key + " (caller: " + Omnibug.Tools.getFuncName( arguments.callee.caller ) + ")\n" );
 
             var val,
                 u = new OmniUrl( data.url ),
                 obj = {
-                    state: data,    // raw data from the browser event
-                    raw: {},        // ungrouped object of all props
-                    vars: {},       // omniture evars
-                    props: {},      // omniture props
-                    other: {},      // any other values
-                    useful: {},     // values marked as useful
-                    moniforce: {},  // moniforce values
-                    webtrends: {},  // webtrends values
-                    toString: function() {
-                        return "Obj{\n\tvars=" + this.vars + "\n\tprops=" + this.props + "\n\tother=" + this.other + "}";
-                    }
+                    state: data    // raw data from the browser event
                 };
 
-            var that = this;
+            var that = this,
+                processedKeys = {},
+                provider = data.omnibugProvider;
+
             u.getQueryNames().forEach( function( n ) {
                 if( n ) {
-                    val = u.getFirstQueryValue( n ).replace( "<", "&lt;" );  // escape HTML in output HTML
-
-                    if( that.omRef.cfg.usefulKeys[n] ) {
-                        // 'useful' keys
-                        obj.useful[n] = val;
-                        obj.raw[n] = val;
-                    } else if( n.match( /^c(\d+)$/ ) || n.match( /^prop(\d+)$/i ) ) {
-                        // omniture props
-                        obj.props["prop"+RegExp.$1] = val;
-                        obj.raw["prop"+RegExp.$1] = val;
-                    } else if( n.match( /^v(\d+)$/ ) || n.match( /^evar(\d+)$/i ) ) {
-                        // omniture evars
-                        obj.vars["eVar"+RegExp.$1] = val;
-                        obj.raw["eVar"+RegExp.$1] = val;
-                    } else if( n.match( /^\[?AQB\]?$/ ) || n.match( /^\[?AQE\]?$/ ) ) {
-                        // noop; skip Omniture's [AQB] and [AQE] elements
-                    } else if( n.match( /^mfinfo/ ) ) {
-                        // moniforce
-                        obj.moniforce[n] = val;
-                        obj.raw[n] = val;
-                    } else if( n.match( /^WT\./ ) ) {
-                        // webtrends
-                        obj.webtrends[n] = val;
-                        obj.raw[n] = val;
-                    } else {
-                        // everything else
-                        obj.other[n] = val;
-                        obj.raw[n] = val;
-                    }
+                    vals = u.getQueryValues( n );
+                    that.processQueryParam( n, vals, provider, processedKeys );
                 }
             } );
+
+            this.delegateCustomProcessing( data.url, provider, processedKeys );
+
+            // @TODO: the nested loops below for raw support are hideous.  refactor??
+            obj["raw"] = {};
+            for( var o in obj ) {
+                if( obj.hasOwnProperty( o ) ) {
+                    obj["raw"][o] = obj[o];
+                    for( var io in obj[o] ) {
+                        if( obj[o].hasOwnProperty( io ) ) {
+                            obj["raw"][io] = obj[o][io];
+                        }
+                    }
+                }
+            }
+
+            // merge processedKeys into obj
+            for( var key in processedKeys ) {
+                if( processedKeys.hasOwnProperty( key ) ) {
+                    obj[key] = processedKeys[key];
+                    obj["raw"][key] = processedKeys[key];
+
+                    for( var ik in processedKeys[key] ) {
+                        if( processedKeys[key].hasOwnProperty( ik ) ) {
+                            obj["raw"][ik] = processedKeys[key][ik];
+                            for( var iik in processedKeys[key][ik] ) {
+                                if( processedKeys[key][ik].hasOwnProperty( iik ) ) {
+                                    obj["raw"][iik] = processedKeys[key][ik][iik];
+                                }
+                            }
+                        }
+                    }
+                } 
+            }
 
             obj = this.augmentData( obj );
             try {
                 this.report( obj );
             } catch( ex ) {
                 _dump( "decodeUrl: exception in report(): " + ex + "\n" );
+            }
+        },
+
+
+        /**
+         * Takes a single name/value pair and delegates handling of it to the provider
+         * Otherwise, inserts into the `other' bucket
+         */
+        processQueryParam: function( name, value, provider, container ) {
+            if( provider.handleQueryParam( name, value, container ) ) {
+                // noop (processedKeys modified by provider's method)
+            } else {
+                // stick in `other'
+                container["other"] = container["other"] || {};
+                container["other"][name] = value;
+            }
+        },
+
+
+        /**
+         * If the provider defines a custom URL handler, delegate to it
+         */
+        delegateCustomProcessing: function( url, provider, container ) {
+            if( typeof( provider.handleCustom ) === "function" ) {
+                provider.handleCustom( url, container );
             }
         },
 
@@ -333,40 +355,27 @@ FBL.ns( function() { with( FBL ) {
         augmentData: function( data ) {
             data["omnibug"] = {};
 
-            // workaround -- kill it when vendor-specific code in place
             var eventType = ( data.state.doneLoading ? "click" : "load" ),
                 url = data.state.url,
-                urlLength = data.state.url.length,
-                provider = ( url.match( /(?:\/b\/ss|2o7)/ ) ? "Omniture" :
-                    ( url.match( /moniforce\.gif/ ) ? "Moniforce" :
-                        ( url.match( /dcs\.gif/ ) ? "WebTrends" :
-                            ( url.match( /__utm\.gif/ ) ? "Urchin" :
-                                ( url.match( /\/collect\?/ ) ? "UniversalAnalytics" :
-                                    "Unknown"
-                                )
-                            )
-                        )
-                    )
-                );
+                urlLength = data.state.url.length;
 
             // hacky: sometimes load events are being reported as click events.  For Omniture, detect
             // the event type (pe= means a click event), and reset eventType accordingly.
-            if( provider === "Omniture" ) {
+            if( data.state.omnibugProvider.name === "OMNITURE" ) {
                 var oldEventType = eventType;
                 eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
-                _dump( "report: found Omniture 'pe' parameter; resetting eventType (was=" + oldEventType + "; now=" + eventType + ")\n" );
             }
 
-            data.omnibug["Key"]        = data.raw["Key"]        = data.state.key;
-            data.omnibug["Event"]      = data.raw["Event"]      = eventType;
-            data.omnibug["Timestamp"]  = data.raw["Timestamp"]  = data.state.timeStamp;
-            data.omnibug["Provider"]   = data.raw["Provider"]   = provider;
-            data.omnibug["Source"]     = data.raw["Source"]     = ( data.state.src === "prev" ? "Previous page" : "Current page" );
-            data.omnibug["Parent URL"] = data.raw["Parent URL"] = data.state.parentUrl;
-            data.omnibug["Full URL"]   = data.raw["Full URL"]   = data.state.url
-                                                                  + " (" + urlLength + " characters"
-                                                                  + ( urlLength > 2083 ? ", *** too long for IE6/7! ***" : "" )
-                                                                  + ")";
+            data.omnibug["Key"]        = data.state.key;
+            data.omnibug["Event"]      = eventType;
+            data.omnibug["Timestamp"]  = data.state.timeStamp;
+            data.omnibug["Provider"]   = data.state.omnibugProvider.name;
+            data.omnibug["Source"]     = ( data.state.src === "prev" ? "Previous page" : "Current page" );
+            data.omnibug["Parent URL"] = data.state.parentUrl;
+            data.omnibug["Full URL"]   = data.state.url
+                                         + " (" + urlLength + " characters"
+                                         + ( urlLength > 2083 ? ", *** too long for IE6/7! ***" : "" )
+                                         + ")";
 
             return data;
         },
@@ -385,6 +394,8 @@ FBL.ns( function() { with( FBL ) {
          * @param data the data object to report on
          */
         report: function( data ) {
+            var provider = data.state.omnibugProvider;
+
             var expanderImage, expanderClass;
             if( this.omRef.cfg.alwaysExpand ) {
                 expanderClass = "reg";
@@ -441,13 +452,19 @@ FBL.ns( function() { with( FBL ) {
                 class: "ent"
             }, exp );
 
-            this.generateReportFragment( data.omnibug, "Summary", tblCont );      // summary values
-            this.generateReportFragment( data.props, "Props", tblCont );          // omniture props
-            this.generateReportFragment( data.vars, "eVars", tblCont );           // omniture eVars
-            this.generateReportFragment( data.useful, "Useful", tblCont );        // useful params
-            this.generateReportFragment( data.moniforce, "Moniforce", tblCont );  // moniforce params
-            this.generateReportFragment( data.webtrends, "WebTrends", tblCont );  // webtrends params
-            this.generateReportFragment( data.other, "Other", tblCont );          // everything else
+
+            this.generateReportSection( data.omnibug, provider, "Summary", tblCont );      // summary values
+
+            for( var providerKey in data ) {
+                if( data.hasOwnProperty( providerKey ) && providerKey in OmnibugProvider ) {
+                    for( var sectionKey in data[providerKey] ) {
+                        if( data[providerKey].hasOwnProperty( sectionKey ) ) {
+                            this.generateReportSection( data[providerKey][sectionKey], provider, sectionKey, tblCont );  // provider-specific values
+                        }
+                    }
+                }
+            }
+            this.generateReportSection( data.other, provider, "Other", tblCont );          // everything else
 
             var sp = this.getContext().getPanel("OmnibugSide");
             sp.updateWatches( data );
@@ -459,27 +476,13 @@ FBL.ns( function() { with( FBL ) {
         /**
          * Generate an HTML report fragment for the given section
          */
-        generateReportFragment: function( data, title, parent ) {
-            var cn, kt,
-                i = 0,
+        generateReportSection: function( data, provider, title, parent ) {
+            var i = 0,
                 rows = [];
-            
+
             for( var el in data ) {
                 if( data.hasOwnProperty( el ) && !! data[el] ) {
-                    cn = _isHighlightable.call( this, el ) ? "hilite" : "";
-                    kt = _getTitleForKey.call( this, el );
-
-                    var tr = _createElement.call( this, "tr", { class: cn } );
-                    var td = _createElement.call( this, "td", {
-                         class: "k " + ( i++ % 2 === 0 ? 'even' : 'odd' ),
-                         title: ( !! kt ? kt : "" )
-                    }, tr, el );
-
-                    var tdVal = _createElement.call( this, "td", { class: "v" }, tr );
-
-                    _quoteValue.call( this, data[el], tdVal );
-
-                    rows.push( tr );
+                    rows.push( this.generateReportRow( el, data[el], provider, i++ ) );
                 }
             }
 
@@ -499,6 +502,68 @@ FBL.ns( function() { with( FBL ) {
                 parent.appendChild( tbody );
             }
         },
+        
+
+        /**
+         * Generate DOM elements for a single element
+         */
+        generateReportRow: function( key, value, provider, idx ) {
+            var i = 0,
+                cn = _isHighlightable.call( this, key ) ? "hilite" : "",
+                keyTitle = _getTitleForKey.call( this, key, provider ),
+                text = ( this.omRef.cfg.showFullNames ? keyTitle : key ),
+                hover = ( this.omRef.cfg.showFullNames ? key : keyTitle ),
+                value = this.processValue( value );
+
+            var tr = _createElement.call( this, "tr", {
+                class: cn,
+                title: ( !! hover ? hover : "" )
+            } );
+            var td = _createElement.call( this, "td", {
+                class: "k " + ( i++ % 2 === 0 ? 'even' : 'odd' ),
+                title: ( !! hover ? hover : "" )
+            }, tr, text );
+
+            var tdVal = _createElement.call( this, "td", { class: "v" }, tr );
+
+            if( value instanceof Array && value.length > 1 ) {
+                value.forEach( function( val ) {
+                    tdVal.appendChild( val );
+                } );
+                _createElement.call( this, "p", {}, tdVal, "foo" );
+                _createElement.call( this, "p", {}, tdVal, "bar" );
+                _createElement.call( this, "p", {}, tdVal, "baz" );
+            } else {
+                _quoteValue.call( this, value, tdVal );
+            }
+
+            return tr;
+        },
+
+
+        /**
+         * Rewrite a value for more appropriate display
+         */
+        processValue: function( value ) {
+            var stringValue = new String( value );
+            if( stringValue.match( /^\d{13}(?:\.\d+)?$/ ) && stringValue.indexOf( 1 ) == 0 ) {
+                return new Date( parseInt( value ) ) + "&nbsp;&nbsp;[" + value + "]";
+            } else if( stringValue.match( /^\d{10}$/ ) && stringValue.indexOf( 1 ) == 0 ) {
+                return new Date( parseInt( value * 1000 ) ) + "&nbsp;&nbsp;[" + value + "]";
+            } else if( typeof( value ) === "object" && Object.keys( value ).length > 1 ) {
+                var parts = [];
+                for( var key in value ) {
+                    if( value.hasOwnProperty( key ) ) {
+                        var p = _createElement.call( this, "p" );
+                        _quoteValue.call( this, value[key], p );
+                        parts.push( p );
+                    }
+                }
+                return parts;
+            }
+            return value;
+        },
+
 
 
         /**
@@ -532,7 +597,8 @@ FBL.ns( function() { with( FBL ) {
             return [
                 this.optionMenu( "Enable File Logging", "enableFileLogging" ),
                 this.optionMenu( "Always expand entries", "alwaysExpand" ),
-                this.optionMenu( "Surround values with quotes", "showQuotes" )
+                this.optionMenu( "Surround values with quotes", "showQuotes" ),
+                this.optionMenu( "Show element descriptions instead of names", "showFullNames" )
             ];
         },
 
@@ -727,7 +793,7 @@ FBL.ns( function() { with( FBL ) {
 
                             if( mode === "remove" && remKey === key ) {
                                 rows[row].parentNode.removeChild( rows[row] );
-                            } else if( val ) {
+                            } else if( val && val.firstChild ) {
                                 val = val.firstChild.nodeValue
                                 if( val ) {
                                     existingVals[key] = val;
@@ -763,6 +829,7 @@ FBL.ns( function() { with( FBL ) {
                     class: "p"
                 }, tr, "Prev" );
 
+                // @TODO: no longer works -- the `key' now can be the description (rather than the actual key)
                 var currWatches = _delimStringToObj( this.omRef.getPreference( "watchKeys" ) );
                 for( key in currWatches ) {
                     if( currWatches.hasOwnProperty( key ) ) {
@@ -777,6 +844,7 @@ FBL.ns( function() { with( FBL ) {
                             class: "v"
                         }, row );
                         _quoteValue.call( this, !! data.raw[key] ? data.raw[key] : null, cell );
+                        //_quoteValue.call( this, !! data[key] ? data[key] : null, cell );
 
                         var cell2 = _createElement.call( this, "td", {}, row );
                         _quoteValue.call( this, !! existingVals[key] ? existingVals[key] : null, cell2 );
@@ -790,7 +858,7 @@ FBL.ns( function() { with( FBL ) {
 
 
     /**
-     * OmniUrl
+     * OmniUrl: class to parse a URL into component pieces
      */
     var OmniUrl = function( url ) {
         this.url = url;
@@ -830,16 +898,34 @@ FBL.ns( function() { with( FBL ) {
                 }
             },
             decode: function( val ) {
-                var retVal;
+                var retVal = val;
                 try {
-                    return val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : '';
+                    retVal = val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : '';
                 } catch( e ) {
-                    return val;
+                    try {
+                        retVal = unescape( val.replace( /\+/g, "%20" ) );
+                    } catch( e ) {
+                        // noop
+                    }
+                    //return val;
                 }
+                return retVal.replace( "<", "&lt;" ); 
             },
+
+            smartSplit: function( str, sep, limit) {
+                str = str.split( sep );
+                if( str.length > limit ) {
+                    var ret = str.splice( 0, limit );
+                    ret.push( str.join( sep ) );
+                    return ret;
+                }
+                return str;
+            },
+
             parseUrl: function() {
                 var url = this.url;
-                var pieces = url.split( '?' );
+                var sep = ( url.indexOf( "?" ) != -1 ? "?" : ";" );
+                var pieces = this.smartSplit( url, sep, 1 );
                 var p2 = pieces[0].split( ';' );
                 this.query = {};
                 this.queryString = '';
@@ -852,7 +938,8 @@ FBL.ns( function() { with( FBL ) {
                     this.anchor = ( p3[1] ? p3[1] : '' );
                 }
                 if( this.queryString ) {
-                    var kvPairs = this.queryString.split( /&/ );
+                    var kvSep = ( this.queryString.indexOf( "&" ) != -1 ? "&" : ";" );
+                    var kvPairs = this.queryString.split( kvSep );
                     for( var i=0; i<kvPairs.length; ++i ) {
                         var kv = kvPairs[i].split( '=' );
                         this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
