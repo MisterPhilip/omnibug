@@ -10,6 +10,9 @@ pref( "extensions.omnibug.alwaysExpand", false );
 // surround values with quotes?
 pref( "extensions.omnibug.showQuotes", true );
 
+// show descriptions instead of keys?
+pref( "extensions.omnibug.showFullNames", true );
+
 // colors
 pref( "extensions.omnibug.color_load", "#dbedff" );
 pref( "extensions.omnibug.color_click", "#f1ffdb" );
@@ -17,3 +20,4 @@ pref( "extensions.omnibug.color_prev", "#ffd5de" );
 pref( "extensions.omnibug.color_quotes", "#f00" );
 pref( "extensions.omnibug.color_hilite", "#ff0" );
 pref( "extensions.omnibug.color_hover", "#ccc" );
+
