@@ -530,9 +530,6 @@ FBL.ns( function() { with( FBL ) {
                 value.forEach( function( val ) {
                     tdVal.appendChild( val );
                 } );
-                _createElement.call( this, "p", {}, tdVal, "foo" );
-                _createElement.call( this, "p", {}, tdVal, "bar" );
-                _createElement.call( this, "p", {}, tdVal, "baz" );
             } else {
                 _quoteValue.call( this, value, tdVal );
             }
@@ -554,7 +551,7 @@ FBL.ns( function() { with( FBL ) {
                 var parts = [];
                 for( var key in value ) {
                     if( value.hasOwnProperty( key ) ) {
-                        var p = _createElement.call( this, "p" );
+                        var p = _createElement.call( this, "p", { class: "tblLi" } );
                         _quoteValue.call( this, value[key], p );
                         parts.push( p );
                     }
@@ -628,7 +625,7 @@ FBL.ns( function() { with( FBL ) {
 
             // get a handle to the tbody element, so we can use the className element later
             tbody = node;
-            while( tbody && tbody.tagName.toUpperCase() !== "TBODY" ) {
+            while( tbody && tbody.tagName && tbody.tagName.toUpperCase() !== "TBODY" ) {
                 tbody = tbody.parentNode;
             }
 
