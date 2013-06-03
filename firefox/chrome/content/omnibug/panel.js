@@ -123,13 +123,18 @@ FBL.ns( function() { with( FBL ) {
      * @return the map
      */
     function _delimStringToObj( str ) {
-        var obj = {},
-            str = ( str ? str : "" ),
+        var keys,
+            obj = {};
+
+        if( str != null && str != "" ) {
             keys = str.split( /, ?/ );
-        for( var idx in keys ) {
-            obj[keys[idx]] = 1;
+
+            for( var idx in keys ) {
+                obj[keys[idx]] = 1;
+            }
+            return obj;
         }
-        return obj;
+        return {};
     }
 
 
@@ -260,7 +265,8 @@ FBL.ns( function() { with( FBL ) {
             var val,
                 u = new OmniUrl( data.url ),
                 obj = {
-                    state: data    // raw data from the browser event
+                    state: data,    // raw data from the browser event
+                    raw: {}
                 };
 
             var that = this,
@@ -270,41 +276,16 @@ FBL.ns( function() { with( FBL ) {
             u.getQueryNames().forEach( function( n ) {
                 if( n ) {
                     vals = u.getQueryValues( n );
-                    that.processQueryParam( n, vals, provider, processedKeys );
+                    that.processQueryParam( n, vals, provider, processedKeys, obj["raw"] );
                 }
             } );
 
-            this.delegateCustomProcessing( data.url, provider, processedKeys );
-
-            // @TODO: the nested loops below for raw support are hideous.  refactor??
-            obj["raw"] = {};
-            for( var o in obj ) {
-                if( obj.hasOwnProperty( o ) ) {
-                    obj["raw"][o] = obj[o];
-                    for( var io in obj[o] ) {
-                        if( obj[o].hasOwnProperty( io ) ) {
-                            obj["raw"][io] = obj[o][io];
-                        }
-                    }
-                }
-            }
+            this.delegateCustomProcessing( data.url, provider, processedKeys, obj["raw"] );
 
             // merge processedKeys into obj
             for( var key in processedKeys ) {
                 if( processedKeys.hasOwnProperty( key ) ) {
                     obj[key] = processedKeys[key];
-                    obj["raw"][key] = processedKeys[key];
-
-                    for( var ik in processedKeys[key] ) {
-                        if( processedKeys[key].hasOwnProperty( ik ) ) {
-                            obj["raw"][ik] = processedKeys[key][ik];
-                            for( var iik in processedKeys[key][ik] ) {
-                                if( processedKeys[key][ik].hasOwnProperty( iik ) ) {
-                                    obj["raw"][iik] = processedKeys[key][ik][iik];
-                                }
-                            }
-                        }
-                    }
                 } 
             }
 
@@ -321,7 +302,7 @@ FBL.ns( function() { with( FBL ) {
          * Takes a single name/value pair and delegates handling of it to the provider
          * Otherwise, inserts into the `other' bucket
          */
-        processQueryParam: function( name, value, provider, container ) {
+        processQueryParam: function( name, value, provider, container, rawCont ) {
             if( provider.handleQueryParam( name, value, container ) ) {
                 // noop (processedKeys modified by provider's method)
             } else {
@@ -329,15 +310,19 @@ FBL.ns( function() { with( FBL ) {
                 container["other"] = container["other"] || {};
                 container["other"][name] = value;
             }
+            rawCont[name] = value;
         },
 
 
         /**
          * If the provider defines a custom URL handler, delegate to it
          */
-        delegateCustomProcessing: function( url, provider, container ) {
+        delegateCustomProcessing: function( url, provider, container, rawCont ) {
             if( typeof( provider.handleCustom ) === "function" ) {
-                provider.handleCustom( url, container );
+                var parts = provider.handleCustom( url, container );
+                if( parts && parts.length == 2 ) {
+                    rawCont[parts[0]] = parts[1];
+                }
             }
         },
 
@@ -361,16 +346,16 @@ FBL.ns( function() { with( FBL ) {
                 eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
             }
 
-            data.omnibug["Key"]        = data.state.key;
-            data.omnibug["Event"]      = eventType;
-            data.omnibug["Timestamp"]  = data.state.timeStamp;
-            data.omnibug["Provider"]   = data.state.omnibugProvider.name;
-            data.omnibug["Source"]     = ( data.state.src === "prev" ? "Previous page" : "Current page" );
-            data.omnibug["Parent URL"] = data.state.parentUrl;
-            data.omnibug["Full URL"]   = data.state.url
-                                         + " (" + urlLength + " characters"
-                                         + ( urlLength > 2083 ? ", *** too long for IE6/7! ***" : "" )
-                                         + ")";
+            data.omnibug["key"]       = data["raw"]["key"]       = data.state.key;
+            data.omnibug["event"]     = data["raw"]["event"]     = eventType;
+            data.omnibug["timestamp"] = data["raw"]["timestamp"] = data.state.timeStamp;
+            data.omnibug["provider"]  = data["raw"]["provider"]  = data.state.omnibugProvider.name;
+            data.omnibug["source"]    = data["raw"]["source"]    = ( data.state.src === "prev" ? "Previous page" : "Current page" );
+            data.omnibug["parentUrl"] = data["raw"]["parentUrl"] = data.state.parentUrl;
+            data.omnibug["fullUrl"]   = data["raw"]["fullUrl"]   = data.state.url
+                                                                 + " (" + urlLength + " characters"
+                                                                 + ( urlLength > 2083 ? ", *** too long for IE6/7! ***" : "" )
+                                                                 + ")";
 
             return data;
         },
@@ -403,7 +388,7 @@ FBL.ns( function() { with( FBL ) {
             var table = _createElement.call( this, "table", {
                 cellspacing: 0,
                 border: 0,
-                class: "req " + data.omnibug.Event + ( data.state.src ? " " + data.state.src : "" ),
+                class: "req " + data.omnibug.event + ( data.state.src ? " " + data.state.src : "" ),
                 id: "ob_" + data.state.key
             }, this.panelNode );
 
@@ -430,10 +415,10 @@ FBL.ns( function() { with( FBL ) {
                 class: "summary"
             }, std );
 
-            _createElement.call( this, "strong", {}, p, this.camelCapser( data.omnibug.Event ) + " event" );
+            _createElement.call( this, "strong", {}, p, this.camelCapser( data.omnibug.event ) + " event" );
 
             var str = ( data.state.src === "prev" ? " (previous page)" : "" ) + " | "
-                    + data.omnibug.Provider + " | "
+                    + data.omnibug.provider + " | "
                     + data.state.timeStamp + " | "
                     + data.state.key
                     + ( data.state.statusText != null ? " | " + data.state.statusText : "" )
@@ -447,8 +432,18 @@ FBL.ns( function() { with( FBL ) {
                 class: "ent"
             }, exp );
 
-
-            this.generateReportSection( data.omnibug, provider, "Summary", tblCont );      // summary values
+            var summaryProvider = {
+                keys: {
+                    key:       "Key"
+                  , "event":   "Event"
+                  , timestamp: "Timestamp"
+                  , provider:  "Provider"
+                  , source:    "Source"
+                  , parentUrl: "Parent URL"
+                  , fullUrl:   "Full URL"
+                }
+            };
+            this.generateReportSection( data.omnibug, summaryProvider, "Summary", tblCont );      // summary values
 
             for( var providerKey in data ) {
                 if( data.hasOwnProperty( providerKey ) && providerKey in OmnibugProvider ) {
