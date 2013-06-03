@@ -67,7 +67,6 @@ FBL.ns( function() { with( FBL ) {
             latestOmnibugContext: null,
             defaultRegex: null,
             userRegex: null,
-            usefulKeys: {},
             highlightKeys: {},
             watchKeys: {},
             alwaysExpand: false,
@@ -305,7 +304,6 @@ FBL.ns( function() { with( FBL ) {
 
                 case "defaultPattern":
                 case "userPattern":
-                case "usefulKeys":
                 case "highlightKeys":
                 case "watchKeys":
                     this.initPatterns();
@@ -637,19 +635,6 @@ FBL.ns( function() { with( FBL ) {
             if( userPattern ) {
                 this.cfg.userRegex = new RegExp( userPattern );
             }
-
-            // init useful keys
-            var keyList = this.getPreference( "usefulKeys" );
-            this.cfg.usefulKeys = {}; // reset
-            if( keyList ) {
-                var parts = keyList.split( "," );
-                for( var part in parts ) {
-                    if( parts.hasOwnProperty( part ) ) {
-                        this.cfg.usefulKeys[parts[part]] = 1;
-                    }
-                }
-            }
-            _dump( "initPatterns: usefulKeys=" + Omnibug.Tools.objDump( this.cfg.usefulKeys ) + "\n" );
 
             // init highlight keys
             keyList = this.getPreference( "highlightKeys" );

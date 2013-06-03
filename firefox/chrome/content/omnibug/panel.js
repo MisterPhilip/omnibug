@@ -33,11 +33,6 @@ FBL.ns( function() { with( FBL ) {
         return this.omRef.cfg.highlightKeys[elName];
     }
 
-    // returns true when the given name is in the usefulKeys list
-    function _isUseful( elName ) {
-        return this.omRef.cfg.usefulKeys[elName];
-    }
-
     // returns the title (if any) for a given key
     function _getTitleForKey( elName, provider ) {
         var title;
@@ -645,15 +640,6 @@ FBL.ns( function() { with( FBL ) {
                         items.push( "-", { label: "Unhighlight '" + val + "'", command: bind( this.removePref, this, val, "highlightKeys", tr ) } );
                     } else {
                         items.push( "-", { label: "Highlight '" + val + "'", command: bind( this.addPref, this, val, "highlightKeys", tr ) } );
-                    }
-
-                    // useful
-                    if( tbody && tbody.className && ! tbody.className.match( /\bsummary\b/ ) ) {
-                        if( _isUseful.call( this, val ) ) {
-                            items.push( "-", { label: "Remove '" + val + "' from Useful group", command: bind( this.removePref, this, val, "usefulKeys" ) } );
-                        } else {
-                            items.push( "-", { label: "Add '" + val + "' to Useful group", command: bind( this.addPref, this, val, "usefulKeys" ) } );
-                        }
                     }
                 }
             }
