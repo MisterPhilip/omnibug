@@ -74,6 +74,10 @@ table.ent td.v {
     cursor: default;
 }
 
+table.ent p.tblLi {
+    margin: 0;
+}
+
 #watchTbl thead tr:hover {
     background-color: transparent;
 }
