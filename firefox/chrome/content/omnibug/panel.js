@@ -154,7 +154,7 @@ FBL.ns( function() { with( FBL ) {
      * @param pref pref list to remove from
      */
     function _removeFromPrefList( key, pref ) {
-        _dump( "removeFromWatches: key='" + key + "'; pref='" + pref + "'\n" );
+        //_dump( "removeFromWatches: key='" + key + "'; pref='" + pref + "'\n" );
         var currPrefs = _delimStringToObj( this.omRef.getPreference( pref ) );
         delete( currPrefs[key] );
         this.omRef.setPreference( pref, _objToDelimString( currPrefs ) );
@@ -167,7 +167,7 @@ FBL.ns( function() { with( FBL ) {
      * @param pref the pref list to add to
      */
     function _addToPrefList( key, pref ) {
-        //_dump( "addToWatches: ctx='" + ctx + "'; key='" + key + "'; pref='" + pref + "'\n" );
+        //_dump( "addToWatches: key='" + key + "'; pref='" + pref + "'\n" );
         var currPrefs = _delimStringToObj( this.omRef.getPreference( pref ) );
         currPrefs[key] = 1;
         this.omRef.setPreference( pref, _objToDelimString( currPrefs ) );
@@ -512,6 +512,7 @@ FBL.ns( function() { with( FBL ) {
 
             var tr = _createElement.call( this, "tr", {
                 class: cn,
+                "data-key": key,
                 title: ( !! hover ? hover : "" )
             } );
             var td = _createElement.call( this, "td", {
@@ -609,7 +610,7 @@ FBL.ns( function() { with( FBL ) {
         },
 
         getContextMenuItems: function( style, target ) {
-            var val, tr,
+            var val, tr, key,
                 node = target,
                 items = [];
 
@@ -617,6 +618,7 @@ FBL.ns( function() { with( FBL ) {
                 node = node.parentNode;
             }
             tr = node;
+            key = tr.getAttribute( "data-key" );
 
             // get a handle to the tbody element, so we can use the className element later
             tbody = node;
@@ -624,22 +626,20 @@ FBL.ns( function() { with( FBL ) {
                 tbody = tbody.parentNode;
             }
 
-            node = node.getElementsByTagName( "td" )[0];
-            if( node ) {
-                val = node.firstChild.nodeValue;
-                if( val ) {
+            if( tr && key ) {
+                if( key ) {
                     // watch
-                    if( _isWatched.call( this, val ) ) {
-                        items.push( "-", { label: "Unwatch '" + val + "'", command: bind( this.removePrefAndUpdateWatches, this, val, "watchKeys" ) } );
+                    if( _isWatched.call( this, key ) ) {
+                        items.push( "-", { label: "Unwatch '" + key + "'", command: bind( this.removePrefAndUpdateWatches, this, key, "watchKeys" ) } );
                     } else {
-                        items.push( "-", { label: "Watch '" + val + "'", command: bind( this.addPref, this, val, "watchKeys" ) } );
+                        items.push( "-", { label: "Watch '" + key + "'", command: bind( this.addPref, this, key, "watchKeys" ) } );
                     }
 
                     // highlight
-                    if( _isHighlightable.call( this, val ) ) {
-                        items.push( "-", { label: "Unhighlight '" + val + "'", command: bind( this.removePref, this, val, "highlightKeys", tr ) } );
+                    if( _isHighlightable.call( this, key ) ) {
+                        items.push( "-", { label: "Unhighlight '" + key + "'", command: bind( this.removePref, this, key, "highlightKeys", tr ) } );
                     } else {
-                        items.push( "-", { label: "Highlight '" + val + "'", command: bind( this.addPref, this, val, "highlightKeys", tr ) } );
+                        items.push( "-", { label: "Highlight '" + key + "'", command: bind( this.addPref, this, key, "highlightKeys", tr ) } );
                     }
                 }
             }
@@ -746,7 +746,6 @@ FBL.ns( function() { with( FBL ) {
         },
 
 
-
         /**
          * Update the values (if any) in the watches side-panel
          * @param data the data object
@@ -755,6 +754,7 @@ FBL.ns( function() { with( FBL ) {
          * @param remKey the key to remove when mode=remove
          */
         updateWatches: function( data, mode, remKey ) {
+            // _dump( ">>> updateWatches: data=" + data + "; mode=" + mode + "; rk=" + remKey + "\n" );
             var existingVals = {},
                 tbl = this.document.getElementById( "watchTbl" );
 
@@ -812,12 +812,10 @@ FBL.ns( function() { with( FBL ) {
                     class: "p"
                 }, tr, "Prev" );
 
-                // @TODO: no longer works -- the `key' now can be the description (rather than the actual key)
                 var currWatches = _delimStringToObj( this.omRef.getPreference( "watchKeys" ) );
                 for( key in currWatches ) {
                     if( currWatches.hasOwnProperty( key ) ) {
                         var kt = _getTitleForKey.call( this, key );
-
                         var row = _createElement.call( this, "tr", {}, table );
                         _createElement.call( this, "td", {
                             class: "k",
@@ -827,7 +825,6 @@ FBL.ns( function() { with( FBL ) {
                             class: "v"
                         }, row );
                         _quoteValue.call( this, !! data.raw[key] ? data.raw[key] : null, cell );
-                        //_quoteValue.call( this, !! data[key] ? data[key] : null, cell );
 
                         var cell2 = _createElement.call( this, "td", {}, row );
                         _quoteValue.call( this, !! existingVals[key] ? existingVals[key] : null, cell2 );
