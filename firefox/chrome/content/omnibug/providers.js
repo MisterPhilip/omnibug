@@ -197,6 +197,7 @@ var OmnibugProvider = {
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
             }
+            return [ "rsid", rv[this.key][this.name]["rsid"] ];
         }
     },
 
