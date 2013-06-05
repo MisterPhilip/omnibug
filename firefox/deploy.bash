@@ -28,22 +28,22 @@ VER="${MAJOR}.${MINOR}.${PATCH}"
 echo "new=${PATCH}"
 echo ""
 
-cat install.rdf | sed "s/em:version=\".*\"$/em:version=\"${VER}\"/" > install.rdf.$$
-mv install.rdf.$$ install.rdf
+cat install.rdf.site | sed "s/em:version=\".*\"$/em:version=\"${VER}\"/" > install.rdf.site.$$
+mv install.rdf.site.$$ install.rdf.site
 
-echo "Comitting updated install.rdf (as ${VER})"
+echo "Comitting updated install.rdf.site (as ${VER})"
 # Commit modified install
-git commit install.rdf -m"[$0] Incrementing install.rdf version for build" && git push
+git commit install.rdf.site -m"[$0] Incrementing install.rdf.site version for build" && git push
 echo ""
 
 XPI=${APP}-${VER}.xpi
 cp ${APP}.xpi $XPI
 
-echo "Adding updated install.rdf to ${APP}.xpi"
+echo "Adding updated install.rdf.site to ${APP}.xpi"
 zip -u $XPI
 echo ""
 
-# Don't generate hash until after adding the updated install.rdf
+# Don't generate hash until after adding the updated install.rdf.site
 HASH=`openssl sha1 ${XPI} | awk '{ print $2 }'`
 
 cat update.rdf.tpl | sed "s/TOK_VER/${VER}/g" | sed "s/TOK_HASH/${HASH}/g" > update.rdf
@@ -54,6 +54,9 @@ cat update.rdf.tpl | sed "s/TOK_VER/${VER}/g" | sed "s/TOK_HASH/${HASH}/g" > upd
 echo -n "Please sign `pwd`/update.rdf with McCoy now; press enter when done."
 read foo
 
+
+echo -n "Press enter to deploy $VER to rosssimpson.com"
+read foo
 
 #
 # Deploy (or not)
