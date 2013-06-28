@@ -766,16 +766,51 @@ FBL.ns( function() { with( FBL ) {
                     }
 
                     // write to file, if defined
-                    file = omRef.cfg.outFile;
-                    if( file !== null ) {
-                        FileIO.write( file, now + "\t" + key + "\t" + request.name + "\t" + this.context.browser.currentURI.spec + "\n", "a" );
-                    }
+                    this.logToFile( now + "\t" + key + "\t" + request.name + "\t" + this.context.browser.currentURI.spec + "\n" );
                 } else {
                     //_dump( "onStateChange: not start (" + getStateDescription( flag ) + "); key=" + key + "\n" );
                 }
             }
             return 0;
+        },
+
+        /**
+         * Append to the logfile, if we've got one and private browsing is not enabled
+         */
+        logToFile: function( msg ) {
+            file = Firebug.Omnibug.cfg.outFile;
+            if( file !== null && !( this.isPrivateBrowsing() ) ) {
+                FileIO.write( file, msg, "a" );
+            }
+        },
+
+        /**
+         * Detect private browsing mode
+         * Be cautious and only return false if we're *sure*
+         */
+        isPrivateBrowsing: function() {
+            try {
+                // Firefox 20+
+                Components.utils.import( "resource://gre/modules/PrivateBrowsingUtils.jsm" );
+                if( !PrivateBrowsingUtils.isWindowPrivate( window ) ) {
+                    return false;
+                }
+            } catch( e ) {
+                // pre Firefox 20
+                try {
+                    var inPrivateBrowsing = Components.classes["@mozilla.org/privatebrowsing;1"].
+                                            getService( Components.interfaces.nsIPrivateBrowsingService ).
+                                            privateBrowsingEnabled;
+                    if( !inPrivateBrowsing ) {
+                        return false;
+                    }
+                } catch( e ) {
+                    Components.utils.reportError( e );
+                }
+            }
+            return true;
         }
+
     };
 
 
