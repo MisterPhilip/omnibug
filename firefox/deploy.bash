@@ -28,20 +28,23 @@ echo ""
 echo "$PATCH" > $PLACEHOLDER
 
 # Update install manifests
-sed -i.bak "s/em:version=\".*\"$/em:version=\"${VER}\"/" > install.rdf.*
+sed -i.bak "s/em:version=\".*\"$/em:version=\"${VER}\"/" install.rdf.*
+rm *.bak
 
 echo "Comitting updated install manifests (as ${VER})"
 # Commit modified install
-git commit install.rdf.* $PLACEHOLDER -m"[$0] Incrementing version for build" && git push
+git commit install.rdf.amo install.rdf.site $PLACEHOLDER -m"[$0] Incrementing version for build" && git push
 echo ""
 
 # build for site deploy
+./build.bash amo
 ./build.bash site
 
 XPI=${APP}-${VER}.xpi
-cp ${APP}.xpi $XPI
+cp ${APP}-site.xpi $XPI
+cp ${APP}-amo.xpi "${APP}-amo-${VER}.xpi"
 
-echo "Adding updated install.rdf.site to ${APP}.xpi"
+echo "Adding updated install.rdf to ${APP}.xpi"
 zip -u $XPI
 echo ""
 
@@ -57,7 +60,7 @@ echo -n "Please sign `pwd`/update.rdf with McCoy now; press enter when done."
 read foo
 
 
-echo -n "Press enter to deploy $VER to rosssimpson.com"
+echo -n "Press enter to deploy $VER to rosssimpson.com. "
 read foo
 
 #

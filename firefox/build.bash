@@ -23,9 +23,7 @@ else
 fi
 
 APP=omnibug
-XPIFILE=${APP}.xpi
-
-find . -name "*.xpi" -exec rm {} \;
+XPIFILE=${APP}-${1}.xpi
 
 echo "Creating xpi"
 chrome_files=`find chrome -type f|grep -v \.git`
