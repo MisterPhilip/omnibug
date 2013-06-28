@@ -18,8 +18,6 @@ if [[ "$1" == "ross" ]]; then
     echo "Doing private deployment to ${extrapath}"
 fi
 
-# build for site deploy
-./build.bash site
 
 # update version
 echo -n "$0: incrementing version: old=$PATCH; "
@@ -27,14 +25,18 @@ PATCH=$((PATCH+1))
 VER="${MAJOR}.${MINOR}.${PATCH}"
 echo "new=${PATCH}"
 echo ""
+echo "$PATCH" > $PLACEHOLDER
 
-cat install.rdf.site | sed "s/em:version=\".*\"$/em:version=\"${VER}\"/" > install.rdf.site.$$
-mv install.rdf.site.$$ install.rdf.site
+# Update install manifests
+sed -i.bak "s/em:version=\".*\"$/em:version=\"${VER}\"/" > install.rdf.*
 
-echo "Comitting updated install.rdf.site (as ${VER})"
+echo "Comitting updated install manifests (as ${VER})"
 # Commit modified install
-git commit install.rdf.site -m"[$0] Incrementing install.rdf.site version for build" && git push
+git commit install.rdf.* $PLACEHOLDER -m"[$0] Incrementing version for build" && git push
 echo ""
+
+# build for site deploy
+./build.bash site
 
 XPI=${APP}-${VER}.xpi
 cp ${APP}.xpi $XPI
