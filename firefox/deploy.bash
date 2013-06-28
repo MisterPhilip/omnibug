@@ -41,8 +41,8 @@ echo ""
 ./build.bash site
 
 XPI=${APP}-${VER}.xpi
-cp ${APP}-site.xpi $XPI
-cp ${APP}-amo.xpi "${APP}-amo-${VER}.xpi"
+mv ${APP}-site.xpi $XPI
+mv ${APP}-amo.xpi "${APP}-amo-${VER}.xpi"
 
 echo "Adding updated install.rdf to ${APP}.xpi"
 zip -u $XPI
