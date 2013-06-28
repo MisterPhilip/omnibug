@@ -4,6 +4,8 @@
 # Extension deployment script
 #
 
+find . -name "*.xpi" -delete
+
 APP=omnibug
 MAJOR=0
 MINOR=5
