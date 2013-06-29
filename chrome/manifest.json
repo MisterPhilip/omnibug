@@ -1,31 +1,27 @@
 {
-  "name": "Omnibug",
-  "version": "0.3",
-  "manifest_version": 2,
-
-  "description": "Omnibug for Chrome",
-  "icons": {
-    "16": "images/o-16.png",
-    "48": "images/o-48.png",
-    "128": "images/o-128.png"
-  },
-
-  "background": {
-    "scripts": [ "providers.js", "eventPage.js" ],
-    "persistent": true // must be persistent to use WebRequest!
-  },
-
-  "homepage_url": "http://omnibug.rosssimpson.com/chrome.html",
-
-  "devtools_page": "devtools.html",
-  "options_page": "options.html",
-
-  "permissions": [
-    "tabs",
-    "storage",
-    "webRequest",
-    "*://*/*"
-  ]
-
+    "name": "Omnibug",
+    "version": "0.3",
+    "manifest_version": 2,
+    "description": "Omnibug for Chrome",
+    "icons": {
+        "16": "images/o-16.png",
+        "48": "images/o-48.png",
+        "128": "images/o-128.png"
+    },
+    "background": {
+        "scripts": [
+            "providers.js",
+            "eventPage.js"
+        ],
+        "persistent": true
+    },
+    "homepage_url": "http://omnibug.rosssimpson.com/chrome.html",
+    "devtools_page": "devtools.html",
+    "options_page": "options.html",
+    "permissions": [
+        "tabs",
+        "storage",
+        "webRequest",
+        "*://*/*"
+    ]
 }
-
