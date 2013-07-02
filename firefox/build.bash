@@ -26,8 +26,8 @@ APP=omnibug
 XPIFILE=${APP}-${1}.xpi
 
 echo "Creating xpi"
-chrome_files=`find chrome -type f|grep -v \.git`
-defaults_files=`find defaults -type f|grep -v \.git`
+chrome_files=`find -L chrome -type f|grep -v \.git`
+defaults_files=`find -L defaults -type f|grep -v \.git`
 
 zip "$XPIFILE" $chrome_files $defaults_files install.rdf chrome.manifest
 echo ""
