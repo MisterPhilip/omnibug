@@ -781,7 +781,52 @@ var OmnibugProvider = {
             }
             return false;
         }
+    },
+
+    SOPHUS3 : {
+          key: "SOPHUS3"
+        , name: "sophus3"
+        , pattern: /sophus3\.com|touchclarity\.com|logging\.js|logging-code\.js/
+        , keys: {
+              r:    "Referrer URL"
+            , tagv: "Script Version"
+            , Ts:   "Time Stamp"
+            , sr:   "Screen Resolution"
+            , sw:   "Screen Width"
+            , ah:   "Actual Height"
+            , aw:   "Actual Width"
+            , sh:   "Screen Height"
+            , pd:   "Pixel Depth"
+            , cd:   "Colour Depth"
+        },
+        handleQueryParam: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    MEDIAMIND : {
+          key: "MEDIAMIND"
+        , name: "MediaMind"
+        , pattern: /\.serving-sys\.com/
+        , keys: {
+        },
+        handleQueryParam: function( name, value, rv ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                return true;
+            }
+            return false;
+        }
     }
+
 };
 } catch( ex ) {
     console.log( "Providers generated an exception: ", ex.message );
