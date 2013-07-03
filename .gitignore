@@ -10,3 +10,10 @@ Desktop.ini
 
 # Mac crap
 .DS_Store
+
+# CI
+node_modules/
+
+# Chrome packaging
+omnibug.pem
+*.crx
