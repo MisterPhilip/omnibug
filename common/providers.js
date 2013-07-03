@@ -549,11 +549,11 @@ var OmnibugProvider = {
                                 rv[this.key][this.name][k] = parsed[k];
                             }
                         }
-                    }    
+                    }
                 } catch( e ) {
                     // noop
                 }
-                
+
                 return true;
             } else if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
@@ -733,11 +733,11 @@ var OmnibugProvider = {
                                 rv[this.key][this.name][k] = parsed[k];
                             }
                         }
-                    }    
+                    }
                 } catch( e ) {
                     // noop
                 }
-                
+
                 return true;
             } else if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
@@ -786,18 +786,21 @@ var OmnibugProvider = {
     SOPHUS3 : {
           key: "SOPHUS3"
         , name: "sophus3"
-        , pattern: /sophus3\.com|touchclarity\.com|logging\.js|logging-code\.js/
+        , pattern: /sophus3\.com\/i|sophus3\.com\/d/
         , keys: {
-              r:    "Referrer URL"
-            , tagv: "Script Version"
-            , Ts:   "Time Stamp"
-            , sr:   "Screen Resolution"
-            , sw:   "Screen Width"
-            , ah:   "Actual Height"
-            , aw:   "Actual Width"
-            , sh:   "Screen Height"
-            , pd:   "Pixel Depth"
-            , cd:   "Colour Depth"
+              r:      "Referrer URL"
+            , tagv:   "Script Version"
+            , Ts:     "Time Stamp"
+            , sr:     "Screen Resolution"
+            , sw:     "Screen Width"
+            , ah:     "Actual Height"
+            , aw:     "Actual Width"
+            , sh:     "Screen Height"
+            , pd:     "Pixel Depth"
+            , cd:     "Colour Depth"
+            , siteID: "SiteID"
+            , ts:     "Ts"
+            , "location": "Location"
         },
         handleQueryParam: function( name, value, rv ) {
             if( name in this.keys ) {
