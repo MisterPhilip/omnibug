@@ -1,0 +1,19 @@
+{
+  "name": "omnibug-build",
+  "version": "0.1.1-1",
+  "description": "Build environment for Omnibug extensions",
+  "author": "Ross Simpson <simpsora@gmail.com>",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/simpsora/omnibug"
+  },
+  "devDependencies": {
+    "grunt-cli": "0.1.6",
+    "grunt": "0.4.0",
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-qunit": "~0.1.1",
+    "grunt-qunit-junit": "~0.1.0",
+    "grunt-contrib-watch": "~0.2.0",
+    "grunt-qunit-cov": "~0.3.2"
+  }
+}
