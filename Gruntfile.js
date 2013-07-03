@@ -1,9 +1,9 @@
 /*global module*/
-module.exports = function (grunt) {
+module.exports = function( grunt ) {
     'use strict';
 
     var gruntConfig = {};
-    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks( 'grunt-contrib-jshint' );
     gruntConfig.jshint = {
         options: { bitwise: true, camelcase: false, curly: true, eqeqeq: true, forin: true, immed: true,
                    indent: 4, latedef: true, newcap: true, noarg: true, noempty: true, nonew: true, plusplus: false,
@@ -19,6 +19,8 @@ module.exports = function (grunt) {
             //'chrome/options.js'
         ]
     };
-    grunt.initConfig(gruntConfig);
+
+    grunt.initConfig( gruntConfig );
+    grunt.registerTask( 'travis', 'jshint' );
 
 };
