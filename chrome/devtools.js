@@ -9,6 +9,8 @@
  * USA.
  *
  */
+
+/*global chrome*/
 ( function() {
 
     /**
@@ -42,7 +44,7 @@
 
             // Release queued messages
             var msg;
-            while( msg = queuedMessages.shift() )  {
+            while( ( msg = queuedMessages.shift() ) ) {
                 panelWindow.Omnibug.receive_message( msg );
             }
 
@@ -54,11 +56,11 @@
 
 
         // add a clear button
-        clearBtn = panel.createStatusBarButton( "images/clear_button.png", "Clear events.", false );
-        clearBtn.onClicked.addListener( function() {
+        clearButton = panel.createStatusBarButton( "images/clear_button.png", "Clear events.", false );
+        clearButton.onClicked.addListener( function() {
             var tables = panelWindow.document.getElementsByTagName( "table" );
             while( tables.length > 0 ) {
-                for( i=0; i<tables.length; ++i ) {
+                for( var i=0; i<tables.length; ++i ) {
                     if( tables[i].className.match( /req/ ) ) {
                         tables[i].parentNode.removeChild( tables[i] );
                     }
@@ -66,7 +68,7 @@
                 tables = panelWindow.document.getElementsByTagName( "table" );
             }
         } );
-    }
+    };
 
 
     /**
