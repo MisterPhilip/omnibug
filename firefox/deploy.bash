@@ -35,7 +35,7 @@ rm *.bak
 
 echo "Comitting updated install manifests (as ${VER})"
 # Commit modified install
-git commit install.rdf.amo install.rdf.site $PLACEHOLDER -m"[$0] Incrementing version for build" && git push
+git commit install.rdf.amo install.rdf.site $PLACEHOLDER -m"[$0] Incrementing version for build ($VER)" && git push
 echo ""
 
 # build for site deploy
