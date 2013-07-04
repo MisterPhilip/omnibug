@@ -20,7 +20,49 @@ module.exports = function( grunt ) {
         ]
     };
 
+    grunt.loadNpmTasks('grunt-contrib-jasmine');
+    gruntConfig.jasmine = {
+        src: {
+            src: [
+                //'src/js/**/*.js',
+                //'!src/js/**/*.test.js'
+                'common/*.js'
+            ],
+            options: {
+                //specs: 'src/js/**/*.test.js',
+                specs: 'test/*.js'
+                /*
+                junit: {
+                    path: 'output/testresults'
+                }
+                */
+            }
+        }
+    };
+    grunt.registerTask('test', 'jasmine:src');
+
+    /*
+    gruntConfig.jasmine.istanbul= {
+        src: gruntConfig.jasmine.src.src,
+        options: {
+            specs: gruntConfig.jasmine.src.options.specs,
+            template: require('grunt-template-jasmine-istanbul'),
+            templateOptions: {
+                coverage: 'output/coverage/coverage.json',
+                report: [
+                    {type: 'html', options: {dir: 'output/coverage'}},
+                    {type: 'cobertura', options: {dir: 'output/coverage/cobertura'}},
+                    {type: 'text-summary'}
+                ]
+            }
+        }
+    };
+    grunt.registerTask('coverage', 'jasmine:istanbul');
+    */
+
+
+
     grunt.initConfig( gruntConfig );
-    grunt.registerTask( 'travis', 'jshint' );
+    grunt.registerTask( 'travis', ['jshint', 'test' ]);
 
 };

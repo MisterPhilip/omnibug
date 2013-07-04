@@ -1,25 +1,30 @@
 {
-  "name": "omnibug-build",
-  "version": "0.1.1-1",
-  "description": "Build environment for Omnibug extensions",
-  "author": "Ross Simpson <simpsora@gmail.com>",
-
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/simpsora/omnibug"
-  },
-
-  "devDependencies": {
-    "grunt-cli": "0.1.6",
-    "grunt": "0.4.0",
-    "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-qunit": "~0.1.1",
-    "grunt-qunit-junit": "~0.1.0",
-    "grunt-contrib-watch": "~0.2.0",
-    "grunt-qunit-cov": "~0.3.2"
-  },
-
+  "name": "omnibug",
+  "version": "0.0.1",
+  "description": "Omnibug Extension",
+  "main": "Gruntfile.js",
   "scripts": {
     "test": "grunt travis"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/simpsora/omnibug.git"
+  },
+  "keywords": [
+    "omnibug"
+  ],
+  "author": "Ross Simpson <omnibug@rosssimpson.com>",
+  "license": "CC BY-SA 3.0",
+  "readmeFilename": "README.md",
+  "gitHead": "b5b8894969929643643d502463893985cb85a132",
+  "bugs": {
+    "url": "https://github.com/simpsora/omnibug/issues"
+  },
+  "devDependencies": {
+    "grunt-contrib-jasmine": "~0.5.1",
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt-template-jasmine-istanbul": "~0.2.4"
   }
 }
