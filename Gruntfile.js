@@ -41,7 +41,6 @@ module.exports = function( grunt ) {
     };
     grunt.registerTask('test', 'jasmine:src');
 
-    /*
     gruntConfig.jasmine.istanbul= {
         src: gruntConfig.jasmine.src.src,
         options: {
@@ -58,11 +57,8 @@ module.exports = function( grunt ) {
         }
     };
     grunt.registerTask('coverage', 'jasmine:istanbul');
-    */
-
-
 
     grunt.initConfig( gruntConfig );
-    grunt.registerTask( 'travis', ['jshint', 'test' ]);
+    grunt.registerTask( 'travis', [ 'jshint', 'test', 'coverage' ]);
 
 };
