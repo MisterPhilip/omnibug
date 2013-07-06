@@ -23,6 +23,33 @@ var OmnibugProvider = {
     },
 
     /**
+     * Return a map of key->display name of providers
+     */
+    getProviders: function() {
+        var providers = {};
+        for( var key in this ) {
+            if( this.hasOwnProperty( key ) && typeof( this[key] ) !== "function" ) {
+                providers[key] = this[key].name;
+            }
+        }
+        return providers;
+
+    },
+
+    /**
+     * Return a map of key->pattern
+     */
+    getPatterns: function() {
+        var patterns = {};
+        for( var key in this ) {
+            if( this.hasOwnProperty( key ) && typeof( this[key] ) !== "function" ) {
+                patterns[key] = this[key].pattern.source;
+            }
+        }
+        return patterns;
+    },
+
+    /**
      * Return the provider for a URL, if any
      */
     getProviderForUrl: function( url ) {
@@ -42,6 +69,8 @@ var OmnibugProvider = {
             }
         }
     },
+
+
 
     URCHIN: {
           key: "URCHIN"
