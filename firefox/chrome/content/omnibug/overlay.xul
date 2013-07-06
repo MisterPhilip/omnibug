@@ -13,6 +13,7 @@
     <script type="application/x-javascript" src="chrome://omnibug/content/md5.js"/>
     <script type="application/x-javascript" src="chrome://omnibug/content/io.js"/>
     <script type="application/x-javascript" src="chrome://omnibug/content/providers.js"/>
+    <script type="application/x-javascript" src="chrome://omnibug/content/omnibugurl.js"/>
 
     <commandset id="mainCommandSet">
         <command id="cmd_clear" oncommand="Firebug.Omnibug.clearPanel()"/>

@@ -263,7 +263,7 @@ FBL.ns( function() { with( FBL ) {
             _dump( "decodeUrl: processing key=" + data.key + " (doneLoading=" + data.doneLoading + ")\n" );
 
             var val,
-                u = new OmniUrl( data.url ),
+                u = new OmnibugUrl( data.url ),
                 obj = {
                     state: data,    // raw data from the browser event
                     raw: {}
@@ -286,7 +286,7 @@ FBL.ns( function() { with( FBL ) {
             for( var key in processedKeys ) {
                 if( processedKeys.hasOwnProperty( key ) ) {
                     obj[key] = processedKeys[key];
-                } 
+                }
             }
 
             obj = this.augmentData( obj );
@@ -404,7 +404,7 @@ FBL.ns( function() { with( FBL ) {
             a.addEventListener( "click", this.document.omnibugContext.toggle );
 
             _createElement.call( this, "img", {
-                src: "chrome://omnibug/skin/" + expanderImage 
+                src: "chrome://omnibug/skin/" + expanderImage
             }, a );
 
             var std = _createElement.call( this, "td", {
@@ -486,13 +486,13 @@ FBL.ns( function() { with( FBL ) {
                 parent.appendChild( thead );
 
                 var tbody = _createElement.call( this, "tbody", { class: title.toLowerCase() } );
-                rows.forEach( function( row ) { 
+                rows.forEach( function( row ) {
                     tbody.appendChild( row );
                 } );
                 parent.appendChild( tbody );
             }
         },
-        
+
 
         /**
          * Generate DOM elements for a single element
@@ -830,100 +830,6 @@ FBL.ns( function() { with( FBL ) {
 
     } );
     Firebug.registerPanel( OmnibugSidePanel );
-
-
-    /**
-     * OmniUrl: class to parse a URL into component pieces
-     */
-    var OmniUrl = function( url ) {
-        this.url = url;
-        this.parseUrl();
-    };
-
-    OmniUrl.prototype = (function() {
-        var U = {
-            hasQueryValue: function( key ) {
-                return typeof this.query[key] !== 'undefined';
-            },
-            getFirstQueryValue: function( key ) {
-                return this.query[key] ? this.query[key][0] : '';
-            },
-            getQueryValues: function( key ) {
-                return this.query[key] ? this.query[key] : [];
-            },
-            getQueryNames: function() {
-                var i, a = [];
-                for( i in this.query ) {
-                    a.push( i );
-                }
-                return a;
-            },
-            getLocation: function() {
-                return this.location;
-            },
-            getParamString: function() {
-                return this.paramString;
-            },
-            addQueryValue: function( key ) {
-                if( ! this.hasQueryValue( key ) ) {
-                    this.query[key] = [];
-                }
-                for( var i=1; i<arguments.length; ++i ) {
-                    this.query[key].push( arguments[i] );
-                }
-            },
-            decode: function( val ) {
-                var retVal = val;
-                try {
-                    retVal = val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : '';
-                } catch( e ) {
-                    try {
-                        retVal = unescape( val.replace( /\+/g, "%20" ) );
-                    } catch( e ) {
-                        // noop
-                    }
-                    //return val;
-                }
-                return retVal.replace( "<", "&lt;" ); 
-            },
-
-            smartSplit: function( str, sep, limit) {
-                str = str.split( sep );
-                if( str.length > limit ) {
-                    var ret = str.splice( 0, limit );
-                    ret.push( str.join( sep ) );
-                    return ret;
-                }
-                return str;
-            },
-
-            parseUrl: function() {
-                var url = this.url;
-                var sep = ( url.indexOf( "?" ) != -1 ? "?" : ";" );
-                var pieces = this.smartSplit( url, sep, 1 );
-                var p2 = pieces[0].split( ';' );
-                this.query = {};
-                this.queryString = '';
-                this.anchor = '';
-                this.location = p2[0];
-                this.paramString = ( p2[1] ? p2[1] : '' );
-                if( pieces[1] ) {
-                    var p3 = pieces[1].split( '#' );
-                    this.queryString = p3[0];
-                    this.anchor = ( p3[1] ? p3[1] : '' );
-                }
-                if( this.queryString ) {
-                    var kvSep = ( this.queryString.indexOf( "&" ) != -1 ? "&" : ";" );
-                    var kvPairs = this.queryString.split( kvSep );
-                    for( var i=0; i<kvPairs.length; ++i ) {
-                        var kv = kvPairs[i].split( '=' );
-                        this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
-                    }
-                }
-            }
-        };
-        return U;
-    } )();
 
 }} );
 
