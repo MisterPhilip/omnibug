@@ -236,7 +236,17 @@ describe( "Provider", function() {
     } );
 
 
-    // @TODO: doubleclick??
+    describe( "Doubleclick", function() {
+        var url = "http://ad.de.doubleclick.net/adj/worldsoffood.de/home;pack=diaet_abnehmen;theme=home;zustand=public;forum=nein;sz=468x60,728x90;ipv40=1;ipv50=1;ipv60=1;ipv70=0;ipv80=0;ipv90=0;ipv95=0;ipv100=0;ip_v=1;timeslot=265;tile=1;async=0;as13489=117847;as13489=117866;as13489=118019;as13489=118372;as13489=118422;as13489=118694;as13489=118748;asi=a11295;asi=a11296;asi=a11318;asi=a11319;asi=a10994;asi=a10045;asi=a10076;asi=a10088;asi=a10090;asi=a10095;asi=a10102;asi=b10001;asi=b0;j4=2;j5=3;i1=4;n1=4;n7=4;c1=0;c2=2;d7=2;j3=4;c3=1;d5=4;d6=4;d9=4;g2=4;d1=4;z2=7;ct_a=0;ct_b=1;ct_c=1;ct_i=1;ck_s=0;ct_y=0;ord=567683?",
+            provider = OmnibugProvider.getProviderForUrl( url );
+
+        it( "should return the Doubleclick provider", function() {
+            expect( provider.key ).toBe( "DOUBLECLICK" );
+            expect( provider.name ).toBe( "Doubleclick" );
+        } );
+
+        // @TODO: custom tests for this provider!
+    } );
 
 
 } );
