@@ -8,7 +8,6 @@
  * USA.
  *
  */
-try {
 var OmnibugProvider = {
     /**
      * Gathers each provider's pattern and concatenates (with alternation)
@@ -194,10 +193,11 @@ var OmnibugProvider = {
         },
         handleCustom: function( url, rv ) {
             if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
+                rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
+                return [ "rsid", rv[this.key][this.name]["rsid"] ];
             }
-            return [ "rsid", rv[this.key][this.name]["rsid"] ];
         }
     },
 
@@ -813,10 +813,10 @@ var OmnibugProvider = {
         }
     },
 
-    MEDIAMIND : {
-          key: "MEDIAMIND"
-        , name: "MediaMind"
-        , pattern: /\.serving-sys\.com/
+    DOUBLECLICK : {
+          key: "DOUBLECLICK"
+        , name: "Doubleclick"
+        , pattern: /\.doubleclick\.net\/ad/
         , keys: {
         },
         handleQueryParam: function( name, value, rv ) {
@@ -831,6 +831,4 @@ var OmnibugProvider = {
     }
 
 };
-} catch( ex ) {
-    console.log( "Providers generated an exception: ", ex.message );
-}
+
