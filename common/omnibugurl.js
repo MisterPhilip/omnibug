@@ -72,8 +72,26 @@ OmnibugUrl.prototype = (function() {
         },
 
         parseUrl: function() {
-            var url = this.url;
-            var sep = ( url.indexOf( "?" ) != -1 ? "?" : ";" );
+            var sep,
+                url = this.url,
+                sPos = url.indexOf( ";" ),
+                qPos = url.indexOf( "?" );
+
+            if( sPos > -1 && qPos > -1 ) {
+                // both
+                sep = sPos < qPos ? ";" : "?";
+            } else if( qPos > -1 ) {
+                sep = "?";
+            } else {
+                sep = ";";
+            }
+
+            /* (hideous) fix for doubleclick style urls, which
+               use only path parameters and *end* with a "?" */
+            if( sep === ";" && ( url.indexOf( "?" ) === url.length-1) ) {
+                url = url.substring( 0, url.length-1 );
+            }
+
             var pieces = this.smartSplit( url, sep, 1 );
             var p2 = pieces[0].split( ';' );
             this.query = {};
@@ -81,11 +99,13 @@ OmnibugUrl.prototype = (function() {
             this.anchor = '';
             this.location = p2[0];
             this.paramString = ( p2[1] ? p2[1] : '' );
+
             if( pieces[1] ) {
                 var p3 = pieces[1].split( '#' );
                 this.queryString = p3[0];
                 this.anchor = ( p3[1] ? p3[1] : '' );
             }
+
             if( this.queryString ) {
                 var kvSep = ( this.queryString.indexOf( "&" ) != -1 ? "&" : ";" );
                 var kvPairs = this.queryString.split( kvSep );
