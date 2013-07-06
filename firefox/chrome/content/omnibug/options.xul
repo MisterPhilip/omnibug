@@ -10,6 +10,8 @@
             buttons="accept,cancel"
             xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+    <script type="text/javascript" src="providers.js"></script>
+
     <prefpane id="omnibug-gen-pane" label="General Settings">
         <preferences>
             <preference id="pref-log" name="extensions.omnibug.enableFileLogging" type="bool"/>
@@ -25,6 +27,26 @@
             <preference id="pref-color-click" name="extensions.omnibug.color_click" type="string"/>
             <preference id="pref-color-prev" name="extensions.omnibug.color_prev" type="string"/>
             <preference id="pref-color-hover" name="extensions.omnibug.color_hover" type="string"/>
+
+            <!-- providers -->
+            <preference id="pref-prov-URCHIN" name="extensions.omnibug.provider.URCHIN" type="bool" />
+            <preference id="pref-prov-OMNITURE" name="extensions.omnibug.provider.OMNITURE" type="bool" />
+            <preference id="pref-prov-MONIFORCE" name="extensions.omnibug.provider.MONIFORCE" type="bool" />
+            <preference id="pref-prov-WEBTRENDS" name="extensions.omnibug.provider.WEBTRENDS" type="bool" />
+            <preference id="pref-prov-UNIVERSALANALYTICS" name="extensions.omnibug.provider.UNIVERSALANALYTICS" type="bool" />
+            <preference id="pref-prov-COREMETRICS" name="extensions.omnibug.provider.COREMETRICS" type="bool" />
+            <preference id="pref-prov-ATINTERNET" name="extensions.omnibug.provider.ATINTERNET" type="bool" />
+            <preference id="pref-prov-KISSMETRICS" name="extensions.omnibug.provider.KISSMETRICS" type="bool" />
+            <preference id="pref-prov-FBLIKE" name="extensions.omnibug.provider.FBLIKE" type="bool" />
+            <preference id="pref-prov-TORBIT" name="extensions.omnibug.provider.TORBIT" type="bool" />
+            <preference id="pref-prov-QUANTSERVE" name="extensions.omnibug.provider.QUANTSERVE" type="bool" />
+            <preference id="pref-prov-MARKETO" name="extensions.omnibug.provider.MARKETO" type="bool" />
+            <preference id="pref-prov-CROWDFACTORY" name="extensions.omnibug.provider.CROWDFACTORY" type="bool" />
+            <preference id="pref-prov-NEWRELIC" name="extensions.omnibug.provider.NEWRELIC" type="bool" />
+            <preference id="pref-prov-KRUX" name="extensions.omnibug.provider.KRUX" type="bool" />
+            <preference id="pref-prov-OPTIMIZELY" name="extensions.omnibug.provider.OPTIMIZELY" type="bool" />
+            <preference id="pref-prov-SOPHUS3" name="extensions.omnibug.provider.SOPHUS3" type="bool" />
+            <preference id="pref-prov-DOUBLECLICK" name="extensions.omnibug.provider.DOUBLECLICK" type="bool" />
         </preferences>
 
         <!-- file logging -->
@@ -78,33 +100,62 @@
                 <textbox id="color-hover-box" preference="pref-color-hover" size="7" maxlegth="7" />
             </hbox>
         </groupbox>
-    </prefpane>
 
-<!--
-    <prefpane id="omnibug-pat-pane" label="Pattern Settings">
-        <preferences>
-            <preference id="pref-useful" name="extensions.omnibug.usefulKeys" type="string"/>
-            <preference id="pref-highlight" name="extensions.omnibug.highlightKeys" type="string"/>
-            <preference id="pref-watch" name="extensions.omnibug.watchKeys" type="string"/>
-        </preferences>
-
-        <groupbox>
-            <caption label="Keys (comma-separated)" />
-            <hbox align="center">
-                <label control="watch-useful-box" value="Useful keys:" />
-                <textbox id="watch-useful-box" preference="pref-useful" flex="1" />
-            </hbox>
-            <hbox align="center">
-                <label control="watch-highlight-box" value="Highlight keys:" />
-                <textbox id="watch-highlight-box" preference="pref-highlight" flex="1" />
-            </hbox>
-            <hbox align="center">
-                <label control="watch-keys-box" value="Watch keys:" />
-                <textbox id="watch-keys-box" preference="pref-watch" flex="1" />
-            </hbox>
+        <!-- enabled providers -->
+        <groupbox id="providerGB">
+            <caption label="Enabled Providers" />
         </groupbox>
     </prefpane>
--->
+
+
+    <script type="application/javascript">
+    <![CDATA[
+        function createCheckbox( label, pref ) {
+            // checkbox label="AT Internet" preference="pref-prov-ATINTERNET"
+            var cb = document.createElement( "checkbox" );
+            cb.setAttribute( "label", label );
+            cb.setAttribute( "preference", pref );
+            return cb;
+        }
+
+        var i = 0,
+            groupbox = document.getElementById( "providerGB" ),
+            prefPane = document.getElementById( "omnibug-gen-pane" ),
+            providers = OmnibugProvider.getProviders(),
+            leftVBox = document.createElement( "vbox" ),
+            rightVBox = document.createElement( "vbox" ),
+            halfway = Math.round( Object.keys( providers ).length / 2 );
+
+        Object.keys( providers ).sort().forEach( function( prov ) {
+            var prefName = "pref-prov-" + prov;
+
+            /* comment out for now (doesn't work)
+            // preference id="pref-prov-ATINTERNET" name="extensions.omnibug.provider.ATINTERNET" type="bool"
+            var pref = document.createElement( "preference" );
+            pref.setAttribute( "id", prefName );
+            pref.setAttribute( "name", "extensions.omnibug.provider." + prov );
+            pref.setAttribute( "type", "bool" );
+            prefPane.appendChild( pref );
+            */
+
+            var checkbox = createCheckbox( providers[prov], prefName );
+            if( ++i <= halfway ) {
+                leftVBox.appendChild( checkbox );
+            } else {
+                rightVBox.appendChild( checkbox );
+            }
+        } );
+
+        var hbox = document.createElement( "hbox" );
+        hbox.appendChild( leftVBox );
+        hbox.appendChild( rightVBox );
+
+        var vbox = document.createElement( "vbox" );
+        vbox.appendChild( hbox );
+
+        groupbox.appendChild( vbox );
+    ]]>
+    </script>
 
 </prefwindow>
 

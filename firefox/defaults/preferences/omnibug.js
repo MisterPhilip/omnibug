@@ -20,3 +20,23 @@ pref( "extensions.omnibug.color_quotes", "#f00" );
 pref( "extensions.omnibug.color_hilite", "#ff0" );
 pref( "extensions.omnibug.color_hover", "#ccc" );
 
+// providers
+pref( "extensions.omnibug.provider.URCHIN", true );
+pref( "extensions.omnibug.provider.OMNITURE", true );
+pref( "extensions.omnibug.provider.MONIFORCE", true );
+pref( "extensions.omnibug.provider.WEBTRENDS", true );
+pref( "extensions.omnibug.provider.UNIVERSALANALYTICS", true );
+pref( "extensions.omnibug.provider.COREMETRICS", true );
+pref( "extensions.omnibug.provider.ATINTERNET", true );
+pref( "extensions.omnibug.provider.KISSMETRICS", true );
+pref( "extensions.omnibug.provider.FBLIKE", true );
+pref( "extensions.omnibug.provider.TORBIT", true );
+pref( "extensions.omnibug.provider.QUANTSERVE", true );
+pref( "extensions.omnibug.provider.MARKETO", true );
+pref( "extensions.omnibug.provider.CROWDFACTORY", true );
+pref( "extensions.omnibug.provider.NEWRELIC", true );
+pref( "extensions.omnibug.provider.KRUX", true );
+pref( "extensions.omnibug.provider.OPTIMIZELY", true );
+pref( "extensions.omnibug.provider.SOPHUS3", true );
+pref( "extensions.omnibug.provider.DOUBLECLICK", true );
+

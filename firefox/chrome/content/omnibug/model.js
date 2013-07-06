@@ -309,6 +309,11 @@ FBL.ns( function() { with( FBL ) {
                     this.initPatterns();
                     break;
             }
+
+            // Outside the switch so we can use startsWith()
+            if( key.startsWith( "provider." ) ) {
+                this.initPatterns();
+            }
         },
 
 
@@ -629,7 +634,18 @@ FBL.ns( function() { with( FBL ) {
             _dump( "initPatterns: initing patterns from prefs\n" );
             var userPattern = this.getPreference( "userPattern" );
 
-            this.cfg.defaultPattern = OmnibugProvider.getDefaultPattern().source;
+            //this.cfg.defaultPattern = OmnibugProvider.getDefaultPattern().source;
+            var that = this,
+                patterns = [],
+                providerPatterns = OmnibugProvider.getPatterns();
+
+            Object.keys( providerPatterns ).forEach( function( provider ) {
+                var enabled = that.getPreference( "provider." + provider );
+                if( enabled ) {
+                    patterns.push( providerPatterns[provider] );
+                }
+            } );
+            this.cfg.defaultPattern = new RegExp( patterns.join( "|" ) ).source;
             this.cfg.defaultRegex = new RegExp( this.cfg.defaultPattern );
 
             if( userPattern ) {
