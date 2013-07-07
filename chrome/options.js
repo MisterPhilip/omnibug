@@ -41,6 +41,25 @@
     }
 
     /**
+     * Get the list of enabled providers
+     */
+    function getCheckboxValues( elem ) {
+        var provs = [],
+            targ = document.querySelector( "#providers" ),
+            cbs = targ.querySelectorAll( "input[type='checkbox']" );
+
+        for( var cbIdx in cbs ) {
+            if( cbs.hasOwnProperty( cbIdx ) && cbs[cbIdx] instanceof HTMLInputElement ) {
+                var cb = cbs[cbIdx];
+                if( cb.checked ) {
+                    provs.push( cb.value );
+                }
+            }
+        }
+        return provs;
+    }
+
+    /**
      * Save new prefs back to local storage
      */
     function saveOptions( evt ) {
@@ -60,8 +79,15 @@
                         var active = document.querySelector( "input[type='radio'][name='" + key + "']:checked" );
                         prefs[key] = processFormValue( key, active.value );
                     } else if( elem.type === "hidden" ) {
-                        var values = getVisualListValues( elem );
-                        prefs[key] = values;
+                        var dataUse = elem.getAttribute( "data-use" );
+                        if( dataUse === "list" ) {
+                            var values = getVisualListValues( elem );
+                            prefs[key] = values;
+                        } else if( dataUse === "checkbox" ) {
+                            var values = getCheckboxValues( elem );
+                            prefs[key] = values;
+                        }
+
                     } else {
                         console.error( "Unknown options element type ", elem.type, " for option ", key );
                     }
@@ -72,35 +98,12 @@
         // save the new values into local storage
         try {
             chrome.storage.local.set( { "omnibug" : prefs }, function() {
-                    if( !! chrome.runtime.lastError ) {
-                        console.error( "Error setting prefs: ", chrome.runtime.lastError );
-                        flashMessage( "Error saving options", true );
-                    } else {
-                        flashMessage( "Options saved successfully", false );
-                    }
-
+                if( !! chrome.runtime.lastError ) {
+                    console.error( "Error setting prefs: ", chrome.runtime.lastError );
+                }
             } );
         } catch( ex ) {
             console.error( "Error saving prefs: ", ex.message );
-            flashMessage( "Error saving options", true );
-        }
-    }
-
-    /**
-     * Display an alert message next to the save button
-     */
-    function flashMessage( msg, error ) {
-        var statusArea = document.querySelector( "#status" );
-        if( !! statusArea ) {
-            statusArea.innerHTML = msg;
-            statusArea.style.backgroundColor = ( error ? "#faa" : "#afa" );
-            statusArea.style.visibility = "visible";
-            statusArea.style.opacity = 0;
-            setTimeout( function() {
-                statusArea.style.visibility = "hidden";
-                statusArea.style.opacity = 1;
-                statusArea.innerHTML = "";
-            }, 2100 );
         }
     }
 
@@ -111,6 +114,18 @@
         var elem = document.querySelector( "input[type='radio'][name='" + key + "'][value='" + value + "']" );
         if( !! elem ) {
             elem.checked = true;
+
+            while( elem.type !== "fieldset" ) {
+                elem = elem.parentNode;
+            }
+
+            var buttons = elem.querySelectorAll( "input[type='radio']" );
+            for( var btn in buttons ) {
+                if( buttons.hasOwnProperty( btn ) && buttons[btn] instanceof HTMLInputElement ) {
+                    buttons[btn].addEventListener( "input", saveOptions );
+                    buttons[btn].addEventListener( "change", saveOptions );
+                }
+            }
         }
     }
 
@@ -147,16 +162,59 @@
         } );
 
         var add = p.querySelector( "input[type='button']" );
-        add.addEventListener( "click", function( e ) {
-            var p   = e.target.parentNode,
-                inp = p.querySelector( "input[type='text']" );
+        if( !! add ) {
+            add.addEventListener( "click", function( e ) {
+                var p   = e.target.parentNode,
+                    inp = p.querySelector( "input[type='text']" );
 
-            if( !! inp.value ) {
-                p.querySelector( "ul" ).appendChild( createListItem( inp.value ) );
-                inp.value = "";
-            }
-            saveOptions();
-        } );
+                if( !! inp.value ) {
+                    p.querySelector( "ul" ).appendChild( createListItem( inp.value ) );
+                    inp.value = "";
+                }
+                saveOptions();
+            } );
+        }
+    }
+
+    /**
+     * Create a set of checkboxes
+     * Adds behavior to clicks on the checkboxes
+     */
+    function makeCheckboxList( key, value, elem ) {
+        if( key === "enabledProviders" ) {
+            var i = 0,
+                cont = elem.parentNode,
+                leftCol  = document.createElement( "p" ),
+                rightCol = document.createElement( "p" ),
+                providers = OmnibugProvider.getProviders(),
+                halfway = Math.round( Object.keys( providers ).length / 2 );
+
+            Object.keys( providers ).sort().forEach( function( prov ) {
+                var cb = document.createElement( "input" );
+                cb.type = "checkbox";
+                cb.name = "enabledProvList";
+
+                if( value.indexOf( prov ) > -1 ) {
+                    cb.checked = true;
+                }
+
+                cb.value = prov;
+                cb.addEventListener( "change", saveOptions );
+
+                var lbl = document.createElement( "label" );
+                lbl.appendChild( cb );
+                lbl.appendChild( document.createTextNode( OmnibugProvider[prov].name ) );
+
+                if( ++i <= halfway ) {
+                    leftCol.appendChild( lbl );
+                } else {
+                    rightCol.appendChild( lbl );
+                }
+
+                cont.appendChild( leftCol );
+                cont.appendChild( rightCol );
+            } );
+        }
     }
 
     /**
@@ -185,24 +243,27 @@
 
                         if( key.substring( 0, 6 ) === "color_" ) {
                             updateExampleColor( elem, prefs[key] );
-                            elem.addEventListener( 'input', function( e ) {
+                            elem.addEventListener( "input", function( e ) {
                                 updateExampleColor( e.target, e.target.value );
+                                saveOptions();
                             } );
                         }
 
                     } else if( elem.type === "radio" ) {
                         setRadioButton( key, prefs[key] );
                     } else if( elem.type === "hidden" ) {
-                        makeHiddenList( key, prefs[key], elem );
+                        var dataUse = elem.getAttribute( "data-use" );
+                        if( dataUse === "list" ) {
+                            makeHiddenList( key, prefs[key], elem );
+                        } else if( dataUse === "checkbox" ) {
+                            makeCheckboxList( key, prefs[key], elem );
+                        }
                     } else {
                         console.error( "Unknown options element type ", elem.type, " for option ", key );
                     }
                 }
             }
         }
-
-        // attach save button handler
-        document.querySelector( '#save' ).addEventListener( 'click', saveOptions );
     }
 
     // load prefs and update the HTML

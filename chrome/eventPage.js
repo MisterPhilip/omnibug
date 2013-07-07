@@ -30,6 +30,11 @@
         var prefs = {
             // pattern to match in request url
               defaultPattern : OmnibugProvider.getDefaultPattern().source
+
+            // all providers (initially)
+            , enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort()
+
+            // keys to highlight
             , highlightKeys  : [ "pageName", "ch", "events", "products" ]
 
             // show entries expanded?
@@ -57,20 +62,22 @@
         } );
 
         // force a (re)load of prefs, now that they may have changed
-        loadPrefsFromStorage();
+        loadPrefsFromStorage( "initPrefs" );
     }
 
 
     /**
      * Grab prefs data from storage
      */
-    function loadPrefsFromStorage() {
+    function loadPrefsFromStorage( whence ) {
         chrome.storage.local.get( "omnibug", function( prefData ) {
             that.prefs = prefData.omnibug;
+
+            var pattern = that.prefs.defaultPattern = getCurrentPattern( prefData.omnibug );
             that.prefs.defaultRegex = new RegExp( that.prefs.defaultPattern );
         } );
     }
-    loadPrefsFromStorage();
+
 
     /**
      * Receive updates when prefs change and broadcast them out
@@ -82,6 +89,8 @@
 
             // update local (eventPage.js) prefs
             that.prefs = newPrefs;
+
+            var newPattern = that.prefs.defaultPattern = getCurrentPattern( newPrefs );
             that.prefs.defaultRegex = new RegExp( that.prefs.defaultPattern );
 
             // send new prefs to all connected devtools panels
@@ -91,7 +100,25 @@
 
 
     /**
-     * Quickly determine if a URL is a candidate for us or now
+     * Return a pattern that matches the currently enabled providers
+     */
+    function getCurrentPattern( prefSet ) {
+        var that = this,
+            patterns = [],
+            providerPatterns = OmnibugProvider.getPatterns();
+
+        Object.keys( providerPatterns ).forEach( function( provider ) {
+            var enabled = prefSet.enabledProviders.indexOf( provider ) > -1;
+            if( enabled ) {
+                patterns.push( providerPatterns[provider] );
+            }
+        } );
+        return new RegExp( patterns.join( "|" ) ).source;
+    }
+
+
+    /**
+     * Quickly determine if a URL is a candidate for us or not
      */
     function shouldProcess( url ) {
         return url.match( this.prefs.defaultRegex );

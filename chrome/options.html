@@ -1,21 +1,21 @@
 <html>
 <head>
     <title>Omnibug Options</title>
-    <script src="options.js"></script>
+    <script type="text/javascript" src="options.js"></script>
+    <script type="text/javascript" src="omnibugurl.js"></script>
+    <script type="text/javascript" src="providers.js"></script>
 
     <style type="text/css">
         body { text-align: center; font-family: arial, helvetica, clean, sans-serif; }
         body > * { text-align: left; }
-        form, div.header { display: inline-block; width: 50%; }
+        form, div.header, p.note { display: inline-block; width: 50%; }
         fieldset { margin: 1em 0; }
 
         span.example { padding: 5px; margin-left: 2em; }
-        fieldset#submit { border: 0; }
         fieldset.color input { width: 5em; font-family: monospace; }
         #highlightKeys { width: 25em; }
         p.hint { color: #999; font-size: smaller; margin: 0.5em 0 0 0; }
         p.hint:hover { color: #000; }
-        #save { font-size: larger; }
 
         div.header h3 {
             display: inline-block;
@@ -23,23 +23,6 @@
             padding: 0;
             line-height: 64px;
             vertical-align: top;
-        }
-
-        #status {
-            margin-left: 1.5em;
-            padding: 0.75em;
-            background-color: #afa;
-            font-size: larger;
-            font-weight: bold;
-            visibility: hidden;
-        }
-
-        .fadable {
-           opacity: 1;
-           transition: opacity 1.0s ease-out;
-           transition-delay: 1s;
-           -webkit-transition: opacity 1.0s ease-out;
-           -webkit-transition-delay: 1s;
         }
 
         fieldset ul {
@@ -55,12 +38,20 @@
             padding: 5px;
         }
 
+        #providers label {
+            display: block;
+        }
+        #providers p {
+            width: 48%;
+            float: left;
+            margin: 0;
+        }
+
         a.rem {
             font-weight: bold;
             text-decoration: none;
             margin-left: 8px;
         }
-
     </style>
 </head>
 
@@ -69,14 +60,22 @@
         <img src="images/o-64.png" alt="O" />
         <h3>Omnibug Options</h3>
     </div>
+
+    <p class="note">Note: changes to preferences are saved immediately</p>
+
     <form action="">
         <fieldset>
             <legend>Highlight parameter names</legend>
             <ul></ul>
             <input type="text" />
             <input type="button" value="Add" />
-            <input type="hidden" id="highlightKeys" />
+            <input type="hidden" id="highlightKeys" data-use="list" />
             <p class="hint">Parameter names to be highlighted</p>
+        </fieldset>
+
+        <fieldset id="providers">
+            <legend>Enabled providers</legend>
+            <input type="hidden" id="enabledProviders" data-use="checkbox" />
         </fieldset>
 
         <fieldset>
@@ -148,13 +147,7 @@
             <span class="example">Example</span>
         </fieldset>
 
-        <fieldset id="submit">
-            <button id="save">Save</button>
-            <span id="status" class="fadable"></span>
-        </fieldset>
-
     </form>
-
 
 </body>
 </html>
