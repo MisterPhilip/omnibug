@@ -21,6 +21,7 @@
     "url": "https://github.com/simpsora/omnibug/issues"
   },
   "devDependencies": {
+    "underscore.string": "~2.2.0",
     "grunt": "~0.4.1",
     "grunt-cli": "~0.1.9",
     "grunt-contrib-watch": "~0.4.4",
