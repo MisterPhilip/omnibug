@@ -69,8 +69,15 @@ read foo
 # Deploy (or not)
 #
 if [[ "x$1" == "x" || "$1" == "ross" ]]; then
-    echo "Sending update.rdf and xpi"
-    scp update.rdf $XPI rosssimpson.com:www/dev/${extrapath}
+    echo "Sending XPI"
+    scp $XPI rosssimpson.com:www/dev/${extrapath}
+    echo "XPI URL is https://rosssimpson.com/dev/${extrapath}${XPI}"
+
+    echo -n "Press enter to complete deployment"
+    read foo
+
+    echo "Sending update.rdf"
+    scp update.rdf rosssimpson.com:www/dev/${extrapath}
     echo ""
 
     echo "Updating symlink"
