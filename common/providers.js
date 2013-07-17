@@ -64,7 +64,7 @@ var OmnibugProvider = {
             , pattern: /^5831c14e26a2ded99d98782c15e92d62f195d9bcf53869f4d412cff5a074e5246c99916ada7ad760$/
             , keys: {
             },
-            handleQueryParam: function( name, value, rv ) {
+            handleQueryParam: function( name, value, rv, raw ) {
                 return false;
             }
         }
@@ -124,11 +124,12 @@ var OmnibugProvider = {
             , utmsn:  "Social network name"
             , utmht:  "Time dispatched"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys || name.match( /^utm.*/ ) ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -194,7 +195,7 @@ var OmnibugProvider = {
             , zip:    "ZIP/Postal code"
             , rsid:   "Report Suites"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             var _name;
             if( name.match( /^c(\d+)$/ ) || name.match( /^prop(\d+)$/i ) ) {
                 // props
@@ -202,30 +203,34 @@ var OmnibugProvider = {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["prop"+RegExp.$1] = value;
+                raw["prop"+RegExp.$1] = value;
             } else if( name.match( /^v(\d+)$/ ) || name.match( /^evar(\d+)$/i ) ) {
                 // eVars
                 _name = "Conversion Variables"
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["eVar"+RegExp.$1] = value;
+                raw["eVar"+RegExp.$1] = value;
             } else if( name.match( /^\[?AQB\]?$/ ) || name.match( /^\[?AQE\]?$/ ) ) {
                 // noop; skip Omniture's [AQB] and [AQE] elements
+                raw[name] = value;
             } else if( name in this.keys ) {
                 // anything else
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
             } else {
                 return false;
             }
             return true;
         },
-        handleCustom: function( url, rv ) {
+        handleCustom: function( url, rv, raw ) {
             if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
-                return [ "rsid", rv[this.key][this.name]["rsid"] ];
+                raw["rsid"] = RegExp.$1.split( "," );
             }
         }
     },
@@ -236,11 +241,12 @@ var OmnibugProvider = {
         , pattern: /moniforce\.gif/
         , keys: {
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys || name.match( /^mfinfo/ ) ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -314,11 +320,12 @@ var OmnibugProvider = {
             , "dcsref":      "Referrer URL"
             , "dcsredirect": "Cookie detection (internal)"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys || name.match( /^WT\./ ) || name.match( /^dcs/ ) ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -390,11 +397,12 @@ var OmnibugProvider = {
             , exd:    "Exception description"
             , exf:    "Is exception fatal?"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -462,7 +470,7 @@ var OmnibugProvider = {
             , vn1:   "Coremetrics library version"
             , vn2:   "Coremetrics library version 2"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             var _name;
             if( name.match( /^rg(\d+)$/ ) ) {
                 _name = "Registration Tag Attributes"
@@ -522,6 +530,7 @@ var OmnibugProvider = {
             } else {
                 return false;
             }
+            raw[name] = value;
             return true;
         }
     },
@@ -540,11 +549,12 @@ var OmnibugProvider = {
             , re:   "Viewport resolution"
             , dest: "Destination URL"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -557,7 +567,7 @@ var OmnibugProvider = {
         , pattern: /api\.mixpanel\.com\/track\//
         , keys: {
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name == "data" ) {
                 var obj = atob( value );
                 try {
@@ -570,12 +580,14 @@ var OmnibugProvider = {
                                         rv[this.key] = rv[this.key] || {};
                                         rv[this.key][k] = rv[this.key][k] || {};
                                         rv[this.key][k][innerK] = parsed[k][innerK];
+                                        raw[innerK] = parsed[k][innerK];
                                     }
                                 }
                             } else {
                                 rv[this.key] = rv[this.key] || {};
                                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                                 rv[this.key][this.name][k] = parsed[k];
+                                raw[k] = parsed[k];
                             }
                         }
                     }
@@ -588,6 +600,7 @@ var OmnibugProvider = {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -618,6 +631,7 @@ var OmnibugProvider = {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -648,11 +662,12 @@ var OmnibugProvider = {
             , tags: "tags"
             , v: "v"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -670,11 +685,12 @@ var OmnibugProvider = {
             , sr:  "Screen resolution"
             , et:  "Timestamp"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -699,11 +715,12 @@ var OmnibugProvider = {
             , _mchQp: "_mchQp"
             , _mchVr: "_mchVr"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -725,11 +742,12 @@ var OmnibugProvider = {
             , session:      "Session"
             , _mkto_trk:    "_mkto_trk"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -742,7 +760,7 @@ var OmnibugProvider = {
         , pattern: /beacon.*\.newrelic\.com\//
         , keys: {
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name == "perf" ) {
                 try {
                     var parsed = JSON.parse( value );
@@ -754,12 +772,14 @@ var OmnibugProvider = {
                                         rv[this.key] = rv[this.key] || {};
                                         rv[this.key][k] = rv[this.key][k] || {};
                                         rv[this.key][k][innerK] = parsed[k][innerK];
+                                        raw[innerK] = parsed[k][innerK];
                                     }
                                 }
                             } else {
                                 rv[this.key] = rv[this.key] || {};
                                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                                 rv[this.key][this.name][k] = parsed[k];
+                                raw[k] = parsed[k];
                             }
                         }
                     }
@@ -772,6 +792,7 @@ var OmnibugProvider = {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -784,11 +805,12 @@ var OmnibugProvider = {
         , pattern: /beacon\.krxd\.net\/pixel\.gif/
         , keys: {
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -801,11 +823,12 @@ var OmnibugProvider = {
         , pattern: /optimizely\.com\/event/
         , keys: {
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -831,11 +854,12 @@ var OmnibugProvider = {
             , ts:     "Ts"
             , "location": "Location"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;
@@ -848,11 +872,12 @@ var OmnibugProvider = {
         , pattern: /\.doubleclick\.net\/ad/
         , keys: {
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
+                raw[name] = value;
                 return true;
             }
             return false;

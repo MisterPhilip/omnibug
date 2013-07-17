@@ -6,7 +6,7 @@ describe( "Provider", function() {
         it( "should return the unknown provider for an unknown URL", function() {
             var provider = OmnibugProvider.getProviderForUrl( "" );
             expect( provider.key ).toBe( "UNKNOWN" );
-            expect( provider.handleQueryParam( null, null, null ) ).toBe( false );
+            expect( provider.handleQueryParam( null, null, null, null ) ).toBe( false );
         } );
     } );
 
@@ -20,21 +20,23 @@ describe( "Provider", function() {
         } );
 
         it( "should reject an unknown key", function() {
-            var rv = {};
-            expect( provider.handleQueryParam( "nonsenseValue", "", rv ) ).toBe( false );
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "nonsenseValue", "", rv, raw ) ).toBe( false );
         } );
 
         it( "should allow a known key", function() {
-            var rv = {};
-            expect( provider.handleQueryParam( "utmttx", 4, rv ) ).toBe( true );
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "utmttx", 4, rv, raw ) ).toBe( true );
             expect( rv[provider.key][provider.name].utmttx ).toBe( 4 );
+            expect( raw.utmttx ).toBe( 4 );
         } );
 
         it( "should overwrite an existing value with a new one", function() {
-            var rv = {};
-            expect( provider.handleQueryParam( "utmttx", 4, rv ) ).toBe( true );
-            expect( provider.handleQueryParam( "utmttx", 7, rv ) ).toBe( true );
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "utmttx", 4, rv, raw ) ).toBe( true );
+            expect( provider.handleQueryParam( "utmttx", 7, rv, raw ) ).toBe( true );
             expect( rv[provider.key][provider.name].utmttx ).toBe( 7 );
+            expect( raw.utmttx ).toBe( 7 );
         } );
     } );
 
@@ -49,28 +51,33 @@ describe( "Provider", function() {
         } );
 
         it( "should allow a known key", function() {
-            var rv = {};
-            expect( provider.handleQueryParam( "ch", "mq.mq", rv ) ).toBe( true );
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "ch", "mq.mq", rv, raw ) ).toBe( true );
             expect( rv[provider.key][provider.name].ch ).toBe( "mq.mq" );
+            expect( raw.ch ).toBe( "mq.mq" );
         } );
 
         it( "should populate an rsid in handleCustom", function() {
-            var rv = {};
-            provider.handleCustom( url, rv );
+            var rv = {}, raw = {};
+            provider.handleCustom( url, rv, raw );
             expect( rv[provider.key][provider.name].rsid ).toContain( "aolsvc" );
             expect( rv[provider.key][provider.name].rsid.length ).toBe( 1 );
+            expect( raw.rsid ).toContain( "aolsvc" );
+            expect( raw.rsid.length ).toBe( 1 );
         } );
 
         it( "should handle a custom traffic variable", function() {
-            var rv = {};
-            expect( provider.handleQueryParam( "c3", "gmt_5", rv ) ).toBe( true );
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "c3", "gmt_5", rv, raw ) ).toBe( true );
             expect( rv[provider.key]["Custom Traffic Variables"].prop3 ).toBe( "gmt_5" );
+            expect( raw.prop3 ).toBe( "gmt_5" );
         } );
 
         it( "should handle a conversion variable", function() {
-            var rv = {};
-            expect( provider.handleQueryParam( "evar1", "ooo", rv ) ).toBe( true );
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "evar1", "ooo", rv, raw ) ).toBe( true );
             expect( rv[provider.key]["Conversion Variables"].eVar1 ).toBe( "ooo" );
+            expect( raw.eVar1 ).toBe( "ooo" );
         } );
     } );
 
