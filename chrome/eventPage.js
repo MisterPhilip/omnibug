@@ -264,7 +264,8 @@
         var val,
             u = new OmnibugUrl( data.url ),
             obj = {
-                state: data    // raw data from the browser event
+                state: data,    // raw data from the browser event
+                raw: {}
             };
 
         var that = this,
@@ -274,11 +275,11 @@
         u.getQueryNames().forEach( function( n ) {
             if( n ) {
                 vals = u.getQueryValues( n );
-                processQueryParam( n, vals, provider, processedKeys );
+                processQueryParam( n, vals, provider, processedKeys, obj["raw"] );
             }
         } );
 
-        delegateCustomProcessing( data.url, provider, processedKeys );
+        delegateCustomProcessing( data.url, provider, processedKeys, obj["raw"] );
 
         // merge processedKeys into obj
         for( var key in processedKeys ) {
@@ -296,13 +297,14 @@
      * Takes a single name/value pair and delegates handling of it to the provider
      * Otherwise, inserts into the `other' bucket
      */
-    function processQueryParam( name, value, provider, container ) {
-        if( provider.handleQueryParam( name, value, container ) ) {
-            // noop (processedKeys modified by provider's method)
+    function processQueryParam( name, value, provider, container, rawCont ) {
+        if( provider.handleQueryParam( name, value, container, rawCont ) ) {
+            // noop (container (and rawCont) modified by provider's method)
         } else {
-            // stick in `other'
+            // stick in `other' (and rawCont)
             container["other"] = container["other"] || {};
             container["other"][name] = value;
+            rawCont[name] = value;
         }
     }
 
@@ -310,9 +312,9 @@
     /**
      * If the provider defines a custom URL handler, delegate to it
      */
-    function delegateCustomProcessing( url, provider, container ) {
+    function delegateCustomProcessing( url, provider, container, rawCont ) {
         if( typeof( provider.handleCustom ) === "function" ) {
-            provider.handleCustom( url, container );
+            provider.handleCustom( url, container, rawCont );
         }
     }
 

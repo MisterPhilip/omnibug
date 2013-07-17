@@ -303,14 +303,14 @@ FBL.ns( function() { with( FBL ) {
          * Otherwise, inserts into the `other' bucket
          */
         processQueryParam: function( name, value, provider, container, rawCont ) {
-            if( provider.handleQueryParam( name, value, container ) ) {
-                // noop (processedKeys modified by provider's method)
+            if( provider.handleQueryParam( name, value, container, rawCont ) ) {
+                // noop (container (and rawCont) modified by provider's method)
             } else {
-                // stick in `other'
+                // stick in `other' (and rawCont)
                 container["other"] = container["other"] || {};
                 container["other"][name] = value;
+                rawCont[name] = value;
             }
-            rawCont[name] = value;
         },
 
 
@@ -319,10 +319,7 @@ FBL.ns( function() { with( FBL ) {
          */
         delegateCustomProcessing: function( url, provider, container, rawCont ) {
             if( typeof( provider.handleCustom ) === "function" ) {
-                var parts = provider.handleCustom( url, container );
-                if( parts && parts.length == 2 ) {
-                    rawCont[parts[0]] = parts[1];
-                }
+                provider.handleCustom( url, container, rawCont );
             }
         },
 
