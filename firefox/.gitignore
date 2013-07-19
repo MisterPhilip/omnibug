@@ -1,3 +1,4 @@
 *.xpi
 update.rdf
 install.rdf
+push.bash

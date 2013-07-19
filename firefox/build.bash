@@ -4,8 +4,20 @@
 # Build extension .xpi
 #
 
+APP=omnibug
+MAJOR=0
+MINOR=5
+
+# Get most current version
+PLACEHOLDER=version.txt
+PATCH=`cat ${PLACEHOLDER}`
+
+VERSION="${MAJOR}.${MINOR}.${PATCH}"
+
+
 if [[ "$1" != "amo" && "$1" != "site" ]]; then
     echo "Usage: $0 <mode>, where mode is one of [ 'amo', 'site' ]"
+    echo "You probably want 'site' mode."
     echo
     exit 1
 fi
@@ -23,9 +35,9 @@ else
 fi
 
 APP=omnibug
-XPIFILE=${APP}-${1}.xpi
+XPIFILE=${APP}-${1}-${VERSION}.xpi
 
-echo "Creating xpi"
+echo "Creating XPI"
 chrome_files=$( find -L chrome -type f | egrep -v '(\.git|\.swp)' )
 defaults_files=$( find -L defaults -type f | egrep -v '(\.git|\.swp)' )
 

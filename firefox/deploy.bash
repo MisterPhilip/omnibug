@@ -14,12 +14,6 @@ MINOR=5
 PLACEHOLDER=version.txt
 PATCH=`cat ${PLACEHOLDER}`
 
-extrapath=""
-if [[ "$1" == "ross" ]]; then
-    extrapath=ross/
-    echo "Doing private deployment to ${extrapath}"
-fi
-
 
 # update version
 echo -n "$0: incrementing version: old=$PATCH; "
@@ -42,9 +36,7 @@ echo ""
 ./build.bash amo
 ./build.bash site
 
-XPI=${APP}-${VER}.xpi
-mv ${APP}-site.xpi $XPI
-mv ${APP}-amo.xpi "${APP}-amo-${VER}.xpi"
+XPI=${APP}-site-${VER}.xpi
 
 echo "Adding updated install.rdf to ${APP}.xpi"
 zip -u $XPI
@@ -61,30 +53,5 @@ cat update.rdf.tpl | sed "s/TOK_VER/${VER}/g" | sed "s/TOK_HASH/${HASH}/g" > upd
 echo -n "Please sign `pwd`/update.rdf with McCoy now; press enter when done."
 read foo
 
-
-echo -n "Press enter to deploy $VER to rosssimpson.com. "
-read foo
-
-#
-# Deploy (or not)
-#
-if [[ "x$1" == "x" || "$1" == "ross" ]]; then
-    echo "Sending XPI"
-    scp $XPI rosssimpson.com:www/dev/${extrapath}
-    echo "XPI URL is https://rosssimpson.com/dev/${extrapath}${XPI}"
-
-    echo -n "Press enter to complete deployment"
-    read foo
-
-    echo "Sending update.rdf"
-    scp update.rdf rosssimpson.com:www/dev/${extrapath}
-    echo ""
-
-    echo "Updating symlink"
-    ssh rosssimpson.com "ln -sf $XPI www/dev/${extrapath}${APP}-current.xpi"
-
-    echo "Done.  URL is https://rosssimpson.com/dev/${extrapath}${APP}-current.xpi"
-else
-    echo "Done.  Did not deploy."
-fi
+echo "Build complete"
 
