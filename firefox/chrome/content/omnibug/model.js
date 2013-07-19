@@ -63,7 +63,6 @@ FBL.ns( function() { with( FBL ) {
     Firebug.Omnibug = extend( Firebug.Module, {
         cfg: {
             requests: {},
-            messages: [],
             latestOmnibugContext: null,
             defaultRegex: null,
             userRegex: null,
@@ -344,7 +343,6 @@ FBL.ns( function() { with( FBL ) {
 
                     var msg = "File logging enabled; requests will be written to " + this.cfg.outFile.path;
                     _dump( "initLogging: " + msg + "\n" );
-                    this.cfg.messages.push( msg );
                 } catch( ex ) {
                     _dump( "initLogging: unable to create output file: " + ex + "\n" );
                 }
@@ -434,11 +432,6 @@ FBL.ns( function() { with( FBL ) {
             }
 
             context.omnibug.loaded = true;
-
-            // dump any messages waiting
-            while( this.cfg.messages.length ) {
-                context.getPanel("Omnibug").printLine( this.cfg.messages.shift() );
-            }
 
             // dump any requests waiting
             this.processRequests( context );
