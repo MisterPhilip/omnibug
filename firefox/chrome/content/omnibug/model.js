@@ -245,7 +245,7 @@ FBL.ns( function() { with( FBL ) {
                         // update request list
                         if( omRef.cfg.requests[key] ) {
                             omRef.cfg.requests[key]["statusText"] = statusStr;
-                            dump( "responseObserver: updating request in list for key=" + key + "; obj=" + Omnibug.Tools.objDump( omRef.cfg.requests[key] ) + "\n" );
+                            _dump( "responseObserver: updating request in list for key=" + key + "\n" );
                         }
                     }
                 }
@@ -877,7 +877,7 @@ FBL.ns( function() { with( FBL ) {
     }
 
     Omnibug.Tools.chooseLogFile = function( win ) {
-        dump( "chooseLogFile: win=" + win + "\n" );
+        _dump( "chooseLogFile: win=" + win + "\n" );
 
         const nsIFilePicker = Components.interfaces.nsIFilePicker;
         var fp = CC( "@mozilla.org/filepicker;1" ).createInstance( nsIFilePicker );
@@ -887,12 +887,12 @@ FBL.ns( function() { with( FBL ) {
         var rv = fp.show();
         if( rv == nsIFilePicker.returnOK || rv == nsIFilePicker.returnReplace ) {
             var path = fp.file.path;
-            dump( "chooseLogFile: new path = " + path + "\n" );
+            _dump( "chooseLogFile: new path = " + path + "\n" );
 
             Firebug.Omnibug.setPreference( "logFileName", path );
             Firebug.Omnibug.setPreference( "enableFileLogging", true );
 
-            dump( "chooseLogFile: set new path; get=" + Firebug.Omnibug.getPreference( "logFileName" ) + "\n" );
+            _dump( "chooseLogFile: set new path; get=" + Firebug.Omnibug.getPreference( "logFileName" ) + "\n" );
 
             return true;
         }

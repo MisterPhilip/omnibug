@@ -456,7 +456,7 @@ FBL.ns( function() { with( FBL ) {
             var sp = this.getContext().getPanel("OmnibugSide");
             sp.updateWatches( data );
 
-            _dump( "report: wrote entry for " + data.state.key + "\n" );
+            _dump( "report: wrote entry for " + data.state.key + " (eventType=" + data.raw.event + ")\n" );
         },
 
 

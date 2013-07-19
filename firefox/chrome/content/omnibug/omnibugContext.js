@@ -8,7 +8,7 @@ if ( typeof Omnibug == "undefined" ) {
 }
 
 Omnibug.OmnibugContext = function( panel ) {
-    dump( ">>>   OmnibugContext: constructor, panel=" + panel + "\n" );
+    //dump( ">>>   OmnibugContext: constructor, panel=" + panel + "\n" );
 };
 
 /**
