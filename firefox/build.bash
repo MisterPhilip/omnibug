@@ -4,6 +4,8 @@
 # Build extension .xpi
 #
 
+set -e
+
 APP=omnibug
 MAJOR=0
 MINOR=5
@@ -34,7 +36,10 @@ else
     cp install.rdf.site install.rdf
 fi
 
-APP=omnibug
+# Copy common JS
+cp ../common/*.js chrome/content/omnibug/
+
+
 XPIFILE=${APP}-${1}-${VERSION}.xpi
 
 echo "Creating XPI"
