@@ -67,6 +67,14 @@
 
 
     /**
+     * Browser startup callback
+     */
+    chrome.runtime.onStartup.addListener( function() {
+        loadPrefsFromStorage( "onStartup" );
+    } );
+
+
+    /**
      * Grab prefs data from storage
      */
     function loadPrefsFromStorage( whence ) {
