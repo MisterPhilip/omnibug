@@ -42,11 +42,10 @@ module.exports = function( grunt ) {
             ],
             options: {
                 //specs: "src/js/**/*.test.js",
-                specs: "test/common/*.js"/*,
+                specs: "test/common/*.js",
                 junit: {
                     path: "build/test-results"
                 }
-                */
             }
         }
     };
