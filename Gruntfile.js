@@ -3,9 +3,118 @@ module.exports = function( grunt ) {
     "use strict";
     grunt.file.mkdir( "build" );
     var gruntConfig = {
-        pkg: grunt.file.readJSON( "package.json" )
+        pkg: grunt.file.readJSON( "package.json" ),
+        deploy: grunt.file.readJSON( "deploy.json" )
     };
     grunt.initConfig( gruntConfig );
+
+
+    /*
+     * Copy artifacts to remote
+     */
+    grunt.loadNpmTasks( "grunt-scp" );
+    gruntConfig.scp = {
+        options: {
+            host: "<%= deploy.host %>",
+            username: "<%= deploy.username %>",
+            privateKey: grunt.file.read( "deploy.key" )
+        },
+        chrome: {
+            files: [
+                { cwd: "build", src: "*.crx", dest: "<%= deploy.path %>" }
+            ]
+        },
+        firefox: {
+            files: [
+                { cwd: "build", src: "<%= pkg.name %>-<%= pkg.version %>.xpi", dest: "<%= deploy.path %>" },
+                { cwd: "firefox", src: "update.rdf", dest: "<%= deploy.path %>" }
+            ]
+        }
+    };
+
+
+    /*
+     * Create a symlink on the remote end
+     */
+    grunt.loadNpmTasks( "grunt-ssh" );
+    gruntConfig.sshexec = {
+        link: {
+            command: "ln -sf <%= deploy.path %><%= pkg.name %>-<%= pkg.version %>.xpi <%= deploy.path %><%= pkg.name %>-current.xpi",
+            options: {
+                path: "<%= deploy.path %>",
+                host: "<%= deploy.host %>",
+                username: "<%= deploy.username %>",
+                privateKey: grunt.file.read( "deploy.key" )
+            }
+        }
+    };
+
+
+    /*
+     * Shell commands
+     * NOTE: this is non-portable and will likely only work on Linux/OS X!
+     */
+    grunt.loadNpmTasks( "grunt-shell" );
+    gruntConfig.shell = {
+        // Populate the updateHash value and sign the XPI
+        signXPI: {
+            command: [
+                "set -e",
+                "HASH=$( openssl sha1 build/<%= pkg.name %>-<%= pkg.version %>.xpi | awk '{ print $2 }' )",
+                "cat firefox/update.rdf.tpl | sed \"s/TOK_HASH/${HASH}/g\" > firefox/update.rdf",
+                "echo",
+                "echo \"Please sign and verify `pwd`/firefox/update.rdf with McCoy now\"",
+                "mccoy || exit 1"
+            ].join( " && " ),
+            options: {
+                stdout: true,
+                stderr: true,
+                failOnError: true
+            }
+        },
+
+        // Tag the repo
+        gitTag: {
+            command: [
+                "set -e",
+                "git tag '<%= pkg.name %>-<%= pkg.version %>'",
+                "echo echo git push --tags"
+            ].join( " && " ),
+            options: {
+                stdout: true,
+                stderr: true,
+                failOnError: true
+            }
+        },
+
+        // Commit after doing a deploy
+        gitCommitDeploy: {
+            command: [
+                "set -e",
+                "echo echo git commit chrome/manifest.json firefox/install.rdf.amo firefox/install.rdf.site firefox/update.rdf.tpl -m'Commit for deploy <%= pkg.version %>'",
+                "echo echo git push"
+            ].join( " && " ),
+            options: {
+                stdout: true,
+                stderr: true,
+                failOnError: true
+            }
+        },
+
+        // Commit after bumping the version number
+        gitCommitVersionIncrement: {
+            command: [
+                "set -e",
+                "git commit package.json -m'Bump version number after release'",
+                "git push"
+            ].join( " && " ),
+            options: {
+                stdout: true,
+                stderr: true,
+                failOnError: true
+            }
+        }
+    };
 
 
     /*
@@ -120,8 +229,15 @@ module.exports = function( grunt ) {
                 replace: "[0-9]+\\.[0-9]+\\.[0-9]+",
             },
             src: [ "firefox/install.rdf.site", "firefox/install.rdf.amo", "firefox/update.rdf.tpl" ]
+        },
+        omnibug: {
+            src: [ "package.json" ],
+            options: {
+                release: "patch"
+            }
         }
     };
+    grunt.registerTask( "updateVersion", [ "version:omnibug", "shell:gitCommitVersionIncrement" ] );
 
 
     /*
@@ -176,7 +292,20 @@ module.exports = function( grunt ) {
     grunt.registerTask( "makeFirefox", [ "copy:firefox", "version:firefox", "compress:site", "compress:amo" ] );
 
 
-    grunt.registerTask( "makeAll", [ "clean", "jshint", "test", "makeChrome", "makeFirefox" ] );
+
+    /*
+     * Deploy tasks
+     */
+    grunt.registerTask( "deployFirefox", [ "makeFirefox", "shell:signXPI", "scp:firefox", "sshexec:link" ] );
+    grunt.registerTask( "deployChrome", [ "makeChrome", "scp:chrome" ] );
+
+    /*
+     * Pipeline tasks
+     */
+    //grunt.registerTask( "makeAll", [ "clean", "jshint", "test", "makeChrome", "makeFirefox" ] );
+    //grunt.registerTask( "firefox", [ "deployFirefox", "shell:gitCommitDeploy", "shell:gitTag", "updateVersion" ] );
+    //grunt.registerTask( "chrome", [ "deployChrome", "shell:gitCommitDeploy", "shell:gitTag", "updateVersion" ] );
+    grunt.registerTask( "release", [ "deployFirefox", "deployChrome", "shell:gitCommitDeploy", "shell:gitTag", "updateVersion" ] );
 
     // CI tasks
     grunt.registerTask( "travis", [ "jshint", "test", "coverage" ]);
