@@ -60,9 +60,43 @@ module.exports = function( grunt ) {
     grunt.registerTask('coverage', 'jasmine:istanbul');
     */
 
-
-
     grunt.initConfig( gruntConfig );
     grunt.registerTask( 'travis', ['jshint', 'test' ]);
+
+
+    // copies dependency files into place
+    grunt.loadNpmTasks( "grunt-contrib-copy" );
+    gruntConfig.copy = {
+        main: {
+            files: [
+                { expand: true, cwd: "common/", src: [ "*.js" ], dest: "chrome/" },
+                { expand: true, cwd: "common/", src: [ "*.js" ], dest: "firefox/chrome/content/omnibug/" }
+            ]
+        }
+    };
+    grunt.registerTask( "makeDev", [ "copy" ] );
+
+    // clean the project dir
+    grunt.loadNpmTasks( "grunt-contrib-clean" );
+    gruntConfig.clean = {
+        clean: [ "*.xpi", "*.crx",
+                 "chrome/providers.js", "chrome/omnibugurl.js",
+                 "firefox/chrome/content/omnibug/providers.js", "firefox/chrome/content/omnibug/omnibugurl.js" ]
+    };
+
+    /*
+     * Build Chrome extension
+     */
+    grunt.loadNpmTasks( "grunt-crx" );
+    gruntConfig.crx = {
+        omnibugPackage: {
+            "src": "chrome/",
+            "dest": ".",
+            "privateKey": "omnibug.pem"
+
+        }
+    };
+    grunt.registerTask( "makeChrome", [ "copy", "crx" ] );
+
 
 };
