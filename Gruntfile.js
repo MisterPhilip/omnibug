@@ -88,8 +88,29 @@ module.exports = function( grunt ) {
     gruntConfig.clean = {
         clean: [ "*.xpi", "*.crx",
                  "chrome/providers.js", "chrome/omnibugurl.js",
-                 "firefox/chrome/content/omnibug/providers.js", "firefox/chrome/content/omnibug/omnibugurl.js" ]
+                 "firefox/chrome/content/omnibug/providers.js", "firefox/chrome/content/omnibug/omnibugurl.js",
+                 "firefox/install.rdf", "firefox/update.rdf" ]
     };
+
+
+    grunt.loadNpmTasks( "grunt-version" );
+    gruntConfig.version = {
+        options: {
+            pkg: grunt.file.readJSON( "package.json" )
+        },
+        chrome: {
+            src: [ "chrome/manifest.json" ]
+        },
+        firefox: {
+            options: {
+                prefix: "em:updateLink=\"http:\/\/.*\/omnibug-|[^\\-]em:version['\"]?\\s*[:=]\\s*['\"]",
+                // NOTE: only supports dot-separated digits (to keep from breaking em:updateLink)
+                replace: "[0-9]+\\.[0-9]+\\.[0-9]+",
+            },
+            src: [ "firefox/install.rdf.site", "firefox/install.rdf.amo", "firefox/update.rdf.tpl" ]
+        }
+    };
+
 
     /*
      * Build Chrome extension
@@ -103,7 +124,7 @@ module.exports = function( grunt ) {
 
         }
     };
-    grunt.registerTask( "makeChrome", [ "copy", "crx" ] );
+    grunt.registerTask( "makeChrome", [ "copy", "version", "crx" ] );
 
 
     /*
@@ -138,9 +159,9 @@ module.exports = function( grunt ) {
             ]
         }
     };
-    grunt.registerTask( "makeFirefox", [ "copy", "compress:site" ] );
+    grunt.registerTask( "makeFirefox", [ "copy", "version", "compress:site" ] );
 
-    grunt.registerTask( "makeAll", [ "clean", "jshint", "test", "copy", "makeChrome", "makeFirefox" ] );
+    grunt.registerTask( "makeAll", [ "clean", "jshint", "test", "makeChrome", "makeFirefox" ] );
 
 
     // CI tasks
