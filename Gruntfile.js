@@ -1,6 +1,7 @@
 /*global module*/
 module.exports = function( grunt ) {
     "use strict";
+    grunt.file.mkdir( "build" );
     var gruntConfig = {
         pkg: grunt.file.readJSON( "package.json" )
     };
@@ -31,7 +32,7 @@ module.exports = function( grunt ) {
     /*
      * Jasmine tests
      */
-    grunt.loadNpmTasks("grunt-contrib-jasmine");
+    grunt.loadNpmTasks( "grunt-contrib-jasmine" );
     gruntConfig.jasmine = {
         src: {
             src: [
@@ -41,10 +42,9 @@ module.exports = function( grunt ) {
             ],
             options: {
                 //specs: "src/js/**/*.test.js",
-                specs: "test/common/*.js"
-                /*
+                specs: "test/common/*.js"/*,
                 junit: {
-                    path: "output/testresults"
+                    path: "build/test-results"
                 }
                 */
             }
@@ -97,7 +97,7 @@ module.exports = function( grunt ) {
      */
     grunt.loadNpmTasks( "grunt-contrib-clean" );
     gruntConfig.clean = {
-        clean: [ "*.xpi", "*.crx",
+        clean: [ "build",
                  "chrome/providers.js", "chrome/omnibugurl.js",
                  "firefox/chrome/content/omnibug/providers.js", "firefox/chrome/content/omnibug/omnibugurl.js",
                  "firefox/install.rdf", "firefox/update.rdf" ]
@@ -130,7 +130,7 @@ module.exports = function( grunt ) {
     gruntConfig.crx = {
         omnibugPackage: {
             "src": "chrome/",
-            "dest": ".",
+            "dest": "build/",
             "privateKey": "omnibug.pem",
             "exclude": [ "scripts" ]
         }
@@ -145,7 +145,7 @@ module.exports = function( grunt ) {
     gruntConfig.compress = {
         site: {
             options: {
-                archive: "<%= pkg.name %>-<%= pkg.version %>.xpi",
+                archive: "build/<%= pkg.name %>-<%= pkg.version %>.xpi",
                 mode: "zip"
             },
             files: [
@@ -159,7 +159,7 @@ module.exports = function( grunt ) {
         },
         amo: {
             options: {
-                archive: "<%= pkg.name %>-amo-<%= pkg.version %>.xpi",
+                archive: "build/<%= pkg.name %>-amo-<%= pkg.version %>.xpi",
                 mode: "zip"
             },
             files: [
