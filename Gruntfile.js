@@ -1,4 +1,4 @@
-/*global module*/
+/*global module, require*/
 module.exports = function( grunt ) {
     "use strict";
     grunt.file.mkdir( "build" );
@@ -44,32 +44,34 @@ module.exports = function( grunt ) {
                 //specs: "src/js/**/*.test.js",
                 specs: "test/common/*.js",
                 junit: {
-                    path: "build/test-results"
+                    path: "build/test-results",
+                    consolidate: true
                 }
             }
         }
     };
-    grunt.registerTask("test", "jasmine:src");
+    grunt.registerTask( "test", "jasmine:src" );
 
 
     /*
+     * JS code coverage
+     */
     gruntConfig.jasmine.istanbul= {
         src: gruntConfig.jasmine.src.src,
         options: {
             specs: gruntConfig.jasmine.src.options.specs,
-            template: require("grunt-template-jasmine-istanbul"),
+            template: require( "grunt-template-jasmine-istanbul" ),
             templateOptions: {
-                coverage: "output/coverage/coverage.json",
+                coverage: "build/coverage/coverage.json",
                 report: [
-                    {type: "html", options: {dir: "output/coverage"}},
-                    {type: "cobertura", options: {dir: "output/coverage/cobertura"}},
-                    {type: "text-summary"}
+                    { type: "html", options: { dir: "build/coverage" } },
+                    { type: "cobertura", options: { dir: "build/coverage/cobertura" } },
+                    { type: "text-summary" }
                 ]
             }
         }
     };
-    grunt.registerTask("coverage", "jasmine:istanbul");
-    */
+    grunt.registerTask( "coverage", "jasmine:istanbul" );
 
 
     /*
@@ -177,6 +179,6 @@ module.exports = function( grunt ) {
     grunt.registerTask( "makeAll", [ "clean", "jshint", "test", "makeChrome", "makeFirefox" ] );
 
     // CI tasks
-    grunt.registerTask( "travis", ["jshint", "test" ]);
+    grunt.registerTask( "travis", [ "jshint", "test", "coverage" ]);
 
 };
