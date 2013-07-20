@@ -78,9 +78,13 @@ module.exports = function( grunt ) {
      */
     grunt.loadNpmTasks( "grunt-contrib-copy" );
     gruntConfig.copy = {
-        main: {
+        chrome: {
             files: [
                 { expand: true, cwd: "common/", src: [ "*.js" ], dest: "chrome/" },
+            ]
+        },
+        firefox: {
+            files: [
                 { expand: true, cwd: "common/", src: [ "*.js" ], dest: "firefox/chrome/content/omnibug/" }
             ]
         }
@@ -131,7 +135,7 @@ module.exports = function( grunt ) {
             "exclude": [ "scripts" ]
         }
     };
-    grunt.registerTask( "makeChrome", [ "copy", "version", "crx" ] );
+    grunt.registerTask( "makeChrome", [ "copy:chrome", "version:chrome", "crx" ] );
 
 
     /*
@@ -155,7 +159,8 @@ module.exports = function( grunt ) {
         },
         amo: {
             options: {
-                archive: "foo.zip"
+                archive: "<%= pkg.name %>-amo-<%= pkg.version %>.xpi",
+                mode: "zip"
             },
             files: [
                 { expand: true, cwd: "firefox/", src: [ "chrome/**" ] },
@@ -167,7 +172,7 @@ module.exports = function( grunt ) {
             ]
         }
     };
-    grunt.registerTask( "makeFirefox", [ "copy", "version", "compress:site" ] );
+    grunt.registerTask( "makeFirefox", [ "copy:firefox", "version:firefox", "compress:site", "compress:amo" ] );
 
 
     grunt.registerTask( "makeAll", [ "clean", "jshint", "test", "makeChrome", "makeFirefox" ] );
