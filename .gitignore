@@ -15,3 +15,7 @@ omnibug.pem
 
 # Build output
 build/
+
+# Deployment details
+deploy.key
+deploy.json
