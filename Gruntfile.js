@@ -1,7 +1,9 @@
 /*global module*/
 module.exports = function( grunt ) {
     "use strict";
-    var gruntConfig = {};
+    var gruntConfig = {
+        pkg: grunt.file.readJSON( "package.json" )
+    };
     grunt.initConfig( gruntConfig );
 
 
@@ -71,7 +73,9 @@ module.exports = function( grunt ) {
     */
 
 
-    // copies dependency files into place
+    /*
+     * Copy common files into place
+     */
     grunt.loadNpmTasks( "grunt-contrib-copy" );
     gruntConfig.copy = {
         main: {
@@ -83,7 +87,10 @@ module.exports = function( grunt ) {
     };
     grunt.registerTask( "makeDev", [ "copy" ] );
 
-    // clean the project dir
+
+    /*
+     * Clean the project dir
+     */
     grunt.loadNpmTasks( "grunt-contrib-clean" );
     gruntConfig.clean = {
         clean: [ "*.xpi", "*.crx",
@@ -93,18 +100,18 @@ module.exports = function( grunt ) {
     };
 
 
+    /*
+     * Set correct version numbers in various files
+     */
     grunt.loadNpmTasks( "grunt-version" );
     gruntConfig.version = {
-        options: {
-            pkg: grunt.file.readJSON( "package.json" )
-        },
         chrome: {
             src: [ "chrome/manifest.json" ]
         },
         firefox: {
             options: {
                 prefix: "em:updateLink=\"http:\/\/.*\/omnibug-|[^\\-]em:version['\"]?\\s*[:=]\\s*['\"]",
-                // NOTE: only supports dot-separated digits (to keep from breaking em:updateLink)
+                // NOTE: only supporting dot-separated digits (to keep from breaking em:updateLink)
                 replace: "[0-9]+\\.[0-9]+\\.[0-9]+",
             },
             src: [ "firefox/install.rdf.site", "firefox/install.rdf.amo", "firefox/update.rdf.tpl" ]
@@ -120,8 +127,8 @@ module.exports = function( grunt ) {
         omnibugPackage: {
             "src": "chrome/",
             "dest": ".",
-            "privateKey": "omnibug.pem"
-
+            "privateKey": "omnibug.pem",
+            "exclude": [ "scripts" ]
         }
     };
     grunt.registerTask( "makeChrome", [ "copy", "version", "crx" ] );
@@ -134,7 +141,8 @@ module.exports = function( grunt ) {
     gruntConfig.compress = {
         site: {
             options: {
-                archive: "foo.zip"
+                archive: "<%= pkg.name %>-<%= pkg.version %>.xpi",
+                mode: "zip"
             },
             files: [
                 { expand: true, cwd: "firefox/", src: [ "chrome/**" ] },
@@ -161,8 +169,8 @@ module.exports = function( grunt ) {
     };
     grunt.registerTask( "makeFirefox", [ "copy", "version", "compress:site" ] );
 
-    grunt.registerTask( "makeAll", [ "clean", "jshint", "test", "makeChrome", "makeFirefox" ] );
 
+    grunt.registerTask( "makeAll", [ "clean", "jshint", "test", "makeChrome", "makeFirefox" ] );
 
     // CI tasks
     grunt.registerTask( "travis", ["jshint", "test" ]);
