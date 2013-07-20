@@ -3,8 +3,8 @@ module.exports = function( grunt ) {
     "use strict";
     grunt.file.mkdir( "build" );
     var gruntConfig = {
-        pkg: grunt.file.readJSON( "package.json" ),
-        deploy: grunt.file.readJSON( "deploy.json" )
+        pkg: grunt.file.readJSON( "package.json" )/*,
+        deploy: grunt.file.readJSON( "deploy.json" )*/
     };
     grunt.initConfig( gruntConfig );
 
@@ -78,7 +78,7 @@ module.exports = function( grunt ) {
             command: [
                 "set -e",
                 "git tag '<%= pkg.name %>-<%= pkg.version %>'",
-                "echo echo git push --tags"
+                "git push --tags"
             ].join( " && " ),
             options: {
                 stdout: true,
@@ -91,8 +91,8 @@ module.exports = function( grunt ) {
         gitCommitDeploy: {
             command: [
                 "set -e",
-                "echo echo git commit chrome/manifest.json firefox/install.rdf.amo firefox/install.rdf.site firefox/update.rdf.tpl -m'Commit for deploy <%= pkg.version %>'",
-                "echo echo git push"
+                "git commit chrome/manifest.json firefox/install.rdf.amo firefox/install.rdf.site firefox/update.rdf.tpl -m'Commit for deploy <%= pkg.version %>'",
+                "git push"
             ].join( " && " ),
             options: {
                 stdout: true,
