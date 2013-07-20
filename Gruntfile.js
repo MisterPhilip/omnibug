@@ -17,7 +17,7 @@ module.exports = function( grunt ) {
         options: {
             host: "<%= deploy.host %>",
             username: "<%= deploy.username %>",
-            privateKey: grunt.file.read( "deploy.key" )
+            //privateKey: grunt.file.read( "deploy.key" )
         },
         chrome: {
             files: [
@@ -44,7 +44,7 @@ module.exports = function( grunt ) {
                 path: "<%= deploy.path %>",
                 host: "<%= deploy.host %>",
                 username: "<%= deploy.username %>",
-                privateKey: grunt.file.read( "deploy.key" )
+                //privateKey: grunt.file.read( "deploy.key" )
             }
         }
     };
