@@ -625,6 +625,8 @@ var OmnibugProvider = {
             , show_faces:  "Show faces?"
             , send:        "send"
             , extended_social_context: "Extended social context"
+            , action:      "Action"
+            , height:      "Height"
         },
         handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
