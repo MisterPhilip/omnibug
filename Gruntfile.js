@@ -33,6 +33,8 @@ module.exports = function( grunt ) {
     };
 
 
+
+
     /*
      * Create a symlink on the remote end
      */
@@ -184,22 +186,25 @@ module.exports = function( grunt ) {
 
 
     /*
-     * Copy common files into place
+     * Concat the contents of common/ into libomnibug.js
      */
-    grunt.loadNpmTasks( "grunt-contrib-copy" );
-    gruntConfig.copy = {
+    grunt.loadNpmTasks( "grunt-contrib-concat" );
+    gruntConfig.concat = {
+        options: {
+            //stripBanners: true,
+            banner: "/*! libomnibug.js <%= pkg.version %> - <%= grunt.template.today( 'yyyy-mm-dd' ) %> */\n\n",
+        },
         chrome: {
-            files: [
-                { expand: true, cwd: "common/", src: [ "*.js" ], dest: "chrome/" },
-            ]
+            src: [ "common/*.js" ],
+            dest: "chrome/libomnibug.js",
+            nonull: true
         },
         firefox: {
-            files: [
-                { expand: true, cwd: "common/", src: [ "*.js" ], dest: "firefox/chrome/content/omnibug/" }
-            ]
+            src: [ "common/*.js" ],
+            dest: "firefox/chrome/content/omnibug/libomnibug.js",
+            nonull: true
         }
     };
-    grunt.registerTask( "makeDev", [ "copy" ] );
 
 
     /*
@@ -208,8 +213,8 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-contrib-clean" );
     gruntConfig.clean = {
         clean: [ "build",
-                 "chrome/providers.js", "chrome/omnibugurl.js",
-                 "firefox/chrome/content/omnibug/providers.js", "firefox/chrome/content/omnibug/omnibugurl.js",
+                 "chrome/libomnibug.js",
+                 "firefox/chrome/content/omnibug/libomnibug.js",
                  "firefox/install.rdf", "firefox/update.rdf" ]
     };
 
@@ -252,7 +257,7 @@ module.exports = function( grunt ) {
             "exclude": [ "scripts" ]
         }
     };
-    grunt.registerTask( "makeChrome", [ "copy:chrome", "version:chrome", "crx" ] );
+    grunt.registerTask( "makeChrome", [ "concat:chrome", "version:chrome", "crx" ] );
 
 
     /*
@@ -289,7 +294,7 @@ module.exports = function( grunt ) {
             ]
         }
     };
-    grunt.registerTask( "makeFirefox", [ "copy:firefox", "version:firefox", "compress:site", "compress:amo" ] );
+    grunt.registerTask( "makeFirefox", [ "concat:firefox", "version:firefox", "compress:site", "compress:amo" ] );
 
 
 
