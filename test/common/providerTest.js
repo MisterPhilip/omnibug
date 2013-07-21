@@ -91,7 +91,12 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "WebTrends" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "WT.co", 4, rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name]["WT.co"] ).toBe( 4 );
+            expect( raw["WT.co"] ).toBe( 4 );
+        } );
     } );
 
 
@@ -104,7 +109,12 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "Universal Analytics" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "v", 1, rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].v ).toBe( 1 );
+            expect( raw.v ).toBe( 1 );
+        } );
     } );
 
 
@@ -115,6 +125,13 @@ describe( "Provider", function() {
         it( "should return the CM provider", function() {
             expect( provider.key ).toBe( "COREMETRICS" );
             expect( provider.name ).toBe( "Core Metrics" );
+        } );
+
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "tid", 2, rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].tid ).toBe( 2 );
+            expect( raw.tid ).toBe( 2 );
         } );
 
         // @TODO: custom tests for this provider!
@@ -130,7 +147,12 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "AT Internet" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "s2", 6, rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].s2 ).toBe( 6 );
+            expect( raw.s2 ).toBe( 6 );
+        } );
     } );
 
 
@@ -156,13 +178,33 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "Facebook" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "api_key", "xxx", rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].api_key ).toBe( "xxx" );
+            expect( raw.api_key ).toBe( "xxx" );
+        } );
     } );
 
 
-    // @TODO: torbit??
+    describe( "Torbit Insight", function() {
+        var url = "https://insight-beacon.torbit.com/beacon.gif?onready=4181&frontend=3296&onload=5310&total_load_time=5310&red_t=0&cache_t=2&dns_t=30&tcp_t=450&b_wait_t=482&b_tran_t=144&onready_t=4154&onload_t=5307&scr_proc_t=1&src=nav&tbtim=&conversion=&tags=&v=0.3",
+            provider = OmnibugProvider.getProviderForUrl( url );
 
-    
+        it( "should return the Torbit provider", function() {
+            expect( provider.key ).toBe( "TORBIT" );
+            expect( provider.name ).toBe( "Torbit Insight" );
+        } );
+
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "v", "0.3", rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].v ).toBe( "0.3" );
+            expect( raw.v ).toBe( "0.3" );
+        } );
+    } );
+
+
     describe( "Quantserve", function() {
         var url = "http://pixel.quantserve.com/pixel;r=1906218773;a.1=p-94D6e1NDscLvI;labels.1=comment-links;a.2=p-18-mFEk4J448M;labels.2=type.intensedebate.embed;fpan=0;fpa=P0-1160896523-1373109920723;ns=0;ce=1;cm=;je=1;sr=1280x800x24;enc=n;dst=1;et=1373109964712;tzo=-600;ref=;url=http%3A%2F%2Ftorbit.com%2Fblog%2F;ogl=",
             provider = OmnibugProvider.getProviderForUrl( url );
@@ -172,7 +214,12 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "Quantcast" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "tzo", "-600", rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].tzo ).toBe( "-600" );
+            expect( raw.tzo ).toBe( "-600" );
+        } );
     } );
 
 
@@ -185,7 +232,12 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "Marketo" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "_mchVr", "134", rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name]._mchVr ).toBe( "134" );
+            expect( raw._mchVr ).toBe( "134" );
+        } );
     } );
 
 
@@ -213,7 +265,12 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "Krux" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "geo_country", "AU", rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].geo_country ).toBe( "AU" );
+            expect( raw.geo_country ).toBe( "AU" );
+        } );
     } );
 
 
@@ -226,7 +283,12 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "Optimizely" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "t", "1374410630817", rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].t ).toBe( "1374410630817" );
+            expect( raw.t ).toBe( "1374410630817" );
+        } );
     } );
 
 
@@ -239,7 +301,12 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "sophus3" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "sh", 800, rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].sh ).toBe( 800 );
+            expect( raw.sh ).toBe( 800 );
+        } );
     } );
 
 
@@ -252,8 +319,12 @@ describe( "Provider", function() {
             expect( provider.name ).toBe( "Doubleclick" );
         } );
 
-        // @TODO: custom tests for this provider!
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "sz", "468x60", rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].sz ).toBe( "468x60" );
+            expect( raw.sz ).toBe( "468x60" );
+        } );
     } );
-
 
 } );

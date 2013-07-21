@@ -626,7 +626,7 @@ var OmnibugProvider = {
             , send:        "send"
             , extended_social_context: "Extended social context"
         },
-        handleQueryParam: function( name, value, rv ) {
+        handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -804,6 +804,9 @@ var OmnibugProvider = {
         , name: "Krux"
         , pattern: /beacon\.krxd\.net\/pixel\.gif/
         , keys: {
+              geo_country: "Country"
+            , geo_region:  "Region"
+            , geo_city:    "City"
         },
         handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
@@ -822,6 +825,7 @@ var OmnibugProvider = {
         , name: "Optimizely"
         , pattern: /optimizely\.com\/event/
         , keys: {
+              t: "Timestamp"
         },
         handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
@@ -871,6 +875,9 @@ var OmnibugProvider = {
         , name: "Doubleclick"
         , pattern: /\.doubleclick\.net\/ad/
         , keys: {
+              cat: "Category"
+            , kwd: "Keywords"
+            , sz:  "Size"
         },
         handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
