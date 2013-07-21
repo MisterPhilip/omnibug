@@ -10,8 +10,7 @@
     },
     "background": {
         "scripts": [
-            "omnibugurl.js",
-            "providers.js",
+            "libomnibug.js",
             "eventPage.js"
         ],
         "persistent": true

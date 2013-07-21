@@ -10,7 +10,7 @@
             buttons="accept,cancel"
             xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <script type="text/javascript" src="providers.js"></script>
+    <script type="text/javascript" src="libomnibug.js"></script>
 
     <prefpane id="omnibug-gen-pane" label="General Settings">
         <preferences>
