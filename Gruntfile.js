@@ -147,17 +147,20 @@ module.exports = function( grunt ) {
     gruntConfig.jasmine = {
         src: {
             src: [
-                //"src/js/**/*.js",
-                //"!src/js/**/*.test.js"
-                "common/*.js"
+                "common/*.js",
+                "firefox/chrome/content/omnibug/common.js"
             ],
             options: {
-                //specs: "src/js/**/*.test.js",
-                specs: "test/common/*.js",
+                specs: [
+                    "test/common/*.js",
+                    "test/firefox/*.js"
+                ],
                 junit: {
                     path: "build/test-results",
                     consolidate: true
-                }
+                },
+                outfile: "test/SpecRunner.html",
+                keepRunner: true
             }
         }
     };
@@ -192,7 +195,7 @@ module.exports = function( grunt ) {
     gruntConfig.concat = {
         options: {
             //stripBanners: true,
-            banner: "/*! libomnibug.js <%= pkg.version %> - <%= grunt.template.today( 'yyyy-mm-dd' ) %> */\n\n",
+            banner: "/*! libomnibug.js <%= pkg.version %> - <%= grunt.template.today( 'yyyy-mm-dd' ) %> DERIVED FILE - DO NOT MODIFY */\n\n",
         },
         chrome: {
             src: [ "common/*.js" ],
@@ -200,7 +203,7 @@ module.exports = function( grunt ) {
             nonull: true
         },
         firefox: {
-            src: [ "common/*.js" ],
+            src: [ "common/*.js", "firefox/chrome/content/omnibug/common.js" ],
             dest: "firefox/chrome/content/omnibug/libomnibug.js",
             nonull: true
         }
