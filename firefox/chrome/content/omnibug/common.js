@@ -13,6 +13,21 @@ var OmnibugCommon = {
     EVENT_TYPE_CLICK: "click",
 
     /**
+     * Debug logging method
+     * @TODO: move out of here
+     */
+    _pad: function( n ) {
+        return '' + ( n <= 9 ? "00" : n <= 99 ? "0" : '' ) + n;
+    },
+    _dump: function( str ) {
+        if( typeof( dump ) !== "undefined" ) {
+	        var d = new Date();
+	        dump( d.toLocaleTimeString() + "." + this._pad( d.getMilliseconds() ) + ":  " + str );
+	    }
+    },
+
+
+    /**
      * Augments the data object with summary data
      * @param data the data object
      * @return the augmented data object
@@ -25,14 +40,14 @@ var OmnibugCommon = {
             urlLength = data.state.url.length,
             provider = data.state.omnibugProvider;
 
-        // hacky: sometimes load events are being reported as click events.  For Omniture, detect
+        // Sometimes load events are being reported as click events.  For Omniture, detect
         // the event type (pe= means a click event), and reset eventType accordingly.
         if( provider.key === "OMNITURE" ) {
             if( omnibugUrl.hasQueryValue( "pe" ) ) {
-                _dump( "augmentData: found Omniture `pe' parameter; overriding event type to `click' (was: " + eventType + ")\n" );
+                this._dump( "augmentData: found Omniture `pe' parameter; overriding event type to `click' (was: " + eventType + ")\n" );
                 eventType = this.EVENT_TYPE_CLICK;
             } else {
-                _dump( "augmentData: no Omniture `pe' parameter found; overriding event type to `load' (was: " + eventType + ")\n" );
+                this._dump( "augmentData: no Omniture `pe' parameter found; overriding event type to `load' (was: " + eventType + ")\n" );
                 eventType = this.EVENT_TYPE_LOAD;
             }
         }
