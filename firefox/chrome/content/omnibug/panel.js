@@ -11,6 +11,7 @@ FBL.ns( function() { with( FBL ) {
     function pad( n ) {
         return '' + ( n <= 9 ? "00" : n <= 99 ? "0" : '' ) + n;
     }
+
     function _dump( str ) {
         var d = new Date();
         dump( d.toLocaleTimeString() + "." + pad( d.getMilliseconds() ) + ":  " + str );
@@ -289,7 +290,11 @@ FBL.ns( function() { with( FBL ) {
                 }
             }
 
-            obj = this.augmentData( obj );
+            try {
+                obj = OmnibugCommon.augmentData( obj, u );
+            } catch( ex ) {
+                _dump( "decodeUrl: exception in augmentData(): " + ex + "\n" );
+            }
             try {
                 this.report( obj );
             } catch( ex ) {
@@ -321,40 +326,6 @@ FBL.ns( function() { with( FBL ) {
             if( typeof( provider.handleCustom ) === "function" ) {
                 provider.handleCustom( url, container, rawCont );
             }
-        },
-
-
-        /**
-         * Augments the data object with summary data
-         * @param data the data object
-         * @return the augmented data object
-         */
-        augmentData: function( data ) {
-            data["omnibug"] = {};
-
-            var eventType = ( data.state.doneLoading ? "click" : "load" ),
-                url = data.state.url,
-                urlLength = data.state.url.length;
-
-            // hacky: sometimes load events are being reported as click events.  For Omniture, detect
-            // the event type (pe= means a click event), and reset eventType accordingly.
-            if( data.state.omnibugProvider.name === "OMNITURE" ) {
-                var oldEventType = eventType;
-                eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
-            }
-
-            data.omnibug["key"]       = data["raw"]["key"]       = data.state.key;
-            data.omnibug["event"]     = data["raw"]["event"]     = eventType;
-            data.omnibug["timestamp"] = data["raw"]["timestamp"] = data.state.timeStamp;
-            data.omnibug["provider"]  = data["raw"]["provider"]  = data.state.omnibugProvider.name;
-            data.omnibug["source"]    = data["raw"]["source"]    = ( data.state.src === "prev" ? "Previous page" : "Current page" );
-            data.omnibug["parentUrl"] = data["raw"]["parentUrl"] = data.state.parentUrl;
-            data.omnibug["fullUrl"]   = data["raw"]["fullUrl"]   = data.state.url
-                                                                 + " (" + urlLength + " characters"
-                                                                 + ( urlLength > 2083 ? ", *** too long for IE6/7! ***" : "" )
-                                                                 + ")";
-
-            return data;
         },
 
 

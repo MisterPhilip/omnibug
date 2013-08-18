@@ -7,12 +7,12 @@
    - file, You can obtain one at http://mozilla.org/MPL/2.0/.  -->
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <script type="application/x-javascript" src="chrome://omnibug/content/libomnibug.js"/>
     <script type="application/x-javascript" src="chrome://omnibug/content/omnibugContext.js"/>
     <script type="application/x-javascript" src="chrome://omnibug/content/model.js"/>
     <script type="application/x-javascript" src="chrome://omnibug/content/panel.js"/>
     <script type="application/x-javascript" src="chrome://omnibug/content/md5.js"/>
     <script type="application/x-javascript" src="chrome://omnibug/content/io.js"/>
-    <script type="application/x-javascript" src="chrome://omnibug/content/libomnibug.js"/>
 
     <commandset id="mainCommandSet">
         <command id="cmd_clear" oncommand="Firebug.Omnibug.clearPanel()"/>
