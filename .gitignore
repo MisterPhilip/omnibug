@@ -19,3 +19,6 @@ build/
 # Deployment details
 deploy.key
 deploy.json
+
+# Grunt work
+.grunt/
