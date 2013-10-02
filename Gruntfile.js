@@ -3,8 +3,8 @@ module.exports = function( grunt ) {
     "use strict";
     grunt.file.mkdir( "build" );
     var gruntConfig = {
-        pkg: grunt.file.readJSON( "package.json" )/*,
-        deploy: grunt.file.readJSON( "deploy.json" )*/
+        pkg: grunt.file.readJSON( "package.json" ),
+        deploy: grunt.file.readJSON( "deploy.json" )
     };
     grunt.initConfig( gruntConfig );
 
@@ -17,7 +17,7 @@ module.exports = function( grunt ) {
         options: {
             host: "<%= deploy.host %>",
             username: "<%= deploy.username %>",
-            //privateKey: grunt.file.read( "deploy.key" )
+            privateKey: grunt.file.read( "deploy.key" )
         },
         chrome: {
             files: [
@@ -46,7 +46,7 @@ module.exports = function( grunt ) {
                 path: "<%= deploy.path %>",
                 host: "<%= deploy.host %>",
                 username: "<%= deploy.username %>",
-                //privateKey: grunt.file.read( "deploy.key" )
+                privateKey: grunt.file.read( "deploy.key" )
             }
         }
     };
