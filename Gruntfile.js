@@ -245,7 +245,7 @@ module.exports = function( grunt ) {
             }
         }
     };
-    grunt.registerTask( "updateVersion", [ "version:omnibug", "shell:gitCommitVersionIncrement" ] );
+    grunt.registerTask( "updateVersion", [ "version:omnibug", "version:chrome", "version:firefox", "shell:gitCommitVersionIncrement" ] );
 
 
     /*
@@ -260,7 +260,7 @@ module.exports = function( grunt ) {
             "exclude": [ "scripts" ]
         }
     };
-    grunt.registerTask( "makeChrome", [ "concat:chrome", "version:chrome", "crx" ] );
+    grunt.registerTask( "makeChrome", [ "concat:chrome", "crx" ] );
 
 
     /*
@@ -297,7 +297,7 @@ module.exports = function( grunt ) {
             ]
         }
     };
-    grunt.registerTask( "makeFirefox", [ "concat:firefox", "version:firefox", "compress:site", "compress:amo" ] );
+    grunt.registerTask( "makeFirefox", [ "concat:firefox", "compress:site", "compress:amo" ] );
 
 
 
