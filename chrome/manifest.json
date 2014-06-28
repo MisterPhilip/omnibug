@@ -1,8 +1,9 @@
 {
+    "manifest_version": 2,
     "name": "Omnibug",
     "version": "0.5.501",
-    "manifest_version": 2,
-    "description": "Omnibug for Chrome",
+    "default_locale": "en",
+    "description": "Omnibug is a Chrome extension to decode and display outgoing web metrics requests.",
     "icons": {
         "16": "images/o-16.png",
         "48": "images/o-48.png",
@@ -15,13 +16,14 @@
         ],
         "persistent": true
     },
-    "homepage_url": "http://omnibug.rosssimpson.com/chrome.html",
     "devtools_page": "devtools.html",
+    "homepage_url": "http://omnibug.rosssimpson.com/chrome.html",
     "options_page": "options.html",
     "permissions": [
         "tabs",
         "storage",
         "webRequest",
         "*://*/*"
-    ]
+    ],
+    "short_name": "Omnibug"
 }
