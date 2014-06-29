@@ -72,7 +72,6 @@ if (typeof(JSIO) != 'boolean') {
                 file.append( name );
                 return file;
             } catch( e ) {
-                dump( ">>>   [io.js] append: exception: " + e + "\n" );
                 return false;
             }
         },
@@ -85,7 +84,6 @@ if (typeof(JSIO) != 'boolean') {
                 return file;
             }
             catch(e) {
-                dump( ">>>   [io.js] open: exception: " + e + "\n" );
                 return false;
             }
         },
@@ -108,7 +106,6 @@ if (typeof(JSIO) != 'boolean') {
                 return data;
             }
             catch(e) {
-                dump( ">>>   [io.js] read: exception: " + e + "\n" );
                 return false;
             }
         },
@@ -131,7 +128,6 @@ if (typeof(JSIO) != 'boolean') {
                 return true;
             }
             catch(e) {
-                dump( ">>>   [io.js] write: exception: " + e + "\n" );
                 return false;
             }
         },
@@ -142,7 +138,6 @@ if (typeof(JSIO) != 'boolean') {
                 return true;
             }
             catch(e) {
-                dump( ">>>   [io.js] create: exception: " + e + "\n" );
                 return false;
             }
         },
@@ -153,7 +148,6 @@ if (typeof(JSIO) != 'boolean') {
                 return true;
             }
             catch(e) {
-                dump( ">>>   [io.js] unlink: exception: " + e + "\n" );
                 return false;
             }
         },
@@ -164,7 +158,6 @@ if (typeof(JSIO) != 'boolean') {
                             .replace(/^\s*\/?/, '').replace(/\ /g, '%20');
             }
             catch(e) {
-                dump( ">>>   [io.js] path: exception: " + e + "\n" );
                 return false;
             }
         },
@@ -177,8 +170,7 @@ if (typeof(JSIO) != 'boolean') {
                 data = uniConv.ConvertToUnicode(data);
             }
             catch(e) {
-                dump( ">>>   [io.js] toUnicode: exception: " + e + "\n" );
-                // foobar!
+                // pass
             }
             return data;
         },
@@ -192,8 +184,7 @@ if (typeof(JSIO) != 'boolean') {
                 // data += uniConv.Finish();
             }
             catch(e) {
-                dump( ">>>   [io.js] fromUnicode: exception: " + e + "\n" );
-                // foobar!
+                // pass
             }
             return data;
         }
@@ -286,7 +277,7 @@ if (typeof(JSIO) != 'boolean') {
                 }
             }
             catch(e) {
-                // foobar!
+                // pass
             }
             return list;
         },
@@ -312,7 +303,7 @@ if (typeof(JSIO) != 'boolean') {
                 }
             }
             catch(e) {
-               // foobar!
+               // pass
             }
             return list;
         },
