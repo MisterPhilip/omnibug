@@ -360,7 +360,7 @@ module.exports = function( grunt ) {
     //grunt.registerTask( "makeAll", [ "clean", "jshint", "test", "makeChrome", "makeFirefox" ] );
     //grunt.registerTask( "firefox", [ "deployFirefox", "shell:gitCommitDeploy", "shell:gitTag", "updateVersion" ] );
     //grunt.registerTask( "chrome", [ "deployChrome", "shell:gitCommitDeploy", "shell:gitTag", "updateVersion" ] );
-    grunt.registerTask( "release", [ "deployFirefox", "deployChrome", "shell:gitCommitDeploy", "shell:gitTag", "updateVersion" ] );
+    grunt.registerTask( "release", [ "deployFirefox", "shell:gitCommitDeploy", "shell:gitTag", "updateVersion" ] );
 
     // CI tasks
     grunt.registerTask( "travis", [ "jshint", "test", "coverage" ]);
