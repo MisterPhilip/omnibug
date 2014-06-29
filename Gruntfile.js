@@ -249,6 +249,45 @@ module.exports = function( grunt ) {
 
 
     /*
+     * Remove logging from public extensions
+     */
+    grunt.loadNpmTasks('grunt-line-remover');
+    gruntConfig.lineremover = {
+        cleanup: {
+            files: [
+                {
+                    src: 'firefox/chrome/content/omnibug/common.js',
+                    dest: 'firefox/chrome/content/omnibug/common.js'
+                },
+                {
+                    src: 'firefox/chrome/content/omnibug/io.js',
+                    dest: 'firefox/chrome/content/omnibug/io.js'
+                },
+                {
+                    src: 'firefox/chrome/content/omnibug/md5.js',
+                    dest: 'firefox/chrome/content/omnibug/md5.js'
+                },
+                {
+                    src: 'firefox/chrome/content/omnibug/model.js',
+                    dest: 'firefox/chrome/content/omnibug/model.js'
+                },
+                {
+                    src: 'firefox/chrome/content/omnibug/omnibugContext.js',
+                    dest: 'firefox/chrome/content/omnibug/omnibugContext.js'
+                },
+                {
+                    src: 'firefox/chrome/content/omnibug/panel.js',
+                    dest: 'firefox/chrome/content/omnibug/panel.js'
+                }
+            ],
+            options: {
+                exclusionPattern: /_dump/g
+            }
+        },
+    };
+
+
+    /*
      * Build Chrome extension
      */
     grunt.loadNpmTasks( "grunt-crx" );
@@ -274,9 +313,12 @@ module.exports = function( grunt ) {
                 mode: "zip"
             },
             files: [
-                { expand: true, cwd: "firefox/", src: [ "chrome/**" ] },
+                { expand: true, cwd: "firefox/", src: [ "chrome/content/omnibug/*.js" ] },
+                { expand: true, cwd: "firefox/", src: [ "chrome/content/omnibug/*.xul" ] },
+                { expand: true, cwd: "firefox/", src: [ "chrome/content/omnibug/LICENSE" ] },
+                { expand: true, cwd: "firefox/", src: [ "chrome/skin/**" ] },
                 { expand: true, cwd: "firefox/", src: [ "defaults/**" ] },
-                { expand: true, cwd: "firefox/", src: [ "chrome.manifest" ] },,
+                { expand: true, cwd: "firefox/", src: [ "chrome.manifest" ] },
                 { expand: true, cwd: "firefox/", src: [ "install.rdf.site" ], rename: function( d, s ) {
                     return s.replace( /\.site|\.amo/, "" );
                 } }
@@ -288,16 +330,19 @@ module.exports = function( grunt ) {
                 mode: "zip"
             },
             files: [
-                { expand: true, cwd: "firefox/", src: [ "chrome/**" ] },
+                { expand: true, cwd: "firefox/", src: [ "chrome/content/omnibug/*.js" ] },
+                { expand: true, cwd: "firefox/", src: [ "chrome/content/omnibug/*.xul" ] },
+                { expand: true, cwd: "firefox/", src: [ "chrome/content/omnibug/LICENSE" ] },
+                { expand: true, cwd: "firefox/", src: [ "chrome/skin/**" ] },
                 { expand: true, cwd: "firefox/", src: [ "defaults/**" ] },
-                { expand: true, cwd: "firefox/", src: [ "chrome.manifest" ] },,
+                { expand: true, cwd: "firefox/", src: [ "chrome.manifest" ] },
                 { expand: true, cwd: "firefox/", src: [ "install.rdf.amo" ], rename: function( d, s ) {
                     return s.replace( /\.site|\.amo/, "" );
                 } }
             ]
         }
     };
-    grunt.registerTask( "makeFirefox", [ "concat:firefox", "compress:site", "compress:amo" ] );
+    grunt.registerTask( "makeFirefox", [ "lineremover:cleanup", "concat:firefox", "compress:site", "compress:amo" ] );
 
 
 
