@@ -12,10 +12,7 @@ FBL.ns( function() { with( FBL ) {
         return '' + ( n <= 9 ? "00" : n <= 99 ? "0" : '' ) + n;
     }
 
-    function _dump( str ) {
-        var d = new Date();
-        dump( d.toLocaleTimeString() + "." + pad( d.getMilliseconds() ) + ":  " + str );
-    }
+    function _dump( str ) { var d = new Date(); dump( d.toLocaleTimeString() + "." + pad( d.getMilliseconds() ) + ":  " + str ); }
 
 
     /*
