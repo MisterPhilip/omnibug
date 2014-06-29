@@ -3,21 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 if ( typeof Omnibug == "undefined" ) {
-    dump( ">>>   OmnibugContext: creating new Omnibug object\n" );
     var Omnibug = {};
 }
 
-Omnibug.OmnibugContext = function( panel ) {
-    //dump( ">>>   OmnibugContext: constructor, panel=" + panel + "\n" );
-};
+Omnibug.OmnibugContext = function( panel ) { };
 
 /**
  * Toggle a row
  * @param {Event} evt DOM event fired for the click
  */
 Omnibug.OmnibugContext.prototype.toggle = function( evt ) {
-    //dump( ">>>   OmnibugContext: toggle, evt=" + evt + "\n" );
-
     var i, img,
         el = evt.target,
         tr = el.parentNode.parentNode.parentNode,
