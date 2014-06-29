@@ -525,7 +525,7 @@ FBL.ns( function() { with( FBL ) {
             var age,
                 requests = Firebug.Omnibug.cfg.requests;
 
-            _dump( "processRequests: processing " + Object.size( requests ) + " requests; context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
+            _dump( "processRequests: processing " + Object.sizeof( requests ) + " requests; context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
 
             try {
                 for( var key in requests ) {
@@ -551,7 +551,7 @@ FBL.ns( function() { with( FBL ) {
             } catch( ex ) {
                 _dump( "processRequests: caught exception: " + ex + "\n" );
             }
-            _dump( "processRequests: done (" + Object.size( requests ) + " remaining)\n" );
+            _dump( "processRequests: done (" + Object.sizeof( requests ) + " remaining)\n" );
         },
 
 
@@ -566,7 +566,7 @@ FBL.ns( function() { with( FBL ) {
             var age,
                 requests = Firebug.Omnibug.cfg.requests;
 
-            _dump( "expireRequests: processing " + Object.size( requests ) + " requests; context[" + context.uid + "]\n" );
+            _dump( "expireRequests: processing " + Object.sizeof( requests ) + " requests; context[" + context.uid + "]\n" );
 
             try {
                 for( var key in requests ) {
@@ -586,7 +586,7 @@ FBL.ns( function() { with( FBL ) {
             } catch( ex ) {
                 _dump( "expireRequests: caught exception: " + ex + "\n" );
             }
-            _dump( "expireRequests: done (" + Object.size( requests ) + " remaining)\n" );
+            _dump( "expireRequests: done (" + Object.sizeof( requests ) + " remaining)\n" );
         },
 
 
@@ -856,9 +856,9 @@ FBL.ns( function() { with( FBL ) {
     }
 
     /**
-     * Object.size: implement Array-like length getter for Objects
+     * Object.sizeof: implement Array-like length getter for Objects
      */
-    Object.size = function(obj) {
+    Object.sizeof = function(obj) {
         var size = 0, key;
         for (key in obj) {
             if (obj.hasOwnProperty(key)) size++;
