@@ -19,12 +19,7 @@ var OmnibugCommon = {
     _pad: function( n ) {
         return '' + ( n <= 9 ? "00" : n <= 99 ? "0" : '' ) + n;
     },
-    _dump: function( str ) {
-        if( typeof( dump ) !== "undefined" ) {
-	        var d = new Date();
-	        dump( d.toLocaleTimeString() + "." + this._pad( d.getMilliseconds() ) + ":  " + str );
-	    }
-    },
+    _dump: function( str ) { if( typeof( dump ) !== "undefined" ) { var d = new Date(); dump( d.toLocaleTimeString() + "." + this._pad( d.getMilliseconds() ) + ":  " + str ); } },
 
 
     /**
