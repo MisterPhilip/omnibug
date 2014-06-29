@@ -251,33 +251,33 @@ module.exports = function( grunt ) {
     /*
      * Remove logging from public extensions
      */
-    grunt.loadNpmTasks('grunt-line-remover');
+    grunt.loadNpmTasks("grunt-line-remover");
     gruntConfig.lineremover = {
         cleanup: {
             files: [
                 {
-                    src: 'firefox/chrome/content/omnibug/common.js',
-                    dest: 'firefox/chrome/content/omnibug/common.js'
+                    src: "firefox/chrome/content/omnibug/common.js",
+                    dest: "firefox/chrome/content/omnibug/common.js"
                 },
                 {
-                    src: 'firefox/chrome/content/omnibug/io.js',
-                    dest: 'firefox/chrome/content/omnibug/io.js'
+                    src: "firefox/chrome/content/omnibug/io.js",
+                    dest: "firefox/chrome/content/omnibug/io.js"
                 },
                 {
-                    src: 'firefox/chrome/content/omnibug/md5.js',
-                    dest: 'firefox/chrome/content/omnibug/md5.js'
+                    src: "firefox/chrome/content/omnibug/md5.js",
+                    dest: "firefox/chrome/content/omnibug/md5.js"
                 },
                 {
-                    src: 'firefox/chrome/content/omnibug/model.js',
-                    dest: 'firefox/chrome/content/omnibug/model.js'
+                    src: "firefox/chrome/content/omnibug/model.js",
+                    dest: "firefox/chrome/content/omnibug/model.js"
                 },
                 {
-                    src: 'firefox/chrome/content/omnibug/omnibugContext.js',
-                    dest: 'firefox/chrome/content/omnibug/omnibugContext.js'
+                    src: "firefox/chrome/content/omnibug/omnibugContext.js",
+                    dest: "firefox/chrome/content/omnibug/omnibugContext.js"
                 },
                 {
-                    src: 'firefox/chrome/content/omnibug/panel.js',
-                    dest: 'firefox/chrome/content/omnibug/panel.js'
+                    src: "firefox/chrome/content/omnibug/panel.js",
+                    dest: "firefox/chrome/content/omnibug/panel.js"
                 }
             ],
             options: {
