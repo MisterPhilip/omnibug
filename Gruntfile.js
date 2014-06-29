@@ -19,11 +19,13 @@ module.exports = function( grunt ) {
             username: "<%= deploy.username %>",
             //privateKey: grunt.file.read( "deploy.key" )
         },
+        /*
         chrome: {
             files: [
                 { cwd: "build", src: "*.crx", dest: "<%= deploy.path %>" }
             ]
         },
+        */
         firefox: {
             files: [
                 { cwd: "build", src: "<%= pkg.name %>-<%= pkg.version %>.xpi", dest: "<%= deploy.path %>" },
@@ -350,7 +352,7 @@ module.exports = function( grunt ) {
      * Deploy tasks
      */
     grunt.registerTask( "deployFirefox", [ "makeFirefox", "shell:signXPI", "scp:firefox", "sshexec:link" ] );
-    grunt.registerTask( "deployChrome", [ "makeChrome", "scp:chrome" ] );
+    //grunt.registerTask( "deployChrome", [ "makeChrome", "scp:chrome" ] );
 
     /*
      * Pipeline tasks
