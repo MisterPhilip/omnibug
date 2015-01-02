@@ -68,7 +68,7 @@ module.exports = function( grunt ) {
                 "cat firefox/update.rdf.tpl | sed \"s/TOK_HASH/${HASH}/g\" > firefox/update.rdf",
                 "echo",
                 "echo \"Please sign and verify `pwd`/firefox/update.rdf with McCoy now\"",
-                "mccoy || exit 1"
+                "/Applications/McCoy.app/Contents/MacOS/mccoy || exit 1"
             ].join( " && " ),
             options: {
                 stdout: true,
@@ -111,6 +111,19 @@ module.exports = function( grunt ) {
                 "set -e",
                 "git commit package.json -m'Bump version number after release'",
                 "git push"
+            ].join( " && " ),
+            options: {
+                stdout: true,
+                stderr: true,
+                failOnError: true
+            }
+        },
+
+        // Discard parsed files
+        cleanParsedFiles: {
+            command: [
+                "set -e",
+                "git checkout firefox/chrome/content/omnibug/common.js firefox/chrome/content/omnibug/io.js firefox/chrome/content/omnibug/md5.js firefox/chrome/content/omnibug/model.js firefox/chrome/content/omnibug/omnibugContext.js firefox/chrome/content/omnibug/panel.js"
             ].join( " && " ),
             options: {
                 stdout: true,
@@ -344,7 +357,7 @@ module.exports = function( grunt ) {
             ]
         }
     };
-    grunt.registerTask( "makeFirefox", [ "lineremover:cleanup", "concat:firefox", "compress:site", "compress:amo" ] );
+    grunt.registerTask( "makeFirefox", [ "lineremover:cleanup", "concat:firefox", "compress:site", "compress:amo", "shell:cleanParsedFiles" ] );
 
 
 
