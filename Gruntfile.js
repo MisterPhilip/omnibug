@@ -18,8 +18,10 @@ module.exports = function( grunt ) {
         signXPI: {
             command: [
                 "set -e",
+                "echo \"Signing file '$(ls build/<%= pkg.name %>-<%= pkg.version %>.xpi)'\"",
                 "HASH=$( openssl sha1 build/<%= pkg.name %>-<%= pkg.version %>.xpi | awk '{ print $2 }' )",
                 "cat firefox/update.rdf.tpl | sed \"s/TOK_HASH/${HASH}/g\" > firefox/update.rdf",
+                "echo \"Wrote hash '${HASH}' to firefox/update.rdf\"",
                 "echo",
                 "echo \"Please sign and verify `pwd`/firefox/update.rdf with McCoy now\"",
                 "/Applications/McCoy.app/Contents/MacOS/mccoy || exit 1",
