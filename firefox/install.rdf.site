@@ -5,7 +5,7 @@
   <RDF:Description RDF:about="rdf:#$AdUzy3"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="1.5"
-                   em:maxVersion="30.*" />
+                   em:maxVersion="35.*" />
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="Omnibug@rosssimpson.com"
                    em:version="0.5.502"
@@ -14,8 +14,8 @@
                    em:description="Firebug Extension for web metrics testing and debugging"
                    em:creator="Ross Simpson"
                    em:homepageURL="http://omnibug.rosssimpson.com/"
-                   em:updateURL="http://www.rosssimpson.com/dev/update.rdf"
                    em:optionsURL="chrome://omnibug/content/options.xul"
+                   em:updateURL="http://www.rosssimpson.com/dev/update.rdf"
                    em:updateKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDW6UjioaK4ma+++R9jYZv177DnYhDbfMqHzY5tfiKK+t+J5j+0aJXHyiWgOIQ/UDtXHi0znlK4MMVLDTXg0G8O9LfzbnYduAeaDQKxkXfV9e7HPBzU5zBmIOcejZWs3nAADhLHIXZBV4pLfSb0Fjk4+Y3eAPT+CkbzgKPkrkh8vwIDAQAB">
     <em:targetApplication RDF:resource="rdf:#$AdUzy3"/>
   </RDF:Description>
