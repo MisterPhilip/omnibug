@@ -52,7 +52,7 @@ module.exports = function( grunt ) {
         gitCommitDeploy: {
             command: [
                 "set -e",
-                "git commit chrome/manifest.json firefox/install.rdf.amo firefox/install.rdf.site firefox/update.rdf.tpl -m'Commit for deploy <%= pkg.version %>'",
+                "git commit chrome/manifest.json firefox/install.rdf.amo firefox/install.rdf.site firefox/omnibug_rel_notes.xhtml firefox/update.rdf.tpl -m'Commit for deploy <%= pkg.version %>'",
                 "git push"
             ].join( " && " ),
             options: {
@@ -343,7 +343,7 @@ module.exports = function( grunt ) {
     /*
      * Pipeline tasks
      */
-    grunt.registerTask( "release", [ "deployFirefox", "shell:gitCommitDeploy", "shell:gitTag", "updateVersion" ] );
+    grunt.registerTask( "release", [ "shell:gitCommitDeploy", "deployFirefox", "shell:gitTag", "updateVersion" ] );
 
     /*
      * CI tasks
