@@ -343,7 +343,7 @@ module.exports = function( grunt ) {
     /*
      * Pipeline tasks
      */
-    grunt.registerTask( "release", [ "shell:gitCommitDeploy", "deployFirefox", "shell:gitTag", "updateVersion" ] );
+    grunt.registerTask( "release", [ "shell:gitCommitDeploy", "deployFirefox", "shell:gitTag", "updateVersion", "clean" ] );
 
     /*
      * CI tasks
