@@ -15,7 +15,7 @@
                    em:creator="Ross Simpson"
                    em:homepageURL="http://omnibug.rosssimpson.com/"
                    em:optionsURL="chrome://omnibug/content/options.xul"
-                   em:updateURL="http://www.rosssimpson.com/dev/update.rdf"
+                   em:updateURL="http://omnibug.rosssimpson.com/dist/update.rdf"
                    em:updateKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDW6UjioaK4ma+++R9jYZv177DnYhDbfMqHzY5tfiKK+t+J5j+0aJXHyiWgOIQ/UDtXHi0znlK4MMVLDTXg0G8O9LfzbnYduAeaDQKxkXfV9e7HPBzU5zBmIOcejZWs3nAADhLHIXZBV4pLfSb0Fjk4+Y3eAPT+CkbzgKPkrkh8vwIDAQAB">
     <em:targetApplication RDF:resource="rdf:#$AdUzy3"/>
   </RDF:Description>
