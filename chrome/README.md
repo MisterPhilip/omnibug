@@ -2,7 +2,7 @@ Omnibug
 ==========
 
 Omnibug, for Chrome
-For the time being, see here: http://www.rosssimpson.com/dev/omnibug.html
+For more details, see the main project page: http://omnibug.rosssimpson.com/chrome.html
 
 "O" icons courtesy of: http://www.iconarchive.com/show/bag-o-tiles-icons-by-barkerbaggies.html
 
