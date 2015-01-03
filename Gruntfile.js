@@ -235,7 +235,7 @@ module.exports = function( grunt ) {
             }
         }
     };
-    grunt.registerTask( "updateVersion", [ "version:omnibug", "version:chrome", "version:firefox", "shell:gitCommitVersionIncrement" ] );
+    grunt.registerTask( "updateVersion", [ "version:omnibug", "version:chrome", "version:firefox" ] );
 
 
     /*
