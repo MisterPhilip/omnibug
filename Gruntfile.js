@@ -218,13 +218,17 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-version" );
     gruntConfig.version = {
         chrome: {
-            src: [ "chrome/manifest.json" ]
+            src: [ "chrome/manifest.json" ],
+            options: {
+                release: "patch"
+            }
         },
         firefox: {
             options: {
                 prefix: "em:updateLink=\"http:\/\/.*\/omnibug-|[^\\-]em:version['\"]?\\s*[:=]\\s*['\"]|<h1>Omnibug v",
                 // NOTE: only supporting dot-separated digits (to keep from breaking em:updateLink)
                 replace: "[0-9]+\\.[0-9]+\\.[0-9]+",
+                release: "patch"
             },
             src: [ "firefox/install.rdf.site", "firefox/install.rdf.amo", "firefox/update.rdf.tpl", "firefox/omnibug_rel_notes.xhtml" ]
         },
