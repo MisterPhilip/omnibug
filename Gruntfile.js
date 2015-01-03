@@ -3,55 +3,9 @@ module.exports = function( grunt ) {
     "use strict";
     grunt.file.mkdir( "build" );
     var gruntConfig = {
-        pkg: grunt.file.readJSON( "package.json" )/*,
-        deploy: grunt.file.readJSON( "deploy.json" )*/
+        pkg: grunt.file.readJSON( "package.json" )
     };
     grunt.initConfig( gruntConfig );
-
-
-    /*
-     * Copy artifacts to remote
-     */
-    grunt.loadNpmTasks( "grunt-scp" );
-    gruntConfig.scp = {
-        options: {
-            host: "<%= deploy.host %>",
-            username: "<%= deploy.username %>",
-            //privateKey: grunt.file.read( "deploy.key" )
-        },
-        /*
-        chrome: {
-            files: [
-                { cwd: "build", src: "*.crx", dest: "<%= deploy.path %>" }
-            ]
-        },
-        */
-        firefox: {
-            files: [
-                { cwd: "build", src: "<%= pkg.name %>-<%= pkg.version %>.xpi", dest: "<%= deploy.path %>" },
-                { cwd: "firefox", src: "update.rdf", dest: "<%= deploy.path %>" }
-            ]
-        }
-    };
-
-
-
-
-    /*
-     * Create a symlink on the remote end
-     */
-    grunt.loadNpmTasks( "grunt-ssh" );
-    gruntConfig.sshexec = {
-        link: {
-            command: "ln -sf <%= deploy.path %><%= pkg.name %>-<%= pkg.version %>.xpi <%= deploy.path %><%= pkg.name %>-current.xpi",
-            options: {
-                path: "<%= deploy.path %>",
-                host: "<%= deploy.host %>",
-                username: "<%= deploy.username %>",
-                //privateKey: grunt.file.read( "deploy.key" )
-            }
-        }
-    };
 
 
     /*
@@ -68,7 +22,8 @@ module.exports = function( grunt ) {
                 "cat firefox/update.rdf.tpl | sed \"s/TOK_HASH/${HASH}/g\" > firefox/update.rdf",
                 "echo",
                 "echo \"Please sign and verify `pwd`/firefox/update.rdf with McCoy now\"",
-                "/Applications/McCoy.app/Contents/MacOS/mccoy || exit 1"
+                "/Applications/McCoy.app/Contents/MacOS/mccoy || exit 1",
+                "cp firefox/update.rdf build/"
             ].join( " && " ),
             options: {
                 stdout: true,
@@ -124,6 +79,20 @@ module.exports = function( grunt ) {
             command: [
                 "set -e",
                 "git checkout firefox/chrome/content/omnibug/common.js firefox/chrome/content/omnibug/io.js firefox/chrome/content/omnibug/md5.js firefox/chrome/content/omnibug/model.js firefox/chrome/content/omnibug/omnibugContext.js firefox/chrome/content/omnibug/panel.js"
+            ].join( " && " ),
+            options: {
+                stdout: true,
+                stderr: true,
+                failOnError: true
+            }
+        },
+
+        deploy: {
+            command: [
+                "set -e",
+                "cp firefox/omnibug_rel_notes.xhtml build/",
+                "git co gh-pages",
+                "cp build/omnibug-0*.xpi build/omnibug_rel_notes.xhtml build/update.rdf dist/"
             ].join( " && " ),
             options: {
                 stdout: true,
@@ -360,12 +329,10 @@ module.exports = function( grunt ) {
     grunt.registerTask( "makeFirefox", [ "lineremover:cleanup", "concat:firefox", "compress:site", "compress:amo", "shell:cleanParsedFiles" ] );
 
 
-
     /*
-     * Deploy tasks
+     *  tasks
      */
-    grunt.registerTask( "deployFirefox", [ "makeFirefox", "shell:signXPI", "scp:firefox", "sshexec:link" ] );
-    //grunt.registerTask( "deployChrome", [ "makeChrome", "scp:chrome" ] );
+    grunt.registerTask( "deployFirefox", [ "makeFirefox", "shell:signXPI", "shell:deploy" ] );
 
     /*
      * Pipeline tasks
