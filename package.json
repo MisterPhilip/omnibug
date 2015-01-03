@@ -1,6 +1,6 @@
 {
   "name": "omnibug",
-  "version": "0.5.504",
+  "version": "0.5.505",
   "description": "Omnibug Extension",
   "main": "Gruntfile.js",
   "scripts": {
@@ -30,8 +30,6 @@
     "grunt-crx": "~0.2.4",
     "grunt-contrib-compress": "~0.5.2",
     "grunt-version": "~0.2.2",
-    "grunt-ssh": "~0.6.0",
-    "grunt-scp": "~0.1.5",
     "grunt-shell": "~0.3.1",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-line-remover": "0.0.2"
