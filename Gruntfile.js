@@ -92,7 +92,10 @@ module.exports = function( grunt ) {
                 "set -e",
                 "cp firefox/omnibug_rel_notes.xhtml build/",
                 "git co gh-pages",
-                "cp build/omnibug-0*.xpi build/omnibug_rel_notes.xhtml build/update.rdf dist/"
+                "cp build/omnibug-0*.xpi build/omnibug_rel_notes.xhtml build/update.rdf dist/",
+                "git add dist/*",
+                "git commit dist/ -m'Deploying <%= pkg.version %>'",
+                "git push"
             ].join( " && " ),
             options: {
                 stdout: true,
