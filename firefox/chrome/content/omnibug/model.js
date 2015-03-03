@@ -18,7 +18,10 @@ FBL.ns( function() { with( FBL ) {
     // Components.interfaces helper
     if( typeof( "CI" ) !== "function" ) {
         function CI( ifaceName ) {
-            return Components.interfaces[ifaceName];
+            if(typeof Components.interfaces[ifaceName] !== 'undefined')
+                return Components.interfaces[ifaceName];
+            _dump( "Error instantiating component interface: " + ifaceName + "\n" );
+            return {};
         }
     }
 
@@ -36,15 +39,11 @@ FBL.ns( function() { with( FBL ) {
     // ************************************************************************************************
     // Constants
 
-    try {
-        const nsIWebProgressListener = CI( "nsIWebProgressListener" );
-        const nsIWebProgress = CI( "nsIWebProgress" );
-        const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
-        const nsIObserverService = CI( "nsIObserverService" );
-        const nsISupports = CI( "nsISupports" );
-    } catch( ex ) {
-        _dump( "Error instantiating component interfaces: " + ex + "\n" );
-    }
+    const nsIWebProgressListener = CI( "nsIWebProgressListener" );
+    const nsIWebProgress = CI( "nsIWebProgress" );
+    const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
+    const nsIObserverService = CI( "nsIObserverService" );
+    const nsISupports = CI( "nsISupports" );
 
     const NOTIFY_STATE_DOCUMENT = nsIWebProgress.NOTIFY_STATE_DOCUMENT;
     const NOTIFY_ALL = nsIWebProgress.NOTIFY_ALL;
@@ -55,7 +54,6 @@ FBL.ns( function() { with( FBL ) {
     const STATE_START = nsIWebProgressListener.STATE_START;
     const STATE_STOP = nsIWebProgressListener.STATE_STOP;
     const STATE_TRANSFERRING = nsIWebProgressListener.STATE_TRANSFERRING;
-
 
     Firebug.Omnibug = extend( Firebug.Module, {
         cfg: {
