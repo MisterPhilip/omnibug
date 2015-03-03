@@ -891,6 +891,55 @@ var OmnibugProvider = {
             }
             return false;
         }
+    },
+
+    ADOBETARGET : {
+        key: "ADOBETARGET"
+        , name: "Adobe Target"
+        , pattern: /\.tt\.omtrdc\.net\//
+        , keys: {
+            mbox:              "Mbox Name"
+            , mboxType:          "Mbox Type"
+            , mboxCount:         "Mbox Count"
+            , mboxId:            "Mbox ID"
+            , mboxSession:       "Mbox Session"
+            , mboxPC:            "Mbox PC ID"
+            , mboxPage:          "Mbox Page ID"
+            , clientCode:        "Client Code"
+            , mboxHost:          "Page Host"
+            , mboxURL:           "Page URL"
+            , mboxReferrer:      "Page Referrer"
+            , screenHeight:      "Screen Height"
+            , screenWidth:       "Screen Width"
+            , browserWidth:      "Browser Width"
+            , browserHeight:     "Browser Height"
+            , browserTimeOffset: "Browser Timezone Offset"
+            , colorDepth:        "Browser Color Depth"
+            , mboxXDomain:       "CrossDomain Enabled"
+            , mboxTime:          "Timestamp"
+            , mboxVersion:       "Library Version"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        },
+        handleCustom: function( url, rv, raw ) {
+            var matches =  url.match( /\/([^\/]+)\/mbox\/([^\/\?]+)/ );
+            if(matches !== null && matches.length == 3) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name]["clientCode"] = matches[1];
+                rv[this.key][this.name]["mboxType"] = matches[2];
+                raw["clientCode"] = matches[1];
+                raw["mboxType"] = matches[2];
+            }
+        }
     }
 
 };
