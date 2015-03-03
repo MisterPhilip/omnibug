@@ -248,7 +248,7 @@ FBL.ns( function() { with( FBL ) {
         clear: function() {
             var el = this.panelNode,
                 children = Array.prototype.slice.call(el.childNodes);
-            for( var i= 0,l=children.length-1; i<=l; ++i ) {
+            for( var i= 0,l=children.length; i<l; ++i ) {
                 el.removeChild( children[i] );
             }
         },
