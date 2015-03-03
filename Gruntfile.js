@@ -337,6 +337,8 @@ module.exports = function( grunt ) {
         }
     };
     grunt.registerTask( "makeFirefox", [ "lineremover:cleanup", "concat:firefox", "compress:site", "compress:amo", "shell:cleanParsedFiles" ] );
+    grunt.registerTask( "makeFirefoxDev", [ "concat:firefox", "compress:site", "compress:amo" ] );
+    // ffdev also needs to: `cp install.rdf.site install.rdf`
 
 
     /*
