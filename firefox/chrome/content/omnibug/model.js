@@ -36,15 +36,11 @@ FBL.ns( function() { with( FBL ) {
     // ************************************************************************************************
     // Constants
 
-    try {
-        const nsIWebProgressListener = CI( "nsIWebProgressListener" );
-        const nsIWebProgress = CI( "nsIWebProgress" );
-        const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
-        const nsIObserverService = CI( "nsIObserverService" );
-        const nsISupports = CI( "nsISupports" );
-    } catch( ex ) {
-        _dump( "Error instantiating component interfaces: " + ex + "\n" );
-    }
+    const nsIWebProgressListener = CI( "nsIWebProgressListener" );
+    const nsIWebProgress = CI( "nsIWebProgress" );
+    const nsISupportsWeakReference = CI( "nsISupportsWeakReference" );
+    const nsIObserverService = CI( "nsIObserverService" );
+    const nsISupports = CI( "nsISupports" );
 
     const NOTIFY_STATE_DOCUMENT = nsIWebProgress.NOTIFY_STATE_DOCUMENT;
     const NOTIFY_ALL = nsIWebProgress.NOTIFY_ALL;
