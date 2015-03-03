@@ -24,7 +24,7 @@ module.exports = function( grunt ) {
                 "echo \"Wrote hash '${HASH}' to firefox/update.rdf\"",
                 "echo",
                 "echo \"Please sign and verify `pwd`/firefox/update.rdf with McCoy now\"",
-                "/Applications/McCoy.app/Contents/MacOS/mccoy || exit 1",
+                "/Applications/McCoy.app/Contents/MacOS/mccoy 2>/dev/null || exit 1",
                 "cp firefox/update.rdf build/"
             ].join( " && " ),
             options: {
@@ -344,12 +344,12 @@ module.exports = function( grunt ) {
     /*
      *  tasks
      */
-    grunt.registerTask( "deployFirefox", [ "makeFirefox", "shell:signXPI", "shell:deploy" ] );
+    grunt.registerTask( "deployFirefox", [ "makeFirefox", "shell:signXPI", "shell:gitCommitDeploy", "shell:deploy" ] );
 
     /*
      * Pipeline tasks
      */
-    grunt.registerTask( "release", [ "shell:gitCommitDeploy", "deployFirefox", "shell:gitTag", "updateVersion", "clean" ] );
+    grunt.registerTask( "release", [ "deployFirefox", "shell:gitTag", "updateVersion", "clean" ] );
 
     /*
      * CI tasks
