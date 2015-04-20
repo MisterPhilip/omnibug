@@ -116,6 +116,22 @@ FBL.ns( function() { with( FBL ) {
         },
 
         /**
+         * Called when the expand all button is pushed
+         */
+        expandAll: function() {
+            this.getContext().getPanel("Omnibug").expandAll();
+        },
+
+        /**
+         * Called when the expand all button is pushed
+         */
+        collapseAll: function() {
+            this.getContext().getPanel("Omnibug").collapseAll();
+        },
+
+
+
+        /**
          * Show the prefs menu
          */
         showMenu: function() {

@@ -17,6 +17,8 @@
     <commandset id="mainCommandSet">
         <command id="cmd_clear" oncommand="Firebug.Omnibug.clearPanel()"/>
         <command id="cmd_menu" oncommand="Firebug.Omnibug.showMenu()"/>
+        <command id="cmd_expand_all" oncommand="Firebug.Omnibug.expandAll()"/>
+        <command id="cmd_collapse_all" oncommand="Firebug.Omnibug.collapseAll()"/>
     </commandset>
 
     <toolbar id="fbToolbar" align="center">
@@ -28,6 +30,8 @@
                 <toolbarbutton label="Tools" id="omnibugToolsMenu" type="menu">
                     <menupopup>
                         <menuitem label="Choose log file" oncommand="Firebug.Omnibug.omnibugTools( this )"/>
+                        <menuitem label="Expand all entries" command="cmd_expand_all"/>
+                        <menuitem label="Collapse all entries" command="cmd_collapse_all"/>
                     </menupopup>
                 </toolbarbutton>
             </hbox>
