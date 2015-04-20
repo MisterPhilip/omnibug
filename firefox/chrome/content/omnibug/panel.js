@@ -263,11 +263,11 @@ FBL.ns( function() { with( FBL ) {
                 children = Array.prototype.slice.call(el.childNodes),
                 clickEvent = new MouseEvent('click');
             for( var i= 0,l=children.length; i<l; ++i ) {
-                var isExpanded = children[i].querySelector('td.summ > div.hid');
-                if(isExpanded !== null) {
+                var isHidden = children[i].querySelector('td.summ > div.hid');
+                if(isHidden !== null) {
                     var link = children[i].querySelector('td.exp > a');
                     if(link !== null) {
-                        children[i].querySelector('td.exp > a').dispatchEvent(clickEvent);
+                        link.dispatchEvent(clickEvent);
                     }
                 }
             }
@@ -287,7 +287,7 @@ FBL.ns( function() { with( FBL ) {
                 if(isExpanded !== null) {
                     var link = children[i].querySelector('td.exp > a');
                     if(link !== null) {
-                        children[i].querySelector('td.exp > a').dispatchEvent(clickEvent);
+                        link.dispatchEvent(clickEvent);
                     }
                 }
             }
