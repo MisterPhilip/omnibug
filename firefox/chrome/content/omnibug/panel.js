@@ -242,14 +242,14 @@ FBL.ns( function() { with( FBL ) {
             this.document.omnibugContext = this.getContext().omnibugContext;
         },
 
+        /**
+         * Clears all prior caught requests from the panel
+         */
         clear: function() {
-            /*
-             * works better than the above.  still have to click clear more than once occasionally.. not sure why this is.
-             * using this.panelNode.parentNode removes too much; subsequent requests without a page refresh won't get logged.
-             */
-            var el = this.panelNode;
-                    for( var i=0; i<el.childNodes.length; ++i ) {
-                el.removeChild( el.childNodes[i] );
+            var el = this.panelNode,
+                children = Array.prototype.slice.call(el.childNodes);
+            for( var i= 0,l=children.length; i<l; ++i ) {
+                el.removeChild( children[i] );
             }
         },
 
