@@ -253,6 +253,45 @@ FBL.ns( function() { with( FBL ) {
             }
         },
 
+        /**
+         * Expands all rows currently closed
+         *
+         * @todo - refactor to not have to use click events (requires updates to OmnibugContext)
+         */
+        expandAll: function() {
+            var el = this.panelNode,
+                children = Array.prototype.slice.call(el.childNodes),
+                clickEvent = new MouseEvent('click');
+            for( var i= 0,l=children.length; i<l; ++i ) {
+                var isHidden = children[i].querySelector('td.summ > div.hid');
+                if(isHidden !== null) {
+                    var link = children[i].querySelector('td.exp > a');
+                    if(link !== null) {
+                        link.dispatchEvent(clickEvent);
+                    }
+                }
+            }
+        },
+
+        /**
+         * Collapses all rows currently opened
+         *
+         * @todo - refactor to not have to use click events (requires updates to OmnibugContext)
+         */
+        collapseAll: function() {
+            var el = this.panelNode,
+                children = Array.prototype.slice.call(el.childNodes),
+                clickEvent = new MouseEvent('click');
+            for( var i= 0,l=children.length; i<l; ++i ) {
+                var isExpanded = children[i].querySelector('td.summ > div.reg');
+                if(isExpanded !== null) {
+                    var link = children[i].querySelector('td.exp > a');
+                    if(link !== null) {
+                        link.dispatchEvent(clickEvent);
+                    }
+                }
+            }
+        },
 
         /**
          * Receives a data object from the model, decodes it, and passes it on to report()
