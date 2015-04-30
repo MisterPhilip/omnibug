@@ -181,6 +181,8 @@ var OmnibugProvider = {
             , vid:    "Visitor ID"
             , vidn:   "New visitor ID"
             , fid:    "Fallback Visitor ID"
+            , mid:    "Marketing Cloud Visitor ID"
+            , aid:    "Legacy Visitor ID"
             , cdp:    "Cookie domain periods"
             , pageName: "Page name"
             , pageType: "Page type"
@@ -216,6 +218,68 @@ var OmnibugProvider = {
                 raw[name] = value;
             } else if( name in this.keys ) {
                 // anything else
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+            } else {
+                return false;
+            }
+            return true;
+        },
+        handleCustom: function( url, rv, raw ) {
+            if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
+                raw["rsid"] = RegExp.$1.split( "," );
+            }
+        }
+    },
+
+    VISITORAPI: {
+        key: "VISITORAPI"
+        , name: "Adobe Visitor API"
+        , pattern: /\/id\?callback=s_c_il/
+        , keys: {
+            mcorgid:     "Adobe Organization ID"
+            , mid:       "Visitor ID"
+            , callback:  "Callback property"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            var _name;
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+            } else {
+                return false;
+            }
+            return true;
+        },
+        handleCustom: function( url, rv, raw ) {
+            if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
+                raw["rsid"] = RegExp.$1.split( "," );
+            }
+        }
+    },
+
+    AUDIENCEMANAGER: {
+        key: "AUDIENCEMANAGER"
+        , name: "Adobe Audience Manager"
+        , pattern: /demdex\.net\//
+        , keys: {
+            d_orgid:  "Adobe Organization ID"
+          , d_rtbd:   "Return Method"
+          , d_cb:     "Callback property"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            var _name;
+            if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
