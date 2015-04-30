@@ -138,7 +138,7 @@ var OmnibugProvider = {
 
     OMNITURE: {
           key: "OMNITURE"
-        , name: "Omniture"
+        , name: "Adobe Analytics"
         , pattern: /\/b\/ss\/|2o7/
         , keys: {
               ns:     "Visitor namespace"
@@ -177,10 +177,10 @@ var OmnibugProvider = {
             , cc:     "Currency code"
             , t:      "Browser time"  // "[d/m/yyyy]   [hh:mm:ss]  [weekday]  [time zone offset]"
             , v:      "Javascript-enabled browser?"
-            , v0:     "Campaign variable"
             , pccr:   "Prevent infinite redirects"
             , vid:    "Visitor ID"
             , vidn:   "New visitor ID"
+            , fid:    "Fallback Visitor ID"
             , cdp:    "Cookie domain periods"
             , pageName: "Page name"
             , pageType: "Page type"
