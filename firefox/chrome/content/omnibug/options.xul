@@ -31,6 +31,8 @@
             <!-- providers -->
             <preference id="pref-prov-URCHIN" name="extensions.omnibug.provider.URCHIN" type="bool" />
             <preference id="pref-prov-OMNITURE" name="extensions.omnibug.provider.OMNITURE" type="bool" />
+            <preference id="pref-prov-VISITORAPI" name="extensions.omnibug.provider.VISITORAPI" type="bool" />
+            <preference id="pref-prov-AUDIENCEMANAGER" name="extensions.omnibug.provider.AUDIENCEMANAGER" type="bool" />
             <preference id="pref-prov-MONIFORCE" name="extensions.omnibug.provider.MONIFORCE" type="bool" />
             <preference id="pref-prov-WEBTRENDS" name="extensions.omnibug.provider.WEBTRENDS" type="bool" />
             <preference id="pref-prov-UNIVERSALANALYTICS" name="extensions.omnibug.provider.UNIVERSALANALYTICS" type="bool" />

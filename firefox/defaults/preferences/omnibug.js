@@ -1,5 +1,5 @@
 // pattern to match in request url
-pref( "extensions.omnibug.defaultPattern", "/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif|\/collect\?|\/tt\.omtrdc\.net\/" );
+pref( "extensions.omnibug.defaultPattern", "/b/ss/|2o7|moniforce\.gif|dcs\.gif|__utm\.gif|\/collect\?|\/tt\.omtrdc\.net\/|\/id\?callback=s_c_il|demdex\.net\/" );
 pref( "extensions.omnibug.enableFileLogging", false );
 pref( "extensions.omnibug.highlightKeys", "events,products" );
 
@@ -23,6 +23,10 @@ pref( "extensions.omnibug.color_hover", "#ccc" );
 // providers
 pref( "extensions.omnibug.provider.URCHIN", true );
 pref( "extensions.omnibug.provider.OMNITURE", true );
+pref( "extensions.omnibug.provider.VISITORAPI", true );
+pref( "extensions.omnibug.provider.AUDIENCEMANAGER", true );
+pref( "extensions.omnibug.provider.VISITORAPI", true );
+pref( "extensions.omnibug.provider.AUDIENCEMANAGER", true );
 pref( "extensions.omnibug.provider.MONIFORCE", true );
 pref( "extensions.omnibug.provider.WEBTRENDS", true );
 pref( "extensions.omnibug.provider.UNIVERSALANALYTICS", true );
