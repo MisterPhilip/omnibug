@@ -327,4 +327,40 @@ describe( "Provider", function() {
         } );
     } );
 
+
+    describe( "Adobe Target", function() {
+        var url = "http://foobar.tt.omtrdc.net/m2/foobar/mbox/standard?mboxHost=foo.test.com&mboxSession=1234567890123-456789&mboxPC=1234567890123-456789.19_07&mboxPage=0987654321098-765432&screenHeight=1080&screenWidth=1920&browserWidth=1920&browserHeight=955&browserTimeOffset=-420&colorDepth=24&mboxXDomain=enabled&mboxCount=1&mbox=OmnibugTestMbox&mboxId=0&mboxTime=1425398080493&mboxURL=http%3A%2F%2Ffoo.test.com%2Fsample-mbox%2Fpage.html&mboxReferrer=http%3A%2F%2Ffoo.test.com%2Fsome-sample-referrer&mboxVersion=55",
+            provider = OmnibugProvider.getProviderForUrl( url );
+
+        it( "should return the Adobe Target provider", function() {
+            expect( provider.key ).toBe( "ADOBETARGET" );
+            expect( provider.name ).toBe( "Adobe Target" );
+        } );
+
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "mbox", "OmnibugTestMbox", rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].mbox ).toBe( "OmnibugTestMbox" );
+            expect( raw.mbox ).toBe( "OmnibugTestMbox" );
+        } );
+
+        it( "should populate an mboxType in handleCustom", function() {
+            var rv = {}, raw = {};
+            provider.handleCustom( url, rv, raw );
+            expect( rv[provider.key][provider.name].mboxType ).toContain( "standard" );
+            expect( rv[provider.key][provider.name].mboxType.length ).toBe( 8 );
+            expect( raw.mboxType ).toContain( "standard" );
+            expect( raw.mboxType.length ).toBe( 8 );
+        } );
+
+        it( "should populate a clientCode in handleCustom", function() {
+            var rv = {}, raw = {};
+            provider.handleCustom( url, rv, raw );
+            expect( rv[provider.key][provider.name].clientCode ).toEqual( "foobar" );
+            expect( rv[provider.key][provider.name].clientCode.length ).toBe( 6 );
+            expect( raw.clientCode ).toEqual( "foobar" );
+            expect( raw.clientCode.length ).toBe( 6 );
+        } );
+    } );
+
 } );
