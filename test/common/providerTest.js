@@ -41,13 +41,13 @@ describe( "Provider", function() {
     } );
 
 
-    describe( "Adobe Analytics", function() {
+    describe( "Omniture", function() {
         var url = "http://o.sa.aol.com/b/ss/aolsvc/1/H.25.4/s95323655775282?AQB=1&ndh=1&t=6%2F6%2F2013%2020%3A55%3A17%206%20-600&fid=3072B7AEA40CF981-2FE133AF4D25371B&ns=aolllc&cl=63072000&pageName=map%20%3A%20mq.main&g=http%3A%2F%2Fwww.mapquest.com%2F&cc=USD&ch=mq.mq&events=event10&c1=map%20%3A%20MQ10.com&c2=map%20%3A%20mq%20main&c3=gmt_5&c7=D%3DDNT&c10=external%20web%20browser&c12=http%3A%2F%2Fwww.mapquest.com%2F&c13=non-authenticated&c14=no%20referrer&v14=map%20%3A%20mapquest%7Cafarm%7Ctestbed%20A&c15=unavailable&c17=map%20%3A%20afarm%20%3A%20testbed%20A&c24=D%3Dv52&c49=H.25.4-May2013%7Cmmx_1&v52=uaid_1afb3152f63a49f2a86cb79169faa173&c55=108117104&c56=www.mapquest.com&c61=D%3Dpccr&s=1280x800&c=24&j=1.6&v=Y&k=Y&bw=1116&bh=378&p=Shockwave%20Flash%3BChrome%20Remote%20Desktop%20Viewer%3BNative%20Client%3BChrome%20PDF%20Viewer%3BLogitech%20Device%20Detection%3BAdobe%20Acrobat%20NPAPI%20Plug-in%2C%20Version%2010.1.7%3BCitrix%20Receiver%20Plug-in%3BShockwave%20for%20Director%3BGarmin%20Communicator%20Plug-in%20Version%204.0.1.0%3BGoogle%20Talk%20Plugin%3BJava%20Plug-In%202%20for%20NPAPI%20Browsers%3BGoogle%20Talk%20Plugin%20Video%20Accelerator%3BGoogle%20Talk%20Plugin%20Video%20Renderer%3BMicrosoft%20Office%20Live%20Plug-in%3BQuickTime%20Plug-in%207.7.1%3BSharePoint%20Browser%20Plug-in%3BSilverlight%20Plug-In%3B&AQE=1",
             provider = OmnibugProvider.getProviderForUrl( url );
 
-        it( "should return the Adobe Analytics provider", function() {
+        it( "should return the Omniture provider", function() {
             expect( provider.key ).toBe( "OMNITURE" );
-            expect( provider.name ).toBe( "Adobe Analytics" );
+            expect( provider.name ).toBe( "Omniture" );
         } );
 
         it( "should allow a known key", function() {
@@ -78,40 +78,6 @@ describe( "Provider", function() {
             expect( provider.handleQueryParam( "evar1", "ooo", rv, raw ) ).toBe( true );
             expect( rv[provider.key]["Conversion Variables"].eVar1 ).toBe( "ooo" );
             expect( raw.eVar1 ).toBe( "ooo" );
-        } );
-    } );
-
-    describe( "Adobe Visitor API", function() {
-        var url = "http://test-metrics.misterphilip.com/id?callback=s_c_il%5B0%5D._setAnalyticsFields&mcorgid=XXXXX3625269AB1E0A4XXXXX%40AdobeOrg&mid=06801727180314520982602291780711040219",
-            provider = OmnibugProvider.getProviderForUrl( url );
-
-        it( "should return the Adobe Visitor API provider", function() {
-            expect( provider.key ).toBe( "VISITORAPI" );
-            expect( provider.name ).toBe( "Adobe Visitor API" );
-        } );
-
-        it( "should allow a known key", function() {
-            var rv = {}, raw = {};
-            expect( provider.handleQueryParam( "mcorgid", "XXXXX3625269AB1E0A4XXXXX@AdobeOrg", rv, raw ) ).toBe( true );
-            expect( rv[provider.key][provider.name].mcorgid ).toBe( "XXXXX3625269AB1E0A4XXXXX@AdobeOrg" );
-            expect( raw.mcorgid ).toBe( "XXXXX3625269AB1E0A4XXXXX@AdobeOrg" );
-        } );
-    } );
-
-    describe( "Adobe Audience Manager", function() {
-        var url = "http://dpm.demdex.net/id/rd?d_rtbd=json&d_ver=2&d_verify=1&d_orgid=XXXXX3625269AB1E0A4XXXXX%40AdobeOrg&d_cb=s_c_il%5B0%5D._setMarketingCloudFields",
-            provider = OmnibugProvider.getProviderForUrl( url );
-
-        it( "should return the Adobe Audience Manager provider", function() {
-            expect( provider.key ).toBe( "AUDIENCEMANAGER" );
-            expect( provider.name ).toBe( "Adobe Audience Manager" );
-        } );
-
-        it( "should allow a known key", function() {
-            var rv = {}, raw = {};
-            expect( provider.handleQueryParam( "d_orgid", "XXXXX3625269AB1E0A4XXXXX@AdobeOrg", rv, raw ) ).toBe( true );
-            expect( rv[provider.key][provider.name].d_orgid ).toBe( "XXXXX3625269AB1E0A4XXXXX@AdobeOrg" );
-            expect( raw.d_orgid ).toBe( "XXXXX3625269AB1E0A4XXXXX@AdobeOrg" );
         } );
     } );
 
