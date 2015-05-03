@@ -25,8 +25,6 @@ pref( "extensions.omnibug.provider.URCHIN", true );
 pref( "extensions.omnibug.provider.OMNITURE", true );
 pref( "extensions.omnibug.provider.VISITORAPI", true );
 pref( "extensions.omnibug.provider.AUDIENCEMANAGER", true );
-pref( "extensions.omnibug.provider.VISITORAPI", true );
-pref( "extensions.omnibug.provider.AUDIENCEMANAGER", true );
 pref( "extensions.omnibug.provider.MONIFORCE", true );
 pref( "extensions.omnibug.provider.WEBTRENDS", true );
 pref( "extensions.omnibug.provider.UNIVERSALANALYTICS", true );
