@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Omnibug",
-    "version": "0.5.512",
+    "version": "0.5.513",
     "description": "Omnibug is a Chrome extension to decode and display outgoing web metrics requests.",
     "icons": {
         "16": "images/o-16.png",
