@@ -534,7 +534,7 @@ FBL.ns( function() { with( FBL ) {
             var age,
                 requests = Firebug.Omnibug.cfg.requests;
 
-            _dump( "processRequests: processing " + Object.sizeof( requests ) + " requests; context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
+            _dump( "processRequests: processing " + Omnibug.Tools.sizeof( requests ) + " requests; context[" + context.uid + "]; browser[" + context.browser.uid + "]\n" );
 
             try {
                 for( var key in requests ) {
@@ -560,7 +560,7 @@ FBL.ns( function() { with( FBL ) {
             } catch( ex ) {
                 _dump( "processRequests: caught exception: " + ex + "\n" );
             }
-            _dump( "processRequests: done (" + Object.sizeof( requests ) + " remaining)\n" );
+            _dump( "processRequests: done (" + Omnibug.Tools.sizeof( requests ) + " remaining)\n" );
         },
 
 
@@ -575,7 +575,7 @@ FBL.ns( function() { with( FBL ) {
             var age,
                 requests = Firebug.Omnibug.cfg.requests;
 
-            _dump( "expireRequests: processing " + Object.sizeof( requests ) + " requests; context[" + context.uid + "]\n" );
+            _dump( "expireRequests: processing " + Omnibug.Tools.sizeof( requests ) + " requests; context[" + context.uid + "]\n" );
 
             try {
                 for( var key in requests ) {
@@ -595,7 +595,7 @@ FBL.ns( function() { with( FBL ) {
             } catch( ex ) {
                 _dump( "expireRequests: caught exception: " + ex + "\n" );
             }
-            _dump( "expireRequests: done (" + Object.sizeof( requests ) + " remaining)\n" );
+            _dump( "expireRequests: done (" + Omnibug.Tools.sizeof( requests ) + " remaining)\n" );
         },
 
 
@@ -864,16 +864,6 @@ FBL.ns( function() { with( FBL ) {
         return state;
     }
 
-    /**
-     * Object.sizeof: implement Array-like length getter for Objects
-     */
-    Object.sizeof = function(obj) {
-        var size = 0, key;
-        for (key in obj) {
-            if (obj.hasOwnProperty(key)) size++;
-        }
-        return size;
-    }
 
 
 
@@ -924,6 +914,17 @@ FBL.ns( function() { with( FBL ) {
             }
         }
         return str + "}";
+    }
+
+    /**
+     * sizeof: implement Array-like length getter for Objects
+     */
+    Omnibug.Tools.sizeof = function( obj ) {
+        var size = 0, key;
+        for( key in obj ) {
+            if( obj.hasOwnProperty( key ) ) size++;
+        }
+        return size;
     }
 
 }} );
