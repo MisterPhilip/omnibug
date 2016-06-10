@@ -166,6 +166,7 @@
 
         // store the current tab's loading state into the details object
         details.omnibugLoading = tabs[details.tabId].loading;
+        if (details.requestBody) details.post_string = String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes));
 
         chrome.tabs.get( details.tabId, detailsProcessingCallbackFactory( details ) );
     };
@@ -184,10 +185,11 @@
     };
 
 
-    chrome.webRequest.onResponseStarted.addListener(
+    chrome.webRequest.onBeforeRequest.addListener(
         responseStartedCallback,
-        { urls: ["<all_urls>"] }
-        // @TODO: filter these based on static patterns/config ?
+    //  @TODO: filter these based on static patterns/config ?
+        { urls: ["<all_urls>"] },
+        ['requestBody', 'blocking']       
     );
 
 

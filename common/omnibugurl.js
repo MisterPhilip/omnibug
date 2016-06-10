@@ -11,7 +11,7 @@
 
 var OmnibugUrl = function( url ) {
     this.url = url;
-    this.parseUrl();
+    this.parseUrl(details);
 };
 
 OmnibugUrl.prototype = (function() {
@@ -73,7 +73,7 @@ OmnibugUrl.prototype = (function() {
 
         parseUrl: function() {
             var sep,
-                url = this.url,
+                url = typeof details.post_string != 'undefined' ? this.url + '?' + details.post_string : this.url,
                 sPos = url.indexOf( ";" ),
                 qPos = url.indexOf( "?" );
 
