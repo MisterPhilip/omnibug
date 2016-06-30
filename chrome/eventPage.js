@@ -341,7 +341,7 @@
 
         // hacky: sometimes load events are being reported as click events.  For Omniture, detect
         // the event type (pe= means a click event), and reset eventType accordingly.
-        if( data.state.omnibugProvider.name === "OMNITURE" ) {
+        if( data.state.omnibugProvider.key.toUpperCase() === "OMNITURE" ) {
             var oldEventType = eventType;
             eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
         }
