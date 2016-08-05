@@ -1004,6 +1004,92 @@ var OmnibugProvider = {
                 raw["mboxType"] = matches[2];
             }
         }
+    },
+
+    ZAIUS : {
+        key: "ZAIUS"
+        , name: "Zaius"
+        , pattern: /(jumbe|zaius)\.gif/
+        , keys: {
+            event_type:             "Event Type",
+            vdl_action:             "Action",
+            action:                 "Action",
+            vuid:                   "Unique User ID",
+            customer_id:            "Customer ID",
+            tracker_id:             "Tracker ID",
+            page:                   "Page URL",
+            title:                  "Page Title",
+            new_user:               "New User",
+            product_id:             "Product ID",
+            order_id:               "Order ID",
+            hostname:               "Host Name",
+            landing:                "Landing Page",
+            referrer:               "Referrer",
+            keywords:               "Keywords",
+            source:                 "Source",
+            medium:                 "Medium",
+            campaign:               "Campaign",
+            content:                "Content",
+            search_term:            "Search Term",
+            paginate_result_count:  "Paginate Result Count",
+            paginate_page_number:   "Paginate Page Number",
+            filter_field:           "Filter Field",
+            filter_value:           "Filter Value",
+            sort_direction:         "Sort Direction",
+            sort_field:             "Sort Field",
+            carousel_scroll:        "Carousel Scroll",
+            carousel_page_number:   "Carousel Page Number",
+            resolution:             "Screen Resolution",
+            viewport:               "Window Resolution",
+            color_depth:            "Color Depth",
+            language:               "Language",
+            character_set:          "Character Set",
+            java:                   "Java Enabled",
+            flash:                  "Flash Version",
+            vtsrc:                  "Source Info",
+            days_since_last_visit:  "Days Since Last Visit",
+            redirect_time:          "Redirect Time (ms)",
+            domain_lookup_time:     "Domain Lookup Time (ms)",
+            server_connect_time:    "Server Connect Time (ms)",
+            server_response_time:   "Server Response Time (ms)",
+            page_download_time:     "Page Download Time (ms)",
+            page_load_time:         "Page Load Time (ms)",
+            total_load_time:        "Total Load Time (ms)",
+            version:                "Zaius JS Version",
+            zaius_js_version:       "Zaius JS Version",
+            name:                   "Name",
+            first_name:             "Customer First Name",
+            last_name:              "Customer Last Name",
+            email:                  "Customer Email",
+            email_status:           "Customer Email Status",
+            phone:                  "Customer Phone",
+            street1:                "Customer Street 1",
+            street2:                "Customer Street 2",
+            city:                   "Customer City",
+            state:                  "Customer State",
+            zip:                    "Customer Zipcode",
+            country:                "Customer Country",
+            timezone:               "Customer Timezone",
+            total:                  "Order Total",
+            discount:               "Order Discount",
+            subtotal:               "Order Subtotal",
+            tax:                    "Order Tax",
+            shipping:               "Order Shipping",
+            brand:                  "Brand",
+            category:               "Category",
+            u:                      "Time"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            var match;
+            if ( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
     }
 
 };
