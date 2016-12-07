@@ -9,8 +9,9 @@
  *
  */
 
-var OmnibugUrl = function( url ) {
+var OmnibugUrl = function( url, postData ) {
     this.url = url;
+    this.postData = postData;
     this.parseUrl();
 };
 
@@ -106,11 +107,24 @@ OmnibugUrl.prototype = (function() {
                 this.anchor = ( p3[1] ? p3[1] : '' );
             }
 
+            var kvPairs = [],
+                i = 0,
+                l = 0,
+                kv = [];
+
             if( this.queryString ) {
                 var kvSep = ( this.queryString.indexOf( "&" ) != -1 ? "&" : ";" );
-                var kvPairs = this.queryString.split( kvSep );
-                for( var i=0; i<kvPairs.length; ++i ) {
-                    var kv = kvPairs[i].split( '=' );
+                kvPairs = this.queryString.split( kvSep );
+                for( i=0, l=kvPairs.length; i<l; ++i ) {
+                    kv = kvPairs[i].split( '=' );
+                    this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
+                }
+            }
+
+            if( this.postData ) {
+                kvPairs = this.postData.split( '&' );
+                for( i=0, l=kvPairs.length; i<l; ++i ) {
+                    kv = kvPairs[i].split( '=' );
                     this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
                 }
             }

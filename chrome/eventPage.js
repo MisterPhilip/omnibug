@@ -150,7 +150,7 @@
      *   type: "xmlhttprequest"
      *   url: "https://0-act.channel.facebook.com/pull?cha...
      */
-    var responseStartedCallback = function( details ) {
+    var beforeRequestCallback = function( details ) {
         // ignore chrome:// requests and non-metrics URLs
         if( details.tabId == -1 || !shouldProcess( details.url ) ) return;
 
@@ -184,9 +184,10 @@
     };
 
 
-    chrome.webRequest.onResponseStarted.addListener(
-        responseStartedCallback,
-        { urls: ["<all_urls>"] }
+    chrome.webRequest.onBeforeRequest.addListener(
+        beforeRequestCallback,
+        { urls: ["<all_urls>"] },
+        ['requestBody']
         // @TODO: filter these based on static patterns/config ?
     );
 
@@ -269,8 +270,14 @@
      * Receives a data object from the model, decodes it, and passes it on to report()
      */
     function decodeUrl( data ) {
+
+        var url = data.url, postData = null;
+        if( data.method === 'POST' ) {
+            postData =  String.fromCharCode.apply( null, new Uint8Array( data.requestBody.raw[0].bytes ) );
+        }
+
         var val,
-            u = new OmnibugUrl( data.url ),
+            u = new OmnibugUrl( data.url, postData ),
             obj = {
                 state: data,    // raw data from the browser event
                 raw: {}
@@ -359,6 +366,7 @@
         data.omnibug["Request ID"]   = data.state.requestId;
         data.omnibug["Status Line"]  = data.state.statusLine;
         data.omnibug["Request Type"] = data.state.type;
+        data.omnibug["Method"]       = data.state.method;
 
         return data;
     }
