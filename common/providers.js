@@ -71,6 +71,362 @@ var OmnibugProvider = {
     },
 
 
+    /**
+     * Providers
+     * Ordered by pattern match specificity (decreasing)
+     */
+
+    AUDIENCEMANAGER: {
+        key: "AUDIENCEMANAGER"
+        , name: "Adobe Audience Manager"
+        , pattern: /demdex\.net\//
+        , keys: {
+            d_orgid:  "Adobe Organization ID"
+          , d_rtbd:   "Return Method"
+          , d_cb:     "Callback property"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            var _name;
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+            } else {
+                return false;
+            }
+            return true;
+        },
+        handleCustom: function( url, rv, raw ) {
+            if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
+                raw["rsid"] = RegExp.$1.split( "," );
+            }
+        }
+    },
+
+    KISSMETRICS : {
+          key: "KISSMETRICS"
+        , name: "KISSmetrics"
+        , pattern: /api\.mixpanel\.com\/track\//
+        , keys: {
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name == "data" ) {
+                var obj = atob( value );
+                try {
+                    var parsed = JSON.parse( obj );
+                    for( var k in parsed ) {
+                        if( parsed.hasOwnProperty( k ) ) {
+                            if( typeof( parsed[k] ) === "object" ) {
+                                for( var innerK in parsed[k] ) {
+                                    if( parsed[k].hasOwnProperty( innerK ) ) {
+                                        rv[this.key] = rv[this.key] || {};
+                                        rv[this.key][k] = rv[this.key][k] || {};
+                                        rv[this.key][k][innerK] = parsed[k][innerK];
+                                        raw[innerK] = parsed[k][innerK];
+                                    }
+                                }
+                            } else {
+                                rv[this.key] = rv[this.key] || {};
+                                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                                rv[this.key][this.name][k] = parsed[k];
+                                raw[k] = parsed[k];
+                            }
+                        }
+                    }
+                } catch( e ) {
+                    // noop
+                }
+
+                return true;
+            } else if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    TORBIT : {
+          key: "TORBIT"
+        , name: "Torbit Insight"
+        , pattern: /insight-beacon\.torbit\.com/
+        , keys: {
+              onready: "onready"
+            , onload:    "onload"
+            , frontend: "frontend"
+            , total_load_time: "Total load time"
+            , red_t: "red_t"
+            , cache_t: "Cache time"
+            , dns_t: "DNS time"
+            , tcp_t: "TCP time"
+            , b_wait_t: "b_wait_t"
+            , b_tran_t: "b_tran_t"
+            , onready_t: "onready time"
+            , onload_t: "onload time"
+            , scr_proc_t: "scr_proc_t"
+            , src: "src"
+            , tbtim: "tbtim"
+            , conversion: "conversion"
+            , tags: "tags"
+            , v: "v"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    QUANTSERVE : {
+          key: "QUANTSERVE"
+        , name: "Quantcast"
+        , pattern: /pixel\.quantserve\.com\/pixel/
+        , keys: {
+              ref: "Referrer"
+            , tzo: "Time zone offset"
+            , dst: "Daylight savings time active?"
+            , sr:  "Screen resolution"
+            , et:  "Timestamp"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    MARKETO : {
+          key: "MARKETO"
+        , name: "Marketo"
+        , pattern: /mktoresp.com\/webevents\/visitWebPage/
+        , keys: {
+              _mchNc: "Timestamp"
+            , _mchCn: "_mchCn"
+            , _mchId: "ID"
+            , _mchTk: "_mchTk"
+            , _mchHo: "Hostname"
+            , _mchPo: "_mchPo"
+            , _mchRu: "Request URL"
+            , _mchPc: "Scheme"
+            , _mchHa: "_mchHa"
+            , _mchRe: "Referrer"
+            , _mchQp: "_mchQp"
+            , _mchVr: "_mchVr"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    NEWRELIC : {
+          key: "NEWRELIC"
+        , name: "NewRelic"
+        , pattern: /beacon.*\.newrelic\.com\//
+        , keys: {
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name == "perf" ) {
+                try {
+                    var parsed = JSON.parse( value );
+                    for( var k in parsed ) {
+                        if( parsed.hasOwnProperty( k ) ) {
+                            if( typeof( parsed[k] ) === "object" ) {
+                                for( var innerK in parsed[k] ) {
+                                    if( parsed[k].hasOwnProperty( innerK ) ) {
+                                        rv[this.key] = rv[this.key] || {};
+                                        rv[this.key][k] = rv[this.key][k] || {};
+                                        rv[this.key][k][innerK] = parsed[k][innerK];
+                                        raw[innerK] = parsed[k][innerK];
+                                    }
+                                }
+                            } else {
+                                rv[this.key] = rv[this.key] || {};
+                                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                                rv[this.key][this.name][k] = parsed[k];
+                                raw[k] = parsed[k];
+                            }
+                        }
+                    }
+                } catch( e ) {
+                    // noop
+                }
+
+                return true;
+            } else if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    KRUX : {
+          key: "KRUX"
+        , name: "Krux"
+        , pattern: /beacon\.krxd\.net\/pixel\.gif/
+        , keys: {
+              geo_country: "Country"
+            , geo_region:  "Region"
+            , geo_city:    "City"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    OPTIMIZELY : {
+          key: "OPTIMIZELY"
+        , name: "Optimizely"
+        , pattern: /optimizely\.com\/event/
+        , keys: {
+              t: "Timestamp"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    SOPHUS3 : {
+          key: "SOPHUS3"
+        , name: "sophus3"
+        , pattern: /sophus3\.com\/i|sophus3\.com\/d/
+        , keys: {
+              r:      "Referrer URL"
+            , tagv:   "Script Version"
+            , Ts:     "Time Stamp"
+            , sr:     "Screen Resolution"
+            , sw:     "Screen Width"
+            , ah:     "Actual Height"
+            , aw:     "Actual Width"
+            , sh:     "Screen Height"
+            , pd:     "Pixel Depth"
+            , cd:     "Colour Depth"
+            , siteID: "SiteID"
+            , ts:     "Ts"
+            , "location": "Location"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    DOUBLECLICK : {
+          key: "DOUBLECLICK"
+        , name: "Doubleclick"
+        , pattern: /\.doubleclick\.net\/(ad|r|pcs|gampad)/
+        , keys: {
+              cat: "Category"
+            , kwd: "Keywords"
+            , sz:  "Size"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    ADOBETARGET : {
+        key: "ADOBETARGET"
+        , name: "Adobe Target"
+        , pattern: /\.tt\.omtrdc\.net\//
+        , keys: {
+            mbox:              "Mbox Name"
+            , mboxType:          "Mbox Type"
+            , mboxCount:         "Mbox Count"
+            , mboxId:            "Mbox ID"
+            , mboxSession:       "Mbox Session"
+            , mboxPC:            "Mbox PC ID"
+            , mboxPage:          "Mbox Page ID"
+            , clientCode:        "Client Code"
+            , mboxHost:          "Page Host"
+            , mboxURL:           "Page URL"
+            , mboxReferrer:      "Page Referrer"
+            , screenHeight:      "Screen Height"
+            , screenWidth:       "Screen Width"
+            , browserWidth:      "Browser Width"
+            , browserHeight:     "Browser Height"
+            , browserTimeOffset: "Browser Timezone Offset"
+            , colorDepth:        "Browser Color Depth"
+            , mboxXDomain:       "CrossDomain Enabled"
+            , mboxTime:          "Timestamp"
+            , mboxVersion:       "Library Version"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        },
+        handleCustom: function( url, rv, raw ) {
+            var matches =  url.match( /\/([^\/]+)\/mbox\/([^\/\?]+)/ );
+            if(matches !== null && matches.length == 3) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name]["clientCode"] = matches[1];
+                rv[this.key][this.name]["mboxType"] = matches[2];
+                raw["clientCode"] = matches[1];
+                raw["mboxType"] = matches[2];
+            }
+        }
+    },
 
     URCHIN: {
           key: "URCHIN"
@@ -268,37 +624,6 @@ var OmnibugProvider = {
         }
     },
 
-    AUDIENCEMANAGER: {
-        key: "AUDIENCEMANAGER"
-        , name: "Adobe Audience Manager"
-        , pattern: /demdex\.net\//
-        , keys: {
-            d_orgid:  "Adobe Organization ID"
-          , d_rtbd:   "Return Method"
-          , d_cb:     "Callback property"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            var _name;
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-            } else {
-                return false;
-            }
-            return true;
-        },
-        handleCustom: function( url, rv, raw ) {
-            if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
-                raw["rsid"] = RegExp.$1.split( "," );
-            }
-        }
-    },
-
     MONIFORCE: {
           key: "MONIFORCE"
         , name: "Moniforce"
@@ -386,83 +711,6 @@ var OmnibugProvider = {
         },
         handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys || name.match( /^WT\./ ) || name.match( /^dcs/ ) ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    UNIVERSALANALYTICS : {
-          key: "UNIVERSALANALYTICS"
-        , name: "Universal Analytics"
-        , pattern: /\/collect\/?\?/
-        , keys: {
-              v:      "Protocol Version"
-            , tid:    "Tracking ID"
-            , aip:    "Anonymize IP"
-            , qt:     "Queue Time"
-            , z:      "Cache Buster"
-            , cid:    "Client ID"
-            , sc:     "Session Control"
-            , dr:     "Document Referrer"
-            , cn:     "Campaign Name"
-            , cs:     "Campaign Source"
-            , cm:     "Campaign Medium"
-            , ck:     "Campaign Keyword"
-            , cc:     "Campaign Content"
-            , ci:     "Campaign ID"
-            , gclid:  "Google AdWords ID"
-            , dclid:  "Google Display Ads ID"
-            , sr:     "Screen Resolution"
-            , vp:     "Viewport Size"
-            , de:     "Document Encoding"
-            , sd:     "Screen Colors"
-            , ul:     "User Language"
-            , je:     "Java Enabled"
-            , fl:     "Flash Version"
-            , t:      "Hit Type"
-            , ni:     "Non-Interaction Hit"
-            , dl:     "Document location URL"
-            , dh:     "Document Host Name"
-            , dp:     "Document Path"
-            , dt:     "Document Title"
-            , cd:     "Content Description"
-            , an:     "Application Name"
-            , av:     "Application Version"
-            , ec:     "Event Category"
-            , ea:     "Event Action"
-            , el:     "Event Label"
-            , ev:     "Event Value"
-            , ti:     "Transaction ID"
-            , ta:     "Transaction Affiliation"
-            , tr:     "Transaction Revenue"
-            , ts:     "Transaction Shipping"
-            , tt:     "Transaction Tax"
-            , "in":   "Item Name"
-            , ip:     "Item Price"
-            , iq:     "Item Quantity"
-            , ic:     "Item Code"
-            , iv:     "Item Category"
-            , cu:     "Currency Code"
-            , sn:     "Social Network"
-            , sa:     "Social Action"
-            , st:     "Social Action Target"
-            , utl:    "User timing label"
-            , plt:    "Page load time"
-            , dns:    "DNS time"
-            , pdt:    "Page download time"
-            , rrt:    "Redirect response time"
-            , tcp:    "TCP connect time"
-            , srt:    "Server response time"
-            , exd:    "Exception description"
-            , exf:    "Is exception fatal?"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
@@ -625,52 +873,6 @@ var OmnibugProvider = {
         }
     },
 
-    KISSMETRICS : {
-          key: "KISSMETRICS"
-        , name: "KISSmetrics"
-        , pattern: /api\.mixpanel\.com\/track\//
-        , keys: {
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name == "data" ) {
-                var obj = atob( value );
-                try {
-                    var parsed = JSON.parse( obj );
-                    for( var k in parsed ) {
-                        if( parsed.hasOwnProperty( k ) ) {
-                            if( typeof( parsed[k] ) === "object" ) {
-                                for( var innerK in parsed[k] ) {
-                                    if( parsed[k].hasOwnProperty( innerK ) ) {
-                                        rv[this.key] = rv[this.key] || {};
-                                        rv[this.key][k] = rv[this.key][k] || {};
-                                        rv[this.key][k][innerK] = parsed[k][innerK];
-                                        raw[innerK] = parsed[k][innerK];
-                                    }
-                                }
-                            } else {
-                                rv[this.key] = rv[this.key] || {};
-                                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                                rv[this.key][this.name][k] = parsed[k];
-                                raw[k] = parsed[k];
-                            }
-                        }
-                    }
-                } catch( e ) {
-                    // noop
-                }
-
-                return true;
-            } else if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
     FBLIKE : {
           key: "FBLIKE"
         , name: "Facebook"
@@ -691,95 +893,6 @@ var OmnibugProvider = {
             , extended_social_context: "Extended social context"
             , action:      "Action"
             , height:      "Height"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    TORBIT : {
-          key: "TORBIT"
-        , name: "Torbit Insight"
-        , pattern: /insight-beacon\.torbit\.com/
-        , keys: {
-              onready: "onready"
-            , onload:    "onload"
-            , frontend: "frontend"
-            , total_load_time: "Total load time"
-            , red_t: "red_t"
-            , cache_t: "Cache time"
-            , dns_t: "DNS time"
-            , tcp_t: "TCP time"
-            , b_wait_t: "b_wait_t"
-            , b_tran_t: "b_tran_t"
-            , onready_t: "onready time"
-            , onload_t: "onload time"
-            , scr_proc_t: "scr_proc_t"
-            , src: "src"
-            , tbtim: "tbtim"
-            , conversion: "conversion"
-            , tags: "tags"
-            , v: "v"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    QUANTSERVE : {
-          key: "QUANTSERVE"
-        , name: "Quantcast"
-        , pattern: /pixel\.quantserve\.com\/pixel/
-        , keys: {
-              ref: "Referrer"
-            , tzo: "Time zone offset"
-            , dst: "Daylight savings time active?"
-            , sr:  "Screen resolution"
-            , et:  "Timestamp"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    MARKETO : {
-          key: "MARKETO"
-        , name: "Marketo"
-        , pattern: /mktoresp.com\/webevents\/visitWebPage/
-        , keys: {
-              _mchNc: "Timestamp"
-            , _mchCn: "_mchCn"
-            , _mchId: "ID"
-            , _mchTk: "_mchTk"
-            , _mchHo: "Hostname"
-            , _mchPo: "_mchPo"
-            , _mchRu: "Request URL"
-            , _mchPc: "Scheme"
-            , _mchHa: "_mchHa"
-            , _mchRe: "Referrer"
-            , _mchQp: "_mchQp"
-            , _mchVr: "_mchVr"
         },
         handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
@@ -817,192 +930,6 @@ var OmnibugProvider = {
                 return true;
             }
             return false;
-        }
-    },
-
-    NEWRELIC : {
-          key: "NEWRELIC"
-        , name: "NewRelic"
-        , pattern: /beacon.*\.newrelic\.com\//
-        , keys: {
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name == "perf" ) {
-                try {
-                    var parsed = JSON.parse( value );
-                    for( var k in parsed ) {
-                        if( parsed.hasOwnProperty( k ) ) {
-                            if( typeof( parsed[k] ) === "object" ) {
-                                for( var innerK in parsed[k] ) {
-                                    if( parsed[k].hasOwnProperty( innerK ) ) {
-                                        rv[this.key] = rv[this.key] || {};
-                                        rv[this.key][k] = rv[this.key][k] || {};
-                                        rv[this.key][k][innerK] = parsed[k][innerK];
-                                        raw[innerK] = parsed[k][innerK];
-                                    }
-                                }
-                            } else {
-                                rv[this.key] = rv[this.key] || {};
-                                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                                rv[this.key][this.name][k] = parsed[k];
-                                raw[k] = parsed[k];
-                            }
-                        }
-                    }
-                } catch( e ) {
-                    // noop
-                }
-
-                return true;
-            } else if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    KRUX : {
-          key: "KRUX"
-        , name: "Krux"
-        , pattern: /beacon\.krxd\.net\/pixel\.gif/
-        , keys: {
-              geo_country: "Country"
-            , geo_region:  "Region"
-            , geo_city:    "City"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    OPTIMIZELY : {
-          key: "OPTIMIZELY"
-        , name: "Optimizely"
-        , pattern: /optimizely\.com\/event/
-        , keys: {
-              t: "Timestamp"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    SOPHUS3 : {
-          key: "SOPHUS3"
-        , name: "sophus3"
-        , pattern: /sophus3\.com\/i|sophus3\.com\/d/
-        , keys: {
-              r:      "Referrer URL"
-            , tagv:   "Script Version"
-            , Ts:     "Time Stamp"
-            , sr:     "Screen Resolution"
-            , sw:     "Screen Width"
-            , ah:     "Actual Height"
-            , aw:     "Actual Width"
-            , sh:     "Screen Height"
-            , pd:     "Pixel Depth"
-            , cd:     "Colour Depth"
-            , siteID: "SiteID"
-            , ts:     "Ts"
-            , "location": "Location"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    DOUBLECLICK : {
-          key: "DOUBLECLICK"
-        , name: "Doubleclick"
-        , pattern: /\.doubleclick\.net\/ad/
-        , keys: {
-              cat: "Category"
-            , kwd: "Keywords"
-            , sz:  "Size"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    ADOBETARGET : {
-        key: "ADOBETARGET"
-        , name: "Adobe Target"
-        , pattern: /\.tt\.omtrdc\.net\//
-        , keys: {
-            mbox:              "Mbox Name"
-            , mboxType:          "Mbox Type"
-            , mboxCount:         "Mbox Count"
-            , mboxId:            "Mbox ID"
-            , mboxSession:       "Mbox Session"
-            , mboxPC:            "Mbox PC ID"
-            , mboxPage:          "Mbox Page ID"
-            , clientCode:        "Client Code"
-            , mboxHost:          "Page Host"
-            , mboxURL:           "Page URL"
-            , mboxReferrer:      "Page Referrer"
-            , screenHeight:      "Screen Height"
-            , screenWidth:       "Screen Width"
-            , browserWidth:      "Browser Width"
-            , browserHeight:     "Browser Height"
-            , browserTimeOffset: "Browser Timezone Offset"
-            , colorDepth:        "Browser Color Depth"
-            , mboxXDomain:       "CrossDomain Enabled"
-            , mboxTime:          "Timestamp"
-            , mboxVersion:       "Library Version"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        },
-        handleCustom: function( url, rv, raw ) {
-            var matches =  url.match( /\/([^\/]+)\/mbox\/([^\/\?]+)/ );
-            if(matches !== null && matches.length == 3) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name]["clientCode"] = matches[1];
-                rv[this.key][this.name]["mboxType"] = matches[2];
-                raw["clientCode"] = matches[1];
-                raw["mboxType"] = matches[2];
-            }
         }
     },
 
@@ -1082,6 +1009,83 @@ var OmnibugProvider = {
         handleQueryParam: function( name, value, rv, raw ) {
             var match;
             if ( name in this.keys ) {
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][this.name] = rv[this.key][this.name] || {};
+                rv[this.key][this.name][name] = value;
+                raw[name] = value;
+                return true;
+            }
+            return false;
+        }
+    },
+
+    UNIVERSALANALYTICS : {
+          key: "UNIVERSALANALYTICS"
+        , name: "Universal Analytics"
+        , pattern: /\/collect\/?\?/
+        , keys: {
+              v:      "Protocol Version"
+            , tid:    "Tracking ID"
+            , aip:    "Anonymize IP"
+            , qt:     "Queue Time"
+            , z:      "Cache Buster"
+            , cid:    "Client ID"
+            , sc:     "Session Control"
+            , dr:     "Document Referrer"
+            , cn:     "Campaign Name"
+            , cs:     "Campaign Source"
+            , cm:     "Campaign Medium"
+            , ck:     "Campaign Keyword"
+            , cc:     "Campaign Content"
+            , ci:     "Campaign ID"
+            , gclid:  "Google AdWords ID"
+            , dclid:  "Google Display Ads ID"
+            , sr:     "Screen Resolution"
+            , vp:     "Viewport Size"
+            , de:     "Document Encoding"
+            , sd:     "Screen Colors"
+            , ul:     "User Language"
+            , je:     "Java Enabled"
+            , fl:     "Flash Version"
+            , t:      "Hit Type"
+            , ni:     "Non-Interaction Hit"
+            , dl:     "Document location URL"
+            , dh:     "Document Host Name"
+            , dp:     "Document Path"
+            , dt:     "Document Title"
+            , cd:     "Content Description"
+            , an:     "Application Name"
+            , av:     "Application Version"
+            , ec:     "Event Category"
+            , ea:     "Event Action"
+            , el:     "Event Label"
+            , ev:     "Event Value"
+            , ti:     "Transaction ID"
+            , ta:     "Transaction Affiliation"
+            , tr:     "Transaction Revenue"
+            , ts:     "Transaction Shipping"
+            , tt:     "Transaction Tax"
+            , "in":   "Item Name"
+            , ip:     "Item Price"
+            , iq:     "Item Quantity"
+            , ic:     "Item Code"
+            , iv:     "Item Category"
+            , cu:     "Currency Code"
+            , sn:     "Social Network"
+            , sa:     "Social Action"
+            , st:     "Social Action Target"
+            , utl:    "User timing label"
+            , plt:    "Page load time"
+            , dns:    "DNS time"
+            , pdt:    "Page download time"
+            , rrt:    "Redirect response time"
+            , tcp:    "TCP connect time"
+            , srt:    "Server response time"
+            , exd:    "Exception description"
+            , exf:    "Is exception fatal?"
+        },
+        handleQueryParam: function( name, value, rv, raw ) {
+            if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;

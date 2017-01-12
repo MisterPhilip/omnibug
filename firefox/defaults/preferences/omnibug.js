@@ -42,3 +42,4 @@ pref( "extensions.omnibug.provider.OPTIMIZELY", true );
 pref( "extensions.omnibug.provider.SOPHUS3", true );
 pref( "extensions.omnibug.provider.DOUBLECLICK", true );
 pref( "extensions.omnibug.provider.ADOBETARGET", true );
+pref( "extensions.omnibug.provider.ZAIUS", true );

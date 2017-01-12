@@ -277,7 +277,6 @@ describe( "Provider", function() {
 
     // @TODO: crowdfactory??
 
-    
     describe( "NewRelic", function() {
         var url = "http://beacon-1.newrelic.com/1/1d1110a9fb?a=120775&be=523&qt=0&ap=258&dc=786&fe=3467&to=YlZaNkpUXxcDU01QV1sccjFoGmYhIB1wd34aWUsSF0dUBU1YVlRdG1lLEg%3D%3D&v=40&jsonp=NREUM.setToken&perf=%7B%22timing%22%3A%7B%22of%22%3A1373109832853%2C%20%22n%22%3A0%2C%20%22dl%22%3A457%2C%20%22di%22%3A1309%2C%20%22ds%22%3A1309%2C%20%22de%22%3A1362%2C%20%22dc%22%3A3947%2C%20%22l%22%3A3947%2C%20%22le%22%3A3990%2C%20%22f%22%3A0%2C%20%22dn%22%3A0%2C%20%22dne%22%3A0%2C%20%22c%22%3A0%2C%20%22ce%22%3A0%2C%20%22rq%22%3A2%2C%20%22rp%22%3A432%2C%20%22rpe%22%3A452%7D%2C%20%22navigation%22%3A%7B%22ty%22%3A1%7D%7D",
             provider = OmnibugProvider.getProviderForUrl( url );
@@ -394,6 +393,24 @@ describe( "Provider", function() {
             expect( rv[provider.key][provider.name].clientCode.length ).toBe( 6 );
             expect( raw.clientCode ).toEqual( "foobar" );
             expect( raw.clientCode.length ).toBe( 6 );
+        } );
+    } );
+
+
+    describe( "Zaius", function() {
+        var url = "https://jumbe.zaius.com/v2/zaius.gif?resolution=3840x2400&color_depth=24-bit&viewport=2880x742&source=google&medium=organic&java=0&flash=24.0%20r0&language=en-us&character_set=utf-8&days_since_last_visit=0&server_connect_time=589&server_response_time=1304&page_download_time=321&page_load_time=1911&total_load_time=4176&hostname=www.modaoperandi.com&page=%2F&title=Moda%20Operandi&u=2003075067&vuid=29b4a237-7dfe-4e17-ac0d-c49b2ef2bd03&new_user=0&zaius_js_version=2.1.4&tracker_id=d_43qkTBbK0DGIVTYFiCdQ&event_type=pageview&logged_in=not%20signed%20in",
+            provider = OmnibugProvider.getProviderForUrl( url );
+
+        it( "should return the Zaius provider", function() {
+            expect( provider.key ).toBe( "ZAIUS" );
+            expect( provider.name ).toBe( "Zaius" );
+        } );
+
+        it( "should allow a known key", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "resolution", "3840x2400", rv, raw ) ).toBe( true );
+            expect( rv[provider.key][provider.name].resolution ).toBe( "3840x2400" );
+            expect( raw.resolution ).toBe( "3840x2400" );
         } );
     } );
 
