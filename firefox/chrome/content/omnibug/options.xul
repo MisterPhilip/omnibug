@@ -50,6 +50,7 @@
             <preference id="pref-prov-SOPHUS3" name="extensions.omnibug.provider.SOPHUS3" type="bool" />
             <preference id="pref-prov-DOUBLECLICK" name="extensions.omnibug.provider.DOUBLECLICK" type="bool" />
             <preference id="pref-prov-ADOBETARGET" name="extensions.omnibug.provider.ADOBETARGET" type="bool" />
+            <preference id="pref-prov-ZAIUS" name="extensions.omnibug.provider.ZAIUS" type="bool" />
         </preferences>
 
         <!-- file logging -->
