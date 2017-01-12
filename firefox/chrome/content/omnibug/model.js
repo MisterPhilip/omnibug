@@ -18,7 +18,10 @@ FBL.ns( function() { with( FBL ) {
     // Components.interfaces helper
     if( typeof( "CI" ) !== "function" ) {
         function CI( ifaceName ) {
-            return Components.interfaces[ifaceName];
+            if(typeof Components.interfaces[ifaceName] !== 'undefined')
+                return Components.interfaces[ifaceName];
+            _dump( "Error instantiating component interface: " + ifaceName + "\n" );
+            return {};
         }
     }
 
@@ -51,7 +54,6 @@ FBL.ns( function() { with( FBL ) {
     const STATE_START = nsIWebProgressListener.STATE_START;
     const STATE_STOP = nsIWebProgressListener.STATE_STOP;
     const STATE_TRANSFERRING = nsIWebProgressListener.STATE_TRANSFERRING;
-
 
     Firebug.Omnibug = extend( Firebug.Module, {
         cfg: {
