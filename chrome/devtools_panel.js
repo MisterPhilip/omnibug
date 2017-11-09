@@ -199,6 +199,16 @@ window.Omnibug = ( function() {
         return( !! title ? title : elName );
     }
 
+    /* borrowed from https://stackoverflow.com/questions/1219860/html-encoding-lost-when-attribute-read-from-input-field */
+    function htmlEscape(str) {
+        return typeof str !== 'string' ? str : str
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
     /**
      * Return a quoted string (if the pref is set)
      */
@@ -206,9 +216,9 @@ window.Omnibug = ( function() {
         if( this.prefs.showQuotes ) {
             return( ( typeof( str ) === "string" && str.indexOf( "<span class='qq'>" ) === 0 )
                 ? str
-                : "<span class='qq'>\"</span><span class='v'>" + str + "</span><span class='qq'>\"</span>" )
+                : "<span class='qq'>&quot;</span><span class='v'>" + htmlEscape( str ) + "</span><span class='qq'>&quot;</span>" )
         } else {
-            return str;
+            return htmlEscape( str );
         }
     }
 
