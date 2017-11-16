@@ -239,7 +239,7 @@ FBL.ns( function() { with( FBL ) {
 
                     //_dump( "responseObserver: subj=" + subject + "; topic=" + topic + "; key=" + key + "\n" );
 
-                    if(    ( subject && subject.name && subject.name.match( omRef.cfg.defaultRegex ) )
+                    if(    ( subject && subject.name && subject.name.indexOf('data:') !== 0 && subject.name.match( omRef.cfg.defaultRegex ) )
                         || ( subject && subject.name && omRef.cfg.userRegex && subject.name.match( omRef.cfg.userRegex ) ) ) {
                         key = Md5Impl.md5( subject.name );
                         _dump( "responseObserver: key=" + key + "; sc=" + subject.responseStatus + "; st=" + subject.responseStatusText + "\n" );
