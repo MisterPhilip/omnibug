@@ -9,7 +9,7 @@ module.exports = function(grunt) {
         },
         "firefox": {
             "version": "0.6.0",
-            "gecko": "{9e00ccd0-bf33-4038-929d-833a4b8d723b}",
+            "gecko": "Omnibug@rosssimpson.com",
             "usePolyfill": false,
             "folder": "firefox"
         },
