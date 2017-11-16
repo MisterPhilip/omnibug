@@ -90,8 +90,10 @@ module.exports = function(grunt) {
                 "maxparams": 3,
                 "maxdepth": 4,
                 "maxstatements": 50,
+                "maxerr": 200,
                 "globals": {
-                    "browser": true
+                    "browser": true,
+                    "console": true
                 },
                 "reporter": require("jshint-html-reporter"),
                 "reporterOutput": "build/jshint/index.html"
@@ -121,7 +123,8 @@ module.exports = function(grunt) {
             },
             "istanbul": {
                 "src": [
-                    "src/*.js"
+                    "src/omnibugurl.js",
+                    "src/providers.js"
                 ],
                 "options": {
                     "specs": [
@@ -314,5 +317,5 @@ module.exports = function(grunt) {
     /*
      * CI tasks
      */
-    grunt.registerTask( "travis", [ "jshint", "test", "coverage" ]);
+    grunt.registerTask( "travis", [ "test", "coverage" ]);
 };

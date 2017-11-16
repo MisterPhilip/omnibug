@@ -1,13 +1,4 @@
-/*
- * Omnibug
- * Prefs logic
- *
- * This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
- * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send
- * a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041,
- * USA.
- *
- */
+/* globals OmnibugProvider */
 (function() {
     var prefs,
         that = this;
@@ -80,11 +71,12 @@
                         prefs[key] = processFormValue( key, active.value );
                     } else if( elem.type === "hidden" ) {
                         var dataUse = elem.getAttribute( "data-use" );
+                        var values = '';
                         if( dataUse === "list" ) {
-                            var values = getVisualListValues( elem );
+                            values = getVisualListValues( elem );
                             prefs[key] = values;
                         } else if( dataUse === "checkbox" ) {
-                            var values = getCheckboxValues( elem );
+                            values = getCheckboxValues( elem );
                             prefs[key] = values;
                         }
 
@@ -97,9 +89,9 @@
 
         // save the new values into local storage
         try {
-            chrome.storage.local.set( { "omnibug" : prefs }, function() {
-                if( !! chrome.runtime.lastError ) {
-                    console.error( "Error setting prefs: ", chrome.runtime.lastError );
+            browser.storage.local.set( { "omnibug" : prefs }, function() {
+                if( !! browser.runtime.lastError ) {
+                    console.error( "Error setting prefs: ", browser.runtime.lastError );
                 }
             } );
         } catch( ex ) {
@@ -268,7 +260,7 @@
 
     // load prefs and update the HTML
     document.addEventListener( 'DOMContentLoaded', function() {
-        chrome.storage.local.get( "omnibug", restoreOptions );
+        browser.storage.local.get( "omnibug", restoreOptions );
     } );
 
 }() );

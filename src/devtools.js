@@ -17,7 +17,6 @@
     var panelCreated = function( panel ) {
         var queuedMessages = [],
             panelWindow,  // reference to devtools_panel.html's `window` object
-            clearButton,
             port;
 
         port = browser.runtime.connect( { name: "omnibug-" + browser.devtools.inspectedWindow.tabId } );
@@ -51,25 +50,6 @@
                 port.postMessage( msg );
             };
         } );
-
-        /*
-        if(panel.createStatusBarButton) {
-
-            // add a clear button
-            clearButton = panel.createStatusBarButton( "images/clear_button.png", "Clear events.", false );
-            clearButton.onClicked.addListener( function() {
-                var tables = panelWindow.document.getElementsByTagName( "table" );
-                while( tables.length > 0 ) {
-                    for( var i=0; i<tables.length; ++i ) {
-                        if( tables[i].className.match( /req/ ) ) {
-                            tables[i].parentNode.removeChild( tables[i] );
-                        }
-                    }
-                    tables = panelWindow.document.getElementsByTagName( "table" );
-                }
-            } );
-        }
-        */
     };
 
 
