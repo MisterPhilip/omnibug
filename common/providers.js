@@ -59,7 +59,7 @@ var OmnibugProvider = {
             }
         }
         return {
-              key: "UNKNOWN"
+            key: "UNKNOWN"
             , name: "Unknown"
             , pattern: /^5831c14e26a2ded99d98782c15e92d62f195d9bcf53869f4d412cff5a074e5246c99916ada7ad760$/
             , keys: {
@@ -82,8 +82,8 @@ var OmnibugProvider = {
         , pattern: /demdex\.net\//
         , keys: {
             d_orgid:  "Adobe Organization ID"
-          , d_rtbd:   "Return Method"
-          , d_cb:     "Callback property"
+            , d_rtbd:   "Return Method"
+            , d_cb:     "Callback property"
         },
         handleQueryParam: function( name, value, rv, raw ) {
             var _name;
@@ -108,7 +108,7 @@ var OmnibugProvider = {
     },
 
     KISSMETRICS : {
-          key: "KISSMETRICS"
+        key: "KISSMETRICS"
         , name: "KISSmetrics"
         , pattern: /api\.mixpanel\.com\/track\//
         , keys: {
@@ -154,11 +154,11 @@ var OmnibugProvider = {
     },
 
     TORBIT : {
-          key: "TORBIT"
+        key: "TORBIT"
         , name: "Torbit Insight"
         , pattern: /insight-beacon\.torbit\.com/
         , keys: {
-              onready: "onready"
+            onready: "onready"
             , onload:    "onload"
             , frontend: "frontend"
             , total_load_time: "Total load time"
@@ -190,11 +190,11 @@ var OmnibugProvider = {
     },
 
     QUANTSERVE : {
-          key: "QUANTSERVE"
+        key: "QUANTSERVE"
         , name: "Quantcast"
         , pattern: /pixel\.quantserve\.com\/pixel/
         , keys: {
-              ref: "Referrer"
+            ref: "Referrer"
             , tzo: "Time zone offset"
             , dst: "Daylight savings time active?"
             , sr:  "Screen resolution"
@@ -213,11 +213,11 @@ var OmnibugProvider = {
     },
 
     MARKETO : {
-          key: "MARKETO"
+        key: "MARKETO"
         , name: "Marketo"
         , pattern: /mktoresp.com\/webevents\/visitWebPage/
         , keys: {
-              _mchNc: "Timestamp"
+            _mchNc: "Timestamp"
             , _mchCn: "_mchCn"
             , _mchId: "ID"
             , _mchTk: "_mchTk"
@@ -243,7 +243,7 @@ var OmnibugProvider = {
     },
 
     NEWRELIC : {
-          key: "NEWRELIC"
+        key: "NEWRELIC"
         , name: "NewRelic"
         , pattern: /beacon.*\.newrelic\.com\//
         , keys: {
@@ -288,11 +288,11 @@ var OmnibugProvider = {
     },
 
     KRUX : {
-          key: "KRUX"
+        key: "KRUX"
         , name: "Krux"
         , pattern: /beacon\.krxd\.net\/pixel\.gif/
         , keys: {
-              geo_country: "Country"
+            geo_country: "Country"
             , geo_region:  "Region"
             , geo_city:    "City"
         },
@@ -309,11 +309,11 @@ var OmnibugProvider = {
     },
 
     OPTIMIZELY : {
-          key: "OPTIMIZELY"
+        key: "OPTIMIZELY"
         , name: "Optimizely"
         , pattern: /optimizely\.com\/event/
         , keys: {
-              t: "Timestamp"
+            t: "Timestamp"
         },
         handleQueryParam: function( name, value, rv, raw ) {
             if( name in this.keys ) {
@@ -328,11 +328,11 @@ var OmnibugProvider = {
     },
 
     SOPHUS3 : {
-          key: "SOPHUS3"
+        key: "SOPHUS3"
         , name: "sophus3"
         , pattern: /sophus3\.com\/i|sophus3\.com\/d/
         , keys: {
-              r:      "Referrer URL"
+            r:      "Referrer URL"
             , tagv:   "Script Version"
             , Ts:     "Time Stamp"
             , sr:     "Screen Resolution"
@@ -359,11 +359,11 @@ var OmnibugProvider = {
     },
 
     DOUBLECLICK : {
-          key: "DOUBLECLICK"
+        key: "DOUBLECLICK"
         , name: "Doubleclick"
         , pattern: /\.doubleclick\.net\/(ad|r|pcs|gampad)/
         , keys: {
-              cat: "Category"
+            cat: "Category"
             , kwd: "Keywords"
             , sz:  "Size"
         },
@@ -429,11 +429,11 @@ var OmnibugProvider = {
     },
 
     URCHIN: {
-          key: "URCHIN"
+        key: "URCHIN"
         , name: "Google Analytics"
         , pattern: /__utm\.gif/
         , keys: {
-              utmac:  "Account string"
+            utmac:  "Account string"
             , utmcc:  "Cookie values"
             , utmcn:  "New campaign session?"
             , utmcr:  "Repeat campaign visit?"
@@ -493,11 +493,11 @@ var OmnibugProvider = {
     },
 
     OMNITURE: {
-          key: "OMNITURE"
+        key: "OMNITURE"
         , name: "Adobe Analytics"
         , pattern: /\/b\/ss\/|2o7/
         , keys: {
-              ns:     "Visitor namespace"
+            ns:     "Visitor namespace"
             , ndh:    "Image sent from JS?"
             , ch:     "Channel"
             , v0:     "Campaign"
@@ -625,7 +625,7 @@ var OmnibugProvider = {
     },
 
     MONIFORCE: {
-          key: "MONIFORCE"
+        key: "MONIFORCE"
         , name: "Moniforce"
         , pattern: /moniforce\.gif/
         , keys: {
@@ -643,11 +643,11 @@ var OmnibugProvider = {
     },
 
     WEBTRENDS: {
-          key: "WEBTRENDS"
+        key: "WEBTRENDS"
         , name: "WebTrends"
         , pattern: /dcs\.gif/
         , keys: {
-              "WT.vt_tlv":   "Time of last visit (SDC)"
+            "WT.vt_tlv":   "Time of last visit (SDC)"
             , "WT.vt_f_tlv": "Time of last visit (cookie)"
             , "WT.vt_f_tlh": "Time of last hit"
             , "WT.vt_d":     "First visitor hit today (EA)"
@@ -722,12 +722,12 @@ var OmnibugProvider = {
     },
 
     COREMETRICS : {
-          key: "COREMETRICS"
+        key: "COREMETRICS"
         , name: "Core Metrics"
         , pattern: /eluminate\/?\?.*tid=/
         , keys: {
             // http://www.akravitz.com/master-list-of-coremetrics-query-strings/
-              at:   "Action tag ID" //  (at 5 = Shop Action 5, at 9 = Shop Action 9)
+            at:   "Action tag ID" //  (at 5 = Shop Action 5, at 9 = Shop Action 9)
             , bp:   "Base price"
             , cat:  "Conversion action type" // (1=initiated event, 2=completed event)
             , cc:   "Currency code"
@@ -848,11 +848,11 @@ var OmnibugProvider = {
     },
 
     ATINTERNET : {
-          key: "ATINTERNET"
+        key: "ATINTERNET"
         , name: "AT Internet"
         , pattern: /\.xiti/
         , keys: {
-              r:    "Screen resolution/depth"
+            r:    "Screen resolution/depth"
             , p:    "Page name"
             , s:    "Site number"
             , s2:   "Site level 2"
@@ -874,11 +874,11 @@ var OmnibugProvider = {
     },
 
     FBLIKE : {
-          key: "FBLIKE"
+        key: "FBLIKE"
         , name: "Facebook"
         , pattern: /facebook.*\/like\.php/
         , keys: {
-              api_key:     "api_key"
+            api_key:     "api_key"
             , locale:      "locale"
             , sdk:         "sdk"
             , channel_url: "channel_url"
@@ -907,11 +907,11 @@ var OmnibugProvider = {
     },
 
     CROWDFACTORY : {
-          key: "CROWDFACTORY"
+        key: "CROWDFACTORY"
         , name: "Marketo Crowdfactory"
         , pattern: /\/tracker\/track\.gif/
         , keys: {
-              cf_eventid:   "cf_eventid"
+            cf_eventid:   "cf_eventid"
             , cachebust:    "Cache buster"
             , subscriber:   "Subscriber"
             , product:      "Product"
@@ -1020,11 +1020,11 @@ var OmnibugProvider = {
     },
 
     UNIVERSALANALYTICS : {
-          key: "UNIVERSALANALYTICS"
+        key: "UNIVERSALANALYTICS"
         , name: "Universal Analytics"
         , pattern: /\/collect\/?\?/
         , keys: {
-              v:      "Protocol Version"
+            v:      "Protocol Version"
             , tid:    "Tracking ID"
             , aip:    "Anonymize IP"
             , qt:     "Queue Time"
@@ -1074,7 +1074,10 @@ var OmnibugProvider = {
             , sn:     "Social Network"
             , sa:     "Social Action"
             , st:     "Social Action Target"
-            , utl:    "User timing label"
+            , utc:    "User Timing Category"
+            , utv:    "User Timing Variable Name"
+            , utt:    "User Timing Time"
+            , utl:    "User timing Label"
             , plt:    "Page load time"
             , dns:    "DNS time"
             , pdt:    "Page download time"
@@ -1083,18 +1086,98 @@ var OmnibugProvider = {
             , srt:    "Server response time"
             , exd:    "Exception description"
             , exf:    "Is exception fatal?"
+            , ds:     "Data Source"
+            , uid:    "User ID"
+            , linkid: "Link ID"
+            , pa:     "Product Action"
+            , tcc:    "Coupon Code"
+            , pal:    "Product Action List"
+            , cos:    "Checkout Step"
+            , col:    "Checkout Step Option"
+            , promoa: "Promotion Action"
+            , xid:    "Content Experiment ID"
+            , xvar:    "Content Experiment Variant"
         },
         handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
+            var groupName, groupItem, lookup = {};
+            if( /^cd(\d+)$/.test( name ) ) {
+                groupName = "Custom Dimensions";
+                groupItem = "Custom Dimension ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^cm(\d+)$/.test( name ) ) {
+                groupName = "Custom Metrics";
+                groupItem = "Custom Metric ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^cg(\d+)$/.test( name ) ) {
+                groupName = "Content Groups";
+                groupItem = "Content Group ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^promo(\d+)([a-z]{2})$/.test( name ) ) {
+                lookup = {"id": "ID", "nm": "Name", "cr": "Creative", "ps": "Position"};
+                groupName = "Promotions";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Promo " + RegExp.$1 + " " + (lookup[RegExp.$2]||"");
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^pr(\d+)([a-z]{2})$/.test( name ) ) {
+                lookup = {"id": "ID", "nm": "Name", "br": "Brand", "ca": "Category", "va": "Variant", "pr": "Price",
+                    "qt": "Quantity", "cc": "Coupon Code", "ps": "Position"};
+                groupName = "Products";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Product " + RegExp.$1 + " " + (lookup[RegExp.$2]||"");
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^pr(\d+)(cd|cm)(\d+)$/.test( name ) ) {
+                lookup = {"cd": "Custom Dimension", "cm": "Custom Metric"};
+                groupName = "Products";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Product " + RegExp.$1 + " " + (lookup[RegExp.$2]||"") + " " + RegExp.$3;
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^il(\d+)nm$/.test( name ) ) {
+                groupName = "Product Impressions";
+                groupItem = "Impression List ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^il(\d+)pi(\d+)(cd|cm)(\d+)$/.test( name ) ) {
+                lookup =  {"cd": "Custom Dimension", "cm": "Custom Metric"};
+                groupName = "Product Impressions";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + (lookup[RegExp.$3]||"") + " " + RegExp.$4;
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^il(\d+)pi(\d+)([a-z]{2})$/.test( name ) ) {
+                lookup = {"id": "ID", "nm": "Name", "br": "Brand", "ca": "Category", "va": "Variant", "pr": "Price", "ps": "Position"};
+                groupName = "Product Impressions";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + (lookup[RegExp.$3]||"");
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
                 raw[name] = value;
-                return true;
+            } else {
+                return false;
             }
-            return false;
+            return true;
         }
     }
-
 };
-
