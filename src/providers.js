@@ -1017,11 +1017,11 @@ var OmnibugProvider = {
     },
 
     UNIVERSALANALYTICS : {
-          key: "UNIVERSALANALYTICS"
+        key: "UNIVERSALANALYTICS"
         , name: "Universal Analytics"
         , pattern: /\/collect\/?\?/
         , keys: {
-              v:      "Protocol Version"
+            v:      "Protocol Version"
             , tid:    "Tracking ID"
             , aip:    "Anonymize IP"
             , qt:     "Queue Time"
@@ -1071,7 +1071,10 @@ var OmnibugProvider = {
             , sn:     "Social Network"
             , sa:     "Social Action"
             , st:     "Social Action Target"
-            , utl:    "User timing label"
+            , utc:    "User Timing Category"
+            , utv:    "User Timing Variable Name"
+            , utt:    "User Timing Time"
+            , utl:    "User timing Label"
             , plt:    "Page load time"
             , dns:    "DNS time"
             , pdt:    "Page download time"
@@ -1080,18 +1083,99 @@ var OmnibugProvider = {
             , srt:    "Server response time"
             , exd:    "Exception description"
             , exf:    "Is exception fatal?"
+            , ds:     "Data Source"
+            , uid:    "User ID"
+            , linkid: "Link ID"
+            , pa:     "Product Action"
+            , tcc:    "Coupon Code"
+            , pal:    "Product Action List"
+            , cos:    "Checkout Step"
+            , col:    "Checkout Step Option"
+            , promoa: "Promotion Action"
+            , xid:    "Content Experiment ID"
+            , xvar:    "Content Experiment Variant"
         },
         handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
+            var groupName, groupItem, lookup = {};
+            if( /^cd(\d+)$/.test( name ) ) {
+                groupName = "Custom Dimensions";
+                groupItem = "Custom Dimension ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^cm(\d+)$/.test( name ) ) {
+                groupName = "Custom Metrics";
+                groupItem = "Custom Metric ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^cg(\d+)$/.test( name ) ) {
+                groupName = "Content Groups";
+                groupItem = "Content Group ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^promo(\d+)([a-z]{2})$/.test( name ) ) {
+                lookup = {"id": "ID", "nm": "Name", "cr": "Creative", "ps": "Position"};
+                groupName = "Promotions";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Promo " + RegExp.$1 + " " + (lookup[RegExp.$2]||"");
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^pr(\d+)([a-z]{2})$/.test( name ) ) {
+                lookup = {"id": "ID", "nm": "Name", "br": "Brand", "ca": "Category", "va": "Variant", "pr": "Price",
+                    "qt": "Quantity", "cc": "Coupon Code", "ps": "Position"};
+                groupName = "Products";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Product " + RegExp.$1 + " " + (lookup[RegExp.$2]||"");
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^pr(\d+)(cd|cm)(\d+)$/.test( name ) ) {
+                lookup = {"cd": "Custom Dimension", "cm": "Custom Metric"};
+                groupName = "Products";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Product " + RegExp.$1 + " " + (lookup[RegExp.$2]||"") + " " + RegExp.$3;
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^il(\d+)nm$/.test( name ) ) {
+                groupName = "Product Impressions";
+                groupItem = "Impression List ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^il(\d+)pi(\d+)(cd|cm)(\d+)$/.test( name ) ) {
+                lookup =  {"cd": "Custom Dimension", "cm": "Custom Metric"};
+                groupName = "Product Impressions";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + (lookup[RegExp.$3]||"") + " " + RegExp.$4;
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^il(\d+)pi(\d+)([a-z]{2})$/.test( name ) ) {
+                lookup = {"id": "ID", "nm": "Name", "br": "Brand", "ca": "Category", "va": "Variant", "pr": "Price", "ps": "Position"};
+                groupName = "Product Impressions";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + (lookup[RegExp.$3]||"");
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
                 raw[name] = value;
-                return true;
+            } else {
+                return false;
             }
-            return false;
+            return true;
         }
     }
-
 };
 

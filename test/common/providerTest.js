@@ -134,8 +134,8 @@ describe( "Provider", function() {
     } );
 
 
-    describe( "Univeral Analytics", function() {
-        var url = "http://www.google-analytics.com/collect?v=1&_v=j10&a=1858140673&t=pageview&_s=1&dl=http%3A%2F%2Fomnibug.rosssimpson.com%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=1280x800&vp=1116x378&je=1&fl=11.7%20r700&_u=MAC~&cid=501006286.1373109213&tid=UA-41016297-1&z=1470222427",
+    describe( "Universal Analytics", function() {
+        var url = "http://www.google-analytics.com/collect?v=1&_v=j10&a=1858140673&t=pageview&_s=1&dl=http%3A%2F%2Fomnibug.rosssimpson.com%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=1280x800&vp=1116x378&je=1&fl=11.7%20r700&_u=MAC~&cid=501006286.1373109213&tid=UA-41016297-1&z=1470222427&cd2=custDim2&cm5=60&cg1=My%20Content%20Group&pr3br=my%20brand",
             provider = OmnibugProvider.getProviderForUrl( url );
 
         it( "should return the UA provider", function() {
@@ -148,6 +148,69 @@ describe( "Provider", function() {
             expect( provider.handleQueryParam( "v", 1, rv, raw ) ).toBe( true );
             expect( rv[provider.key][provider.name].v ).toBe( 1 );
             expect( raw.v ).toBe( 1 );
+        } );
+
+        it( "should handle a custom dimension", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "cd2", "custDim2", rv, raw ) ).toBe( true );
+            expect( rv[provider.key]["Custom Dimensions"]["Custom Dimension 2"] ).toBe( "custDim2" );
+            expect( raw["Custom Dimension 2"] ).toBe( "custDim2" );
+        } );
+
+        it( "should handle a custom metric", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "cm5", "60", rv, raw ) ).toBe( true );
+            expect( rv[provider.key]["Custom Metrics"]["Custom Metric 5"] ).toBe( "60" );
+            expect( raw["Custom Metric 5"] ).toBe( "60" );
+        } );
+
+        it( "should handle a content group", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "cg1", "My Content Group", rv, raw ) ).toBe( true );
+            expect( rv[provider.key]["Content Groups"]["Content Group 1"] ).toBe( "My Content Group" );
+            expect( raw["Content Group 1"] ).toBe( "My Content Group" );
+        } );
+
+        it( "should handle a promotion code", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "promo2id", "sample_promo", rv, raw ) ).toBe( true );
+            expect( rv[provider.key]["Promotions"]["Promo 2 ID"] ).toBe( "sample_promo" );
+            expect( raw["Promo 2 ID"] ).toBe( "sample_promo" );
+        } );
+
+        it( "should handle a product", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "pr3br", "my brand", rv, raw ) ).toBe( true );
+            expect( rv[provider.key]["Products"]["Product 3 Brand"] ).toBe( "my brand" );
+            expect( raw["Product 3 Brand"] ).toBe( "my brand" );
+        } );
+
+        it( "should handle a product custom dimension", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "pr3cd2", "green shirt", rv, raw ) ).toBe( true );
+            expect( rv[provider.key]["Products"]["Product 3 Custom Dimension 2"] ).toBe( "green shirt" );
+            expect( raw["Product 3 Custom Dimension 2"] ).toBe( "green shirt" );
+        } );
+
+        it( "should handle a product impression list name", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "il1nm", "search results", rv, raw ) ).toBe( true );
+            expect( rv[provider.key]["Product Impressions"]["Impression List 1"] ).toBe( "search results" );
+            expect( raw["Impression List 1"] ).toBe( "search results" );
+        } );
+
+        it( "should handle a product impression list products", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "il1pi2nm", "my awesome shirt for sale", rv, raw ) ).toBe( true );
+            expect( rv[provider.key]["Product Impressions"]["Impression List 1 Product 2 Name"] ).toBe( "my awesome shirt for sale" );
+            expect( raw["Impression List 1 Product 2 Name"] ).toBe( "my awesome shirt for sale" );
+        } );
+
+        it( "should handle a product impression list product custom metric", function() {
+            var rv = {}, raw = {};
+            expect( provider.handleQueryParam( "il1pi2cm5", "63.21", rv, raw ) ).toBe( true );
+            expect( rv[provider.key]["Product Impressions"]["Impression List 1 Product 2 Custom Metric 5"] ).toBe( "63.21" );
+            expect( raw["Impression List 1 Product 2 Custom Metric 5"] ).toBe( "63.21" );
         } );
     } );
 
