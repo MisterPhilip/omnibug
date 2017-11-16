@@ -1,0 +1,37 @@
+{
+    "name": "Omnibug",
+    "version": "0.6.0",
+    "description": "Omnibug is a browser extension to decode and display outgoing web metrics requests.",
+    "author": "Philip Lawrence",
+    "icons": {
+        "16": "images/o-16.png",
+        "48": "images/o-48.png",
+        "128": "images/o-128.png"
+    },
+    "background": {
+        "scripts": [
+            "omnibugurl.js",
+            "providers.js",
+            "eventPage.js"
+        ],
+        "persistent": true
+    },
+    "devtools_page": "devtools.html",
+    "homepage_url": "https://omnibug.io/",
+    "options_ui": {
+        "page": "options.html"
+    },
+    "options_page": "options.html",
+    "permissions": [
+        "tabs",
+        "storage",
+        "webRequest",
+        "*://*/*"
+    ],
+    "short_name": "Omnibug",
+    "applications": {
+        "gecko": {
+            "id": "{Omnibug@rosssimpson.com}"
+        }
+    }
+}

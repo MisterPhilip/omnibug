@@ -10,15 +10,8 @@ Desktop.ini
 # CI
 node_modules/
 
-# Chrome packaging
-omnibug.pem
-
 # Build output
 build/
-
-# Deployment details
-deploy.key
-deploy.json
 
 # Grunt work
 .grunt/
