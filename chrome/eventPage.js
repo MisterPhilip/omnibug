@@ -271,13 +271,12 @@
      */
     function decodeUrl( data ) {
 
-        var url = data.url, postData = null;
         if( data.method === 'POST' ) {
-            postData =  String.fromCharCode.apply( null, new Uint8Array( data.requestBody.raw[0].bytes ) );
+            data.postData =  String.fromCharCode.apply( null, new Uint8Array( data.requestBody.raw[0].bytes ) );
         }
 
         var val,
-            u = new OmnibugUrl( data.url, postData ),
+            u = new OmnibugUrl( data.url, data.postData ),
             obj = {
                 state: data,    // raw data from the browser event
                 raw: {}
@@ -367,6 +366,10 @@
         data.omnibug["Status Line"]  = data.state.statusLine;
         data.omnibug["Request Type"] = data.state.type;
         data.omnibug["Method"]       = data.state.method;
+
+        if(data.state.postData) {
+            data.omnibug["Post Payload"] = data.state.postData;
+        }
 
         return data;
     }
