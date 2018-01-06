@@ -50,6 +50,48 @@
         return provs;
     }
 
+    function restoreDefaultOptions( ) {
+        var defaults = {
+            // pattern to match in request url
+            defaultPattern : OmnibugProvider.getDefaultPattern().source
+
+            // all providers (initially)
+            , enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort()
+
+            // keys to highlight
+            , highlightKeys  : [ "pageName", "ch", "events", "products" ]
+
+            // show entries expanded?
+            , alwaysExpand : false
+
+            // surround values with quotes?
+            , showQuotes : true
+
+            // show redirected entries?
+            , showRedirects : false
+
+            // show full variable names?
+            , showFullNames : true
+
+            // colors
+            , color_load    : "dbedff"
+            , color_click   : "f1ffdb"
+            , color_prev    : "ffd5de"
+            , color_quotes  : "ff0000"
+            , color_hilite  : "ffff00"
+            , color_redirect: "eeeeee"
+            , color_hover   : "cccccc"
+        };
+
+        try {
+            browser.storage.local.set({"omnibug" : defaults});
+        } catch( ex ) {
+            console.error( "Error saving prefs: ", ex.message );
+        }
+
+        restoreOptions({"omnibug" : defaults});
+    }
+
     /**
      * Save new prefs back to local storage
      */
@@ -153,6 +195,8 @@
     function makeHiddenList( key, value, elem ) {
         var p = elem.parentNode;
         var list = p.querySelector( "ul" );
+        // Remove previous entries
+        while(list.firstChild) { list.removeChild(list.firstChild); }
         value.forEach( function( v ) {
             list.appendChild( createListItem( v ) );
         } );
@@ -184,6 +228,9 @@
                 rightCol = document.createElement( "p" ),
                 providers = OmnibugProvider.getProviders(),
                 halfway = Math.round( Object.keys( providers ).length / 2 );
+
+            // Remove previous entries
+            while(cont.firstChild) { cont.removeChild(cont.firstChild); }
 
             Object.keys( providers ).sort().forEach( function( prov ) {
                 var cb = document.createElement( "input" );
@@ -270,6 +317,12 @@
     // load prefs and update the HTML
     document.addEventListener( 'DOMContentLoaded', function() {
         browser.storage.local.get( "omnibug" ).then( restoreOptions );
+
+        let defaultBtn = document.getElementById('reset-defaults');
+        defaultBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            restoreDefaultOptions();
+        });
     } );
 
 }() );
