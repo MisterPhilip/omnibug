@@ -89,11 +89,7 @@
 
         // save the new values into local storage
         try {
-            browser.storage.local.set( { "omnibug" : prefs }, function() {
-                if( !! browser.runtime.lastError ) {
-                    console.error( "Error setting prefs: ", browser.runtime.lastError );
-                }
-            } );
+            browser.storage.local.set({"omnibug" : prefs});
         } catch( ex ) {
             console.error( "Error saving prefs: ", ex.message );
         }
@@ -260,7 +256,7 @@
 
     // load prefs and update the HTML
     document.addEventListener( 'DOMContentLoaded', function() {
-        browser.storage.local.get( "omnibug", restoreOptions );
+        browser.storage.local.get( "omnibug" ).then( restoreOptions );
     } );
 
 }() );

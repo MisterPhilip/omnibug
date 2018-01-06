@@ -2,12 +2,9 @@
  * Omnibug
  * Persistent event page, running in background (controller)
  *
- * This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
- * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send
- * a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041,
- * USA.
- *
+ * https://omnibug.io
  */
+
 (function() {
     var prefs,
         tabs = {},
@@ -22,14 +19,14 @@
     }
     browser.runtime.onInstalled.addListener( onInit );
 
-
     /**
      * Store preferences (on extension installation)
      */
     function initPrefs() {
+        console.log('eventPage initPrefs');
         var prefs = {
             // pattern to match in request url
-              defaultPattern : OmnibugProvider.getDefaultPattern().source
+            defaultPattern : OmnibugProvider.getDefaultPattern().source
 
             // all providers (initially)
             , enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort()
@@ -43,54 +40,56 @@
             // surround values with quotes?
             , showQuotes : true
 
+            // show redirected entries?
+            , showRedirects : false
+
             // show full variable names?
             , showFullNames : true
 
             // colors
-            , color_load   : "dbedff"
-            , color_click  : "f1ffdb"
-            , color_prev   : "ffd5de"
-            , color_quotes : "f00"
-            , color_hilite : "ff0"
-            , color_hover  : "ccc"
+            , color_load    : "dbedff"
+            , color_click   : "f1ffdb"
+            , color_prev    : "ffd5de"
+            , color_quotes  : "ff0000"
+            , color_hilite  : "ffff00"
+            , color_redirect: "eeeeee"
+            , color_hover   : "cccccc"
         };
 
-        browser.storage.local.set( { "omnibug" : prefs }, function() {
-            if( !! browser.runtime.lastError ) {
-                console.error( "Error setting prefs: ", browser.runtime.lastError );
-            }
-        } );
+        browser.storage.local.set( { "omnibug" : prefs });
 
         // force a (re)load of prefs, now that they may have changed
         loadPrefsFromStorage( "initPrefs" );
     }
 
-
     /**
      * Browser startup callback
      */
     browser.runtime.onStartup.addListener( function() {
+        console.log('eventPage browser.runtime.onStartup');
         loadPrefsFromStorage( "onStartup" );
     } );
-
 
     /**
      * Grab prefs data from storage
      */
     function loadPrefsFromStorage( whence ) {
-        browser.storage.local.get( "omnibug", function( prefData ) {
+        console.log('eventPage loadPrefsFromStorage', whence);
+        chrome.storage.local.get("omnibug", (prefData) => {
             that.prefs = prefData.omnibug;
 
             var pattern = that.prefs.defaultPattern = getCurrentPattern( prefData.omnibug );
             that.prefs.defaultRegex = new RegExp( that.prefs.defaultPattern );
-        } );
-    }
 
+            console.log('this.prefs.defaultRegex', that.prefs.defaultPattern);
+        });
+    }
 
     /**
      * Receive updates when prefs change and broadcast them out
      */
     browser.storage.onChanged.addListener( function( changes, namespace ) {
+        console.log('eventPage browser.storage.onChanged');
         if( "omnibug" in changes ) {
             var newPrefs = changes["omnibug"].newValue;
             console.log( "Received updated prefs", newPrefs );
@@ -105,7 +104,6 @@
             sendToAllDevTools( { "type" : "prefs", "payload" : that.prefs } );
         }
     } );
-
 
     /**
      * Return a pattern that matches the currently enabled providers
@@ -124,14 +122,12 @@
         return new RegExp( patterns.join( "|" ) ).source;
     }
 
-
     /**
      * Quickly determine if a URL is a candidate for us or not
      */
     function shouldProcess( url ) {
-        return url.match( this.prefs.defaultRegex );
+        return this.prefs.defaultRegex.test( url );
     }
-
 
     /**
      * Callback for the onResponseStarted listener
@@ -151,14 +147,18 @@
      *   url: "https://0-act.channel.facebook.com/pull?cha...
      */
     var beforeRequestCallback = function( details ) {
-        // ignore browser:// requests and non-metrics URLs
-        if( details.tabId == -1 || !shouldProcess( details.url ) ) return;
+        console.log('eventPage beforeRequestCallback', details.url);
 
-        if( !( details.tabId in tabs ) ) {
-            /* disable this error message -- too numerous!
-            console.error( "Request for unknown tabId ", details.tabId ); */
+        // ignore browser:// requests and non-metrics URLs
+        if( details.tabId === -1 || !shouldProcess( details.url ) ) {
             return;
         }
+
+        if( !( details.tabId in tabs ) ) {
+            return;
+        }
+
+        console.log('eventPage beforeRequestCallback MATCH', details);
 
         // look up provider and pass along
         var prov = OmnibugProvider.getProviderForUrl( details.url );
@@ -167,22 +167,21 @@
         // store the current tab's loading state into the details object
         details.omnibugLoading = tabs[details.tabId].loading;
 
-        browser.tabs.get( details.tabId, detailsProcessingCallbackFactory( details ) );
-    };
+        console.log('eventPage beforeRequestCallback MATCH AFTER', details);
 
+        browser.tabs.get( details.tabId).then((tab) => {detailsProcessingCallbackFactory(details, tab)});
+    };
 
     /**
      * Factory function returning a function which has access to details *and* tab
      */
-    var detailsProcessingCallbackFactory = function( details ) {
-        return function( tab ) {
-            // save the tab's current URL into the details object
-            details.tabUrl = tab.url;
+    var detailsProcessingCallbackFactory = function( details, tab ) {
+        console.log('eventPage detailsProcessingCallbackFactory', details, tab);
+        // save the tab's current URL into the details object
+        details.tabUrl = tab.url;
 
-            sendToDevToolsForTab( details.tabId, { "type" : "webEvent", "payload" : decodeUrl( details ) } );
-        }
+        sendToDevToolsForTab( details.tabId, { "type" : "webEvent", "payload" : decodeUrl( details ) } );
     };
-
 
     browser.webRequest.onBeforeRequest.addListener(
         beforeRequestCallback,
@@ -191,14 +190,12 @@
         // @TODO: filter these based on static patterns/config ?
     );
 
-
     /**
      * Return the tabId associated with a port
      */
     function getTabId( port ) {
         return port.name.substring( port.name.indexOf( "-" ) + 1 );
     }
-
 
     /**
      * Accept connections from our devtools panels
@@ -243,13 +240,13 @@
         } );
     } );
 
-
     /**
      * Send a message to the devtools panel on a given tab
      * Assumes the port is already connected
      */
     function sendToDevToolsForTab( tabId, object ) {
         console.debug( "sending ", object.type, " message to tabId: ", tabId, ": ", object );
+        console.log(tabs[tabId].port.postMessage);
         try {
             var payload = JSON.parse(JSON.stringify(object));
             tabs[tabId].port.postMessage( payload );
@@ -308,7 +305,6 @@
         return obj;
     }
 
-
     /**
      * Takes a single name/value pair and delegates handling of it to the provider
      * Otherwise, inserts into the `other' bucket
@@ -324,7 +320,6 @@
         }
     }
 
-
     /**
      * If the provider defines a custom URL handler, delegate to it
      */
@@ -333,7 +328,6 @@
             provider.handleCustom( url, container, rawCont );
         }
     }
-
 
     /**
      * Augments the data object with summary data
@@ -344,11 +338,11 @@
         data["omnibug"] = {};
 
         var eventType = ( data.state.omnibugLoading ? "load" : "click" ),
-            url = data.state.url,
-            urlLength = data.state.url.length;
+            url = data.state.url;
 
         // hacky: sometimes load events are being reported as click events.  For Omniture, detect
         // the event type (pe= means a click event), and reset eventType accordingly.
+        // @TODO: Move this logic to the providers
         if( data.state.omnibugProvider.key.toUpperCase() === "OMNITURE" ) {
             var oldEventType = eventType;
             eventType = ( !!url.match( "[?&]pe=" ) ? "click" : "load" );
@@ -358,12 +352,7 @@
         data.omnibug["Timestamp"]   = data.state.timeStamp;
         data.omnibug["Provider"]    = data.state.omnibugProvider.name;
         data.omnibug["Parent URL"]  = data.state.tabUrl;
-        data.omnibug["Full URL"]    = data.state.url
-                                          + "<br/>(" + urlLength + " characters"
-                                          + ( urlLength > 2083
-                                              ? ", <span class='imp'>*** too long for IE6/7! ***</span>"
-                                              : "" )
-                                          + ")";
+        data.omnibug["Full URL"]    = data.state.url;
         data.omnibug["Request ID"]   = data.state.requestId;
         data.omnibug["Status Line"]  = data.state.statusLine;
         data.omnibug["Request Type"] = data.state.type;
@@ -376,4 +365,3 @@
     return {};
 
 }() );
-

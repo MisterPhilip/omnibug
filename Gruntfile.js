@@ -271,15 +271,18 @@ module.exports = function(grunt) {
 
     grunt.registerTask("build-concat", "Concat build files for a browser", function(browser) {
         grunt.config.requires(browser);
-        let options = grunt.config(browser),
-            sourceFiles = ["src/options.js"];
-        if(options.usePolyfill) {
-            sourceFiles.unshift("src/browser-polyfill.js");
-        }
+        let options = grunt.config(browser);
+        let destFiles = {},
+            baseFiles = [];
 
+        if(options.usePolyfill)
+        {
+            baseFiles.push("src/browser-polyfill.js");
+        }
+        destFiles["platform/" + options.folder + "/options.js"] = baseFiles.concat(["src/options.js"]);
+        destFiles["platform/" + options.folder + "/devtools.js"] = baseFiles.concat(["src/devtools.js"]);
         grunt.config.set("concat." + browser, {
-            src: sourceFiles,
-            dest: "platform/" + options.folder + "/options.js"
+            files: destFiles
         });
         grunt.task.run("concat:" + browser);
     });

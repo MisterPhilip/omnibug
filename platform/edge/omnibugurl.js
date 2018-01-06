@@ -18,10 +18,10 @@ var OmnibugUrl = function( url, postData ) {
 OmnibugUrl.prototype = (function() {
     var U = {
         hasQueryValue: function( key ) {
-            return typeof this.query[key] !== 'undefined';
+            return typeof this.query[key] !== "undefined";
         },
         getFirstQueryValue: function( key ) {
-            return this.query[key] ? this.query[key][0] : '';
+            return this.query[key] ? this.query[key][0] : "";
         },
         getQueryValues: function( key ) {
             return this.query[key] ? this.query[key] : [];
@@ -29,7 +29,9 @@ OmnibugUrl.prototype = (function() {
         getQueryNames: function() {
             var i, a = [];
             for( i in this.query ) {
-                a.push( i );
+                if(this.query.hasOwnProperty(i)) {
+                    a.push( i );
+                }
             }
             return a;
         },
@@ -50,7 +52,7 @@ OmnibugUrl.prototype = (function() {
         decode: function( val ) {
             var retVal = val;
             try {
-                retVal = val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : '';
+                retVal = val ? decodeURIComponent( val.replace( /\+/g, "%20" ) ) : val === 0 ? val : "";
             } catch( e ) {
                 try {
                     retVal = unescape( val.replace( /\+/g, "%20" ) );
@@ -94,17 +96,17 @@ OmnibugUrl.prototype = (function() {
             }
 
             var pieces = this.smartSplit( url, sep, 1 );
-            var p2 = pieces[0].split( ';' );
+            var p2 = pieces[0].split( ";" );
             this.query = {};
-            this.queryString = '';
-            this.anchor = '';
+            this.queryString = "";
+            this.anchor = "";
             this.location = p2[0];
-            this.paramString = ( p2[1] ? p2[1] : '' );
+            this.paramString = ( p2[1] ? p2[1] : "");
 
             if( pieces[1] ) {
-                var p3 = pieces[1].split( '#' );
+                var p3 = pieces[1].split( "#" );
                 this.queryString = p3[0];
-                this.anchor = ( p3[1] ? p3[1] : '' );
+                this.anchor = ( p3[1] ? p3[1] : "" );
             }
 
             var kvPairs = [],
@@ -113,18 +115,18 @@ OmnibugUrl.prototype = (function() {
                 kv = [];
 
             if( this.queryString ) {
-                var kvSep = ( this.queryString.indexOf( "&" ) != -1 ? "&" : ";" );
+                var kvSep = ( this.queryString.indexOf( "&" ) !== -1 ? "&" : ";" );
                 kvPairs = this.queryString.split( kvSep );
                 for( i=0, l=kvPairs.length; i<l; ++i ) {
-                    kv = kvPairs[i].split( '=' );
+                    kv = kvPairs[i].split( "=" );
                     this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
                 }
             }
 
             if( this.postData ) {
-                kvPairs = this.postData.split( '&' );
+                kvPairs = this.postData.split( "&" );
                 for( i=0, l=kvPairs.length; i<l; ++i ) {
-                    kv = kvPairs[i].split( '=' );
+                    kv = kvPairs[i].split( "=" );
                     this.addQueryValue( kv[0] ? this.decode( kv[0] ) : "", kv[1] ? this.decode( kv[1] ) : "" );
                 }
             }

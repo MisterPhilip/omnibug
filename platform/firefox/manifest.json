@@ -31,7 +31,7 @@
     "short_name": "Omnibug",
     "applications": {
         "gecko": {
-            "id": "{9e00ccd0-bf33-4038-929d-833a4b8d723b}"
+            "id": "Omnibug@rosssimpson.com"
         }
     }
 }

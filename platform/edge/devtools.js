@@ -3,11 +3,6 @@
  * Intermediary between eventPage and devTools panel
  * (used for message passing only)
  *
- * This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
- * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send
- * a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041,
- * USA.
- *
  */
 ( function() {
 
@@ -17,7 +12,6 @@
     var panelCreated = function( panel ) {
         var queuedMessages = [],
             panelWindow,  // reference to devtools_panel.html's `window` object
-            clearButton,
             port;
 
         port = browser.runtime.connect( { name: "omnibug-" + browser.devtools.inspectedWindow.tabId } );
@@ -51,25 +45,6 @@
                 port.postMessage( msg );
             };
         } );
-
-        /*
-        if(panel.createStatusBarButton) {
-
-            // add a clear button
-            clearButton = panel.createStatusBarButton( "images/clear_button.png", "Clear events.", false );
-            clearButton.onClicked.addListener( function() {
-                var tables = panelWindow.document.getElementsByTagName( "table" );
-                while( tables.length > 0 ) {
-                    for( var i=0; i<tables.length; ++i ) {
-                        if( tables[i].className.match( /req/ ) ) {
-                            tables[i].parentNode.removeChild( tables[i] );
-                        }
-                    }
-                    tables = panelWindow.document.getElementsByTagName( "table" );
-                }
-            } );
-        }
-        */
     };
 
 
@@ -78,9 +53,8 @@
      */
     browser.devtools.panels.create( "Omnibug",
                                    "images/o-32.png",
-                                   "devtools_panel.html",
-                                   panelCreated
-                                 );
+                                   "devtools_panel.html"
+                                 ).then(panelCreated);
 
     // public
     return {};

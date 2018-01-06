@@ -67,7 +67,7 @@ var OmnibugProvider = {
             handleQueryParam: function( name, value, rv, raw ) {
                 return false;
             }
-        }
+        };
     },
 
 
@@ -86,7 +86,6 @@ var OmnibugProvider = {
           , d_cb:     "Callback property"
         },
         handleQueryParam: function( name, value, rv, raw ) {
-            var _name;
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -114,7 +113,7 @@ var OmnibugProvider = {
         , keys: {
         },
         handleQueryParam: function( name, value, rv, raw ) {
-            if( name == "data" ) {
+            if( name === "data" ) {
                 var obj = atob( value );
                 try {
                     var parsed = JSON.parse( obj );
@@ -249,7 +248,7 @@ var OmnibugProvider = {
         , keys: {
         },
         handleQueryParam: function( name, value, rv, raw ) {
-            if( name == "perf" ) {
+            if( name === "perf" ) {
                 try {
                     var parsed = JSON.parse( value );
                     for( var k in parsed ) {
@@ -417,7 +416,7 @@ var OmnibugProvider = {
         },
         handleCustom: function( url, rv, raw ) {
             var matches =  url.match( /\/([^\/]+)\/mbox\/([^\/\?]+)/ );
-            if(matches !== null && matches.length == 3) {
+            if(matches !== null && matches.length === 3) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name]["clientCode"] = matches[1];
@@ -557,14 +556,14 @@ var OmnibugProvider = {
             var _name;
             if( name.match( /^c(\d+)$/ ) || name.match( /^prop(\d+)$/i ) ) {
                 // props
-                _name = "Custom Traffic Variables"
+                _name = "Custom Traffic Variables";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["prop"+RegExp.$1] = value;
                 raw["prop"+RegExp.$1] = value;
             } else if( name.match( /^v(\d+)$/ ) || name.match( /^evar(\d+)$/i ) ) {
                 // eVars
-                _name = "Conversion Variables"
+                _name = "Conversion Variables";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["eVar"+RegExp.$1] = value;
@@ -603,7 +602,6 @@ var OmnibugProvider = {
             , callback:  "Callback property"
         },
         handleQueryParam: function( name, value, rv, raw ) {
-            var _name;
             if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -785,52 +783,52 @@ var OmnibugProvider = {
         handleQueryParam: function( name, value, rv, raw ) {
             var _name;
             if( name.match( /^rg(\d+)$/ ) ) {
-                _name = "Registration Tag Attributes"
+                _name = "Registration Tag Attributes";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["rg"+RegExp.$1] = value;
             } else if( name.match( /^c_a(\d+)$/ ) ) {
-                _name = "Conversion Event Tag Attributes"
+                _name = "Conversion Event Tag Attributes";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["c_a"+RegExp.$1] = value;
             } else if( name.match( /^cm_mmca(\d+)$/ ) ) {
-                _name = "Marketing Tags"
+                _name = "Marketing Tags";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["cm_mmca"+RegExp.$1] = value;
             } else if( name.match( /^cx(\d+)$/ ) ) {
-                _name = "Conversion Events"
+                _name = "Conversion Events";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["cx"+RegExp.$1] = value;
             } else if( name.match( /^e_a(\d+)$/ ) ) {
-                _name = "Element Tag Attributes"
+                _name = "Element Tag Attributes";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["e_a"+RegExp.$1] = value;
             } else if( name.match( /^np(\d+)$/ ) ) {
-                _name = "Technical Browser Properties"
+                _name = "Technical Browser Properties";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["np"+RegExp.$1] = unescape( value );
             } else if( name.match( /^o_a(\d+)$/ ) ) {
-                _name = "Order Tag Attributes"
+                _name = "Order Tag Attributes";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["o_a"+RegExp.$1] = value;
             } else if( name.match( /^pr_a(\d+)$/ ) ) {
-                _name = "Product View Tag Attributes"
+                _name = "Product View Tag Attributes";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["pr_a"+RegExp.$1] = value;
             } else if( name.match( /^pv_a(\d+)$/ ) ) {
-                _name = "Page View Tag Attributes"
+                _name = "Page View Tag Attributes";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["pv_a"+RegExp.$1] = value;
             } else if( name.match( /^s_a(\d+)$/ ) ) {
-                _name = "Shop Tag Attributes"
+                _name = "Shop Tag Attributes";
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][_name] = rv[this.key][_name] || {};
                 rv[this.key][_name]["s_a"+RegExp.$1] = value;
@@ -1007,7 +1005,6 @@ var OmnibugProvider = {
             u:                      "Time"
         },
         handleQueryParam: function( name, value, rv, raw ) {
-            var match;
             if ( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
@@ -1020,11 +1017,11 @@ var OmnibugProvider = {
     },
 
     UNIVERSALANALYTICS : {
-          key: "UNIVERSALANALYTICS"
+        key: "UNIVERSALANALYTICS"
         , name: "Universal Analytics"
         , pattern: /\/collect\/?\?/
         , keys: {
-              v:      "Protocol Version"
+            v:      "Protocol Version"
             , tid:    "Tracking ID"
             , aip:    "Anonymize IP"
             , qt:     "Queue Time"
@@ -1074,7 +1071,10 @@ var OmnibugProvider = {
             , sn:     "Social Network"
             , sa:     "Social Action"
             , st:     "Social Action Target"
-            , utl:    "User timing label"
+            , utc:    "User Timing Category"
+            , utv:    "User Timing Variable Name"
+            , utt:    "User Timing Time"
+            , utl:    "User timing Label"
             , plt:    "Page load time"
             , dns:    "DNS time"
             , pdt:    "Page download time"
@@ -1083,18 +1083,99 @@ var OmnibugProvider = {
             , srt:    "Server response time"
             , exd:    "Exception description"
             , exf:    "Is exception fatal?"
+            , ds:     "Data Source"
+            , uid:    "User ID"
+            , linkid: "Link ID"
+            , pa:     "Product Action"
+            , tcc:    "Coupon Code"
+            , pal:    "Product Action List"
+            , cos:    "Checkout Step"
+            , col:    "Checkout Step Option"
+            , promoa: "Promotion Action"
+            , xid:    "Content Experiment ID"
+            , xvar:    "Content Experiment Variant"
         },
         handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
+            var groupName, groupItem, lookup = {};
+            if( /^cd(\d+)$/.test( name ) ) {
+                groupName = "Custom Dimensions";
+                groupItem = "Custom Dimension ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^cm(\d+)$/.test( name ) ) {
+                groupName = "Custom Metrics";
+                groupItem = "Custom Metric ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^cg(\d+)$/.test( name ) ) {
+                groupName = "Content Groups";
+                groupItem = "Content Group ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^promo(\d+)([a-z]{2})$/.test( name ) ) {
+                lookup = {"id": "ID", "nm": "Name", "cr": "Creative", "ps": "Position"};
+                groupName = "Promotions";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Promo " + RegExp.$1 + " " + (lookup[RegExp.$2]||"");
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^pr(\d+)([a-z]{2})$/.test( name ) ) {
+                lookup = {"id": "ID", "nm": "Name", "br": "Brand", "ca": "Category", "va": "Variant", "pr": "Price",
+                    "qt": "Quantity", "cc": "Coupon Code", "ps": "Position"};
+                groupName = "Products";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Product " + RegExp.$1 + " " + (lookup[RegExp.$2]||"");
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^pr(\d+)(cd|cm)(\d+)$/.test( name ) ) {
+                lookup = {"cd": "Custom Dimension", "cm": "Custom Metric"};
+                groupName = "Products";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Product " + RegExp.$1 + " " + (lookup[RegExp.$2]||"") + " " + RegExp.$3;
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^il(\d+)nm$/.test( name ) ) {
+                groupName = "Product Impressions";
+                groupItem = "Impression List ";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                rv[this.key][groupName][groupItem + RegExp.$1] = value;
+                raw[groupItem + RegExp.$1] = value;
+            } else if( /^il(\d+)pi(\d+)(cd|cm)(\d+)$/.test( name ) ) {
+                lookup =  {"cd": "Custom Dimension", "cm": "Custom Metric"};
+                groupName = "Product Impressions";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + (lookup[RegExp.$3]||"") + " " + RegExp.$4;
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( /^il(\d+)pi(\d+)([a-z]{2})$/.test( name ) ) {
+                lookup = {"id": "ID", "nm": "Name", "br": "Brand", "ca": "Category", "va": "Variant", "pr": "Price", "ps": "Position"};
+                groupName = "Product Impressions";
+                rv[this.key] = rv[this.key] || {};
+                rv[this.key][groupName] = rv[this.key][groupName] || {};
+                groupItem = "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + (lookup[RegExp.$3]||"");
+                rv[this.key][groupName][groupItem] = value;
+                raw[groupItem] = value;
+            } else if( name in this.keys ) {
                 rv[this.key] = rv[this.key] || {};
                 rv[this.key][this.name] = rv[this.key][this.name] || {};
                 rv[this.key][this.name][name] = value;
                 raw[name] = value;
-                return true;
+            } else {
+                return false;
             }
-            return false;
+            return true;
         }
     }
-
 };
 
