@@ -70,16 +70,24 @@
                         var active = document.querySelector( "input[type='radio'][name='" + key + "']:checked" );
                         prefs[key] = processFormValue( key, active.value );
                     } else if( elem.type === "hidden" ) {
-                        var dataUse = elem.getAttribute( "data-use" );
+                        var dataUse = elem.getAttribute("data-use");
                         var values = '';
-                        if( dataUse === "list" ) {
-                            values = getVisualListValues( elem );
-                            prefs[key] = values;
-                        } else if( dataUse === "checkbox" ) {
-                            values = getCheckboxValues( elem );
+                        if (dataUse === "list")
+                        {
+                            values = getVisualListValues(elem);
                             prefs[key] = values;
                         }
-
+                        else if (dataUse === "checkbox")
+                        {
+                            values = getCheckboxValues(elem);
+                            prefs[key] = values;
+                        }
+                    } else if( elem.type === "color" ) {
+                        if(elem.value.charAt(0) === '#') {
+                            prefs[key] = elem.value.substring(1);
+                        } else {
+                            prefs[key] = elem.value;
+                        }
                     } else {
                         console.error( "Unknown options element type ", elem.type, " for option ", key );
                     }
@@ -212,6 +220,9 @@
         var parentNode = elem.parentNode,
             example = parentNode.querySelector( "span" );
         if( !! example ) {
+            if(value.charAt(0) === '#') {
+                value = value.substring(1);
+            }
             example.style.backgroundColor = value;
         }
     }
@@ -220,6 +231,7 @@
      * Restore state of options elements from prefs
      */
     function restoreOptions( prefData ) {
+        console.log('restore prefs', prefData);
         var prefs = that.prefs = prefData.omnibug;
 
         for( var key in prefs ) {
@@ -228,24 +240,25 @@
                 if( !! elem ) {
                     if( elem.type === "text" ) {
                         elem.value = prefs[key];
-
-                        if( key.substring( 0, 6 ) === "color_" ) {
-                            updateExampleColor( elem, prefs[key] );
-                            elem.addEventListener( "input", function( e ) {
-                                updateExampleColor( e.target, e.target.value );
-                                saveOptions();
-                            } );
-                        }
-
                     } else if( elem.type === "radio" ) {
                         setRadioButton( key, prefs[key] );
                     } else if( elem.type === "hidden" ) {
-                        var dataUse = elem.getAttribute( "data-use" );
-                        if( dataUse === "list" ) {
-                            makeHiddenList( key, prefs[key], elem );
-                        } else if( dataUse === "checkbox" ) {
-                            makeCheckboxList( key, prefs[key], elem );
+                        var dataUse = elem.getAttribute("data-use");
+                        if (dataUse === "list")
+                        {
+                            makeHiddenList(key, prefs[key], elem);
                         }
+                        else if (dataUse === "checkbox")
+                        {
+                            makeCheckboxList(key, prefs[key], elem);
+                        }
+                    } else if( elem.type === "color" ) {
+                        elem.value = '#' + prefs[key];
+                        updateExampleColor( elem, prefs[key] );
+                        elem.addEventListener( "input", function( e ) {
+                            updateExampleColor( e.target, e.target.value );
+                            saveOptions();
+                        } );
                     } else {
                         console.error( "Unknown options element type ", elem.type, " for option ", key );
                     }

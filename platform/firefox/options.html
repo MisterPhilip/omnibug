@@ -8,7 +8,7 @@
     <style type="text/css">
         body { text-align: center; font-family: arial, helvetica, clean, sans-serif; }
         body > * { text-align: left; }
-        form, div.header, p.note { display: inline-block; width: 50%; }
+        form, div.header, p.note { display: inline-block; }
         fieldset { margin: 1em 0; }
 
         span.example { padding: 5px; margin-left: 2em; }
@@ -40,6 +40,10 @@
 
         #providers label {
             display: block;
+            margin-bottom: 0.5em;
+        }
+        #providers input[type="checkbox"] {
+            margin-right: 0.5em;
         }
         #providers p {
             width: 48%;
@@ -80,11 +84,11 @@
 
         <fieldset>
             <legend>Expand entries?</legend>
-            <div>
+            <div class="radio">
                 <input type="radio" name="alwaysExpand" value="true" id="alwaysExpand" />
                 <label for="alwaysExpand">Yes</label>
             </div>
-            <div>
+            <div class="radio">
                 <input type="radio" name="alwaysExpand" value="false" id="alwaysExpandFalse" />
                 <label for="alwaysExpandFalse">No</label>
             </div>
@@ -93,11 +97,11 @@
 
         <fieldset>
             <legend>Quote values?</legend>
-            <div>
+            <div class="radio">
                 <input type="radio" name="showQuotes" value="true" id="showQuotes" />
                 <label for="showQuotes">Yes</label>
             </div>
-            <div>
+            <div class="radio">
                 <input type="radio" name="showQuotes" value="false" id="showQuotesFalse" />
                 <label for="showQuotesFalse">No</label>
             </div>
@@ -106,11 +110,11 @@
 
         <fieldset>
             <legend>Parameter display style</legend>
-            <div>
+            <div class="radio">
                 <input type="radio" name="showFullNames" value="true" id="showFullNames" />
                 <label for="showFullNames">Descriptions</label>
             </div>
-            <div>
+            <div class="radio">
                 <input type="radio" name="showFullNames" value="false" id="showFullNamesFalse" />
                 <label for="showFullNamesFalse">Names</label>
             </div>
@@ -119,37 +123,37 @@
 
         <fieldset class="color">
             <legend>Background color for page load events</legend>
-            #<input type="text" id="color_load" maxlength="6" />
+            <input type="color" id="color_load" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
         <fieldset class="color">
             <legend>Background color for click events</legend>
-            #<input type="text" id="color_click" maxlength="6" />
+            <input type="color" id="color_click" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
         <fieldset class="color">
             <legend>Background color for highlight</legend>
-            #<input type="text" id="color_hilite" maxlength="6" />
+            <input type="color" id="color_hilite" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
         <fieldset class="color">
             <legend>Background color for row hover</legend>
-            #<input type="text" id="color_hover" maxlength="6" />
+            <input type="color" id="color_hover" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
         <fieldset class="color">
             <legend>Background color for redirect entries</legend>
-            #<input type="text" id="color_redirect" maxlength="6" />
+            <input type="color" id="color_redirect" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
         <fieldset class="color">
             <legend>Color for quotes around values</legend>
-            #<input type="text" id="color_quotes" maxlength="6" />
+            <input type="color" id="color_quotes" maxlength="6" />
             <span class="example">Example</span>
         </fieldset>
 
