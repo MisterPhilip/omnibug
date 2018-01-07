@@ -93,14 +93,26 @@ module.exports = function(grunt) {
                 "maxerr": 200,
                 "globals": {
                     "browser": true,
-                    "console": true
+                    "console": true,
+                    "OmnibugProvider": true,
+                    "BaseProvider": true
                 },
                 "reporter": require("jshint-html-reporter"),
                 "reporterOutput": "build/jshint/index.html"
             },
             "all": [
                 "Gruntfile.js",
+                "src/providers/*.js",
                 "src/*.js"
+            ],
+            "build": [
+                "Gruntfile.js"
+            ],
+            "source": [
+                "src/*.js"
+            ],
+            "providers": [
+                "src/providers/*.js"
             ]
         },
         "jasmine": {

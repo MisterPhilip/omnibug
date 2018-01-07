@@ -85,7 +85,7 @@ class AdobeTargetProvider extends BaseProvider
             "mboxVersion": {
                 "name": "Library Version"
             }
-        }
+        };
     }
 
     /**
@@ -116,4 +116,4 @@ class AdobeTargetProvider extends BaseProvider
         return results;
     }
 }
-OmnibugProvider.addProvider(new AdobeTargetProvider);
+OmnibugProvider.addProvider(new AdobeTargetProvider());

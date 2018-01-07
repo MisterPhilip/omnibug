@@ -3,14 +3,15 @@
  *
  * @class
  */
+/* exported BaseProvider */
 class BaseProvider
 {
     constructor()
     {
-        this._key        = '';
+        this._key        = "";
         this._pattern    = /.*/;
-        this._name       = '';
-        this._type       = '';
+        this._name       = "";
+        this._type       = "";
     }
 
     /**
@@ -101,7 +102,7 @@ class BaseProvider
         }
 
         let customData = this.handleCustom(url);
-        if(typeof customData === 'object' && customData !== null)
+        if(typeof customData === "object" && customData !== null)
         {
             if(customData.length) {
                 data = data.concat(customData);
@@ -135,17 +136,15 @@ class BaseProvider
             "field": param.name || name,
             "value": value,
             "group": param.group || "Other"
-        }
+        };
     }
 
     /**
      * Parse custom properties for a given URL
      *
-     * @param {string} url
-     *
-     * @returns {Array}
+     * @returns {void}
      */
-    handleCustom(url)
+    handleCustom( )
     {
 
     }

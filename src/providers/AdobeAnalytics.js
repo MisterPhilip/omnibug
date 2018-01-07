@@ -244,7 +244,7 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "name": "Report Suites",
                 "group": "General"
             }
-        }
+        };
     }
 
     /**
@@ -288,16 +288,16 @@ class AdobeAnalyticsProvider extends BaseProvider
     handleCustom(url)
     {
         let results = [],
-            rsid;
-        if(rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//)) {
+            rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//);
+        if(rsid) {
             results.push({
                 "key":   "rsid",
-                "field": this.keys["rsid"] ? this.keys["rsid"]["name"] : "Report Suites",
+                "field": this.keys.rsid ? this.keys.rsid.name : "Report Suites",
                 "value": rsid[1],
-                "group": this.keys["rsid"] ? this.keys["rsid"]["group"] : "General",
+                "group": this.keys.rsid ? this.keys.rsid.group : "General",
             });
         }
         return results;
     }
 }
-OmnibugProvider.addProvider(new AdobeAnalyticsProvider);
+OmnibugProvider.addProvider(new AdobeAnalyticsProvider());

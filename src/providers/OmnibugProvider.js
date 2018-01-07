@@ -3,6 +3,7 @@
  *
  * @type {{addProvider, getProviders, checkUrl, getProviderForUrl, parseUrl, defaultPattern}}
  */
+/* exported OmnibugProvider */
 var OmnibugProvider = (function() {
 
     var providers = {},
@@ -18,12 +19,14 @@ var OmnibugProvider = (function() {
      */
     let getProviderForUrl = (url) => {
         for(let provider in providers) {
-            if(!providers.hasOwnProperty(provider)) continue;
+            if(!providers.hasOwnProperty(provider)) {
+                continue;
+            }
             if(providers[provider].checkUrl(url)) {
                 return providers[provider];
             }
         }
-        return new BaseProvider;
+        return new BaseProvider();
     };
 
     return {
@@ -38,7 +41,7 @@ var OmnibugProvider = (function() {
             defaultPattern.push(provider.pattern);
             defaultPatternRegex = new RegExp(defaultPattern.map((el) => {
                 return el.source;
-            }).join('|'));
+            }).join("|"));
         },
 
         /**
@@ -90,5 +93,5 @@ var OmnibugProvider = (function() {
         "defaultPattern": () => {
             return defaultPatternRegex;
         }
-    }
+    };
 })();
