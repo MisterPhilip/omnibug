@@ -114,57 +114,6 @@ module.exports = function(grunt) {
             "providers": [
                 "src/providers/*.js"
             ]
-        },
-        "jasmine": {
-            "src": {
-                "src": [
-                    "src/omnibugurl.js",
-                    "src/providers.js"
-                ],
-                "options": {
-                    "specs": [
-                        "test/common/*.js",
-                    ],
-                    "junit": {
-                        "path": "build/test-results",
-                        "consolidate": true
-                    },
-                    "outfile": "test/SpecRunner.html",
-                    "keepRunner": true
-                }
-            },
-            "istanbul": {
-                "src": [
-                    "src/omnibugurl.js",
-                    "src/providers.js"
-                ],
-                "options": {
-                    "specs": [
-                        "test/common/*.js",
-                    ],
-                    "template": require("grunt-template-jasmine-istanbul"),
-                    "templateOptions": {
-                        "coverage": "build/coverage/coverage.json",
-                        "report": [
-                            {
-                                "type": "html",
-                                "options": {
-                                    "dir": "build/coverage"
-                                }
-                            },
-                            {
-                                "type": "cobertura",
-                                "options": {
-                                    "dir": "build/coverage/cobertura"
-                                }
-                            },
-                            {
-                                "type": "text-summary"
-                            }
-                        ]
-                    }
-                }
-            }
         }
     });
 
@@ -174,7 +123,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-contrib-jshint");
-    grunt.loadNpmTasks("grunt-contrib-jasmine");
 
     grunt.registerTask("build-extensions", "Build the Chrome extension", (browsers = "") => {
             let allowedBrowsers = ["chrome", "firefox", "edge"];
@@ -320,17 +268,8 @@ module.exports = function(grunt) {
     });
 
     /*
-     * Jasmine tests
+     * Add aliases
      */
-    grunt.registerTask( "test", "jasmine:src" );
-
-    /*
-     * JS code coverage
-     */
-    grunt.registerTask( "coverage", "jasmine:istanbul" );
-
-    /*
-     * CI tasks
-     */
-    grunt.registerTask( "travis", [ "test", "coverage" ]);
+    grunt.registerTask("default", ["build-extensions"]);
+    grunt.registerTask("build", ["build-extensions"]);
 };

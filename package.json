@@ -1,10 +1,22 @@
 {
   "name": "omnibug",
-  "version": "0.5.515",
+  "version": "0.6.0",
   "description": "Omnibug Extension",
   "main": "Gruntfile.js",
   "scripts": {
-    "test": "grunt travis"
+    "test": "ava --verbose"
+  },
+  "ava": {
+    "providers": {
+      "src": [
+        "test/providers/*.js"
+      ],
+      "source": [
+        "src/providers/OmnibugProvider.js",
+        "src/providers/BaseProvider.js",
+        "src/providers/*.js"
+      ]
+    }
   },
   "repository": {
     "type": "git",
@@ -20,17 +32,18 @@
     "url": "https://github.com/MisterPhilip/omnibug/issues"
   },
   "devDependencies": {
+    "ava": "^0.24.0",
+    "coveralls": "^3.0.0",
     "grunt": "~1.0.1",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-jasmine": "^1.1.0",
     "grunt-contrib-jshint": "~1.1.0",
     "grunt-contrib-nodeunit": "~1.0.0",
-    "grunt-contrib-uglify": "~3.1.0",
+    "grunt-contrib-uglify": "~3.3.0",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-template-jasmine-istanbul": "^0.5.0"
+    "nyc": "^11.4.1"
   },
   "homepage": "https://omnibug.io/",
   "dependencies": {
