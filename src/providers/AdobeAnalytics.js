@@ -128,34 +128,6 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "name": "Video milestone",
                 "group": "General"
             },
-            "c1": {
-                "name": "Prop1",
-                "group": "General"
-            },
-            "h1": {
-                "name": "Hierarchy var1",
-                "group": "General"
-            },
-            "h2": {
-                "name": "Hierarchy var2",
-                "group": "General"
-            },
-            "h3": {
-                "name": "Hierarchy var3",
-                "group": "General"
-            },
-            "h4": {
-                "name": "Hierarchy var4",
-                "group": "General"
-            },
-            "h5": {
-                "name": "Hierarchy var5",
-                "group": "General"
-            },
-            "v1": {
-                "name": "EVar1",
-                "group": "General"
-            },
             "cc": {
                 "name": "Currency code",
                 "group": "General"
@@ -325,6 +297,13 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "field": "eVar" + RegExp.$1,
                 "value": value,
                 "group": "Custom Conversion Variables (eVars)"
+            };
+        } else if(/^(?:h|hier)(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Hierarchy " + RegExp.$1,
+                "value": value,
+                "group": "Hierarchy Variables"
             };
         } else if(name.indexOf(".a.media.") > 0) {
             result = {
