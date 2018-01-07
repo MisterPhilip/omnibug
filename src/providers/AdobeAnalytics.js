@@ -319,7 +319,7 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "value": value,
                 "group": "Custom Traffic Variables (props)"
             };
-        } else if(/^(?:v|eVar)(\d+)$/i.test(name)) {
+        } else if(/^(?:v|eVar)(\d+)$/i.test(name) && name !== "v0") {
             result = {
                 "key":   name,
                 "field": "eVar" + RegExp.$1,
