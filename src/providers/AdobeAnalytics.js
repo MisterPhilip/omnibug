@@ -248,12 +248,66 @@ class AdobeAnalyticsProvider extends BaseProvider
     }
 
     /**
+     * Parse a given URL into human-readable output
+     *
+     * @param {string}  rawUrl   A URL to check against
+     *
+     * @return {{provider: {name: string, key: string, type: string}, data: Array}}
+     */
+    parseUrl(rawUrl)
+    {
+        let url = new URL(rawUrl),
+            data = [],
+            stacked = [];
+        for(let param of url.searchParams)
+        {
+            let key = param[0],
+                value = param[1];
+
+            // Stack context data params
+            if (/\.$/.test(key)) {
+                stacked.push(key);
+                continue;
+            }
+            if (/^\./.test(key)) {
+                stacked.pop();
+                continue;
+            }
+
+            let stackedParam = stacked.join("") + key,
+                result = this.handleQueryParam(stackedParam, value);
+            if(typeof result === "object") {
+                data.push(result);
+            }
+        }
+
+        let customData = this.handleCustom(url);
+        if(typeof customData === "object" && customData !== null)
+        {
+            if(customData.length) {
+                data = data.concat(customData);
+            } else {
+                data.push(customData);
+            }
+        }
+
+        return {
+            "provider": {
+                "name": this.name,
+                "key":  this.key,
+                "type": this.type
+            },
+            "data": data
+        };
+    }
+
+    /**
      * Parse a given URL parameter into human-readable form
      *
      * @param {string}  name
      * @param {string}  value
      *
-     * @returns {{}}
+     * @returns {void|{}}
      */
     handleQueryParam(name, value)
     {
@@ -272,6 +326,30 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "value": value,
                 "group": "Custom Conversion Variables (eVars)"
             };
+        } else if(name.indexOf(".a.media.") > 0) {
+            result = {
+                "key":   name,
+                "field": name.split(".").pop(),
+                "value": value,
+                "group": "Media Module"
+            };
+        } else if(name.indexOf(".a.activitymap.") > 0) {
+            result = {
+                "key":   name,
+                "field": name.split(".").pop(),
+                "value": value,
+                "group": "Activity Map"
+            };
+        } else if(name.indexOf(".") > 0) {
+            result = {
+                "key":   name,
+                "field": name.split(".").pop(),
+                "value": value,
+                "group": "Context Data"
+            };
+        } else if(/^(AQB|AQE)$/i.test(name)) {
+            // ignore
+            return;
         } else {
             result = super.handleQueryParam(name, value);
         }

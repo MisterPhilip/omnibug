@@ -86,7 +86,7 @@ class BaseProvider
      *
      * @param {string}  rawUrl   A URL to check against
      *
-     * @returns {{}}}
+     * @return {{provider: {name: string, key: string, type: string}, data: Array}}
      */
     parseUrl(rawUrl)
     {
@@ -96,9 +96,11 @@ class BaseProvider
         for(let param of url.searchParams)
         {
             let key = param[0],
-                value = param[1];
-
-            data.push(this.handleQueryParam(key, value));
+                value = param[1],
+                result = this.handleQueryParam(key, value);
+            if(typeof result === "object") {
+                data.push(result);
+            }
         }
 
         let customData = this.handleCustom(url);
