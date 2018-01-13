@@ -4,19 +4,24 @@
   "description": "Omnibug Extension",
   "main": "Gruntfile.js",
   "scripts": {
-    "test": "ava --verbose"
+    "test": "grunt build-test-providers && ava"
   },
   "ava": {
-    "providers": {
-      "src": [
-        "test/providers/*.js"
-      ],
-      "source": [
-        "src/providers/OmnibugProvider.js",
-        "src/providers/BaseProvider.js",
-        "src/providers/*.js"
-      ]
+    "src": [
+      "test/providers/*.js"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "babel": {
+      "presets": "inherit"
     }
+  },
+  "babel": {
+    "presets": [
+      "@ava/stage-4",
+      "stage-2"
+    ]
   },
   "repository": {
     "type": "git",
@@ -33,6 +38,8 @@
   },
   "devDependencies": {
     "ava": "^0.24.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-register": "^6.26.0",
     "coveralls": "^3.0.0",
     "grunt": "~1.0.1",
     "grunt-contrib-clean": "^1.1.0",
@@ -40,8 +47,6 @@
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-jshint": "~1.1.0",
-    "grunt-contrib-nodeunit": "~1.0.0",
-    "grunt-contrib-uglify": "~3.3.0",
     "grunt-contrib-watch": "^1.0.0",
     "nyc": "^11.4.1"
   },

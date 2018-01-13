@@ -21,9 +21,21 @@ module.exports = function(grunt) {
         "clean": {
             "chrome": ["platform/chromium", "build/chrome_*.zip"],
             "firefox": ["platform/firefox", "build/firefox_*.zip"],
-            "edge": ["platform/edge", "build/edge_*.zip"]
+            "edge": ["platform/edge", "build/edge_*.zip"],
+            "providers": ["src/providers/providers.js"],
+            "test-providers": ["build/tests/providers.js"]
         },
         "watch": {
+            "providers": {
+                "files": ["src/providers/**"],
+                "tasks": [
+                    "build-test-providers",
+                    "build-providers"
+                ],
+                "options": {
+                    "spawn": false,
+                },
+            },
             "chrome": {
                 "files": ["src/**"],
                 "tasks": [
@@ -265,6 +277,58 @@ module.exports = function(grunt) {
             ]
         });
         grunt.task.run("compress:" + browser);
+    });
+
+    /**
+     * Build providers for testing usage
+     *
+     * Thanks to the stupidity of all the various requirements to test proper ES6, this is a band-aid to add functionality
+     * to the providers.js file for testing purposes ONLY. If anybody has a better way to do this, please speak up!
+     */
+    grunt.registerTask("build-test-providers", "Combine providers into a single file for testing", function() {
+        const sourceBasePath = "./src/providers/",
+              ignoreFile = "!" + sourceBasePath + "providers.js";
+
+        // Grab all of the provider names to append as an export list
+        let providers = grunt.file.expand([sourceBasePath + "*.js", ignoreFile]).map((fileName) => {
+            fileName = fileName.replace(sourceBasePath, "").split(".")[0];
+            return fileName.indexOf("Provider") === -1 ? fileName + "Provider" : fileName;
+        });
+
+        grunt.task.run("clean:test-providers");
+        grunt.config.set("concat.providers-test", {
+            "options": {
+                "banner": "const { URL } = require(\"url\");\n",
+                "footer": "\nexport { " + providers.join(", ") + " };"
+            },
+            "files": {
+                "./build/tests/providers.js": [
+                    sourceBasePath + "BaseProvider.js",
+                    sourceBasePath + "OmnibugProvider.js",
+                    sourceBasePath + "*.js",
+                    ignoreFile
+                ]}
+        });
+        grunt.task.run("concat:providers-test");
+    });
+
+    /**
+     * Build providers for production usage
+     *
+     * This will build the providers for use within the plugin, NOT for testing
+     */
+    grunt.registerTask("build-providers", "Combine providers into a single file", function() {
+        const sourceBasePath = "./src/providers/";
+        grunt.task.run("clean:providers");
+        grunt.config.set("concat.providers", {
+            files: {
+                "./src/providers/providers.js": [
+                    sourceBasePath + "BaseProvider.js",
+                    sourceBasePath + "OmnibugProvider.js",
+                    sourceBasePath + "*.js"
+            ]}
+        });
+        grunt.task.run("concat:providers");
     });
 
     /*

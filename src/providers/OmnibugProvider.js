@@ -61,7 +61,6 @@ var OmnibugProvider = (function() {
          * @returns {boolean}
          */
         "checkUrl": (url) => {
-            console.log(url, defaultPatternRegex, defaultPatternRegex.test(url));
             return defaultPatternRegex.test(url);
         },
 
