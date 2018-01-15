@@ -85,12 +85,24 @@ var OmnibugProvider = (function() {
         },
 
         /**
-         * Get the default RegEx pattern to test URLs against
+         * Return the patterns for all (enabled) providers
+         *
+         * @param   {void|[]}  enabledProviders    Providers that are enabled
          *
          * @returns {RegExp}
          */
-        "defaultPattern": () => {
-            return defaultPatternRegex;
+        "getPattern": (enabledProviders) => {
+            if(!enabledProviders || !enabledProviders.length) {
+                return defaultPatternRegex;
+            }
+
+            let patterns = [];
+            enabledProviders.forEach((provider) => {
+                if(providers[provider]) {
+                    patterns.push(providers[provider].pattern.source);
+                }
+            });
+            return new RegExp(patterns.join("|"));
         }
     };
 })();

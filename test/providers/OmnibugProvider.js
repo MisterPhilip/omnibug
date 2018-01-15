@@ -15,9 +15,16 @@ class OmnibugTestProvider extends BaseProvider {
 }
 
 test("Patterns should exist", t => {
-    let defaultPattern = OmnibugProvider.defaultPattern();
+    let defaultPattern = OmnibugProvider.getPattern();
 
     t.true(defaultPattern instanceof RegExp, "Default pattern should be a RegExp object");
+});
+
+test("Patterns should only return for enabled providers", t => {
+    OmnibugProvider.addProvider(new OmnibugTestProvider());
+    let defaultPattern = OmnibugProvider.getPattern(["OMNIBUG-TEST-PROVIDER"]);
+
+    t.is(defaultPattern.source, /omnibug\-test\-provider\-6548713/.source, "Default pattern should be a RegExp object");
 });
 
 test("Providers should be returned", t => {
