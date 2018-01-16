@@ -48,7 +48,8 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-jshint": "~1.1.0",
     "grunt-contrib-watch": "^1.0.0",
-    "nyc": "^11.4.1"
+    "nyc": "^11.4.1",
+    "url-search-params": "^0.10.0"
   },
   "homepage": "https://omnibug.io/",
   "dependencies": {

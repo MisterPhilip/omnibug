@@ -84,16 +84,24 @@ class BaseProvider
     /**
      * Parse a given URL into human-readable output
      *
-     * @param {string}  rawUrl   A URL to check against
+     * @param {string}  rawUrl      A URL to check against
+     * @param {string}  postData    POST data, if applicable
      *
      * @return {{provider: {name: string, key: string, type: string}, data: Array}}
      */
-    parseUrl(rawUrl)
+    parseUrl(rawUrl, postData = "")
     {
         let url = new URL(rawUrl),
-            data = [];
+            data = [],
+            params = new URLSearchParams(url.search),
+            postParams = this.parsePostData(postData);
 
-        for(let param of url.searchParams)
+        // Handle POST data first, if applicable (treat as query params)
+        postParams.forEach((pair) => {
+            params.append(pair[0], pair[1]);
+        });
+
+        for(let param of params)
         {
             let key = param[0],
                 value = param[1],
@@ -121,6 +129,27 @@ class BaseProvider
             },
             "data": data
         };
+    }
+
+    /**
+     * Parse any POST data into param key/value pairs
+     *
+     * @param postData
+     * @return {Array}
+     */
+    parsePostData(postData = "")
+    {
+        let params = [];
+        // Handle POST data first, if applicable (treat as query params)
+        if(typeof postData === "string" && postData !== "")
+        {
+            let keyPairs = postData.split("&");
+            keyPairs.forEach((keyPair) => {
+                let splitPair = keyPair.split("=");
+                params.push([splitPair[0], decodeURIComponent(splitPair[1] || "")]);
+            });
+        }
+        return params;
     }
 
     /**

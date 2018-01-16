@@ -223,15 +223,24 @@ class AdobeAnalyticsProvider extends BaseProvider
      * Parse a given URL into human-readable output
      *
      * @param {string}  rawUrl   A URL to check against
+     * @param {string}  postData    POST data, if applicable
      *
      * @return {{provider: {name: string, key: string, type: string}, data: Array}}
      */
-    parseUrl(rawUrl)
+    parseUrl(rawUrl, postData = "")
     {
         let url = new URL(rawUrl),
             data = [],
-            stacked = [];
-        for(let param of url.searchParams)
+            stacked = [],
+            params = new URLSearchParams(url.search),
+            postParams = this.parsePostData(postData);
+
+        // Handle POST data first, if applicable (treat as query params)
+        postParams.forEach((pair) => {
+            params.append(pair[0], pair[1]);
+        });
+
+        for(let param of params)
         {
             let key = param[0],
                 value = param[1];

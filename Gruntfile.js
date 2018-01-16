@@ -298,7 +298,8 @@ module.exports = function(grunt) {
         grunt.task.run("clean:test-providers");
         grunt.config.set("concat.providers-test", {
             "options": {
-                "banner": "const { URL } = require(\"url\");\n",
+                "banner":   "const { URL } = require(\"url\");\n" +
+                            "var URLSearchParams = require(\"url-search-params\");\n",
                 "footer": "\nexport { " + providers.join(", ") + " };"
             },
             "files": {

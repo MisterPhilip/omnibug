@@ -76,12 +76,13 @@ var OmnibugProvider = (function() {
         /**
          * Parse a URL into a JSON object
          *
-         * @param {string}  url   URL to be parsed
+         * @param {string}  url         URL to be parsed
+         * @param {string}  postData    POST data, if applicable
          *
          * @returns {{provider, data}}
          */
-        "parseUrl": (url) => {
-            return getProviderForUrl(url).parseUrl(url);
+        "parseUrl": (url, postData = "") => {
+            return getProviderForUrl(url).parseUrl(url, postData);
         },
 
         /**
