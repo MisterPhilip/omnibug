@@ -174,9 +174,11 @@ class BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @returns {void}
+     * @param    {string}   url
+     *
+     * @returns {void|Array}
      */
-    handleCustom( )
+    handleCustom(url)
     {
 
     }

@@ -29,61 +29,80 @@ class AdobeTargetProvider extends BaseProvider
                 "group": "General"
             },
             "mboxType": {
-                "name": "Mbox Type"
+                "name": "Mbox Type",
+                "group": "General"
             },
             "mboxCount": {
-                "name": "Mbox Count"
+                "name": "Mbox Count",
+                "group": "General"
             },
             "mboxId": {
-                "name": "Mbox ID"
+                "name": "Mbox ID",
+                "group": "General"
             },
             "mboxSession": {
-                "name": "Mbox Session"
+                "name": "Mbox Session",
+                "group": "General"
             },
             "mboxPC": {
-                "name": "Mbox PC ID"
+                "name": "Mbox PC ID",
+                "group": "General"
             },
             "mboxPage": {
-                "name": "Mbox Page ID"
+                "name": "Mbox Page ID",
+                "group": "General"
             },
             "clientCode": {
-                "name": "Client Code"
+                "name": "Client Code",
+                "group": "General"
             },
             "mboxHost": {
-                "name": "Page Host"
+                "name": "Page Host",
+                "group": "General"
             },
             "mboxURL": {
-                "name": "Page URL"
+                "name": "Page URL",
+                "group": "General"
             },
             "mboxReferrer": {
-                "name": "Page Referrer"
+                "name": "Page Referrer",
+                "group": "General"
             },
             "screenHeight": {
-                "name": "Screen Height"
+                "name": "Screen Height",
+                "group": "General"
             },
             "screenWidth": {
-                "name": "Screen Width"
+                "name": "Screen Width",
+                "group": "General"
             },
             "browserWidth": {
-                "name": "Browser Width"
+                "name": "Browser Width",
+                "group": "General"
             },
             "browserHeight": {
-                "name": "Browser Height"
+                "name": "Browser Height",
+                "group": "General"
             },
             "browserTimeOffset": {
-                "name": "Browser Timezone Offset"
+                "name": "Browser Timezone Offset",
+                "group": "General"
             },
             "colorDepth": {
-                "name": "Browser Color Depth"
+                "name": "Browser Color Depth",
+                "group": "General"
             },
             "mboxXDomain": {
-                "name": "CrossDomain Enabled"
+                "name": "CrossDomain Enabled",
+                "group": "General"
             },
             "mboxTime": {
-                "name": "Timestamp"
+                "name": "Timestamp",
+                "group": "General"
             },
             "mboxVersion": {
-                "name": "Library Version"
+                "name": "Library Version",
+                "group": "General"
             }
         };
     }
@@ -91,9 +110,9 @@ class AdobeTargetProvider extends BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @param {string} url
+     * @param {URL} url
      *
-     * @returns {Array}
+     * @returns {void|Array}
      */
     handleCustom(url)
     {
