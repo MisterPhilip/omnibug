@@ -1,6 +1,6 @@
 /**
- * Adobe Analytics
- * http://www.adobe.com/data-analytics-cloud/analytics.html
+ * Adobe Audience Manager
+ * http://www.adobe.com/data-analytics-cloud/audience-manager.html
  *
  * @class
  * @extends BaseProvider
