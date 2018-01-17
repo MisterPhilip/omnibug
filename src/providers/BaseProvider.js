@@ -34,7 +34,8 @@ class BaseProvider
         let types = {
             "analytics":    "Analytics",
             "testing":      "UX Testing",
-            "tagmanager":   "Tag Manager"
+            "tagmanager":   "Tag Manager",
+            "visitorid":    "Visitor Identification"
         };
         return types[this._type] || "Unknown";
     }
