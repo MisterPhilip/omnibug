@@ -23,7 +23,7 @@ module.exports = function(grunt) {
             "firefox": ["platform/firefox", "build/firefox_*.zip"],
             "edge": ["platform/edge", "build/edge_*.zip"],
             "providers": ["src/providers/providers.js"],
-            "test-providers": ["build/tests/providers.js"]
+            "test": ["test/*.js", "!test/polyfills.js"]
         },
         "watch": {
             "providers": {
@@ -279,15 +279,32 @@ module.exports = function(grunt) {
         grunt.task.run("compress:" + browser);
     });
 
-    /**
-     * Build providers for testing usage
-     *
-     * Thanks to the stupidity of all the various requirements to test proper ES6, this is a band-aid to add functionality
-     * to the providers.js file for testing purposes ONLY. If anybody has a better way to do this, please speak up!
-     */
-    grunt.registerTask("build-test-providers", "Combine providers into a single file for testing", function() {
+    grunt.registerTask("build-test-files", "Build everything for testing", function() {
+
+        grunt.config.set("concat.test-port", {
+            "options": {
+                "footer": "\nexport { OmnibugPort };"
+            },
+            "files": {
+                "./test/OmnibugPort.js": [
+                    "./src/OmnibugPort.js",
+                ]
+            }
+        });
+        grunt.config.set("concat.test-settings", {
+            "options": {
+                "banner": "import { OmnibugProvider } from \"./providers.js\"\n",
+                "footer": "\nexport { OmnibugSettings };"
+            },
+            "files": {
+                "./test/OmnibugSettings.js": [
+                    "./src/OmnibugSettings.js",
+                ]
+            }
+        });
+
         const sourceBasePath = "./src/providers/",
-              ignoreFile = "!" + sourceBasePath + "providers.js";
+            ignoreFile = "!" + sourceBasePath + "providers.js";
 
         // Grab all of the provider names to append as an export list
         let providers = grunt.file.expand([sourceBasePath + "*.js", ignoreFile]).map((fileName) => {
@@ -295,22 +312,21 @@ module.exports = function(grunt) {
             return fileName.indexOf("Provider") === -1 ? fileName + "Provider" : fileName;
         });
 
-        grunt.task.run("clean:test-providers");
         grunt.config.set("concat.providers-test", {
             "options": {
                 "banner":   "const { URL } = require(\"url\");\n" +
-                            "var URLSearchParams = require(\"url-search-params\");\n",
+                "var URLSearchParams = require(\"url-search-params\");\n",
                 "footer": "\nexport { " + providers.join(", ") + " };"
             },
             "files": {
-                "./build/tests/providers.js": [
+                "./test/providers.js": [
                     sourceBasePath + "BaseProvider.js",
                     sourceBasePath + "OmnibugProvider.js",
                     sourceBasePath + "*.js",
                     ignoreFile
                 ]}
         });
-        grunt.task.run("concat:providers-test");
+        grunt.task.run(["clean:test", "concat:providers-test", "concat:test-port", "concat:test-settings"]);
     });
 
     /**

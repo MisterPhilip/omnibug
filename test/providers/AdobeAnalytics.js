@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { OmnibugProvider, AdobeAnalyticsProvider } from "./../../build/tests/providers.js";
+import { OmnibugProvider, AdobeAnalyticsProvider } from "./../providers.js";
 
 test("Generic AA Provider Information", t => {
     let provider = new AdobeAnalyticsProvider();

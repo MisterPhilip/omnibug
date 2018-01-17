@@ -18,3 +18,8 @@ build/
 
 # Tests/Coverage
 .nyc_output/
+
+/test/*
+!/test/core
+!/test/providers
+!/test/polyfills.js

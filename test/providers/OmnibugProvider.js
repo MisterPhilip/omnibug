@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { OmnibugProvider, BaseProvider } from "../../build/tests/providers";
+import { OmnibugProvider, BaseProvider } from "./../providers.js";
 
 // Sample provider to play with
 class OmnibugTestProvider extends BaseProvider {
