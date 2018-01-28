@@ -22,7 +22,7 @@ class OmnibugSettings
     /**
      * Get default setting values
      *
-     * @return {{defaultPattern: string, enabledProviders: string[], highlightKeys: string[], alwaysExpand: boolean, showQuotes: boolean, showRedirects: boolean, showFullNames: boolean, color_load: string, color_click: string, color_prev: string, color_quotes: string, color_hilite: string, color_redirect: string, color_hover: string}}
+     * @return {{defaultPattern: string, enabledProviders: string[], highlightKeys: [{}], alwaysExpand: boolean, showQuotes: boolean, showRedirects: boolean, showFullNames: boolean, color_load: string, color_click: string, color_prev: string, color_quotes: string, color_hilite: string, color_redirect: string, color_hover: string}}
      */
     get defaults()
     {
@@ -34,7 +34,12 @@ class OmnibugSettings
             , enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort()
 
             // keys to highlight
-            , highlightKeys  : [ "pageName", "ch", "events", "products" ]
+            , highlightKeys  : [
+                {"parameter": "pageName", "provider": "ADOBEANALYTICS"},
+                {"parameter": "ch", "provider": "ADOBEANALYTICS"},
+                {"parameter": "events", "provider": "ADOBEANALYTICS"},
+                {"parameter": "products", "provider": "ADOBEANALYTICS"}
+            ]
 
             // show entries expanded?
             , alwaysExpand : false
@@ -49,13 +54,13 @@ class OmnibugSettings
             , showFullNames : true
 
             // colors
-            , color_load    : "dbedff"
-            , color_click   : "f1ffdb"
-            , color_prev    : "ffd5de"
-            , color_quotes  : "ff0000"
-            , color_hilite  : "ffff00"
-            , color_redirect: "eeeeee"
-            , color_hover   : "cccccc"
+            , color_load        : "#dbedff"
+            , color_click       : "#f1ffdb"
+            , color_prev        : "#ffd5de"
+            , color_quotes      : "#ff0000"
+            , color_highlight   : "#ffff00"
+            , color_redirect    : "#eeeeee"
+            , color_hover       : "#cccccc"
         };
     }
 
