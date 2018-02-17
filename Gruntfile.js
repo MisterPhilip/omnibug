@@ -224,7 +224,7 @@ module.exports = function(grunt) {
     grunt.registerTask("build-copy", "Copy over the source files to the build directory", function(browser) {
         grunt.config.requires(browser);
         let options = grunt.config(browser),
-            filesToCopy = ["eventPage.js", "providers.js", "omnibugurl.js", "options.*", "devtools*", "images/*.*"];
+            filesToCopy = ["eventPage.js", "providers.js", "omnibugurl.js", "options/*.*", "devtools*", "images/*.*", "Omnibug*.js"];
         if(options.usePolyfill) {
             filesToCopy.push("browser-polyfill.js");
         }
@@ -251,7 +251,7 @@ module.exports = function(grunt) {
         {
             baseFiles.push("src/browser-polyfill.js");
         }
-        destFiles["platform/" + options.folder + "/options.js"] = baseFiles.concat(["src/options.js"]);
+        destFiles["platform/" + options.folder + "/options/options.js"] = baseFiles.concat(["src/options/options.js"]);
         destFiles["platform/" + options.folder + "/devtools.js"] = baseFiles.concat(["src/devtools.js"]);
         grunt.config.set("concat." + browser, {
             files: destFiles

@@ -20,11 +20,9 @@
     "devtools_page": "devtools.html",
     "homepage_url": "https://omnibug.io/",
     "options_ui": {
-        "page": "options.html",
-        "chrome_style": true,
-        "browser_style": true
+        "page": "options/options.html"
     },
-    "options_page": "options.html",
+    "options_page": "options/options.html",
     "permissions": [
         "tabs",
         "storage",

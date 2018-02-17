@@ -22,7 +22,7 @@ class OmnibugSettings
     /**
      * Get default setting values
      *
-     * @return {{defaultPattern: string, enabledProviders: string[], highlightKeys: [{}], alwaysExpand: boolean, showQuotes: boolean, showRedirects: boolean, showFullNames: boolean, color_load: string, color_click: string, color_prev: string, color_quotes: string, color_hilite: string, color_redirect: string, color_hover: string}}
+     * @return {{defaultPattern: string, enabledProviders: string[], highlightKeys: string[], alwaysExpand: boolean, showQuotes: boolean, showRedirects: boolean, showFullNames: boolean, color_load: string, color_click: string, color_prev: string, color_quotes: string, color_hilite: string, color_redirect: string, color_hover: string}}
      */
     get defaults()
     {
@@ -34,12 +34,7 @@ class OmnibugSettings
             , enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort()
 
             // keys to highlight
-            , highlightKeys  : [
-                {"parameter": "pageName", "provider": "ADOBEANALYTICS"},
-                {"parameter": "ch", "provider": "ADOBEANALYTICS"},
-                {"parameter": "events", "provider": "ADOBEANALYTICS"},
-                {"parameter": "products", "provider": "ADOBEANALYTICS"}
-            ]
+            , highlightKeys  : ["pageName", "ch", "events", "products"]
 
             // show entries expanded?
             , alwaysExpand : false
@@ -48,7 +43,7 @@ class OmnibugSettings
             , showQuotes : true
 
             // show redirected entries?
-            , showRedirects : false
+            , showRedirects : true
 
             // show full variable names?
             , showFullNames : true
