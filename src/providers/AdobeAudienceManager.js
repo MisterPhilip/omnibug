@@ -17,6 +17,18 @@ class AdobeAudienceManagerProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account": "d_orgid"
+        }
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}

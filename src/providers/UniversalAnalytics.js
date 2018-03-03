@@ -17,6 +17,19 @@ class UniversalAnalyticsProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":     "tid",
+            "requestType": "requestType"
+        }
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -315,6 +328,9 @@ class UniversalAnalyticsProvider extends BaseProvider
             "xvar": {
                 "name": "Content Experiment Variant",
                 "group": "Google Optimize"
+            },
+            "requestType": {
+                "hidden": true
             }
         };
     }
@@ -415,7 +431,8 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "value": value,
                 "group": "Ecommerce"
             };
-        } else if(/^il(\d+)pi(\d+)([a-z]{2})$/i.test(name)) {
+        } else if(/^il(\d+)pi(\d+)([a-z]{2})$/i.test(name))
+        {
             let lookup = {
                     "id": "ID",
                     "nm": "Name",
@@ -427,10 +444,24 @@ class UniversalAnalyticsProvider extends BaseProvider
                 },
                 type = lookup[RegExp.$3] || "";
             result = {
-                "key":   name,
+                "key": name,
                 "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type,
                 "value": value,
                 "group": "Ecommerce"
+            };
+        } else if(name === "t") {
+            let type = "";
+            if(value === "pageview" || value === "screenview") {
+                type = "Page View";
+            } else if(value === "transaction" || value === "item") {
+                type = "Ecommerce " + value.charAt(0).toUpperCase() + value.slice(1);
+            } else {
+                type = value.charAt(0).toUpperCase() + value.slice(1);
+            }
+            result = {
+                "key":    "requestType",
+                "value":  type,
+                "hidden": true
             };
         } else {
             result = super.handleQueryParam(name, value);

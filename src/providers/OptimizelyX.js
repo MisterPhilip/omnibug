@@ -17,6 +17,19 @@ class OptimizelyXProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "mbox"
+        }
+    }
+
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}

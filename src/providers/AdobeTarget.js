@@ -17,6 +17,19 @@ class AdobeTargetProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "mbox",
+            "requestType":  "mboxType"
+        }
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -117,6 +130,7 @@ class AdobeTargetProvider extends BaseProvider
     handleCustom(url)
     {
         let matches =  url.pathname.match( /\/([^\/]+)\/mbox\/([^\/?]+)/ ),
+            mboxName = ""
             results = [];
         if(matches !== null && matches.length === 3) {
             results.push({
@@ -132,6 +146,7 @@ class AdobeTargetProvider extends BaseProvider
                 "group": "General"
             });
         }
+
         return results;
     }
 }

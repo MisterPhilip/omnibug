@@ -17,6 +17,19 @@ class AdobeAnalyticsProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "rsid",
+            "requestType":  "requestType"
+        }
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -215,6 +228,9 @@ class AdobeAnalyticsProvider extends BaseProvider
             "rsid": {
                 "name": "Report Suites",
                 "group": "General"
+            },
+            "requestType": {
+                "hidden": true
             }
         };
     }
@@ -276,7 +292,8 @@ class AdobeAnalyticsProvider extends BaseProvider
             "provider": {
                 "name": this.name,
                 "key":  this.key,
-                "type": this.type
+                "type": this.type,
+                "columns": this.columnMapping
             },
             "data": data
         };
@@ -354,7 +371,9 @@ class AdobeAnalyticsProvider extends BaseProvider
     handleCustom(url)
     {
         let results = [],
-            rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//);
+            rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//),
+            pev2 = url.searchParams.get("pe"),
+            requestType = "Page Load";
         if(rsid) {
             results.push({
                 "key":   "rsid",
@@ -363,6 +382,20 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "group": this.keys.rsid ? this.keys.rsid.group : "General",
             });
         }
+
+        // Handle s.tl calls
+        if(pev2 === "e") {
+            requestType = "Click Event: Exit";
+        } else if(pev2 === "d") {
+            requestType = "Click Event: Download";
+        } else if(pev2 === "o") {
+            requestType = "Click Event: Other";
+        }
+        results.push({
+            "key":   "requestType",
+            "value": requestType,
+            "hidden": true
+        });
         return results;
     }
 }

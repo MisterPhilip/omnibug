@@ -61,6 +61,16 @@ class BaseProvider
     }
 
     /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {};
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -124,9 +134,10 @@ class BaseProvider
 
         return {
             "provider": {
-                "name": this.name,
-                "key":  this.key,
-                "type": this.type
+                "name":    this.name,
+                "key":     this.key,
+                "type":    this.type,
+                "columns": this.columnMapping
             },
             "data": data
         };
