@@ -22,7 +22,7 @@ module.exports = function(grunt) {
             "chrome": ["platform/chromium", "build/chrome_*.zip"],
             "firefox": ["platform/firefox", "build/firefox_*.zip"],
             "edge": ["platform/edge", "build/edge_*.zip"],
-            "providers": ["src/providers/providers.js"],
+            "providers": ["src/providers.js"],
             "test": ["test/*.js", "!test/polyfills.js"]
         },
         "watch": {
@@ -143,6 +143,7 @@ module.exports = function(grunt) {
         } else {
             browsers = browsers.split(",");
         }
+        grunt.task.run("build-providers");
         browsers.forEach((b) => {
             if(allowedBrowsers.indexOf(b) > -1) {
                 grunt.task.run(
@@ -339,11 +340,12 @@ module.exports = function(grunt) {
         grunt.task.run("clean:providers");
         grunt.config.set("concat.providers", {
             files: {
-                "./src/providers/providers.js": [
+                "./src/providers.js": [
                     sourceBasePath + "BaseProvider.js",
                     sourceBasePath + "OmnibugProvider.js",
                     sourceBasePath + "*.js"
-            ]}
+                ],
+            }
         });
         grunt.task.run("concat:providers");
     });
