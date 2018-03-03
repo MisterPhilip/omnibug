@@ -130,7 +130,7 @@ class AdobeTargetProvider extends BaseProvider
     handleCustom(url)
     {
         let matches =  url.pathname.match( /\/([^\/]+)\/mbox\/([^\/?]+)/ ),
-            mboxName = ""
+            mboxName = "",
             results = [];
         if(matches !== null && matches.length === 3) {
             results.push({
