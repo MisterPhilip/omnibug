@@ -19,15 +19,9 @@
         // Migrate from local storage to sync storage, if available
         if(details.reason === "update" && details.previousVersion.indexOf("0.") === 0)
         {
-            settings.migrate().then((loadedSettings) => {
-                cached.settings = loadedSettings;
-                cached.pattern = OmnibugProvider.getPattern(loadedSettings.enabledProviders);
-            });
+            settings.migrate().then(setCachedSettings);
         } else {
-            settings.load().then((loadedSettings) => {
-                cached.settings = loadedSettings;
-                cached.pattern = OmnibugProvider.getPattern(loadedSettings.enabledProviders);
-
+            settings.load().then(setCachedSettings).then((settings) => {
                 // Make sure we save any settings, in case of fresh installs
                 settings.save(settings);
             });
@@ -39,10 +33,7 @@
      */
     browser.runtime.onStartup.addListener(() => {
         console.log("browser.runtime.onStartup");
-        settings.load().then((loadedSettings) => {
-            cached.settings = loadedSettings;
-            cached.pattern = OmnibugProvider.getPattern(cached.settings.enabledProviders);
-        });
+        settings.load().then(setCachedSettings);
     });
 
     /**
@@ -51,8 +42,7 @@
     browser.storage.onChanged.addListener((changes, storageType) => {
         if(OmnibugSettings.storage_key in changes)
         {
-            cached.settings = changes[OmnibugSettings.storage_key];
-            cached.pattern = OmnibugProvider.getPattern(cached.settings.enabledProviders);
+            setCachedSettings(changes[OmnibugSettings.storage_key]);
             tabs.forEach((tab) => {
                 tab.port.postMessage({
                     "event": "settings",
@@ -68,10 +58,7 @@
     browser.runtime.onConnect.addListener((details) => {
         console.log("browser.runtime.onConnect", details);
         if(!cached.pattern) {
-            settings.load().then((loadedSettings) => {
-                cached.settings = loadedSettings;
-                cached.pattern = OmnibugProvider.getPattern(cached.settings.enabledProviders);
-            });
+            settings.load().then(setCachedSettings);
         }
         let port = new OmnibugPort(details);
         if(!port.belongsToOmnibug)
@@ -150,6 +137,18 @@
      */
     function isValidTab(tabId) {
         return (tabId !== -1 && tabId in tabs);
+    }
+
+    /**
+     * Set cached settings
+     *
+     * @param settings
+     * @return {{}}
+     */
+    function setCachedSettings(settings) {
+        cached.settings = settings;
+        cached.pattern = OmnibugProvider.getPattern(cached.settings.enabledProviders);
+        return cached.settings;
     }
 
     /**
