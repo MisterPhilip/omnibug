@@ -38,6 +38,7 @@
      * Load settings when extension is first run a session
      */
     browser.runtime.onStartup.addListener(() => {
+        console.log("browser.runtime.onStartup");
         settings.load().then((loadedSettings) => {
             cached.settings = loadedSettings;
             cached.pattern = OmnibugProvider.getPattern(cached.settings.enabledProviders);
@@ -66,6 +67,12 @@
      */
     browser.runtime.onConnect.addListener((details) => {
         console.log("browser.runtime.onConnect", details);
+        if(!cached.pattern) {
+            settings.load().then((loadedSettings) => {
+                cached.settings = loadedSettings;
+                cached.pattern = OmnibugProvider.getPattern(cached.settings.enabledProviders);
+            });
+        }
         let port = new OmnibugPort(details);
         if(!port.belongsToOmnibug)
         {
@@ -116,21 +123,17 @@
     );
 
     /**
-     * Listen for all requests that match our providers
+     * Listen for all navigations that occur on a top-level frame
      */
     browser.webNavigation.onBeforeNavigate.addListener(
         (details) => {
-            if(isValidTab(details.tabId)) {
-                // We have a valid tab, send a message to the devtools with the web navigation information
+            if(isValidTab(details.tabId) && details.frameId === 0) {
+                // We have a page load within a tab we care about, send a message to the devtools with the info
                 console.log("webNavigation.onBeforeNavigate called", details);
                 tabs[details.tabId].port.postMessage({
                     "request": {
-                        "initiator": details.initiator,
-                        "method":    details.method,
-                        "id":        details.requestId,
                         "tab":       details.tabId,
                         "timestamp": details.timeStamp,
-                        "type":      details.type,
                         "url":       details.url
                     },
                     "event": "webNavigation"
