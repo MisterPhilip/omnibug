@@ -25,7 +25,7 @@ body > header > nav {
 }
 
 #clearResults {
-    background: url('images/clear_button.png') no-repeat;
+    background: url('../images/clear_button.png') no-repeat;
     width: 32px;
     height: 24px;
     display: block;

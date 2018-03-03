@@ -18,7 +18,7 @@
         ],
         "persistent": true
     },
-    "devtools_page": "devtools.html",
+    "devtools_page": "devtools/devtools.html",
     "homepage_url": "https://omnibug.io/",
     "options_ui": {
         "page": "options/options.html"
