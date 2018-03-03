@@ -11,7 +11,8 @@
     },
     "background": {
         "scripts": [
-            "omnibugurl.js",
+            "OmnibugSettings.js",
+            "OmnibugPort.js",
             "providers.js",
             "eventPage.js"
         ],
@@ -27,6 +28,7 @@
         "tabs",
         "storage",
         "webRequest",
+        "webNavigation",
         "*://*/*"
     ],
     "short_name": "Omnibug",

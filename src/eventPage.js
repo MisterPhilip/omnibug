@@ -80,7 +80,7 @@
     browser.webRequest.onBeforeRequest.addListener(
         (details) => {
             // Ignore any requests for windows where devtools isn't open
-            if(details.tabId === -1 || !(details.tabId in tabs) || !cached.pattern.test(details.url))
+            if(!isValidTab(details.tabId) || !cached.pattern.test(details.url))
             {
                 return;
             }
@@ -116,8 +116,41 @@
     );
 
     /**
+     * Listen for all requests that match our providers
+     */
+    browser.webNavigation.onBeforeNavigate.addListener(
+        (details) => {
+            if(isValidTab(details.tabId)) {
+                // We have a valid tab, send a message to the devtools with the web navigation information
+                console.log("webNavigation.onBeforeNavigate called", details);
+                tabs[details.tabId].port.postMessage({
+                    "request": {
+                        "initiator": details.initiator,
+                        "method":    details.method,
+                        "id":        details.requestId,
+                        "tab":       details.tabId,
+                        "timestamp": details.timeStamp,
+                        "type":      details.type,
+                        "url":       details.url
+                    },
+                    "event": "webNavigation"
+                });
+            }
+        }
+    );
+
+    /**
+     * Verify we have a tab that we have devtools open for
+     *
+     * @param tabId
+     * @return {boolean}
+     */
+    function isValidTab(tabId) {
+        return (tabId !== -1 && tabId in tabs);
+    }
+
+    /**
      * @TODO (or at least consider) adding these:
-     * - browser.webNavigation.onBeforeNavigate:    when a user navigates to a new page (clear/fade previous requests)
      * - browser.webRequest.onHeadersReceived:      when a request's headers are returned (useful for seeing 3XX requests)
      */
 })();
