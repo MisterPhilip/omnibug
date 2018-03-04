@@ -23,3 +23,6 @@ build/
 !/test/core
 !/test/providers
 !/test/polyfills.js
+
+# Generated files
+src/providers.js
