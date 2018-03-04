@@ -1,4 +1,4 @@
-Fixes Issue # .
+Reference Issue # .
 
 Changes proposed in this pull request:
 
