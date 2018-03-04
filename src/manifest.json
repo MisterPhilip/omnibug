@@ -11,8 +11,8 @@
     },
     "background": {
         "scripts": [
-            "OmnibugSettings.js",
-            "OmnibugPort.js",
+            "libs/OmnibugSettings.js",
+            "libs/OmnibugPort.js",
             "providers.js",
             "eventPage.js"
         ],

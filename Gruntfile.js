@@ -115,6 +115,9 @@ module.exports = function(grunt) {
             "all": [
                 "Gruntfile.js",
                 "src/providers/*.js",
+                "src/libs/*.js",
+                "src/options/*.js",
+                "src/devtools/*.js",
                 "src/*.js"
             ],
             "build": [
@@ -225,7 +228,7 @@ module.exports = function(grunt) {
     grunt.registerTask("build-copy", "Copy over the source files to the build directory", function(browser) {
         grunt.config.requires(browser);
         let options = grunt.config(browser),
-            filesToCopy = ["eventPage.js", "providers.js", "omnibugurl.js", "options/*.*", "devtools/*.*", "images/*.*", "Omnibug*.js"];
+            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "images/*.*", "libs/*.*"];
         if(options.usePolyfill) {
             filesToCopy.push("browser-polyfill.js");
         }
@@ -250,7 +253,7 @@ module.exports = function(grunt) {
 
         if(options.usePolyfill)
         {
-            baseFiles.push("src/browser-polyfill.js");
+            baseFiles.push("src/libs/browser-polyfill.js");
         }
         destFiles["platform/" + options.folder + "/options/options.js"] = baseFiles.concat(["src/options/options.js"]);
         destFiles["platform/" + options.folder + "/devtools/devtools.js"] = baseFiles.concat(["src/devtools/devtools.js"]);
@@ -288,7 +291,7 @@ module.exports = function(grunt) {
             },
             "files": {
                 "./test/OmnibugPort.js": [
-                    "./src/OmnibugPort.js",
+                    "./src/libs/OmnibugPort.js",
                 ]
             }
         });
@@ -299,7 +302,7 @@ module.exports = function(grunt) {
             },
             "files": {
                 "./test/OmnibugSettings.js": [
-                    "./src/OmnibugSettings.js",
+                    "./src/libs/OmnibugSettings.js",
                 ]
             }
         });
