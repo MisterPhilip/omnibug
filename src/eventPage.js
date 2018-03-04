@@ -11,25 +11,10 @@
 (function() {
     var prefs,
         tabs = {},
-        that = this;
-
-    /**
-     * Installation callback
-     */
-    function onInit() {
-        console.debug( 'eventPage onInit' );
-        initPrefs();
-    }
-    browser.runtime.onInstalled.addListener( onInit );
-
-
-    /**
-     * Store preferences (on extension installation)
-     */
-    function initPrefs() {
-        var prefs = {
+        that = this,
+        defaultPrefs =  {
             // pattern to match in request url
-              defaultPattern : OmnibugProvider.getDefaultPattern().source
+            defaultPattern : OmnibugProvider.getDefaultPattern().source
 
             // all providers (initially)
             , enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort()
@@ -55,7 +40,21 @@
             , color_hover  : "ccc"
         };
 
-        browser.storage.local.set( { "omnibug" : prefs }, function() {
+    /**
+     * Installation callback
+     */
+    function onInit() {
+        console.debug( 'eventPage onInit' );
+        initPrefs();
+    }
+    browser.runtime.onInstalled.addListener( onInit );
+
+
+    /**
+     * Store preferences (on extension installation)
+     */
+    function initPrefs() {
+        browser.storage.local.set( { "omnibug" : defaultPrefs }, function() {
             if( !! browser.runtime.lastError ) {
                 console.error( "Error setting prefs: ", browser.runtime.lastError );
             }
@@ -83,6 +82,8 @@
 
             var pattern = that.prefs.defaultPattern = getCurrentPattern( prefData.omnibug );
             that.prefs.defaultRegex = new RegExp( that.prefs.defaultPattern );
+
+            sendToAllDevTools( { "type" : "prefs", "payload" : that.prefs } );
         } );
     }
 
@@ -129,7 +130,7 @@
      * Quickly determine if a URL is a candidate for us or not
      */
     function shouldProcess( url ) {
-        return url.match( this.prefs.defaultRegex );
+        return this.prefs && this.prefs.defaultRegex && url.match( this.prefs.defaultRegex );
     }
 
 
@@ -212,7 +213,12 @@
         tabs[tabId].port = port;
 
         // respond immediately with prefs data
-        sendToDevToolsForTab( tabId, { "type" : "prefs", "payload" : this.prefs } );
+
+        var prefsToSend = that.prefs || defaultPrefs;
+        if( !that.prefs ) {
+            loadPrefsFromStorage( "onConnect" );
+        }
+        sendToDevToolsForTab( tabId, { "type" : "prefs", "payload" : prefsToSend } );
 
         // Remove port when destroyed (e.g. when devtools instance is closed)
         port.onDisconnect.addListener( function( port ) {

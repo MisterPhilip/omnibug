@@ -3,18 +3,18 @@ module.exports = function(grunt) {
 
     grunt.config.init({
         "chrome": {
-            "version": "0.6.0",
+            "version": "0.6.1",
             "usePolyfill": true,
             "folder": "chromium"
         },
         "firefox": {
-            "version": "0.6.0",
+            "version": "0.6.1",
             "gecko": "Omnibug@rosssimpson.com",
             "usePolyfill": false,
             "folder": "firefox"
         },
         "edge": {
-            "version": "0.6.0",
+            "version": "0.6.1",
             "usePolyfill": false,
             "folder": "edge"
         },
