@@ -13,15 +13,9 @@ module.exports = function(grunt) {
             "usePolyfill": false,
             "folder": "firefox"
         },
-        "edge": {
-            "version": "0.6.0",
-            "usePolyfill": false,
-            "folder": "edge"
-        },
         "clean": {
             "chrome": ["platform/chromium", "build/chrome_*.zip"],
             "firefox": ["platform/firefox", "build/firefox_*.zip"],
-            "edge": ["platform/edge", "build/edge_*.zip"],
             "providers": ["src/providers.js"],
             "test": ["test/*.js", "!test/polyfills.js"]
         },
@@ -55,18 +49,6 @@ module.exports = function(grunt) {
                     "build-copy:firefox",
                     "firefox-manifest",
                     "build-concat:firefox"
-                ],
-                "options": {
-                    "spawn": false,
-                },
-            },
-            "edge": {
-                "files": ["src/**"],
-                "tasks": [
-                    "clean:edge",
-                    "build-copy:edge",
-                    "edge-manifest",
-                    "build-concat:edge"
                 ],
                 "options": {
                     "spawn": false,
@@ -140,7 +122,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-jshint");
 
     grunt.registerTask("build-extensions", "Build the Chrome extension", (browsers = "") => {
-            let allowedBrowsers = ["chrome", "firefox", "edge"];
+            let allowedBrowsers = ["chrome", "firefox"];
         if(browsers === "") {
             browsers = allowedBrowsers;
         } else {
@@ -202,27 +184,6 @@ module.exports = function(grunt) {
 
         grunt.file.write("platform/" + options.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Firefox's manifest.json. ").ok();
-    });
-
-    grunt.registerTask("edge-manifest", "Build the Edge manifest.json file", function() {
-        grunt.config.requires("edge.version");
-
-        let options = grunt.config("edge"),
-            manifest = grunt.file.readJSON("src/manifest.json");
-
-        if(options.usePolyfill) {
-            manifest.background.scripts.unshift("browser-polyfill.js");
-        }
-
-        manifest.version = options.version;
-
-        // Remove anything that will break Edge"s import routine
-        delete manifest.manifest_version;
-        delete manifest.options_ui.chrome_style;
-        delete manifest.options_ui.browser_style;
-
-        grunt.file.write("platform/" + options.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
-        grunt.log.write("Created Edge's manifest.json. ").ok();
     });
 
     grunt.registerTask("build-copy", "Copy over the source files to the build directory", function(browser) {
