@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" type="text/css" href="./panel.css" />
     <link rel="stylesheet" type="text/css" href="../assets/css/font.css" />
     <link rel="stylesheet" type="text/css" href="../assets/css/spectre.min.css" />
     <style>
@@ -10,14 +9,17 @@
             font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
             font-size: 15px;
             color: #555;
-            min-width: 800px;
-            max-width: 1000px;
             margin: 0 auto;
             background-color: #FAFAFA;
+            padding-top: 37px;
         }
         nav.navbar {
-            height: auto;
-            min-height: 40px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border-bottom: 1px solid #DDD;
         }
         .navbar-section:last-of-type a.btn {
             border-left: 1px solid #eee;
@@ -25,6 +27,60 @@
         .navbar a.link {
             padding: .45rem .5rem;
         }
+        .loading:after {
+            animation: loading 1s infinite linear;
+        }
+        .request {
+            width: 100%;
+            padding: 5px 5px 0;
+        }
+        .request:nth-of-type(odd) {
+            background-color: #fafafa;
+        }
+        .request:nth-of-type(even) {
+            background-color: #f0f0f0;
+        }
+        #no-requests {
+            animation: fadein 2s;
+            background-color: transparent;
+        }
+        @keyframes fadein {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        details > summary {
+            -moz-user-select: none;
+            user-select: none;
+            cursor: pointer;
+        }
+        .noselect {
+            -moz-user-select: none;
+            user-select: none;
+        }
+        .request > summary {
+            padding-bottom: 5px;
+        }
+        .request > summary .container {
+            margin-top: -1.5em;
+            margin-left: .75em;
+        }
+        .request > div {
+            border-top: 1px solid #ccc;
+            font-size: .9em;
+            padding: 1em;
+        }
+
+        .request table td, .request table th {
+            padding: .2rem .1rem;
+        }
+        .request-details > summary {
+            font-weight: 600;
+        }
+        .request-details tbody > tr > td:first-of-type {
+            width: 125px;
+            font-weight: 600;
+        }
+
     </style>
 </head>
 <body>
@@ -43,10 +99,20 @@
     </header>
 
     <main>
+        <div class="empty" id="no-requests">
+            <div class="empty-icon">
+                <i class="icon icon-people"></i>
+            </div>
+            <p class="empty-title h4">Listening for requests</p>
+            <p class="empty-subtitle">The page has not sent any requests that match the providers you've selected.</p>
+            <div class="empty-action">
+                <div class="loading loading-lg"></div>
+            </div>
+        </div>
+        <section id="requests">
 
-
+        </section>
     </main>
-
     <div class="modal" id="filter-modal">
         <a href="#close" class="modal-overlay" aria-label="Close"></a>
         <div class="modal-container">

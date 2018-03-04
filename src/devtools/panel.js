@@ -10,7 +10,25 @@
  */
 window.Omnibug = (() => {
 
-    let d = document;
+    let d = document,
+        settings = {},
+        requestPanel = d.getElementById("requests"),
+        noRequests = d.getElementById("no-requests");
+
+    // Clear all requests
+    d.querySelectorAll("a[href=\"#clear\"]").forEach((element) => {
+        element.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            // Clear our current requests
+            while (requestPanel.firstChild) {
+                requestPanel.removeChild(requestPanel.firstChild);
+            }
+
+            // Show the no requests found notification
+            noRequests.classList.remove("d-none");
+        })
+    });
 
     // Open settings from links in devtools
     d.querySelectorAll("a[href=\"#settings\"]").forEach((element) => {
@@ -44,7 +62,162 @@ window.Omnibug = (() => {
         })
     });
 
+    /**
+     * Shortcut to creating an HTML element
+     *
+     * @param type          String
+     * @param classList     []
+     * @param attributes    []
+     * @return {HTMLElement}
+     */
+    function createElement(type, classList = [], attributes = {}) {
+        let element = d.createElement(type);
+        if(classList.length) {
+            element.classList.add(...classList);
+        }
+        Object.entries(attributes).forEach((attribute) => {
+            element.setAttribute(...attribute);
+        });
+        return element;
+    }
 
+    function addRequest(request) {
+        noRequests.classList.add("d-none");
+        requestPanel.appendChild(buildRequest(request));
+    }
+
+    /**
+     *
+     *
+     * @param request
+     * @return {HTMLElement}
+     */
+    function buildRequest(request) {
+        let details = createElement("details", ["request"]),
+            summary = createElement("summary"),
+            body = createElement("div");
+
+        // Setup parent details element
+        if(settings.alwaysExpand) {
+            details.setAttribute("open", "open");
+        }
+
+        // Add the summary (title)
+        let summaryContainer = createElement("div", ["container"]),
+            summaryColumns = createElement("div", ["columns"]),
+            colTitle = createElement("div", ["column", "col-3"]),
+            colAccount = createElement("div", ["column", "col-3"]),
+            colTime = createElement("div", ["column", "col-4"]);
+
+        // Add the provider name & request type (if applicable)
+        colTitle.innerText = request.provider.name;
+        if(request.provider.columns.requestType) {
+            let requestTypeEl = createElement("span", ["label"]),
+                requestTypeValue = request.data.find((el) => {
+                    return el.key === request.provider.columns.requestType;
+                });
+
+            // Verify the column / data exists, if so add it as a label
+            if(requestTypeValue) {
+                requestTypeEl.innerText = requestTypeValue.value;
+                colTitle.appendChild(requestTypeEl);
+            }
+        }
+        summaryColumns.appendChild(colTitle);
+
+        // Add the account ID, if it exists
+        if(request.provider.columns.account) {
+            let accountValue = request.data.find((el) => {
+                return el.key === request.provider.columns.account;
+            });
+            console.log(request.provider.columns.account, accountValue);
+            if(accountValue) {
+                colAccount.innerText = accountValue.value;
+            }
+        }
+        summaryColumns.appendChild(colAccount);
+
+        // Add the timestamp
+        colTime.innerText = new Date(request.request.timestamp);
+        summaryColumns.appendChild(colTime);
+
+        // Append our summary
+        summaryContainer.appendChild(summaryColumns);
+        summary.appendChild(summaryContainer);
+        details.appendChild(summary);
+
+        let requestSummary = [];
+        Object.entries(request.request).forEach((info) => {
+            requestSummary.push({
+                "key": "omnibug-" + info[0],
+                "field": info[0],
+                "value": info[1]
+            });
+        });
+
+        let data = request.data.reduce((groups, item) => {
+            if(!item.hidden) {
+                const val = item.group;
+                groups[val] = groups[val] || [];
+                groups[val].push(item);
+            }
+            return groups;
+        }, {"Summary": requestSummary});
+
+        Object.entries(data).forEach((dataGroup) => {
+            let panel = buildRequestPanel(dataGroup[0], dataGroup[1], settings.showFullNames);
+            body.appendChild(panel);
+        });
+        details.appendChild(body);
+
+        return details;
+    }
+
+    /**
+     * Build the HTML for a request panel
+     *
+     * @param title string
+     * @param data  []
+     * @param useKey Boolean
+     * @return {HTMLElement}
+     */
+    function buildRequestPanel(title, data = [], useKey = false) {
+        let wrapper = createElement("details", ["request-details"], {"open": "open"});
+
+        // Add the summary (title)
+        let summary = createElement("summary");
+        summary.innerText = title;
+        wrapper.appendChild(summary);
+
+        // Setup the table
+        let table = createElement("table", ["table", "table-striped", "table-hover"]),
+            tableBody = createElement("tbody");
+
+        // Loop through each of the data objects to create a new table row
+        data.sort((a, b) => {
+            let aKey = a.field.toLowerCase(),
+                bKey = b.field.toLowerCase();
+            if(aKey < bKey) { return -1; }
+            if(aKey > bKey) { return 1; }
+            return 0;
+        }).forEach((row) => {
+            let tableRow = createElement("tr", [], {"data-parameter-key": row.key}),
+                name = createElement("td"),
+                value = createElement("td");
+            name.innerText = useKey ? row.key : row.field;
+            value.innerText = row.value;
+
+            tableRow.appendChild(name);
+            tableRow.appendChild(value);
+            tableBody.appendChild(tableRow);
+        });
+
+        // Append the final results
+        table.appendChild(tableBody);
+        wrapper.appendChild(table);
+
+        return wrapper;
+    }
 
     // Old code below
 
@@ -330,14 +503,13 @@ window.Omnibug = (() => {
         /**
          * Receive a message from the port; delegate to appropriate handler
          */
-        receive_message: function( msg ) {
-            //alert( "receive_message: type=" + msg.type );
-            if( msg.type === "webEvent" ) {
-                show_message( msg.payload );
-            } else if( msg.type === "prefs" ) {
-                handle_prefs_msg( msg.payload );
+        receive_message: function( message ) {
+            if( message.event === "webRequest" ) {
+                addRequest(message);
+            } else if( message.event === "prefs" ) {
+                handle_prefs_msg( message.payload );
             } else {
-                parent_log( { "Unknown message type received" : msg } );
+                parent_log( { "xUnknown message type received" : message } );
             }
         }
     };
