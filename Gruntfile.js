@@ -151,7 +151,7 @@ module.exports = function(grunt) {
             manifest = grunt.file.readJSON("src/manifest.json");
 
         if(options.usePolyfill) {
-            manifest.background.scripts.unshift("browser-polyfill.js");
+            manifest.background.scripts.unshift("libs/browser-polyfill.js");
         }
 
         manifest.version = options.version;
@@ -171,7 +171,7 @@ module.exports = function(grunt) {
             manifest = grunt.file.readJSON("src/manifest.json");
 
         if(options.usePolyfill) {
-            manifest.background.scripts.unshift("browser-polyfill.js");
+            manifest.background.scripts.unshift("libs/browser-polyfill.js");
         }
 
         manifest.version = options.version;
@@ -189,7 +189,7 @@ module.exports = function(grunt) {
     grunt.registerTask("build-copy", "Copy over the source files to the build directory", function(browser) {
         grunt.config.requires(browser);
         let options = grunt.config(browser),
-            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "images/*.*", "libs/*.*"];
+            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*"];
         if(options.usePolyfill) {
             filesToCopy.push("browser-polyfill.js");
         }
@@ -218,6 +218,7 @@ module.exports = function(grunt) {
         }
         destFiles["platform/" + options.folder + "/options/options.js"] = baseFiles.concat(["src/options/options.js"]);
         destFiles["platform/" + options.folder + "/devtools/devtools.js"] = baseFiles.concat(["src/devtools/devtools.js"]);
+        destFiles["platform/" + options.folder + "/devtools/panel.js"] = baseFiles.concat(["src/devtools/panel.js"]);
         grunt.config.set("concat." + browser, {
             files: destFiles
         });

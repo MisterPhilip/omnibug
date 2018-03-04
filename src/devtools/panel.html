@@ -3,16 +3,88 @@
 <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" type="text/css" href="./panel.css" />
+    <link rel="stylesheet" type="text/css" href="../assets/css/font.css" />
+    <link rel="stylesheet" type="text/css" href="../assets/css/spectre.min.css" />
+    <style>
+        body {
+            font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
+            color: #555;
+            min-width: 800px;
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #FAFAFA;
+        }
+        nav.navbar {
+            height: auto;
+            min-height: 40px;
+        }
+        .navbar-section:last-of-type a.btn {
+            border-left: 1px solid #eee;
+        }
+        .navbar a.link {
+            padding: .45rem .5rem;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav>
-            <button id="clearResults" title="Clear Events"><span class="sr-only">Clear Events</span></button>
+        <nav class="navbar">
+            <section class="navbar-section">
+                <a href="#clear" class="btn btn-link" title="Clear Requests" aria-label="Clear Requests"><i class="fas fa-ban"></i></a>
+            </section>
+            <section class="navbar-section">
+                <a href="#filter-modal" class="btn btn-link" title="Filter Requests" aria-label="Filter Requests" data-target-modal="filter-modal"><i class="fas fa-filter"></i></a>
+                <a href="#export" class="btn btn-link" title="Export Requests" aria-label="Export Requests"><i class="fas fa-download"></i></a>
+                <a href="#settings" class="btn btn-link" title="Omnibug Settings" aria-label="Omnibug Settings"><i class="fas fa-cog"></i></a>
+                <a href="#about-modal" class="btn btn-link" title="About" aria-label="About" data-target-modal="about-modal"><i class="fas fa-question-circle"></i></a>
+            </section>
         </nav>
     </header>
-    <script type="text/javascript" src="../providers.js"></script>
-    <script type="text/javascript" src="../libs/OmnibugSettings.js"></script>
-    <script type="text/javascript" src="./panel.js"></script>
+
+    <main>
+
+
+    </main>
+
+    <div class="modal" id="filter-modal">
+        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+                <div class="modal-title h5">Filter Requests</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    @TODO: Show some content around filtering the requests by provider, key columns.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="about-modal">
+        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+                <div class="modal-title h5">About Omnibug</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <p>Omnibug is a plugin for the Google Chrome and Mozilla Firefox browsers to ease developing and
+                        debugging web metrics implementations. Each outgoing request (sent by the browser) is checked
+                        for a pattern; if a match occurs, the URL is displayed and decoded to show the details of the request.</p>
+                    <p>Need help? Check out our <a href="https://omnibug.io/help?utm_source=extension&utm_medium=devtools&utm_campaign=about" target="_blank">help page</a> for guides &amp; how to reach out to us!</p>
+                    <p>&copy; 2018 <a href="https://omnibug.io/?utm_source=extension&utm_medium=devtools&utm_campaign=about" target="_blank">Omnibug</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../providers.js"></script>
+    <script src="../libs/OmnibugSettings.js"></script>
+    <script src="./panel.js"></script>
+    <script src="../assets/icons/fa-solid.js"></script>
+    <script src="../assets/icons/fontawesome.js"></script>
 </body>
 </html>
 

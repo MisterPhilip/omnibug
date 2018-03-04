@@ -8,27 +8,35 @@ html, body, table {
 body {
     padding-top: 35px;
 }
-
-body > header {
-    position: fixed;
+nav.navbar {
+    position: absolute;
     top: 0;
+    left: 0;
     width: 100%;
-    padding: 0;
-    margin: 0;
     height: 35px;
     background: #fff;
     border-bottom: 1px solid #DDD;
 }
-body > header > nav {
-    padding: 0;
-    margin: 0;
-}
-
-#clearResults {
-    background: url('../images/clear_button.png') no-repeat;
+#clearRequests {
+    background: url('../assets/images/clear_button.png') no-repeat;
     width: 32px;
     height: 24px;
-    display: block;
+    margin: 5px;
+    border: 0;
+    cursor: pointer;
+}
+#filterRequests {
+    background: url('../assets/images/clear_button.png') no-repeat;
+    width: 32px;
+    height: 24px;
+    margin: 5px;
+    border: 0;
+    cursor: pointer;
+}
+#settingsNav {
+    background: url('../assets/images/clear_button.png') no-repeat;
+    width: 32px;
+    height: 24px;
     margin: 5px;
     border: 0;
     cursor: pointer;

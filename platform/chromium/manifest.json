@@ -5,30 +5,31 @@
     "description": "Omnibug is a browser extension to decode and display outgoing web metrics requests.",
     "author": "Philip Lawrence",
     "icons": {
-        "16": "images/o-16.png",
-        "48": "images/o-48.png",
-        "128": "images/o-128.png"
+        "16": "assets/images/o-16.png",
+        "48": "assets/images/o-48.png",
+        "128": "assets/images/o-128.png"
     },
     "background": {
         "scripts": [
-            "browser-polyfill.js",
-            "omnibugurl.js",
+            "libs/browser-polyfill.js",
+            "libs/OmnibugSettings.js",
+            "libs/OmnibugPort.js",
             "providers.js",
             "eventPage.js"
         ],
         "persistent": true
     },
-    "devtools_page": "devtools.html",
+    "devtools_page": "devtools/devtools.html",
     "homepage_url": "https://omnibug.io/",
     "options_ui": {
-        "page": "options.html",
-        "chrome_style": true
+        "page": "options/options.html"
     },
-    "options_page": "options.html",
+    "options_page": "options/options.html",
     "permissions": [
         "tabs",
         "storage",
         "webRequest",
+        "webNavigation",
         "*://*/*"
     ],
     "short_name": "Omnibug"

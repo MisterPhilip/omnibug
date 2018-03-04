@@ -8,7 +8,46 @@
  * USA.
  *
  */
-window.Omnibug = ( function() {
+window.Omnibug = (() => {
+
+    let d = document;
+
+    // Open settings from links in devtools
+    d.querySelectorAll("a[href=\"#settings\"]").forEach((element) => {
+        element.addEventListener("click", (event) => {
+            event.preventDefault();
+            browser.runtime.openOptionsPage();
+        })
+    });
+
+    // Open modals
+    d.querySelectorAll("button[data-target-modal], a[data-target-modal]").forEach((element) => {
+        element.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            let target = d.getElementById(element.getAttribute("data-target-modal"));
+            if(target) {
+                target.classList.add("active");
+            }
+        })
+    });
+
+    // Close modals
+    d.querySelectorAll(".modal a[href=\"#close\"]").forEach((element) => {
+        element.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            let target = element.closest(".modal");
+            if(target) {
+                target.classList.remove("active");
+            }
+        })
+    });
+
+
+
+    // Old code below
+
     var prefs;
 
     function show_message( msg ) {
@@ -303,5 +342,4 @@ window.Omnibug = ( function() {
         }
     };
 
-}() );
-
+})();

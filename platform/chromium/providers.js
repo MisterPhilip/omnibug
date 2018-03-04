@@ -34,7 +34,8 @@ class BaseProvider
         let types = {
             "analytics":    "Analytics",
             "testing":      "UX Testing",
-            "tagmanager":   "Tag Manager"
+            "tagmanager":   "Tag Manager",
+            "visitorid":    "Visitor Identification"
         };
         return types[this._type] || "Unknown";
     }
@@ -57,6 +58,16 @@ class BaseProvider
     get name()
     {
         return this._name;
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {};
     }
 
     /**
@@ -93,17 +104,13 @@ class BaseProvider
     {
         let url = new URL(rawUrl),
             data = [],
-            params = new URLSearchParams(url.search);
+            params = new URLSearchParams(url.search),
+            postParams = this.parsePostData(postData);
 
         // Handle POST data first, if applicable (treat as query params)
-        if(typeof postData === "string" && postData !== "")
-        {
-            let keyPairs = postData.split("&");
-            keyPairs.forEach((keyPair) => {
-                let splitPair = keyPair.split("=");
-                params.append(splitPair[0], splitPair[1] || "");
-            });
-        }
+        postParams.forEach((pair) => {
+            params.append(pair[0], pair[1]);
+        });
 
         for(let param of params)
         {
@@ -127,12 +134,34 @@ class BaseProvider
 
         return {
             "provider": {
-                "name": this.name,
-                "key":  this.key,
-                "type": this.type
+                "name":    this.name,
+                "key":     this.key,
+                "type":    this.type,
+                "columns": this.columnMapping
             },
             "data": data
         };
+    }
+
+    /**
+     * Parse any POST data into param key/value pairs
+     *
+     * @param postData
+     * @return {Array}
+     */
+    parsePostData(postData = "")
+    {
+        let params = [];
+        // Handle POST data first, if applicable (treat as query params)
+        if(typeof postData === "string" && postData !== "")
+        {
+            let keyPairs = postData.split("&");
+            keyPairs.forEach((keyPair) => {
+                let splitPair = keyPair.split("=");
+                params.push([splitPair[0], decodeURIComponent(splitPair[1] || "")]);
+            });
+        }
+        return params;
     }
 
     /**
@@ -156,9 +185,11 @@ class BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @returns {void}
+     * @param    {string}   url
+     *
+     * @returns {void|Array}
      */
-    handleCustom( )
+    handleCustom(url)
     {
 
     }
@@ -288,6 +319,19 @@ class AdobeAnalyticsProvider extends BaseProvider
         this._pattern    = /\/b\/ss\/|\.2o7\.net\/|\.sc\d?\.omtrdc\.net\//;
         this._name       = "Adobe Analytics";
         this._type       = "analytics";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "rsid",
+            "requestType":  "requestType"
+        }
     }
 
     /**
@@ -489,6 +533,9 @@ class AdobeAnalyticsProvider extends BaseProvider
             "rsid": {
                 "name": "Report Suites",
                 "group": "General"
+            },
+            "requestType": {
+                "hidden": true
             }
         };
     }
@@ -506,17 +553,13 @@ class AdobeAnalyticsProvider extends BaseProvider
         let url = new URL(rawUrl),
             data = [],
             stacked = [],
-            params = new URLSearchParams(url.search);
+            params = new URLSearchParams(url.search),
+            postParams = this.parsePostData(postData);
 
         // Handle POST data first, if applicable (treat as query params)
-        if(typeof postData === "string" && postData !== "")
-        {
-            let keyPairs = postData.split("&");
-            keyPairs.forEach((keyPair) => {
-                let splitPair = keyPair.split("=");
-                params.append(splitPair[0], splitPair[1] || "");
-            });
-        }
+        postParams.forEach((pair) => {
+            params.append(pair[0], pair[1]);
+        });
 
         for(let param of params)
         {
@@ -554,7 +597,8 @@ class AdobeAnalyticsProvider extends BaseProvider
             "provider": {
                 "name": this.name,
                 "key":  this.key,
-                "type": this.type
+                "type": this.type,
+                "columns": this.columnMapping
             },
             "data": data
         };
@@ -632,7 +676,9 @@ class AdobeAnalyticsProvider extends BaseProvider
     handleCustom(url)
     {
         let results = [],
-            rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//);
+            rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//),
+            pev2 = url.searchParams.get("pe"),
+            requestType = "Page Load";
         if(rsid) {
             results.push({
                 "key":   "rsid",
@@ -641,7 +687,75 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "group": this.keys.rsid ? this.keys.rsid.group : "General",
             });
         }
+
+        // Handle s.tl calls
+        if(pev2 === "e") {
+            requestType = "Click Event: Exit";
+        } else if(pev2 === "d") {
+            requestType = "Click Event: Download";
+        } else if(pev2 === "o") {
+            requestType = "Click Event: Other";
+        }
+        results.push({
+            "key":   "requestType",
+            "value": requestType,
+            "hidden": true
+        });
         return results;
+    }
+}
+OmnibugProvider.addProvider(new AdobeAnalyticsProvider());
+/**
+ * Adobe Audience Manager
+ * http://www.adobe.com/data-analytics-cloud/audience-manager.html
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class AdobeAudienceManagerProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "ADOBEAUDIENCEMANAGER";
+        this._pattern    = /demdex\.net\//;
+        this._name       = "Adobe Audience Manager";
+        this._type       = "visitorid";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account": "d_orgid"
+        }
+    }
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+            "d_orgid": {
+                "name": "Adobe Organization ID",
+                "group": "General"
+            },
+            "d_rtbd": {
+                "name": "Return Method",
+                "group": "General"
+            },
+            "d_cb": {
+                "name": "Callback property",
+                "group": "General"
+            }
+        };
     }
 }
 OmnibugProvider.addProvider(new AdobeAnalyticsProvider());
@@ -664,6 +778,19 @@ class AdobeTargetProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "mbox",
+            "requestType":  "mboxType"
+        }
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -676,61 +803,80 @@ class AdobeTargetProvider extends BaseProvider
                 "group": "General"
             },
             "mboxType": {
-                "name": "Mbox Type"
+                "name": "Mbox Type",
+                "group": "General"
             },
             "mboxCount": {
-                "name": "Mbox Count"
+                "name": "Mbox Count",
+                "group": "General"
             },
             "mboxId": {
-                "name": "Mbox ID"
+                "name": "Mbox ID",
+                "group": "General"
             },
             "mboxSession": {
-                "name": "Mbox Session"
+                "name": "Mbox Session",
+                "group": "General"
             },
             "mboxPC": {
-                "name": "Mbox PC ID"
+                "name": "Mbox PC ID",
+                "group": "General"
             },
             "mboxPage": {
-                "name": "Mbox Page ID"
+                "name": "Mbox Page ID",
+                "group": "General"
             },
             "clientCode": {
-                "name": "Client Code"
+                "name": "Client Code",
+                "group": "General"
             },
             "mboxHost": {
-                "name": "Page Host"
+                "name": "Page Host",
+                "group": "General"
             },
             "mboxURL": {
-                "name": "Page URL"
+                "name": "Page URL",
+                "group": "General"
             },
             "mboxReferrer": {
-                "name": "Page Referrer"
+                "name": "Page Referrer",
+                "group": "General"
             },
             "screenHeight": {
-                "name": "Screen Height"
+                "name": "Screen Height",
+                "group": "General"
             },
             "screenWidth": {
-                "name": "Screen Width"
+                "name": "Screen Width",
+                "group": "General"
             },
             "browserWidth": {
-                "name": "Browser Width"
+                "name": "Browser Width",
+                "group": "General"
             },
             "browserHeight": {
-                "name": "Browser Height"
+                "name": "Browser Height",
+                "group": "General"
             },
             "browserTimeOffset": {
-                "name": "Browser Timezone Offset"
+                "name": "Browser Timezone Offset",
+                "group": "General"
             },
             "colorDepth": {
-                "name": "Browser Color Depth"
+                "name": "Browser Color Depth",
+                "group": "General"
             },
             "mboxXDomain": {
-                "name": "CrossDomain Enabled"
+                "name": "CrossDomain Enabled",
+                "group": "General"
             },
             "mboxTime": {
-                "name": "Timestamp"
+                "name": "Timestamp",
+                "group": "General"
             },
             "mboxVersion": {
-                "name": "Library Version"
+                "name": "Library Version",
+                "group": "General"
             }
         };
     }
@@ -738,13 +884,14 @@ class AdobeTargetProvider extends BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @param {string} url
+     * @param {URL} url
      *
-     * @returns {Array}
+     * @returns {void|Array}
      */
     handleCustom(url)
     {
         let matches =  url.pathname.match( /\/([^\/]+)\/mbox\/([^\/?]+)/ ),
+            mboxName = "",
             results = [];
         if(matches !== null && matches.length === 3) {
             results.push({
@@ -760,7 +907,583 @@ class AdobeTargetProvider extends BaseProvider
                 "group": "General"
             });
         }
+
         return results;
     }
 }
 OmnibugProvider.addProvider(new AdobeTargetProvider());
+/**
+ * Optimizely
+ * https://www.optimizely.com/
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class OptimizelyXProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "OPTIMIZELYX";
+        this._pattern    = /\.optimizely\.com\/log\/event/;
+        this._name       = "Optimizely X";
+        this._type       = "testing";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "mbox"
+        }
+    }
+
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+
+        };
+    }
+
+    /**
+     * Parse any POST data into param key/value pairs
+     *
+     * @param postData
+     * @return {Array}
+     */
+    parsePostData(postData = "")
+    {
+        let params = [],
+            parsed = {};
+        if(typeof postData === "string" && postData !== "")
+        {
+            try
+            {
+                parsed = JSON.parse(postData);
+
+                /* Based on https://stackoverflow.com/a/19101235 */
+                function recurse (cur, prop)
+                {
+                    if (Object(cur) !== cur)
+                    {
+                        params.push([prop, cur]);
+                    }
+                    else if (Array.isArray(cur))
+                    {
+                        for(var i=0, l=cur.length; i<l; i++)
+                        {
+                            recurse(cur[i], prop + "[" + i + "]");
+                        }
+                        if (l === 0)
+                        {
+                            params.push([prop, ""]);
+                        }
+                    }
+                    else
+                    {
+                        let isEmpty = true;
+                        for (let p in cur)
+                        {
+                            if(!cur.hasOwnProperty(p)) { continue; }
+                            isEmpty = false;
+                            recurse(cur[p], prop ? prop+"."+p : p);
+                        }
+                        if (isEmpty && prop)
+                        {
+                            params.push([prop, ""]);
+                        }
+                    }
+                }
+                recurse(parsed, "");
+            }
+            catch(e)
+            {
+                console.error("postData is not JSON", e.message);
+            }
+        }
+        return params;
+    }
+}
+OmnibugProvider.addProvider(new OptimizelyXProvider());
+/**
+ * Universal Analytics
+ * https://developers.google.com/analytics/devguides/collection/analyticsjs/
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class UniversalAnalyticsProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "UNIVERSALANALYTICS";
+        this._pattern    = /\.(google-analytics\.com|doubleclick\.net)\/(r\/)?collect[\/?]/;
+        this._name       = "Universal Analytics";
+        this._type       = "analytics";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":     "tid",
+            "requestType": "requestType"
+        }
+    }
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+            "v": {
+                "name": "Protocol Version",
+                "group": "General"
+            },
+            "tid": {
+                "name": "Tracking ID",
+                "group": "General"
+            },
+            "aip": {
+                "name": "Anonymize IP",
+                "group": "General"
+            },
+            "qt": {
+                "name": "Queue Time",
+                "group": "General"
+            },
+            "z": {
+                "name": "Cache Buster",
+                "group": "General"
+            },
+            "cid": {
+                "name": "Client ID",
+                "group": "General"
+            },
+            "sc": {
+                "name": "Session Control",
+                "group": "General"
+            },
+            "dr": {
+                "name": "Document Referrer",
+                "group": "General"
+            },
+            "cn": {
+                "name": "Campaign Name",
+                "group": "Campaign"
+            },
+            "cs": {
+                "name": "Campaign Source",
+                "group": "Campaign"
+            },
+            "cm": {
+                "name": "Campaign Medium",
+                "group": "Campaign"
+            },
+            "ck": {
+                "name": "Campaign Keyword",
+                "group": "Campaign"
+            },
+            "cc": {
+                "name": "Campaign Content",
+                "group": "Campaign"
+            },
+            "ci": {
+                "name": "Campaign ID",
+                "group": "Campaign"
+            },
+            "gclid": {
+                "name": "Google AdWords ID",
+                "group": "Campaign"
+            },
+            "dclid": {
+                "name": "Google Display Ads ID",
+                "group": "Campaign"
+            },
+            "sr": {
+                "name": "Screen Resolution",
+                "group": "General"
+            },
+            "vp": {
+                "name": "Viewport Size",
+                "group": "General"
+            },
+            "de": {
+                "name": "Document Encoding",
+                "group": "General"
+            },
+            "sd": {
+                "name": "Screen Colors",
+                "group": "General"
+            },
+            "ul": {
+                "name": "User Language",
+                "group": "General"
+            },
+            "je": {
+                "name": "Java Enabled",
+                "group": "General"
+            },
+            "fl": {
+                "name": "Flash Version",
+                "group": "General"
+            },
+            "t": {
+                "name": "Hit Type",
+                "group": "General"
+            },
+            "ni": {
+                "name": "Non-Interaction Hit",
+                "group": "Events"
+            },
+            "dl": {
+                "name": "Document location URL",
+                "group": "General"
+            },
+            "dh": {
+                "name": "Document Host Name",
+                "group": "General"
+            },
+            "dp": {
+                "name": "Document Path",
+                "group": "General"
+            },
+            "dt": {
+                "name": "Document Title",
+                "group": "General"
+            },
+            "cd": {
+                "name": "Content Description",
+                "group": "General"
+            },
+            "an": {
+                "name": "Application Name",
+                "group": "General"
+            },
+            "av": {
+                "name": "Application Version",
+                "group": "General"
+            },
+            "ec": {
+                "name": "Event Category",
+                "group": "Events"
+            },
+            "ea": {
+                "name": "Event Action",
+                "group": "Events"
+            },
+            "el": {
+                "name": "Event Label",
+                "group": "Events"
+            },
+            "ev": {
+                "name": "Event Value",
+                "group": "Events"
+            },
+            "ti": {
+                "name": "Transaction ID",
+                "group": "Ecommerce"
+            },
+            "ta": {
+                "name": "Transaction Affiliation",
+                "group": "Ecommerce"
+            },
+            "tr": {
+                "name": "Transaction Revenue",
+                "group": "Ecommerce"
+            },
+            "ts": {
+                "name": "Transaction Shipping",
+                "group": "Ecommerce"
+            },
+            "tt": {
+                "name": "Transaction Tax",
+                "group": "Ecommerce"
+            },
+            "in": {
+                "name": "Item Name",
+                "group": "Ecommerce"
+            },
+            "ip": {
+                "name": "Item Price",
+                "group": "Ecommerce"
+            },
+            "iq": {
+                "name": "Item Quantity",
+                "group": "Ecommerce"
+            },
+            "ic": {
+                "name": "Item Code",
+                "group": "Ecommerce"
+            },
+            "iv": {
+                "name": "Item Category",
+                "group": "Ecommerce"
+            },
+            "cu": {
+                "name": "Currency Code",
+                "group": "Ecommerce"
+            },
+            "sn": {
+                "name": "Social Network",
+                "group": "Events"
+            },
+            "sa": {
+                "name": "Social Action",
+                "group": "Events"
+            },
+            "st": {
+                "name": "Social Action Target",
+                "group": "Events"
+            },
+            "utc": {
+                "name": "User Timing Category",
+                "group": "Timing"
+            },
+            "utv": {
+                "name": "User Timing Variable Name",
+                "group": "Timing"
+            },
+            "utt": {
+                "name": "User Timing Time",
+                "group": "Timing"
+            },
+            "utl": {
+                "name": "User timing Label",
+                "group": "Timing"
+            },
+            "plt": {
+                "name": "Page load time",
+                "group": "Timing"
+            },
+            "dns": {
+                "name": "DNS time",
+                "group": "Timing"
+            },
+            "pdt": {
+                "name": "Page download time",
+                "group": "Timing"
+            },
+            "rrt": {
+                "name": "Redirect response time",
+                "group": "Timing"
+            },
+            "tcp": {
+                "name": "TCP connect time",
+                "group": "Timing"
+            },
+            "srt": {
+                "name": "Server response time",
+                "group": "Timing"
+            },
+            "exd": {
+                "name": "Exception description",
+                "group": "Events"
+            },
+            "exf": {
+                "name": "Is exception fatal?",
+                "group": "Events"
+            },
+            "ds": {
+                "name": "Data Source",
+                "group": "General"
+            },
+            "uid": {
+                "name": "User ID",
+                "group": "General"
+            },
+            "linkid": {
+                "name": "Link ID",
+                "group": "General"
+            },
+            "pa": {
+                "name": "Product Action",
+                "group": "Ecommerce"
+            },
+            "tcc": {
+                "name": "Coupon Code",
+                "group": "Ecommerce"
+            },
+            "pal": {
+                "name": "Product Action List",
+                "group": "Ecommerce"
+            },
+            "cos": {
+                "name": "Checkout Step",
+                "group": "Ecommerce"
+            },
+            "col": {
+                "name": "Checkout Step Option",
+                "group": "Ecommerce"
+            },
+            "promoa": {
+                "name": "Promotion Action",
+                "group": "Ecommerce"
+            },
+            "xid": {
+                "name": "Content Experiment ID",
+                "group": "Google Optimize"
+            },
+            "xvar": {
+                "name": "Content Experiment Variant",
+                "group": "Google Optimize"
+            },
+            "requestType": {
+                "hidden": true
+            }
+        };
+    }
+
+    /**
+     * Parse a given URL parameter into human-readable form
+     *
+     * @param {string}  name
+     * @param {string}  value
+     *
+     * @returns {void|{}}
+     */
+    handleQueryParam(name, value)
+    {
+        let result = {};
+        if(/^cd(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Custom Dimension " + RegExp.$1,
+                "value": value,
+                "group": "Custom Dimensions"
+            };
+        } else if(/^cm(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Custom Metric " + RegExp.$1,
+                "value": value,
+                "group": "Custom Metrics"
+            };
+        } else if(/^cg(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Content Group " + RegExp.$1,
+                "value": value,
+                "group": "Content Groups"
+            };
+        } else if(/^promo(\d+)([a-z]{2})$/i.test(name)) {
+            let lookup = {
+                    "id": "ID",
+                    "nm": "Name",
+                    "cr": "Creative",
+                    "ps": "Position"
+                },
+                type = lookup[RegExp.$2] || "";
+            result = {
+                "key":   name,
+                "field": "Promotion " + RegExp.$1 + " " + type,
+                "value": value,
+                "group": "Promotions"
+            };
+        } else if(/^pr(\d+)([a-z]{2})$/i.test(name)) {
+            let lookup = {
+                    "id": "ID",
+                    "nm": "Name",
+                    "br": "Brand",
+                    "ca": "Category",
+                    "va": "Variant",
+                    "pr": "Price",
+                    "qt": "Quantity",
+                    "cc": "Coupon Code",
+                    "ps": "Position"
+                },
+                type = lookup[RegExp.$2] || "";
+            result = {
+                "key":   name,
+                "field": "Product " + RegExp.$1 + " " + type,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else if(/^pr(\d+)(cd|cm)(\d+)$/i.test(name)) {
+            let lookup = {
+                    "cd": "Custom Dimension",
+                    "cm": "Custom Metric"
+                },
+                type = lookup[RegExp.$2] || "";
+            result = {
+                "key":   name,
+                "field": "Product " + RegExp.$1 + " " + type,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else if(/^il(\d+)nm$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Impression List " + RegExp.$1,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else if(/^il(\d+)pi(\d+)(cd|cm)(\d+)$/i.test(name)) {
+            let lookup = {
+                    "cd": "Custom Dimension",
+                    "cm": "Custom Metric"
+                },
+                type = lookup[RegExp.$3] || "";
+            result = {
+                "key":   name,
+                "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type + " " + RegExp.$4,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else if(/^il(\d+)pi(\d+)([a-z]{2})$/i.test(name))
+        {
+            let lookup = {
+                    "id": "ID",
+                    "nm": "Name",
+                    "br": "Brand",
+                    "ca": "Category",
+                    "va": "Variant",
+                    "pr": "Price",
+                    "ps": "Position"
+                },
+                type = lookup[RegExp.$3] || "";
+            result = {
+                "key": name,
+                "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else if(name === "t") {
+            let type = "";
+            if(value === "pageview" || value === "screenview") {
+                type = "Page View";
+            } else if(value === "transaction" || value === "item") {
+                type = "Ecommerce " + value.charAt(0).toUpperCase() + value.slice(1);
+            } else {
+                type = value.charAt(0).toUpperCase() + value.slice(1);
+            }
+            result = {
+                "key":    "requestType",
+                "value":  type,
+                "hidden": true
+            };
+        } else {
+            result = super.handleQueryParam(name, value);
+        }
+        return result;
+    }
+}
+OmnibugProvider.addProvider(new UniversalAnalyticsProvider());
