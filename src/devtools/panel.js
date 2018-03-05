@@ -15,7 +15,8 @@ window.Omnibug = (() => {
     let d = document,
         settings = {},
         requestPanel = d.getElementById("requests"),
-        noRequests = d.getElementById("no-requests");
+        noRequests = d.getElementById("no-requests"),
+        styleSheet = d.getElementById("dynamicStyles");
 
     // Clear all requests
     d.querySelectorAll("a[href=\"#clear\"]").forEach((element) => {
@@ -121,6 +122,7 @@ window.Omnibug = (() => {
 
             // Verify the column / data exists, if so add it as a label
             if(requestTypeValue) {
+                requestTypeEl.setAttribute("data-request-type", requestTypeValue.value);
                 requestTypeEl.innerText = requestTypeValue.value;
                 colTitle.appendChild(requestTypeEl);
             }
@@ -221,6 +223,25 @@ window.Omnibug = (() => {
         return wrapper;
     }
 
+    function loadSettings(newSettings) {
+        settings = newSettings;
+
+        // Clear out any existing rules
+        for(let i=0; i<styleSheet.sheet.cssRules.length; i++) {
+            styleSheet.sheet.removeRule(i);
+        }
+
+        // Highlight colors
+        let highlightPrefix = "[data-parameter-key=\"",
+            highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]";
+        styleSheet.sheet.insertRule(`${highlightKeys} { background-color: ${settings.color_highlight} };`);
+
+        styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click} };`);
+        styleSheet.sheet.insertRule(`[data-request-type="Page Load"] { background-color: ${settings.color_load} };`);
+        styleSheet.sheet.insertRule(`[data-request-type="redirect"] { background-color: ${settings.color_redirect} };`);
+        styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev} };`);
+    }
+
     return {
         receive_message(message) {
             switch(message.event) {
@@ -231,7 +252,7 @@ window.Omnibug = (() => {
                     // do something
                 break;
                 case "settings":
-                    // do something
+                    loadSettings(message.data);
                 break;
                 default:
                     this.send_message("Unknown message type", message);
