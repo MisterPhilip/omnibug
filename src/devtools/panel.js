@@ -169,7 +169,7 @@ window.Omnibug = (() => {
         }, {"Summary": requestSummary});
 
         Object.entries(data).forEach((dataGroup) => {
-            let panel = buildRequestPanel(dataGroup[0], dataGroup[1], settings.showFullNames);
+            let panel = buildRequestPanel(dataGroup[0], dataGroup[1], !settings.showFullNames);
             body.appendChild(panel);
         });
         details.appendChild(body);
@@ -233,13 +233,14 @@ window.Omnibug = (() => {
 
         // Highlight colors
         let highlightPrefix = "[data-parameter-key=\"",
-            highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]";
-        styleSheet.sheet.insertRule(`${highlightKeys} { background-color: ${settings.color_highlight} };`);
+            highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]",
+            rule = `${highlightKeys} { background-color: ${settings.color_highlight}; }`;
+        styleSheet.sheet.insertRule(rule);
 
-        styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click} };`);
-        styleSheet.sheet.insertRule(`[data-request-type="Page Load"] { background-color: ${settings.color_load} };`);
-        styleSheet.sheet.insertRule(`[data-request-type="redirect"] { background-color: ${settings.color_redirect} };`);
-        styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev} };`);
+        styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click}; }`);
+        styleSheet.sheet.insertRule(`[data-request-type="Page Load"] { background-color: ${settings.color_load}; }`);
+        styleSheet.sheet.insertRule(`[data-request-type="redirect"] { background-color: ${settings.color_redirect}; }`);
+        styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev}; }`);
     }
 
     return {

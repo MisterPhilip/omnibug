@@ -175,6 +175,8 @@
 
     document.getElementById("reset-defaults").addEventListener("click", (event) => {
         event.preventDefault();
-        loadSettingsIntoProxy(settingsProvider.defaults);
+        let defaults = settingsProvider.defaults;
+        loadSettingsIntoProxy(defaults);
+        settingsProvider.save(defaults);
     });
 }());

@@ -40,16 +40,10 @@
      * Load settings when storage has changed
      */
     browser.storage.onChanged.addListener((changes, storageType) => {
-        if(OmnibugSettings.storage_key in changes)
-        {
-            setCachedSettings(changes[OmnibugSettings.storage_key]);
-            tabs.forEach((tab) => {
-                tab.port.postMessage({
-                    "event": "settings",
-                    "data":  cached.settings
-                });
-            })
+        if(settings.storage_key in changes) {
+            setCachedSettings(changes[settings.storage_key].newValue);
         }
+        sendSettingsToTabs(tabs);
     });
 
     /**
@@ -65,6 +59,9 @@
         {
             return;
         }
+        let tabList = {};
+        tabList[port.id] = port;
+        sendSettingsToTabs(tabList);
         tabs = port.init(tabs);
     });
 
@@ -137,6 +134,20 @@
      */
     function isValidTab(tabId) {
         return (tabId !== -1 && tabId in tabs);
+    }
+
+    /**
+     * Send new settings values to all tabs
+     *
+     * @param tabs
+     */
+    function sendSettingsToTabs(tabs) {
+        Object.values(tabs).forEach((tab) => {
+            tab.port.postMessage({
+                "event": "settings",
+                "data":  cached.settings
+            });
+        });
     }
 
     /**
