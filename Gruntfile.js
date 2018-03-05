@@ -2,13 +2,16 @@
 module.exports = function(grunt) {
 
     grunt.config.init({
-        "chrome": {
+        "extension": {
+            "name": "Omnibug",
             "version": "0.6.0",
+            "storageKey": "omnibug"
+        },
+        "chrome": {
             "usePolyfill": true,
             "folder": "chromium"
         },
         "firefox": {
-            "version": "0.6.0",
             "gecko": "Omnibug@rosssimpson.com",
             "usePolyfill": false,
             "folder": "firefox"
@@ -111,7 +114,8 @@ module.exports = function(grunt) {
             "providers": [
                 "src/providers/*.js"
             ]
-        }
+        },
+        "pkg": grunt.file.readJSON("package.json")
     });
 
     grunt.loadNpmTasks("grunt-contrib-copy");
@@ -120,6 +124,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks('grunt-text-replace');
 
     grunt.registerTask("build-extensions", "Build the Chrome extension", (browsers = "") => {
             let allowedBrowsers = ["chrome", "firefox"];
@@ -136,6 +141,7 @@ module.exports = function(grunt) {
                     "build-copy:" + b,
                     b + "-manifest",
                     "build-concat:" + b,
+                    "build-placeholders:" + b,
                     "build-compress:" + b
                 );
             } else {
@@ -145,44 +151,48 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask("chrome-manifest", "Build the Chrome manifest.json file", function() {
-        grunt.config.requires("chrome.version");
+        grunt.config.requires("extension.version");
 
-        let options = grunt.config("chrome"),
+        let browserOptions = grunt.config("chrome"),
+            extensionOptions = grunt.config("extension"),
             manifest = grunt.file.readJSON("src/manifest.json");
 
-        if(options.usePolyfill) {
+        if(browserOptions.usePolyfill) {
             manifest.background.scripts.unshift("libs/browser-polyfill.js");
         }
 
-        manifest.version = options.version;
+        manifest.name = extensionOptions.name;
+        manifest.version = extensionOptions.version;
 
         // Remove anything that will break Chrome
         delete manifest.applications;
         delete manifest.options_ui.browser_style;
 
-        grunt.file.write("platform/" + options.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
+        grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Chrome's manifest.json. ").ok();
     });
 
     grunt.registerTask("firefox-manifest", "Build the Firefox manifest.json file", function() {
-        grunt.config.requires("firefox.version", "firefox.gecko");
+        grunt.config.requires("extension.version", "firefox.gecko");
 
-        let options = grunt.config("firefox"),
+        let browserOptions = grunt.config("firefox"),
+            extensionOptions = grunt.config("extension"),
             manifest = grunt.file.readJSON("src/manifest.json");
 
-        if(options.usePolyfill) {
+        if(browserOptions.usePolyfill) {
             manifest.background.scripts.unshift("libs/browser-polyfill.js");
         }
 
-        manifest.version = options.version;
-        manifest.applications.gecko.id = options.gecko;
+        manifest.name = extensionOptions.name;
+        manifest.version = extensionOptions.version;
+        manifest.applications.gecko.id = browserOptions.gecko;
 
         // Remove anything that will break Firefox"s import routine
         delete manifest.options_ui.chrome_style;
         delete manifest.options_page;
         delete manifest.background.persistent;
 
-        grunt.file.write("platform/" + options.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
+        grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Firefox's manifest.json. ").ok();
     });
 
@@ -223,6 +233,38 @@ module.exports = function(grunt) {
             files: destFiles
         });
         grunt.task.run("concat:" + browser);
+    });
+
+    grunt.registerTask("build-placeholders", "Update placeholders in built files", function(browser) {
+        grunt.config.requires(browser, "extension");
+        let browserOptions = grunt.config(browser),
+            extensionOptions = grunt.config("extension"),
+            config = {
+                "src": [
+                    "platform/" + browserOptions.folder + "/**/*.js",
+                    "platform/" + browserOptions.folder + "/*.js",
+                    "platform/" + browserOptions.folder + "/**/*.html",
+                    "platform/" + browserOptions.folder + "/*.html"
+                ],
+                "overwrite": true,
+                "usePrefix": false,
+                "replacements": [
+                    {
+                        "from": "##OMNIBUG_VERSION##",
+                        "to": "<%= pkg.version %>"
+                    },
+                    {
+                        "from": "##OMNIBUG_NAME##",
+                        "to": extensionOptions.name
+                    },
+                    {
+                        "from": "##OMNIBUG_KEY##",
+                        "to": extensionOptions.storageKey
+                    }
+                ]
+            };
+        grunt.config.set("replace." + browser, config);
+        grunt.task.run("replace:" + browser);
     });
 
     grunt.registerTask("build-compress", "Compress build files into extension .zip", function(browser) {

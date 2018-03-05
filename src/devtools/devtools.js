@@ -9,7 +9,7 @@
      * Create the panel
      */
     browser.devtools.panels.create(
-        "Omnibug",
+        "##OMNIBUG_NAME##",
         "./assets/images/o-32.png",
         "./devtools/panel.html"
     ).then((panel) => {
@@ -46,8 +46,8 @@
             }
 
             // Inject a reply mechanism into the caller
-            panelWindow.Omnibug.send_message = (msg) => {
-                port.postMessage( msg );
+            panelWindow.Omnibug.send_message = (...data) => {
+                port.postMessage(data);
             };
         };
         panel.onShown.addListener(listener);

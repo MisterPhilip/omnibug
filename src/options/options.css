@@ -1,31 +1,3 @@
-
-/* Only used for testing the page locally, not to be used for in-extension */
-@-moz-document url-prefix() {
-    body {
-        padding: 4em 0;
-    }
-}
-@media only screen and (min-width: 1000px) {
-    body {
-        padding: 1em 0;
-    }
-}
-@media only screen and (min-width: 1075px) {
-    body {
-        padding: 2em 0;
-    }
-}
-@media only screen and (min-width: 1150px) {
-    body {
-        padding: 3em 0;
-    }
-}
-@media only screen and (min-width: 1225px) {
-    body {
-        padding: 4em 0;
-    }
-}
-/* Start CSS */
 body {
     font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
     font-size: 15px;
@@ -206,4 +178,8 @@ button {
 }
 script[type="text/html"] {
     display: none;
+}
+footer p {
+    text-align: center;
+    color: #ccc;
 }

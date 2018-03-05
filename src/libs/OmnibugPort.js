@@ -37,7 +37,7 @@ class OmnibugPort
      */
     get belongsToOmnibug()
     {
-        return /^omnibug-\d+$/.test(this.name);
+        return /^##OMNIBUG_KEY##-\d+$/.test(this.name);
     }
 
     /**

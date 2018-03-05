@@ -16,7 +16,7 @@ class OmnibugSettings
 
     get storage_key()
     {
-        return "omnibug";
+        return "##OMNIBUG_KEY##";
     }
 
     /**
