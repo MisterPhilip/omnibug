@@ -142,6 +142,7 @@
      * @param tabs
      */
     function sendSettingsToTabs(tabs) {
+        console.log("Sending settings to tabs", cached.settings);
         Object.values(tabs).forEach((tab) => {
             tab.port.postMessage({
                 "event": "settings",

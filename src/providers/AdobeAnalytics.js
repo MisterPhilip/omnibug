@@ -373,7 +373,7 @@ class AdobeAnalyticsProvider extends BaseProvider
         let results = [],
             rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//),
             pev2 = url.searchParams.get("pe"),
-            requestType = "Page Load";
+            requestType = "Page View";
         if(rsid) {
             results.push({
                 "key":   "rsid",
@@ -385,11 +385,11 @@ class AdobeAnalyticsProvider extends BaseProvider
 
         // Handle s.tl calls
         if(pev2 === "e") {
-            requestType = "Click Event: Exit";
+            requestType = "Exit";
         } else if(pev2 === "d") {
-            requestType = "Click Event: Download";
+            requestType = "Download";
         } else if(pev2 === "o") {
-            requestType = "Click Event: Other";
+            requestType = "Other";
         }
         results.push({
             "key":   "requestType",

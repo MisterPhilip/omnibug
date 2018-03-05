@@ -108,12 +108,12 @@ window.Omnibug = (() => {
         // Add the summary (title)
         let summaryContainer = createElement("div", ["container"]),
             summaryColumns = createElement("div", ["columns"]),
-            colTitle = createElement("div", ["column", "col-3"]),
+            colTitleWrapper = createElement("div", ["column", "col-3"]),
+            colTitleSpan = createElement("span"),
             colAccount = createElement("div", ["column", "col-3"]),
-            colTime = createElement("div", ["column", "col-4"]);
+            colTime = createElement("div", ["column", "col-6"]);
 
         // Add the provider name & request type (if applicable)
-        colTitle.innerText = request.provider.name;
         if(request.provider.columns.requestType) {
             let requestTypeEl = createElement("span", ["label"]),
                 requestTypeValue = request.data.find((el) => {
@@ -124,10 +124,12 @@ window.Omnibug = (() => {
             if(requestTypeValue) {
                 requestTypeEl.setAttribute("data-request-type", requestTypeValue.value);
                 requestTypeEl.innerText = requestTypeValue.value;
-                colTitle.appendChild(requestTypeEl);
+                colTitleWrapper.appendChild(requestTypeEl);
             }
         }
-        summaryColumns.appendChild(colTitle);
+        colTitleSpan.innerText = request.provider.name;
+        colTitleWrapper.appendChild(colTitleSpan);
+        summaryColumns.appendChild(colTitleWrapper);
 
         // Add the account ID, if it exists
         if(request.provider.columns.account) {
@@ -238,7 +240,7 @@ window.Omnibug = (() => {
         styleSheet.sheet.insertRule(rule);
 
         styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click}; }`);
-        styleSheet.sheet.insertRule(`[data-request-type="Page Load"] { background-color: ${settings.color_load}; }`);
+        styleSheet.sheet.insertRule(`[data-request-type="Page View"] { background-color: ${settings.color_load}; }`);
         styleSheet.sheet.insertRule(`[data-request-type="redirect"] { background-color: ${settings.color_redirect}; }`);
         styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev}; }`);
     }
