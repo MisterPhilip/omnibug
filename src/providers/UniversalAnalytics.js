@@ -455,6 +455,8 @@ class UniversalAnalyticsProvider extends BaseProvider
                 type = "Page View";
             } else if(value === "transaction" || value === "item") {
                 type = "Ecommerce " + value.charAt(0).toUpperCase() + value.slice(1);
+            } else if(value === "dc") {
+                type = "DoubleClick";
             } else {
                 type = value.charAt(0).toUpperCase() + value.slice(1);
             }
