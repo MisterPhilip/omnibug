@@ -96,9 +96,30 @@
             min-width: 80px;
             text-align: center;
         }
-
+        .navigation {
+            width: 100%;
+            padding: .3em .3em .3em 2em;
+            background-color: #FFF;
+            font-size: .9em;
+            color: #AAA;
+            border-top: 1px solid #DDD;
+        }
+        .navigation:hover {
+            color: #555;
+        }
+        #requests > .navigation:first-of-type {
+            border-top: 0;
+        }
     </style>
-    <style type="text/css" id="dynamicStyles"></style>
+    <style type="text/css" id="dynamicStyles">
+        [data-request-type] { background-color: #f1ffdb; }
+        [data-request-type="Page View"] { background-color: #dbedff; }
+        [data-request-type="redirect"] { background-color: #eeeeee; }
+        [data-request-type="previous"] { background-color: #ffd5de; }
+        .request:hover {
+            background-color: #cccccc;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -127,7 +148,7 @@
             </div>
         </div>
         <section id="requests">
-
+            
         </section>
     </main>
     <div class="modal" id="filter-modal">

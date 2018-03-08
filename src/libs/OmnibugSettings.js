@@ -28,34 +28,37 @@ class OmnibugSettings
     {
         return  {
             // pattern to match in request url
-            defaultPattern : OmnibugProvider.getPattern().source
+            defaultPattern : OmnibugProvider.getPattern().source,
 
             // all providers (initially)
-            , enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort()
+            enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort(),
 
             // keys to highlight
-            , highlightKeys  : ["pageName", "ch", "events", "products"]
+            highlightKeys  : ["pageName", "ch", "events", "products"],
 
             // show entries expanded?
-            , alwaysExpand : false
+            alwaysExpand : false,
 
             // surround values with quotes?
-            , showQuotes : true
+            showQuotes : true,
 
             // show redirected entries?
-            , showRedirects : true
+            showRedirects : true,
 
             // show full variable names?
-            , showFullNames : true
+            showFullNames : true,
+
+            // show navigation requests
+            showNavigation: true,
 
             // colors
-            , color_load        : "#dbedff"
-            , color_click       : "#f1ffdb"
-            , color_prev        : "#ffd5de"
-            , color_quotes      : "#ff0000"
-            , color_highlight   : "#ffff00"
-            , color_redirect    : "#eeeeee"
-            , color_hover       : "#cccccc"
+            color_load        : "#dbedff",
+            color_click       : "#f1ffdb",
+            color_prev        : "#ffd5de",
+            color_quotes      : "#ff0000",
+            color_highlight   : "#ffff00",
+            color_redirect    : "#eeeeee",
+            color_hover       : "#cccccc"
         };
     }
 

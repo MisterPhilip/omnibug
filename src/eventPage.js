@@ -109,11 +109,11 @@
     /**
      * Listen for all navigations that occur on a top-level frame
      */
-    browser.webNavigation.onBeforeNavigate.addListener(
+    browser.webNavigation.onCommitted.addListener(
         (details) => {
             if(isValidTab(details.tabId) && details.frameId === 0) {
                 // We have a page load within a tab we care about, send a message to the devtools with the info
-                console.log("webNavigation.onBeforeNavigate called", details);
+                console.log("webNavigation.onCommitted called", details);
                 tabs[details.tabId].port.postMessage({
                     "request": {
                         "tab":       details.tabId,

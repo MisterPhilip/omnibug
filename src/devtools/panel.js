@@ -136,7 +136,6 @@ window.Omnibug = (() => {
             let accountValue = request.data.find((el) => {
                 return el.key === request.provider.columns.account;
             });
-            console.log(request.provider.columns.account, accountValue);
             if(accountValue) {
                 colAccount.innerText = accountValue.value;
             }
@@ -225,6 +224,17 @@ window.Omnibug = (() => {
         return wrapper;
     }
 
+    /**
+     * Add a navigation event to the panel
+     *
+     * @param navigation
+     */
+    function addNavigation(navigation) {
+        let request = createElement("div", ["navigation", "noselect"]);
+        request.innerText = "Navigated to " + navigation.url;
+        requestPanel.appendChild(request);
+    }
+
     function loadSettings(newSettings) {
         settings = newSettings;
 
@@ -243,16 +253,21 @@ window.Omnibug = (() => {
         styleSheet.sheet.insertRule(`[data-request-type="Page View"] { background-color: ${settings.color_load}; }`);
         styleSheet.sheet.insertRule(`[data-request-type="redirect"] { background-color: ${settings.color_redirect}; }`);
         styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev}; }`);
+        styleSheet.sheet.insertRule(`.request:hover { background-color: ${settings.color_hover}; }`);
+
+        if(!settings.showNavigation) {
+            styleSheet.sheet.insertRule(`.navigation { display: none; }`);
+        }
     }
 
     return {
         receive_message(message) {
-            switch(message.event) {
+            switch(message.event || "") {
                 case "webRequest":
                     addRequest(message);
                 break;
                 case "webNavigation":
-                    // do something
+                    addNavigation(message.request);
                 break;
                 case "settings":
                     loadSettings(message.data);
