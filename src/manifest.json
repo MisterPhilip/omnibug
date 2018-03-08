@@ -19,7 +19,7 @@
         "persistent": true
     },
     "devtools_page": "devtools/devtools.html",
-    "homepage_url": "https://omnibug.io/",
+    "homepage_url": "https://omnibug.io/?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=homepage_url",
     "options_ui": {
         "page": "options/options.html"
     },

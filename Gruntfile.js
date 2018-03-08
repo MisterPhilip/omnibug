@@ -241,6 +241,7 @@ module.exports = function(grunt) {
             extensionOptions = grunt.config("extension"),
             config = {
                 "src": [
+                    "platform/" + browserOptions.folder + "/manifest.json",
                     "platform/" + browserOptions.folder + "/**/*.js",
                     "platform/" + browserOptions.folder + "/*.js",
                     "platform/" + browserOptions.folder + "/**/*.html",
@@ -260,6 +261,10 @@ module.exports = function(grunt) {
                     {
                         "from": "##OMNIBUG_KEY##",
                         "to": extensionOptions.storageKey
+                    },
+                    {
+                        "from": "##BROWSER##",
+                        "to": browser
                     }
                 ]
             };
