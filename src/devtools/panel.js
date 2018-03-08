@@ -208,9 +208,16 @@ window.Omnibug = (() => {
         }).forEach((row) => {
             let tableRow = createElement("tr", [], {"data-parameter-key": row.key}),
                 name = createElement("td"),
-                value = createElement("td");
-            name.innerText = useKey ? row.key : row.field;
+                nameKey = createElement("span", ["parameter-key"], {"title": row.field}),
+                nameField = createElement("span", ["parameter-field"], {"title": row.key}),
+                value = createElement("td", ["parameter-value"]);
+
+            nameKey.innerText = row.key;
+            nameField.innerText = row.field;
             value.innerText = row.value;
+
+            name.appendChild(nameKey,);
+            name.appendChild(nameField);
 
             tableRow.appendChild(name);
             tableRow.appendChild(value);
@@ -235,12 +242,17 @@ window.Omnibug = (() => {
         requestPanel.appendChild(request);
     }
 
+    /**
+     * Load in new settings/styles
+     *
+     * @param newSettings
+     */
     function loadSettings(newSettings) {
         settings = newSettings;
 
         // Clear out any existing rules
-        for(let i=0; i<styleSheet.sheet.cssRules.length; i++) {
-            styleSheet.sheet.removeRule(i);
+        while(styleSheet.sheet.cssRules.length) {
+            styleSheet.sheet.removeRule(0);
         }
 
         // Highlight colors
@@ -249,14 +261,28 @@ window.Omnibug = (() => {
             rule = `${highlightKeys} { background-color: ${settings.color_highlight}; }`;
         styleSheet.sheet.insertRule(rule);
 
-        styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click}; }`);
-        styleSheet.sheet.insertRule(`[data-request-type="Page View"] { background-color: ${settings.color_load}; }`);
-        styleSheet.sheet.insertRule(`[data-request-type="redirect"] { background-color: ${settings.color_redirect}; }`);
-        styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev}; }`);
-        styleSheet.sheet.insertRule(`.request:hover { background-color: ${settings.color_hover}; }`);
+        // Background colors
+        styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click}; }`, styleSheet.sheet.cssRules.length);
+        styleSheet.sheet.insertRule(`[data-request-type="Page View"] { background-color: ${settings.color_load}; }`, styleSheet.sheet.cssRules.length);
+        styleSheet.sheet.insertRule(`[data-request-type="redirect"] { background-color: ${settings.color_redirect}; }`, styleSheet.sheet.cssRules.length);
+        styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev}; }`, styleSheet.sheet.cssRules.length);
+        styleSheet.sheet.insertRule(`.request:hover { background-color: ${settings.color_hover}; }`, styleSheet.sheet.cssRules.length);
 
+        // Key vs. name
+        if(settings.showFullNames) {
+            styleSheet.sheet.insertRule(`.parameter-key { display: none; }`, styleSheet.sheet.cssRules.length);
+        } else {
+            styleSheet.sheet.insertRule(`.parameter-field { display: none; }`, styleSheet.sheet.cssRules.length);
+        }
+
+        // Navigation requests
         if(!settings.showNavigation) {
-            styleSheet.sheet.insertRule(`.navigation { display: none; }`);
+            styleSheet.sheet.insertRule(`.navigation { display: none; }`, styleSheet.sheet.cssRules.length);
+        }
+
+        // Quotes
+        if(settings.showQuotes) {
+            styleSheet.sheet.insertRule(`.parameter-value:before, .parameter-value:after { content: '"'; color: ${settings.color_quotes}; }`, styleSheet.sheet.cssRules.length);
         }
     }
 

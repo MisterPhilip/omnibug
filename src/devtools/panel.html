@@ -85,7 +85,7 @@
             margin-bottom: 1em;
         }
         .request-details tbody > tr > td:first-of-type {
-            width: 125px;
+            width: 150px;
             font-weight: 600;
             padding-left: .3em;
         }
@@ -116,9 +116,9 @@
         [data-request-type="Page View"] { background-color: #dbedff; }
         [data-request-type="redirect"] { background-color: #eeeeee; }
         [data-request-type="previous"] { background-color: #ffd5de; }
-        .request:hover {
-            background-color: #cccccc;
-        }
+        .parameter-key { display: none; }
+        .request:hover {  background-color: #cccccc; }
+        .parameter-value:before, .parameter-value:after  { content: '"'; color: #ff0000; }
     </style>
 </head>
 <body>
@@ -148,7 +148,7 @@
             </div>
         </div>
         <section id="requests">
-            
+
         </section>
     </main>
     <div class="modal" id="filter-modal">
