@@ -26,3 +26,7 @@ build/
 
 # Generated files
 src/providers.js
+
+# Ignore built CSS files
+.sass-cache/
+src/**/*.css

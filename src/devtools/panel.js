@@ -266,7 +266,7 @@ window.Omnibug = (() => {
         styleSheet.sheet.insertRule(`[data-request-type="Page View"] { background-color: ${settings.color_load}; }`, styleSheet.sheet.cssRules.length);
         styleSheet.sheet.insertRule(`[data-request-type="redirect"] { background-color: ${settings.color_redirect}; }`, styleSheet.sheet.cssRules.length);
         styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev}; }`, styleSheet.sheet.cssRules.length);
-        styleSheet.sheet.insertRule(`.request:hover { background-color: ${settings.color_hover}; }`, styleSheet.sheet.cssRules.length);
+        styleSheet.sheet.insertRule(`request:hover > summary { background-color: ${settings.color_hover}; }`, styleSheet.sheet.cssRules.length);
 
         // Key vs. name
         if(settings.showFullNames) {

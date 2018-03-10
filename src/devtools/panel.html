@@ -2,122 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" type="text/css" href="../assets/css/font.css" />
-    <link rel="stylesheet" type="text/css" href="../assets/css/spectre.min.css" />
-    <style>
-        body {
-            font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
-            font-size: 15px;
-            color: #555;
-            margin: 0 auto;
-            background-color: #FAFAFA;
-            padding-top: 37px;
-        }
-        nav.navbar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: #fff;
-            border-bottom: 1px solid #DDD;
-        }
-        .navbar-section:last-of-type a.btn {
-            border-left: 1px solid #eee;
-        }
-        .navbar a.link {
-            padding: .45rem .5rem;
-        }
-        .loading:after {
-            animation: loading 1s infinite linear;
-        }
-        .request {
-            width: 100%;
-            padding: 5px 5px 0;
-        }
-        .request:nth-of-type(odd) {
-            background-color: #fafafa;
-        }
-        .request:nth-of-type(even) {
-            background-color: #f0f0f0;
-        }
-        #no-requests {
-            animation: fadein 2s;
-            background-color: transparent;
-        }
-        @keyframes fadein {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-        details > summary {
-            -moz-user-select: none;
-            user-select: none;
-            cursor: pointer;
-        }
-        .noselect {
-            -moz-user-select: none;
-            user-select: none;
-        }
-        .request > summary {
-            padding-bottom: 5px;
-        }
-        .request > summary .container {
-            margin-top: -1.5em;
-            margin-left: .75em;
-        }
-        .request > div {
-            border-top: 1px solid #dedede;
-            font-size: .9em;
-            padding: 1em;
-        }
-
-        .request table td, .request table th {
-            padding: .2rem .1rem;
-            word-break: break-all;
-        }
-        .request-details > summary {
-            font-weight: 600;
-            font-size: 1.1em;
-            padding: .3em;
-        }
-        .request-details table {
-            border: 1px solid #dedede;
-            border-collapse: initial;
-            margin-bottom: 1em;
-        }
-        .request-details tbody > tr > td:first-of-type {
-            width: 150px;
-            font-weight: 600;
-            padding-left: .3em;
-        }
-        .request summary .label {
-            font-size: .8em;
-            margin-right: .5em;
-            padding: .35em;
-            min-width: 80px;
-            text-align: center;
-        }
-        .navigation {
-            width: 100%;
-            padding: .3em .3em .3em 2em;
-            background-color: #FFF;
-            font-size: .9em;
-            color: #AAA;
-            border-top: 1px solid #DDD;
-        }
-        .navigation:hover {
-            color: #555;
-        }
-        #requests > .navigation:first-of-type {
-            border-top: 0;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="./panel.css" />
     <style type="text/css" id="dynamicStyles">
         [data-request-type] { background-color: #f1ffdb; }
         [data-request-type="Page View"] { background-color: #dbedff; }
         [data-request-type="redirect"] { background-color: #eeeeee; }
         [data-request-type="previous"] { background-color: #ffd5de; }
         .parameter-key { display: none; }
-        .request:hover {  background-color: #cccccc; }
+        .request:hover > summary {  background-color: #CFD8DC; }
         .parameter-value:before, .parameter-value:after  { content: '"'; color: #ff0000; }
     </style>
 </head>

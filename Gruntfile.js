@@ -115,7 +115,15 @@ module.exports = function(grunt) {
                 "src/providers/*.js"
             ]
         },
-        "pkg": grunt.file.readJSON("package.json")
+        "pkg": grunt.file.readJSON("package.json"),
+        "sass": {
+            "dist": {
+                "files": {
+                    "src/devtools/panel.css": "src/devtools/panel.scss",
+                    "src/options/options.css": "src/options/options.scss"
+                }
+            }
+        }
     });
 
     grunt.loadNpmTasks("grunt-contrib-copy");
@@ -125,6 +133,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks('grunt-text-replace');
+    grunt.loadNpmTasks('grunt-contrib-sass');
 
     grunt.registerTask("build-extensions", "Build the Chrome extension", (browsers = "") => {
             let allowedBrowsers = ["chrome", "firefox"];
@@ -138,6 +147,7 @@ module.exports = function(grunt) {
             if(allowedBrowsers.indexOf(b) > -1) {
                 grunt.task.run(
                     "clean:" + b,
+                    "sass",
                     "build-copy:" + b,
                     b + "-manifest",
                     "build-concat:" + b,
@@ -199,7 +209,7 @@ module.exports = function(grunt) {
     grunt.registerTask("build-copy", "Copy over the source files to the build directory", function(browser) {
         grunt.config.requires(browser);
         let options = grunt.config(browser),
-            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*"];
+            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*", "!*./*.scss"];
         if(options.usePolyfill) {
             filesToCopy.push("browser-polyfill.js");
         }
