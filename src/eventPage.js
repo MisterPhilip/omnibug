@@ -84,19 +84,21 @@
                         "tab":       details.tabId,
                         "timestamp": details.timeStamp,
                         "type":      details.type,
-                        "url":       details.url
+                        "url":       details.url,
+                        "postData":  ""
                     },
                     "event": "webRequest"
-                },
-                postData = "";
+                };
 
-            if(details.method === "POST") {
-                postData =  String.fromCharCode.apply( null, new Uint8Array( data.requestBody.raw[0].bytes ) );
+            // Grab any POST data that is included
+            if(details.method === "POST" && details.requestBody && details.requestBody.raw && details.requestBody.raw[0]) {
+                data.request.postData = String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes));
             }
 
+            // Parse the URL and join our request info to the parsed data
             data = Object.assign(
                 data,
-                OmnibugProvider.parseUrl(details.url, postData)
+                OmnibugProvider.parseUrl(data.request.url, data.request.postData)
             );
 
             console.log("Matched URL, sending data to devtools", data);
