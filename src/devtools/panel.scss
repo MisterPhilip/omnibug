@@ -59,6 +59,17 @@ details > summary {
   font-size: .9em;
   padding: 1em;
 }
+.request:not(.redirected) .redirect {
+  display: none;
+}
+.request.redirected .redirect-icon {
+  margin-left: .5em;
+  color: $gray-color;
+}
+.request.redirected:hover .redirect-icon,
+.request.redirected:focus .redirect-icon {
+  color: $error-color;
+}
 
 .request table td, .request table th {
   padding: .2rem .1rem;

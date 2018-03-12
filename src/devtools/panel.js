@@ -90,15 +90,30 @@ window.Omnibug = (() => {
     }
 
     /**
+     * Add a redirected class for all requests that share the same ID
      *
+     * @param requestId
+     */
+    function updateRedirectedEntries(requestId) {
+        let redirectedEntries = d.querySelectorAll(`.request[data-request-id="${requestId}"]`);
+        redirectedEntries.forEach((entry) => {
+            entry.classList.add("redirected");
+        });
+    }
+
+    /**
+     * Build HTML for a request
      *
      * @param request
      * @return {HTMLElement}
      */
     function buildRequest(request) {
-        let details = createElement("details", ["request"]),
+        let details = createElement("details", ["request"], {"data-request-id": request.request.id}),
             summary = createElement("summary"),
             body = createElement("div");
+
+        // Update any redirected entries
+        updateRedirectedEntries(request.request.id);
 
         // Setup parent details element
         if(settings.alwaysExpand) {
@@ -110,6 +125,8 @@ window.Omnibug = (() => {
             summaryColumns = createElement("div", ["columns"]),
             colTitleWrapper = createElement("div", ["column", "col-3"]),
             colTitleSpan = createElement("span"),
+            colTitleRedirect = createElement("small", ["redirect", "redirect-icon"], {"title": "This entry was redirected to a new entry"}),
+            colTitleRedirectIcon = createElement("i", ["fas", "fa-sync"]),
             colAccount = createElement("div", ["column", "col-3"]),
             colTime = createElement("div", ["column", "col-6"]);
 
@@ -128,7 +145,9 @@ window.Omnibug = (() => {
             }
         }
         colTitleSpan.innerText = request.provider.name;
+        colTitleRedirect.appendChild(colTitleRedirectIcon);
         colTitleWrapper.appendChild(colTitleSpan);
+        colTitleWrapper.appendChild(colTitleRedirect);
         summaryColumns.appendChild(colTitleWrapper);
 
         // Add the account ID, if it exists
@@ -150,6 +169,10 @@ window.Omnibug = (() => {
         summaryContainer.appendChild(summaryColumns);
         summary.appendChild(summaryContainer);
         details.appendChild(summary);
+
+        let redirectWarning = createElement("div", ["redirect", "toast", "toast-warning"]);
+        redirectWarning.innerText = "This request was redirected, so the data may not be the final data sent to the provider.";
+        body.appendChild(redirectWarning);
 
         let requestSummary = [];
         Object.entries(request.request).forEach((info) => {
