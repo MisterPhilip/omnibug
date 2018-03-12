@@ -115,3 +115,15 @@ details > summary {
 #requests > .navigation:first-of-type {
   border-top: 0;
 }
+#filter-modal .modal-body {
+  padding-top: 0;
+}
+#filter-providers {
+  list-style-type: none;
+}
+#filter-providers  input {
+  margin-right: .5em;
+}
+.filters-active [data-target-modal="filter-modal"] {
+  color: #FF9800 !important;
+}

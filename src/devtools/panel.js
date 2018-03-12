@@ -13,10 +13,11 @@
 window.Omnibug = (() => {
 
     let d = document,
-        settings = {},
+        settings = (new OmnibugSettings).defaults,
         requestPanel = d.getElementById("requests"),
         noRequests = d.getElementById("no-requests"),
-        styleSheet = d.getElementById("dynamicStyles");
+        filters = {"providers": {}, "account": ""},
+        allProviders = OmnibugProvider.getProviders();
 
     // Clear all requests
     d.querySelectorAll("a[href=\"#clear\"]").forEach((element) => {
@@ -24,9 +25,7 @@ window.Omnibug = (() => {
             event.preventDefault();
 
             // Clear our current requests
-            while (requestPanel.firstChild) {
-                requestPanel.removeChild(requestPanel.firstChild);
-            }
+            clearChildren(requestPanel);
 
             // Show the no requests found notification
             noRequests.classList.remove("d-none");
@@ -65,6 +64,29 @@ window.Omnibug = (() => {
         })
     });
 
+    // Add our listener for the account filter
+    let filterAccount = d.getElementById("filter-account");
+    filterAccount.addEventListener("input", (event) => {
+        // event.preventDefault();
+        let accountFilter = event.target.value;
+        filters.account = accountFilter.replace(/[^0-9a-zA-Z_ .,-]/g, "");
+        updateFiltersStyles();
+    });
+    filterAccount.addEventListener("keypress", (event) => {
+        let key = event.which || event.keyCode;
+        if(key === 13) {
+            d.getElementById("filter-modal").classList.remove("active");
+        }
+    });
+
+    // Setup our providers in our filters list
+    Object.keys(OmnibugProvider.getProviders()).forEach((key) => {
+        filters.providers[key] = true;
+    });
+
+    // Load up the default settings
+    loadSettings(settings);
+
     /**
      * Shortcut to creating an HTML element
      *
@@ -84,6 +106,11 @@ window.Omnibug = (() => {
         return element;
     }
 
+    /**
+     * Add a new provider-based request
+     *
+     * @param request
+     */
     function addRequest(request) {
         noRequests.classList.add("d-none");
         requestPanel.appendChild(buildRequest(request));
@@ -108,7 +135,11 @@ window.Omnibug = (() => {
      * @return {HTMLElement}
      */
     function buildRequest(request) {
-        let details = createElement("details", ["request"], {"data-request-id": request.request.id}),
+        let details = createElement("details", ["request"], {
+                        "data-request-id": request.request.id,
+                        "data-provider": request.provider.key,
+                        "data-account": ""
+                      }),
             summary = createElement("summary"),
             body = createElement("div");
 
@@ -161,6 +192,7 @@ window.Omnibug = (() => {
             if(accountValue) {
                 colAccount.innerText = accountValue.value;
                 colAccount.setAttribute("title", accountValue.value);
+                details.setAttribute("data-account", accountValue.value);
             }
         }
         summaryColumns.appendChild(colAccount);
@@ -277,12 +309,15 @@ window.Omnibug = (() => {
      * @param newSettings
      */
     function loadSettings(newSettings) {
+        let styleSheet = d.getElementById("settingsStyles");
+
         settings = newSettings;
 
+        // Build the filter list
+        buildProviderFilterPanel();
+
         // Clear out any existing rules
-        while(styleSheet.sheet.cssRules.length) {
-            styleSheet.sheet.removeRule(0);
-        }
+        clearStyles(styleSheet);
 
         // Highlight colors
         let highlightPrefix = "[data-parameter-key=\"",
@@ -320,7 +355,121 @@ window.Omnibug = (() => {
         }
     }
 
+    /**
+     * Build the provider filter panel
+     */
+    function buildProviderFilterPanel() {
+        let providerList = d.getElementById("filter-providers");
+
+        // Clear any existing providers
+        clearChildren(providerList);
+
+        // Create an entry for _all_ of our providers
+        for(let providerKey in allProviders) {
+            if(!allProviders.hasOwnProperty(providerKey)) { continue; }
+
+            // Create our DOM elements
+            let wrapper = createElement("li"),
+                input = createElement("input", [], {"type": "checkbox", "id": `filter-provider-${providerKey}`}),
+                label = createElement("label", ["noselect"], {"for": `filter-provider-${providerKey}`}),
+                span = createElement("span");
+
+            // Check if the user has the provider enabled or not
+            if(settings.enabledProviders.indexOf(providerKey) === -1) {
+                input.setAttribute("disabled", "disabled");
+                label.classList.add("disabled");
+                label.setAttribute("title", "This provider is currently disabled and requests for this provider will never be shown. You can re-enable it within the settings");
+            } else {
+                if(filters.providers[providerKey]) {
+                    input.setAttribute("checked", "checked");
+                }
+            }
+
+            // Set our values and setup the DOM structure
+            span.innerText = allProviders[providerKey].name;
+            input.value = providerKey;
+            label.appendChild(input);
+            label.appendChild(span);
+            wrapper.appendChild(label);
+            providerList.appendChild(wrapper);
+
+            // Add our event listener
+            input.addEventListener("change", (event) => {
+                let checkbox = event.target,
+                    providerKey = checkbox.value;
+                filters.providers[providerKey] = checkbox.checked;
+                updateFiltersStyles();
+            });
+
+            filters.providers[providerKey] = input.checked;
+        }
+
+        // Finally, update our stylesheet with the new filters
+        updateFiltersStyles();
+    }
+
+    /**
+     * Update the filters stylesheet
+     */
+    function updateFiltersStyles() {
+        let styleSheet = d.getElementById("filterStyles");
+
+        // Clear out any existing styles
+        clearStyles(styleSheet);
+
+        // Figure out what providers are hidden
+        let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
+            return !provider[1] && (settings.enabledProviders.indexOf(provider[0]) > -1);
+        }).map((provider) => {
+            return `[data-provider="${provider[0]}"]`;
+        });
+
+        // Add hidden providers, if any
+        if(hiddenProviders.length) {
+            styleSheet.sheet.insertRule(`${hiddenProviders.join(", ")} { display: none; }`);
+        }
+
+        // Add account filter, if applicable
+        if(filters.account) {
+            styleSheet.sheet.insertRule(`.request:not([data-account*="${filters.account}" i]) { display: none; }`);
+        }
+
+        // Show the user that filters are (in)active
+        if(filters.account || hiddenProviders.length) {
+            d.body.classList.add("filters-active");
+        } else {
+            d.body.classList.remove("filters-active");
+        }
+    }
+
+    /**
+     * Removes all styles from a stylesheet
+     *
+     * @param styleSheet
+     */
+    function clearStyles(styleSheet) {
+        while(styleSheet.sheet.cssRules.length) {
+            styleSheet.sheet.removeRule(0);
+        }
+    }
+
+    /**
+     * Remove all the pesky children for an element
+     *
+     * @param element
+     */
+    function clearChildren(element) {
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+    }
+
     return {
+        /**
+         * Receive a message from our eventPage file
+         *
+         * @param message
+         */
         receive_message(message) {
             switch(message.event || "") {
                 case "webRequest":

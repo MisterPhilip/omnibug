@@ -50,3 +50,11 @@ label, input, button {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+label.disabled {
+  color: $gray-color;
+}
+label.disabled,
+label.disabled input {
+  cursor: not-allowed;
+}

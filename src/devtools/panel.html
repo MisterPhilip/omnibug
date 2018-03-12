@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" type="text/css" href="./panel.css" />
-    <style type="text/css" id="dynamicStyles">
+    <style type="text/css" id="settingsStyles">
+        /*
         [data-request-type] { background-color: #f1ffdb; }
         [data-request-type="Page View"] { background-color: #dbedff; }
         details.request.redirected [data-request-type]  { background-color: #eeeeee; }
@@ -11,7 +12,9 @@
         .parameter-key { display: none; }
         .request:hover > summary {  background-color: #CFD8DC; }
         .parameter-value:before, .parameter-value:after  { content: '"'; color: #ff0000; }
+        */
     </style>
+    <style type="text/css" id="filterStyles"></style>
 </head>
 <body>
     <header>
@@ -29,6 +32,9 @@
     </header>
 
     <main>
+        <section id="requests">
+
+        </section>
         <div class="empty" id="no-requests">
             <div class="empty-icon">
                 <i class="icon icon-people"></i>
@@ -39,9 +45,6 @@
                 <div class="loading loading-lg"></div>
             </div>
         </div>
-        <section id="requests">
-
-        </section>
     </main>
     <div class="modal" id="filter-modal">
         <a href="#close" class="modal-overlay" aria-label="Close"></a>
@@ -52,7 +55,9 @@
             </div>
             <div class="modal-body">
                 <div class="content">
-                    @TODO: Show some content around filtering the requests by provider, key columns.
+                    <p>Here you can filter by an account ID, a certain list of providers, or both.</p>
+                    <input type="text" id="filter-account" placeholder="Filter by account ID&hellip;" class="form-input">
+                    <ul id="filter-providers"></ul>
                 </div>
             </div>
         </div>
