@@ -8,7 +8,7 @@ body {
   padding-top: 37px;
 }
 nav.navbar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -54,6 +54,9 @@ details > summary {
   margin-top: -1.5em;
   margin-left: .75em;
 }
+.request > summary .column {
+  @include hide-overflow;
+}
 .request > div {
   border-top: 1px solid #dedede;
   font-size: .9em;
@@ -86,7 +89,7 @@ details > summary {
   margin-bottom: 1em;
 }
 .request-details tbody > tr > td:first-of-type {
-  width: 150px;
+  width: 13em;
   font-weight: 600;
   padding-left: .3em;
 }
@@ -98,8 +101,9 @@ details > summary {
   text-align: center;
 }
 .navigation {
+  @include hide-overflow;
   width: 100%;
-  padding: .3em .3em .3em 2em;
+  padding: .3em 2em;
   background-color: #FFF;
   font-size: .9em;
   color: #AAA;

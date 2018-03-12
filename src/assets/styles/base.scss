@@ -40,3 +40,13 @@ $base-font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
 label, input, button {
   cursor: pointer;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+@mixin hide-overflow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -123,12 +123,13 @@ window.Omnibug = (() => {
         // Add the summary (title)
         let summaryContainer = createElement("div", ["container"]),
             summaryColumns = createElement("div", ["columns"]),
-            colTitleWrapper = createElement("div", ["column", "col-3"]),
+            colTitleWrapper = createElement("div", ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-5"]),
             colTitleSpan = createElement("span"),
-            colTitleRedirect = createElement("small", ["redirect", "redirect-icon"], {"title": "This entry was redirected to a new entry"}),
+            colTitleRedirect = createElement("small", ["redirect", "redirect-icon"], {"title": "This entry was redirected."}),
             colTitleRedirectIcon = createElement("i", ["fas", "fa-sync"]),
-            colAccount = createElement("div", ["column", "col-3"]),
-            colTime = createElement("div", ["column", "col-6"]);
+            colAccount = createElement("div", ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-5"]),
+            colTime = createElement("div", ["column", "col-6", "col-lg-4", "col-md-4", "col-sm-2"]),
+            providerTitle = request.provider.name;
 
         // Add the provider name & request type (if applicable)
         if(request.provider.columns.requestType) {
@@ -142,9 +143,11 @@ window.Omnibug = (() => {
                 requestTypeEl.setAttribute("data-request-type", requestTypeValue.value);
                 requestTypeEl.innerText = requestTypeValue.value;
                 colTitleWrapper.appendChild(requestTypeEl);
+                providerTitle += " - " + requestTypeValue.value;
             }
         }
         colTitleSpan.innerText = request.provider.name;
+        colTitleWrapper.setAttribute("title", providerTitle);
         colTitleRedirect.appendChild(colTitleRedirectIcon);
         colTitleWrapper.appendChild(colTitleSpan);
         colTitleWrapper.appendChild(colTitleRedirect);
@@ -157,12 +160,15 @@ window.Omnibug = (() => {
             });
             if(accountValue) {
                 colAccount.innerText = accountValue.value;
+                colAccount.setAttribute("title", accountValue.value);
             }
         }
         summaryColumns.appendChild(colAccount);
 
         // Add the timestamp
-        colTime.innerText = new Date(request.request.timestamp);
+        let timestamp = new Date(request.request.timestamp);
+        colTime.innerText = timestamp;
+        colTime.setAttribute("title", timestamp);
         summaryColumns.appendChild(colTime);
 
         // Append our summary
@@ -171,7 +177,7 @@ window.Omnibug = (() => {
         details.appendChild(summary);
 
         let redirectWarning = createElement("div", ["redirect", "toast", "toast-warning"]);
-        redirectWarning.innerText = "This request was redirected, so the data may not be the final data sent to the provider.";
+        redirectWarning.innerText = "This request was redirected, thus the data may not be the final data sent to the provider.";
         body.appendChild(redirectWarning);
 
         let requestSummary = [];
@@ -287,7 +293,7 @@ window.Omnibug = (() => {
         // Background colors
         styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click}; }`, styleSheet.sheet.cssRules.length);
         styleSheet.sheet.insertRule(`[data-request-type="Page View"] { background-color: ${settings.color_load}; }`, styleSheet.sheet.cssRules.length);
-        styleSheet.sheet.insertRule(`[data-request-type="redirect"] { background-color: ${settings.color_redirect}; }`, styleSheet.sheet.cssRules.length);
+        styleSheet.sheet.insertRule(`details.request.redirected [data-request-type] { background-color: ${settings.color_redirect}; }`, styleSheet.sheet.cssRules.length);
         styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev}; }`, styleSheet.sheet.cssRules.length);
         styleSheet.sheet.insertRule(`request:hover > summary { background-color: ${settings.color_hover}; }`, styleSheet.sheet.cssRules.length);
 
@@ -301,6 +307,11 @@ window.Omnibug = (() => {
         // Navigation requests
         if(!settings.showNavigation) {
             styleSheet.sheet.insertRule(`.navigation { display: none; }`, styleSheet.sheet.cssRules.length);
+        }
+
+        // Redirected requests
+        if(!settings.showRedirects) {
+            styleSheet.sheet.insertRule(`details.request.redirected:not([open]) { display: none; }`, styleSheet.sheet.cssRules.length);
         }
 
         // Quotes
