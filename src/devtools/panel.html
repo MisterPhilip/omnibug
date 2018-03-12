@@ -20,9 +20,11 @@
     <header>
         <nav class="navbar">
             <section class="navbar-section">
-                <a href="#clear" class="btn btn-link" title="Clear Requests" aria-label="Clear Requests"><i class="fas fa-ban"></i></a>
+                <a href="#clear" class="btn btn-link" title="Clear Requests" aria-label="Clear Requests"><i class="fas fa-trash"></i></a>
             </section>
             <section class="navbar-section">
+                <a href="#enable-persist" class="btn btn-link" id="persist-enable" title="Requests will be cleared between page loads. Click to persist them instead." aria-label="Requests will be cleared between page loads. Click to persist them instead."><i class="fas fa-history"></i></a>
+                <a href="#disable-persist" class="btn btn-link" id="persist-disable" title="Requests are persisted across pages. Click to clear them between pages instead." aria-label="Requests are persisted across pages. Click to clear them between pages instead."><i class="fas fa-history"></i></a>
                 <a href="#filter-modal" class="btn btn-link" title="Filter Requests" aria-label="Filter Requests" data-target-modal="filter-modal"><i class="fas fa-filter"></i></a>
                 <a href="#export" class="btn btn-link" title="Export Requests" aria-label="Export Requests"><i class="fas fa-download"></i></a>
                 <a href="#settings" class="btn btn-link" title="Omnibug Settings" aria-label="Omnibug Settings"><i class="fas fa-cog"></i></a>

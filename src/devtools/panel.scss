@@ -127,3 +127,8 @@ details > summary {
 .filters-active [data-target-modal="filter-modal"] {
   color: #FF9800 !important;
 }
+body:not(.persist-disabled) #persist-enable,
+body.persist-disabled #persist-disable {
+  display: none;
+}
+#persist-enable { color: #F44336; }

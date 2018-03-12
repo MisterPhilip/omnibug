@@ -17,6 +17,7 @@ window.Omnibug = (() => {
         requestPanel = d.getElementById("requests"),
         noRequests = d.getElementById("no-requests"),
         filters = {"providers": {}, "account": ""},
+        persist = true,
         allProviders = OmnibugProvider.getProviders();
 
     // Clear all requests
@@ -80,10 +81,9 @@ window.Omnibug = (() => {
     });
 
     // Add our filter
-    document.getElementById("provider-search").addEventListener("input", (event) => {
-        console.log("provider-search", event.target.value);
+    d.getElementById("provider-search").addEventListener("input", (event) => {
         let searchTerm = (event.target.value || "").toLowerCase(),
-            providers = document.querySelectorAll("#filter-providers > li");
+            providers = d.querySelectorAll("#filter-providers > li");
 
         providers.forEach((provider) => {
             let name = provider.getAttribute("data-provider") || "";
@@ -96,6 +96,18 @@ window.Omnibug = (() => {
                 provider.setAttribute("style", "display:none;");
             }
         });
+    });
+
+    // Clear requests on navigation
+    d.getElementById("persist-enable").addEventListener("click", (event) => {
+        event.preventDefault();
+        d.body.classList.remove("persist-disabled");
+        persist = true;
+    });
+    d.getElementById("persist-disable").addEventListener("click", (event) => {
+        event.preventDefault();
+        d.body.classList.add("persist-disabled");
+        persist = false;
     });
 
     // Setup our providers in our filters list
@@ -319,6 +331,13 @@ window.Omnibug = (() => {
     function addNavigation(navigation) {
         let request = createElement("div", ["navigation", "noselect"]);
         request.innerText = "Navigated to " + navigation.url;
+
+        // check if we need to clear any existing requests out first...
+        if(!persist) {
+            clearChildren(requestPanel);
+            noRequests.classList.remove("d-none");
+        }
+
         requestPanel.appendChild(request);
     }
 
