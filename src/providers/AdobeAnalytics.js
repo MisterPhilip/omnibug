@@ -384,12 +384,12 @@ class AdobeAnalyticsProvider extends BaseProvider
         }
 
         // Handle s.tl calls
-        if(pev2 === "e") {
-            requestType = "Exit";
-        } else if(pev2 === "d") {
-            requestType = "Download";
-        } else if(pev2 === "o") {
-            requestType = "Other";
+        if(pev2 === "lnk_e") {
+            requestType = "Exit Click";
+        } else if(pev2 === "lnk_d") {
+            requestType = "Download Click";
+        } else if(pev2 === "lnk_o") {
+            requestType = "Other Click";
         }
         results.push({
             "key":   "requestType",

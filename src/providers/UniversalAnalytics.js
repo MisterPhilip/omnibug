@@ -450,6 +450,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "group": "Ecommerce"
             };
         } else if(name === "t") {
+            value = value.toLowerCase();
             let type = "";
             if(value === "pageview" || value === "screenview") {
                 type = "Page View";
