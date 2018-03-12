@@ -154,22 +154,21 @@
         });
     });
 
-    ["keyup", "change"].map((eventType) => {
-        document.getElementById("provider-search").addEventListener(eventType, (event) => {
-            let searchTerm = (event.target.value || "").toLowerCase(),
-                providers = document.querySelectorAll("#providers-list > .provider-label");
+    document.getElementById("provider-search").addEventListener("input", (event) => {
+        console.log("provider-search", event.target.value);
+        let searchTerm = (event.target.value || "").toLowerCase(),
+            providers = document.querySelectorAll("#providers-list > label");
 
-            providers.forEach((provider) => {
-                let name = provider.getAttribute("data-provider") || "";
-                if(name.toLowerCase().indexOf(searchTerm) >= 0)
-                {
-                    provider.setAttribute("style", "display:block;");
-                }
-                else
-                {
-                    provider.setAttribute("style", "display:none;");
-                }
-            });
+        providers.forEach((provider) => {
+            let name = provider.getAttribute("data-provider") || "";
+            if(name.toLowerCase().indexOf(searchTerm) >= 0)
+            {
+                provider.setAttribute("style", "display:block;");
+            }
+            else
+            {
+                provider.setAttribute("style", "display:none;");
+            }
         });
     });
 
