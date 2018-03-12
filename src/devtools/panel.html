@@ -55,8 +55,16 @@
             </div>
             <div class="modal-body">
                 <div class="content">
-                    <p>Here you can filter by an account ID, a certain list of providers, or both.</p>
-                    <input type="text" id="filter-account" placeholder="Filter by account ID&hellip;" class="form-input">
+                    <p>Here, you can add filters to only show certain requests. You can filter where an account ID contains certain text, show only selected providers, or both.</p>
+                    <div class="form-group">
+                        <label class="form-label" for="filter-account">Filter by Account ID (contains)</label>
+                        <input type="text" id="filter-account" placeholder="Filter by Account ID&hellip;" class="form-input">
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <label class="form-label" for="provider-search">Show the following providers:</label>
+                        <input type="text" id="provider-search" placeholder="Search for a provider&hellip;" class="form-input">
+                    </div>
                     <ul id="filter-providers"></ul>
                 </div>
             </div>

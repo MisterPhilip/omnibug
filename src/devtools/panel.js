@@ -79,6 +79,25 @@ window.Omnibug = (() => {
         }
     });
 
+    // Add our filter
+    document.getElementById("provider-search").addEventListener("input", (event) => {
+        console.log("provider-search", event.target.value);
+        let searchTerm = (event.target.value || "").toLowerCase(),
+            providers = document.querySelectorAll("#filter-providers > li");
+
+        providers.forEach((provider) => {
+            let name = provider.getAttribute("data-provider") || "";
+            if(name.toLowerCase().indexOf(searchTerm) >= 0)
+            {
+                provider.setAttribute("style", "display:block;");
+            }
+            else
+            {
+                provider.setAttribute("style", "display:none;");
+            }
+        });
+    });
+
     // Setup our providers in our filters list
     Object.keys(OmnibugProvider.getProviders()).forEach((key) => {
         filters.providers[key] = true;
@@ -369,7 +388,7 @@ window.Omnibug = (() => {
             if(!allProviders.hasOwnProperty(providerKey)) { continue; }
 
             // Create our DOM elements
-            let wrapper = createElement("li"),
+            let wrapper = createElement("li", [], {"data-provider": providerKey}),
                 input = createElement("input", [], {"type": "checkbox", "id": `filter-provider-${providerKey}`}),
                 label = createElement("label", ["noselect"], {"for": `filter-provider-${providerKey}`}),
                 span = createElement("span");
