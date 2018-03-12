@@ -3,32 +3,22 @@
 <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" type="text/css" href="./panel.css" />
-    <style type="text/css" id="settingsStyles">
-        /*
-        [data-request-type] { background-color: #f1ffdb; }
-        [data-request-type="Page View"] { background-color: #dbedff; }
-        details.request.redirected [data-request-type]  { background-color: #eeeeee; }
-        [data-request-type="previous"] { background-color: #ffd5de; }
-        .parameter-key { display: none; }
-        .request:hover > summary {  background-color: #CFD8DC; }
-        .parameter-value:before, .parameter-value:after  { content: '"'; color: #ff0000; }
-        */
-    </style>
+    <style type="text/css" id="settingsStyles"></style>
     <style type="text/css" id="filterStyles"></style>
 </head>
 <body>
     <header>
         <nav class="navbar">
             <section class="navbar-section">
-                <a href="#clear" class="btn btn-link" title="Clear Requests" aria-label="Clear Requests"><i class="fas fa-trash"></i></a>
+                 <a href="#clear" class="btn btn-link tooltip tooltip-right" aria-label="Clear Requests" data-tooltip="Clear Requests"><i class="fas fa-trash"></i></a>
             </section>
             <section class="navbar-section">
-                <a href="#enable-persist" class="btn btn-link" id="persist-enable" title="Requests will be cleared between page loads. Click to persist them instead." aria-label="Requests will be cleared between page loads. Click to persist them instead."><i class="fas fa-history"></i></a>
-                <a href="#disable-persist" class="btn btn-link" id="persist-disable" title="Requests are persisted across pages. Click to clear them between pages instead." aria-label="Requests are persisted across pages. Click to clear them between pages instead."><i class="fas fa-history"></i></a>
-                <a href="#filter-modal" class="btn btn-link" title="Filter Requests" aria-label="Filter Requests" data-target-modal="filter-modal"><i class="fas fa-filter"></i></a>
-                <a href="#export" class="btn btn-link" title="Export Requests" aria-label="Export Requests"><i class="fas fa-download"></i></a>
-                <a href="#settings" class="btn btn-link" title="Omnibug Settings" aria-label="Omnibug Settings"><i class="fas fa-cog"></i></a>
-                <a href="#about-modal" class="btn btn-link" title="About" aria-label="About" data-target-modal="about-modal"><i class="fas fa-question-circle"></i></a>
+                <a href="#enable-persist" class="btn btn-link tooltip tooltip-left" id="persist-enable" data-tooltip="Click to persist requests across pages." aria-label="Requests will be cleared between page loads. Click to persist them instead."><i class="fas fa-history"></i></a>
+                <a href="#disable-persist" class="btn btn-link tooltip tooltip-left" id="persist-disable" data-tooltip="Click to clear requests between pages." aria-label="Requests are persisted across pages. Click to clear them between pages instead."><i class="fas fa-history"></i></a>
+                <a href="#filter-modal" class="btn btn-link tooltip tooltip-left" aria-label="Filter Requests" data-target-modal="filter-modal" data-tooltip="Filter Requests"><i class="fas fa-filter"></i></a>
+                <a href="#export" class="btn btn-link tooltip tooltip-left" aria-label="Export Requests" data-tooltip="Export Requests"><i class="fas fa-download"></i></a>
+                <a href="#settings" class="btn btn-link tooltip tooltip-left" aria-label="Omnibug Settings" data-tooltip="Omnibug Settings"><i class="fas fa-cog"></i></a>
+                <a href="#about-modal" class="btn btn-link tooltip tooltip-left" aria-label="About" data-target-modal="about-modal" data-tooltip="About Omnibug"><i class="fas fa-question-circle"></i></a>
             </section>
         </nav>
     </header>
@@ -48,6 +38,7 @@
             </div>
         </div>
     </main>
+
     <div class="modal" id="filter-modal">
         <a href="#close" class="modal-overlay" aria-label="Close"></a>
         <div class="modal-container">
