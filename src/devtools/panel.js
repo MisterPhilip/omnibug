@@ -18,18 +18,14 @@ window.Omnibug = (() => {
         noRequests = d.getElementById("no-requests"),
         filters = {"providers": {}, "account": ""},
         persist = true,
+        recordedData = [],
         allProviders = OmnibugProvider.getProviders();
 
     // Clear all requests
     d.querySelectorAll("a[href=\"#clear\"]").forEach((element) => {
         element.addEventListener("click", (event) => {
             event.preventDefault();
-
-            // Clear our current requests
-            clearChildren(requestPanel);
-
-            // Show the no requests found notification
-            noRequests.classList.remove("d-none");
+            clearRequests();
         })
     });
 
@@ -110,6 +106,99 @@ window.Omnibug = (() => {
         persist = false;
     });
 
+    d.getElementById("export-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        let formData = new FormData(event.target),
+            filename = (formData.get("filename") || "").replace(/[^0-9a-zA-Z_ .,-]/g, ""),
+            useFilters = Boolean(formData.get("useFilters")),
+            showNavigation = Boolean(formData.get("showNavigation")),
+            fileType = formData.get("fileType") || "",
+            exportData = recordedData;
+
+        // filter out what is needed
+        if(!showNavigation) {
+            exportData = exportData.filter((request) => {
+                return request.event !== "webNavigation";
+            })
+        }
+        if(useFilters) {
+           exportData = exportData.filter((request) => {
+               if(request.event === "webNavigation") { return true; }
+               let account = getAccountFromRequest(request);
+               return filters.providers[request.provider.key] === true &&
+                      account.indexOf(filters.account) !== -1;
+           });
+        }
+
+        // Check our file type to make sure we're OK
+        if(["csv", "tab"].indexOf(fileType) === -1) {
+            fileType = "csv";
+        }
+
+        // generate a filename if one was not passed or contained too many bad chars
+        if(filename === "") {
+            let now = new Date(),
+                date = [now.getFullYear(), now.getMonth() + 1, now.getDate()].map((e) => e.toString().length === 1 ? "0" + e : e),
+                time = [now.getHours(), now.getMinutes() + 1, now.getSeconds()].map((e) => e.toString().length === 1 ? "0" + e : e);
+            filename = `Omnibug_Export_${date.join("-")}_ ${time.join("-")}`;
+        }
+
+        // Append our file extension
+        filename += `.${fileType}`;
+
+        // Start the export process
+        let colDelim = (fileType === "csv") ? `","` : `"\t"`,
+            exportText = "";
+
+        exportText = exportData.map((request) => {
+            let row = [];
+            if(request.event === "webNavigation") {
+                row = [
+                    "Navigation",
+                    "",
+                    "",
+                    ""
+                ];
+            } else {
+                let account = getAccountFromRequest(request);
+                row = [
+                    "",
+                    request.provider.name,
+                    account,
+                    request.request.id
+                ];
+            }
+            row.push(request.request.url.replace(/"/g, `\\"`));
+            row.push((new Date(request.request.timestamp)).toString());
+            return `"` + row.join(colDelim) + `"`;
+        }).join("\n");
+        exportText = `"` + ["Event Type", "Provider", "Account", "Request ID", "URL", "Timestamp"].join(colDelim) + `"\n` + exportText;
+
+
+        // Generate the file to download
+        let link = d.createElement("a"),
+            json = JSON.stringify(exportData),
+            blob = new Blob([exportText], {type: `text/${fileType}`}),
+            url = window.URL.createObjectURL(blob);
+        d.body.appendChild(link);
+        link.href = url;
+        link.download = filename;
+
+        // Force the download
+        link.click();
+        window.URL.revokeObjectURL(url);
+
+        // Clean up
+        link.remove();
+
+        // Close the modal overlay now that they've exported the file
+        let modal = event.target.closest(".modal");
+        if(modal) {
+            modal.classList.remove("active");
+        }
+    });
+
+
     // Setup our providers in our filters list
     Object.keys(OmnibugProvider.getProviders()).forEach((key) => {
         filters.providers[key] = true;
@@ -137,6 +226,16 @@ window.Omnibug = (() => {
         return element;
     }
 
+    function clearRequests( ) {
+        // Clear our current requests
+        clearChildren(requestPanel);
+
+        // Show the no requests found notification
+        noRequests.classList.remove("d-none");
+
+        recordedData = [];
+    }
+
     /**
      * Add a new provider-based request
      *
@@ -144,6 +243,7 @@ window.Omnibug = (() => {
      */
     function addRequest(request) {
         noRequests.classList.add("d-none");
+        recordedData.push(request);
         requestPanel.appendChild(buildRequest(request));
     }
 
@@ -157,6 +257,27 @@ window.Omnibug = (() => {
         redirectedEntries.forEach((entry) => {
             entry.classList.add("redirected");
         });
+    }
+
+    /**
+     * Get an account value
+     *
+     * @TODO: this should probably be moved into the provider...
+     *
+     * @param request
+     * @return {string}
+     */
+    function getAccountFromRequest(request) {
+        let account = "";
+        if(request.provider.columns.account) {
+            account = request.data.find((el) => {
+                return el.key === request.provider.columns.account;
+            });
+            if(account) {
+                account = account.value;
+            }
+        }
+        return account;
     }
 
     /**
@@ -216,15 +337,12 @@ window.Omnibug = (() => {
         summaryColumns.appendChild(colTitleWrapper);
 
         // Add the account ID, if it exists
-        if(request.provider.columns.account) {
-            let accountValue = request.data.find((el) => {
-                return el.key === request.provider.columns.account;
-            });
-            if(accountValue) {
-                colAccount.innerText = accountValue.value;
-                colAccount.setAttribute("title", accountValue.value);
-                details.setAttribute("data-account", accountValue.value);
-            }
+        let accountValue = getAccountFromRequest(request);
+
+        if(accountValue) {
+            colAccount.innerText = accountValue;
+            colAccount.setAttribute("title", accountValue);
+            details.setAttribute("data-account", accountValue);
         }
         summaryColumns.appendChild(colAccount);
 
@@ -330,13 +448,15 @@ window.Omnibug = (() => {
      */
     function addNavigation(navigation) {
         let request = createElement("div", ["navigation", "noselect"]);
-        request.innerText = "Navigated to " + navigation.url;
+        request.innerText = "Navigated to " + navigation.request.url;
 
         // check if we need to clear any existing requests out first...
         if(!persist) {
-            clearChildren(requestPanel);
-            noRequests.classList.remove("d-none");
+            clearRequests();
         }
+
+        // Add it to our data array
+        recordedData.push(navigation);
 
         requestPanel.appendChild(request);
     }
@@ -514,7 +634,7 @@ window.Omnibug = (() => {
                     addRequest(message);
                 break;
                 case "webNavigation":
-                    addNavigation(message.request);
+                    addNavigation(message);
                 break;
                 case "settings":
                     loadSettings(message.data);

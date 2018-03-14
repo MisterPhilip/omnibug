@@ -16,7 +16,7 @@
                 <a href="#enable-persist" class="btn btn-link tooltip tooltip-left" id="persist-enable" data-tooltip="Click to persist requests across pages." aria-label="Requests will be cleared between page loads. Click to persist them instead."><i class="fas fa-history"></i></a>
                 <a href="#disable-persist" class="btn btn-link tooltip tooltip-left" id="persist-disable" data-tooltip="Click to clear requests between pages." aria-label="Requests are persisted across pages. Click to clear them between pages instead."><i class="fas fa-history"></i></a>
                 <a href="#filter-modal" class="btn btn-link tooltip tooltip-left" aria-label="Filter Requests" data-target-modal="filter-modal" data-tooltip="Filter Requests"><i class="fas fa-filter"></i></a>
-                <a href="#export" class="btn btn-link tooltip tooltip-left" aria-label="Export Requests" data-tooltip="Export Requests"><i class="fas fa-download"></i></a>
+                <a href="#export-modal" class="btn btn-link tooltip tooltip-left" aria-label="Export Requests" data-target-modal="export-modal" data-tooltip="Export Requests"><i class="fas fa-download"></i></a>
                 <a href="#settings" class="btn btn-link tooltip tooltip-left" aria-label="Omnibug Settings" data-tooltip="Omnibug Settings"><i class="fas fa-cog"></i></a>
                 <a href="#about-modal" class="btn btn-link tooltip tooltip-left" aria-label="About" data-target-modal="about-modal" data-tooltip="About Omnibug"><i class="fas fa-question-circle"></i></a>
             </section>
@@ -61,6 +61,57 @@
                     <ul id="filter-providers"></ul>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="modal" id="export-modal">
+        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <form action="#export-modal" method="POST" id="export-form">
+                <div class="modal-header">
+                    <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+                    <div class="modal-title h5">Export Requests</div>
+                </div>
+                <div class="modal-body">
+                    <div class="content">
+                        <p>You can export the requests collected as a CSV file.</p>
+                        <div class="form-group">
+                            <label class="form-label noselect" for="export-file-name">File Name</label>
+                            <input class="form-input" type="text" id="export-file-name" name="filename" placeholder="OmnibugExport">
+                            <p class="form-input-hint">The name of the file that will be downloaded. If one is not provided, it will be automatically generated.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-checkbox noselect">
+                                <input type="checkbox" checked="checked" name="useFilters">
+                                <i class="form-icon"></i> Use active filters
+                            </label>
+                            <p class="form-input-hint">Only show results from any active filters (e.g. certain providers or account.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-checkbox noselect">
+                                <input type="checkbox" checked="checked" name="showNavigation">
+                                <i class="form-icon"></i> Show navigation
+                            </label>
+                            <p class="form-input-hint">Include navigation requests as their own line item.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label noselect">File Type</label>
+                            <label class="form-radio noselect">
+                                <input type="radio" name="fileType" value="csv" checked>
+                                <i class="form-icon"></i> CSV
+                            </label>
+                            <label class="form-radio noselect">
+                                <input type="radio" name="fileType" value="tab">
+                                <i class="form-icon"></i> Tab
+                            </label>
+                            <p class="form-input-hint">Select the file type you'd like to download.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" type="submit">Export</button>
+                </div>
+            </form>
         </div>
     </div>
 
