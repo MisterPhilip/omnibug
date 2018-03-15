@@ -25,7 +25,7 @@ class UniversalAnalyticsProvider extends BaseProvider
     {
         return {
             "account":     "tid",
-            "requestType": "requestType"
+            "requestType": "omnibug_requestType"
         }
     }
 
@@ -449,27 +449,42 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "value": value,
                 "group": "Ecommerce"
             };
-        } else if(name === "t") {
-            value = value.toLowerCase();
-            let type = "";
-            if(value === "pageview" || value === "screenview") {
-                type = "Page View";
-            } else if(value === "transaction" || value === "item") {
-                type = "Ecommerce " + value.charAt(0).toUpperCase() + value.slice(1);
-            } else if(value === "dc") {
-                type = "DoubleClick";
-            } else {
-                type = value.charAt(0).toUpperCase() + value.slice(1);
-            }
-            result = {
-                "key":    "requestType",
-                "value":  type,
-                "hidden": true
-            };
         } else {
             result = super.handleQueryParam(name, value);
         }
         return result;
+    }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param {string} url
+     *
+     * @returns {Array}
+     */
+    handleCustom(url)
+    {
+        let results = [],
+            hitType = url.searchParams.get("t") || "page view",
+            requestType = "";
+
+        hitType = hitType.toLowerCase();
+        if(hitType === "pageview" || hitType === "screenview") {
+            requestType = "Page View";
+        } else if(hitType === "transaction" || hitType === "item") {
+            requestType = "Ecommerce " + hitType.charAt(0).toUpperCase() + hitType.slice(1);
+        } else if(hitType === "dc") {
+            requestType = "DoubleClick";
+        } else {
+            requestType = hitType.charAt(0).toUpperCase() + hitType.slice(1);
+        }
+        results.push({
+            "key":    "omnibug_requestType",
+            "value":  requestType,
+            "hidden": true
+        });
+
+        return results;
     }
 }
 OmnibugProvider.addProvider(new UniversalAnalyticsProvider());

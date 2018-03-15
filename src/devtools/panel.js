@@ -124,7 +124,7 @@ window.Omnibug = (() => {
         if(useFilters) {
            exportData = exportData.filter((request) => {
                if(request.event === "webNavigation") { return true; }
-               let account = getAccountFromRequest(request);
+               let account = getMappedColumnValue("account", request);
                return filters.providers[request.provider.key] === true &&
                       account.indexOf(filters.account) !== -1;
            });
@@ -160,7 +160,7 @@ window.Omnibug = (() => {
                     ""
                 ];
             } else {
-                let account = getAccountFromRequest(request);
+                let account = getMappedColumnValue("account", request);
                 row = [
                     "",
                     request.provider.name,
@@ -260,24 +260,23 @@ window.Omnibug = (() => {
     }
 
     /**
-     * Get an account value
+     * Get a mapped column value
      *
-     * @TODO: this should probably be moved into the provider...
-     *
+     * @param column
      * @param request
      * @return {string}
      */
-    function getAccountFromRequest(request) {
-        let account = "";
-        if(request.provider.columns.account) {
-            account = request.data.find((el) => {
-                return el.key === request.provider.columns.account;
+    function getMappedColumnValue(column, request) {
+        let value = "";
+        if(request.provider && request.provider.columns && request.provider.columns[column]) {
+            value = request.data.find((el) => {
+                return el.key === request.provider.columns[column];
             });
-            if(account) {
-                account = account.value;
+            if(value) {
+                value = value.value;
             }
         }
-        return account;
+        return value;
     }
 
     /**
@@ -337,7 +336,7 @@ window.Omnibug = (() => {
         summaryColumns.appendChild(colTitleWrapper);
 
         // Add the account ID, if it exists
-        let accountValue = getAccountFromRequest(request);
+        let accountValue = getMappedColumnValue("account", request);
 
         if(accountValue) {
             colAccount.innerText = accountValue;
