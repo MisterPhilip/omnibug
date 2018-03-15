@@ -150,4 +150,3 @@ class AdobeTargetProvider extends BaseProvider
         return results;
     }
 }
-OmnibugProvider.addProvider(new AdobeTargetProvider());

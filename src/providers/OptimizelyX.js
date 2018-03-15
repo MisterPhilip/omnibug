@@ -100,4 +100,3 @@ class OptimizelyXProvider extends BaseProvider
         return params;
     }
 }
-OmnibugProvider.addProvider(new OptimizelyXProvider());

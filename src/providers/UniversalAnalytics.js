@@ -487,4 +487,3 @@ class UniversalAnalyticsProvider extends BaseProvider
         return results;
     }
 }
-OmnibugProvider.addProvider(new UniversalAnalyticsProvider());

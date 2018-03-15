@@ -399,4 +399,3 @@ class AdobeAnalyticsProvider extends BaseProvider
         return results;
     }
 }
-OmnibugProvider.addProvider(new AdobeAnalyticsProvider());

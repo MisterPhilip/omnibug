@@ -335,11 +335,19 @@ module.exports = function(grunt) {
             return fileName.indexOf("Provider") === -1 ? fileName + "Provider" : fileName;
         });
 
+        // Load our providers into OmnibugProvider
+        let providerInclude = [];
+        providers.forEach((provider) => {
+            if(["OmnibugProvider", "BaseProvider"].indexOf(provider) === -1) {
+                providerInclude.push(`OmnibugProvider.addProvider(new ${provider}());`);
+            }
+        });
+
         grunt.config.set("concat.providers-test", {
             "options": {
                 "banner":   "const { URL } = require(\"url\");\n" +
                 "var URLSearchParams = require(\"url-search-params\");\n",
-                "footer": "\nexport { " + providers.join(", ") + " };"
+                "footer": `\n${providerInclude.join("\n")}\nexport { ${providers.join(", ")} };`
             },
             "files": {
                 "./test/providers.js": [
@@ -358,9 +366,29 @@ module.exports = function(grunt) {
      * This will build the providers for use within the plugin, NOT for testing
      */
     grunt.registerTask("build-providers", "Combine providers into a single file", function() {
-        const sourceBasePath = "./src/providers/";
         grunt.task.run("clean:providers");
+
+        const sourceBasePath = "./src/providers/",
+            ignoreFile = "!" + sourceBasePath + "providers.js";
+
+        // Grab all of the provider names to append as an export list
+        let providers = grunt.file.expand([sourceBasePath + "*.js", ignoreFile]).map((fileName) => {
+            fileName = fileName.replace(sourceBasePath, "").split(".")[0];
+            return fileName.indexOf("Provider") === -1 ? fileName + "Provider" : fileName;
+        });
+
+        // Load our providers into OmnibugProvider
+        let providerInclude = [];
+        providers.forEach((provider) => {
+            if(["OmnibugProvider", "BaseProvider"].indexOf(provider) === -1) {
+                providerInclude.push(`OmnibugProvider.addProvider(new ${provider}());`);
+            }
+        });
+
         grunt.config.set("concat.providers", {
+            "options": {
+                "footer": `\n${providerInclude.join("\n")}`
+            },
             files: {
                 "./src/providers.js": [
                     sourceBasePath + "BaseProvider.js",

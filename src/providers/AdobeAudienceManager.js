@@ -51,4 +51,3 @@ class AdobeAudienceManagerProvider extends BaseProvider
         };
     }
 }
-OmnibugProvider.addProvider(new AdobeAnalyticsProvider());
