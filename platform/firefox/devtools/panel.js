@@ -100,12 +100,15 @@ window.Omnibug = (() => {
         d.body.classList.remove("persist-disabled");
         persist = true;
     });
+
+    // Persist requests on navigation
     d.getElementById("persist-disable").addEventListener("click", (event) => {
         event.preventDefault();
         d.body.classList.add("persist-disabled");
         persist = false;
     });
 
+    // Export to CSV/Tab files
     d.getElementById("export-form").addEventListener("submit", (event) => {
         event.preventDefault();
         let formData = new FormData(event.target),
@@ -580,7 +583,7 @@ window.Omnibug = (() => {
         let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
             return !provider[1] && (settings.enabledProviders.indexOf(provider[0]) > -1);
         }).map((provider) => {
-            return `[data-provider="${provider[0]}"]`;
+            return `.request[data-provider="${provider[0]}"]`;
         });
 
         // Add hidden providers, if any

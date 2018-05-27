@@ -583,7 +583,7 @@ window.Omnibug = (() => {
         let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
             return !provider[1] && (settings.enabledProviders.indexOf(provider[0]) > -1);
         }).map((provider) => {
-            return `[data-provider="${provider[0]}"]`;
+            return `.request[data-provider="${provider[0]}"]`;
         });
 
         // Add hidden providers, if any
