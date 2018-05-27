@@ -4,7 +4,7 @@ html, body {
   height: 100%;
 }
 body {
-  font-size: 15px;
+  font-size: $font-size;
   margin: 0 auto;
   color: $body-font-color;
   background-color: $body-background-color;

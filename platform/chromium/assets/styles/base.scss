@@ -4,7 +4,7 @@ $primary-color-light:      #BBDEFB;
 
 $secondary-color:          #03A9F4;
 $body-background-color:    #FAFAFA;
-$font-size:   15px;
+$font-size:   14px;
 
 $base-font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
 
@@ -57,4 +57,16 @@ label.disabled {
 label.disabled,
 label.disabled input {
   cursor: not-allowed;
+}
+.modal.modal-lg .modal-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+.modal-lg .modal-container .modal-body {
+  max-height: 80vh;
+}
+.btn {
+  &:focus,
+  &:hover {
+    color: #fff;
+  }
 }

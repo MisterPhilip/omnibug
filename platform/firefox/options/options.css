@@ -400,7 +400,7 @@ body {
   background: #fff;
   color: #50596c;
   font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif, "Helvetica Neue", sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   overflow-x: hidden;
   text-rendering: optimizeLegibility; }
 
@@ -597,7 +597,7 @@ dl dd {
   color: #2196F3;
   cursor: pointer;
   display: inline-block;
-  font-size: 15px;
+  font-size: 14px;
   height: 1.8rem;
   line-height: 1rem;
   outline: none;
@@ -769,7 +769,7 @@ legend {
   border-radius: 0.1rem;
   color: #50596c;
   display: block;
-  font-size: 15px;
+  font-size: 14px;
   height: 1.8rem;
   line-height: 1rem;
   max-width: 100%;
@@ -816,7 +816,7 @@ textarea.form-input {
   border: 0.05rem solid #caced7;
   border-radius: 0.1rem;
   color: inherit;
-  font-size: 15px;
+  font-size: 14px;
   height: 1.8rem;
   line-height: 1rem;
   outline: none;
@@ -2723,6 +2723,15 @@ label.disabled {
 label.disabled,
 label.disabled input {
   cursor: not-allowed; }
+
+.modal.modal-lg .modal-overlay {
+  background: rgba(0, 0, 0, 0.3); }
+
+.modal-lg .modal-container .modal-body {
+  max-height: 80vh; }
+
+.btn:focus, .btn:hover {
+  color: #fff; }
 
 body {
   min-width: 800px;

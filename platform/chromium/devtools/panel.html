@@ -39,7 +39,7 @@
         </div>
     </main>
 
-    <div class="modal" id="filter-modal">
+    <div class="modal modal-lg" id="filter-modal">
         <a href="#close" class="modal-overlay" aria-label="Close"></a>
         <div class="modal-container">
             <div class="modal-header">
@@ -53,7 +53,6 @@
                         <label class="form-label" for="filter-account">Filter by Account ID (contains)</label>
                         <input type="text" id="filter-account" placeholder="Filter by Account ID&hellip;" class="form-input">
                     </div>
-                    <br />
                     <div class="form-group">
                         <label class="form-label" for="provider-search">Show the following providers:</label>
                         <input type="text" id="provider-search" placeholder="Search for a provider&hellip;" class="form-input">
@@ -64,7 +63,7 @@
         </div>
     </div>
 
-    <div class="modal" id="export-modal">
+    <div class="modal modal-lg" id="export-modal">
         <a href="#close" class="modal-overlay" aria-label="Close"></a>
         <div class="modal-container">
             <form action="#export-modal" method="POST" id="export-form">
@@ -74,7 +73,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="content">
-                        <p>You can export the requests collected as a CSV file.</p>
+                        <p>You can export the requests collected as a comma or tab separated file.</p>
                         <div class="form-group">
                             <label class="form-label noselect" for="export-file-name">File Name</label>
                             <input class="form-input" type="text" id="export-file-name" name="filename" placeholder="OmnibugExport">
