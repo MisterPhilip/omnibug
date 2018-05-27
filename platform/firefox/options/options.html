@@ -1,0 +1,208 @@
+<html>
+<head>
+    <title>Omnibug Options</title>
+    <link href="../assets/css/font.css" rel="stylesheet">
+    <link href="./options.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+    <form id="app">
+        <header>
+            <div>
+                <img src="../assets/images/o-64.png" alt="O" />
+                <h1>Omnibug Options</h1>
+            </div>
+            <p class="help">Note: changes to preferences are saved immediately</p>
+        </header>
+        <section>
+
+            <fieldset>
+                <div class="row">
+                    <div class="col-label">Highlight parameters</div>
+                    <div class="col">
+                        <ul id="highlight-params"></ul>
+                        <script type="text/html" id="highlight-parameter-template">
+                            <li data-parameter-name="##PARAMETER##" style="background-color:##HIGHLIGHT_COLOR##;">##PARAMETER## <span class="remove" title="Remove">&times;</span></li>
+                        </script>
+                        <button id="addParam">Add parameter</button>
+                    </div>
+                </div>
+                <p class="help">Select parameters to highlight to easily see values.</p>
+            </fieldset>
+
+            <fieldset id="providers">
+                <div class="row">
+                    <div class="col-label">Enabled providers</div>
+                    <div class="col">
+                        <input type="text" id="provider-search" placeholder="Search for a provider&hellip;">
+                        <div id="providers-list">
+                            <script type="text/html" id="providers-template">
+                                <label style="display:block;" data-provider="##PROVIDER##">
+                                    <input type="checkbox" data-bind-property="enabledProviders" id="provider-##VALUE##" value="##VALUE##" />
+                                    ##PROVIDER##
+                                </label>
+                            </script>
+                        </div>
+                    </div>
+                </div>
+                <p class="help">Select the providers (marketing / analytics tools) to be shown within Omnibug.</p>
+            </fieldset>
+
+            <fieldset>
+                <div class="row">
+                    <label for="alwaysExpand">Expand entries by default</label>
+                    <div class="col">
+                        <input type="checkbox" name="alwaysExpand" id="alwaysExpand" data-bind-property="alwaysExpand" />
+                    </div>
+                </div>
+                <p class="help">Omnibug can automatically expand all entries as they appear.</p>
+            </fieldset>
+
+            <fieldset>
+                <div class="row">
+                    <label for="showRedirects">Show redirected entries</label>
+                    <div class="col">
+                        <input type="checkbox" name="showRedirects" id="showRedirects" data-bind-property="showRedirects" />
+                    </div>
+                </div>
+                <p class="help">Omnibug can show or hide redirected entries for the same parent request. Only the final request is shown if setting is unchecked.</p>
+            </fieldset>
+
+            <fieldset>
+                <div class="row">
+                    <label for="showNavigation">Show navigation entries</label>
+                    <div class="col">
+                        <input type="checkbox" name="showNavigation" id="showNavigation" data-bind-property="showNavigation" />
+                    </div>
+                </div>
+                <p class="help">Omnibug can show or hide dividers to show when you navigated to a new URL.</p>
+            </fieldset>
+
+            <fieldset>
+                <div class="row">
+                    <label for="showQuotes">Add quotes around values</label>
+                    <div class="col">
+                        <input type="checkbox" name="showQuotes" id="showQuotes" data-bind-property="showQuotes" />
+                    </div>
+                </div>
+                <p class="help">Values can be shown with quotes to highlight any extra whitespaces or other characters.</p>
+            </fieldset>
+
+            <fieldset>
+                <div class="row">
+                    <div class="col-label">Parameter display style</div>
+                    <div class="col">
+                        <div>
+                            <label title="Descriptions" for="showFullNamesTrue">
+                                <input type="radio" name="showFullNames" id="showFullNamesTrue" data-bind-property="showFullNames" value="true" />
+                                Descriptions <span class="help">(e.g. "Screen Resolution")</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label title="Descriptions" for="showFullNamesFalse">
+                                <input type="radio" name="showFullNames" id="showFullNamesFalse"  data-bind-property="showFullNames" value="false" />
+                                Parameter Names <span class="help">(e.g. "sr")</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <p class="help">Show the raw parameter name found in the URL, or the user-friendly description for each request.</p>
+            </fieldset>
+
+            <fieldset class="color">
+                <div class="row">
+                    <label for="color_load">Page load event</label>
+                    <div class="col">
+                        <input type="color" id="color_load" data-bind-property="color_load" data-bind-style="background-color" />
+                        <span class="example" >Example</span>
+                    </div>
+                </div>
+                <p class="help">The background color for page load events.</p>
+            </fieldset>
+
+            <fieldset class="color">
+                <div class="row">
+                    <label for="color_click">Click event</label>
+                    <div class="col">
+                        <input type="color" id="color_click" data-bind-property="color_click" data-bind-style="background-color" />
+                        <span class="example">Example</span>
+                    </div>
+                </div>
+                <p class="help">The background color for click events.</p>
+            </fieldset>
+
+            <fieldset class="color">
+                <div class="row">
+                    <label for="color_highlight">Highlighted parameter</label>
+                    <div class="col">
+                        <input type="color" id="color_highlight" data-bind-property="color_highlight" data-bind-style="background-color" />
+                        <span class="example">Example</span>
+                    </div>
+                </div>
+                <p class="help">The background color for parameters that are highlighted (see "Highlight parameters" setting above).</p>
+            </fieldset>
+
+            <fieldset class="color">
+                <div class="row">
+                    <label for="color_hover">Row hover</label>
+                    <div class="col">
+                        <input type="color" id="color_hover" data-bind-property="color_hover" data-bind-style="background-color" />
+                        <span class="example">Example</span>
+                    </div>
+                </div>
+                <p class="help">The background color for when you hover over a row.</p>
+            </fieldset>
+
+            <fieldset class="color">
+                <div class="row">
+                    <label for="color_redirect">Redirected event</label>
+                    <div class="col">
+                        <input type="color" id="color_redirect" data-bind-property="color_redirect" data-bind-style="background-color" />
+                        <span class="example">Example</span>
+                    </div>
+                </div>
+                <p class="help">The background color requests that were redirected (meaning there could be multiple of the same requests).</p>
+            </fieldset>
+
+            <fieldset class="color">
+                <div class="row">
+                    <label for="color_prev">Previous page</label>
+                    <div class="col">
+                        <input type="color" id="color_prev" data-bind-property="color_prev" data-bind-style="background-color" />
+                        <span class="example">Example</span>
+                    </div>
+                </div>
+                <p class="help">The background color for events that happened on the last page.</p>
+            </fieldset>
+
+            <fieldset class="color">
+                <div class="row">
+                    <label for="color_quotes">Quotes</label>
+                    <div class="col">
+                        <input type="color" id="color_quotes" data-bind-property="color_quotes" data-bind-style="color" />
+                        <span class="example">"<span style="color: #555555 !important;">Example</span>"</span>
+                    </div>
+                </div>
+                <p class="help">The color for quotes that surround values (if enabled in the "Add quotes around values" setting above).</p>
+            </fieldset>
+
+            <fieldset id="reset">
+                <div class="row">
+                    <div class="col-label">Reset Settings</div>
+                    <div class="col">
+                        <button id="reset-defaults" title="Clicking this will reset all of your Omnibug settings!">Reset Settings</button>
+                    </div>
+                </div>
+                <p class="help">If you want to reset your settings, or are having issues with Omnibug, you can click the button to reset all settings to their default state.</p>
+            </fieldset>
+        </section>
+    </form>
+    <footer>
+        <p>&copy; 2018 <a href="https://omnibug.io/?utm_source=extension&utm_medium=firefox&utm_campaign=settings-about">Omnibug</a><br />v0.6.0</p>
+    </footer>
+
+    <script src="../providers.js"></script>
+    <script src="../libs/OmnibugSettings.js"></script>
+    <script src="./options.js"></script>
+
+</body>
+</html>

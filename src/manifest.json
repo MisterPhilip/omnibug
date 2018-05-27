@@ -5,9 +5,9 @@
     "description": "Omnibug is a browser extension to decode and display outgoing web metrics requests.",
     "author": "Philip Lawrence",
     "icons": {
-        "16": "assets/images/o-16.png",
-        "48": "assets/images/o-48.png",
-        "128": "assets/images/o-128.png"
+        "16": "assets/images/blue-16.png",
+        "48": "assets/images/blue-48.png",
+        "128": "assets/images/blue-128.png"
     },
     "background": {
         "scripts": [

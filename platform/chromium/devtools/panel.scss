@@ -1,0 +1,145 @@
+@import "../assets/styles/base";
+
+html, body {
+  height: 100%;
+}
+body {
+  font-size: 15px;
+  margin: 0 auto;
+  color: $body-font-color;
+  background-color: $body-background-color;
+  padding-top: 37px;
+  overflow: hidden;
+}
+body > header, nav.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 37px;
+}
+nav.navbar {
+  background: #fff;
+  border-bottom: 1px solid $border-color;
+}
+.navbar-section:last-of-type a.btn {
+  border-left: 1px solid #eee;
+}
+nav.navbar .btn.btn-link {
+  color: $primary-color;
+}
+nav.navbar .btn.btn-link:hover {
+  color: $primary-color-dark;
+}
+body > main {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.request {
+  width: 100%;
+  padding: 0 5px;
+}
+.request > summary {
+  padding-top: 5px;
+}
+.request:nth-of-type(odd) {
+  background-color: #fafafa;
+}
+.request:nth-of-type(even) {
+  background-color: #f0f0f0;
+}
+#no-requests {
+  animation: fadein 2s;
+  background-color: transparent;
+}
+details > summary {
+  -moz-user-select: none;
+  user-select: none;
+  cursor: pointer;
+}
+.request > summary {
+  padding-bottom: 5px;
+}
+.request > summary .container {
+  margin-top: -1.5em;
+  margin-left: .75em;
+}
+.request > summary .column {
+  @include hide-overflow;
+}
+.request > div {
+  border-top: 1px solid #dedede;
+  font-size: .9em;
+  padding: 1em;
+}
+.request:not(.redirected) .redirect {
+  display: none;
+}
+.request.redirected .redirect-icon {
+  margin-left: .5em;
+  color: $gray-color;
+}
+.request.redirected:hover .redirect-icon,
+.request.redirected:focus .redirect-icon {
+  color: $error-color;
+}
+
+.request table td, .request table th {
+  padding: .2rem .1rem;
+  word-break: break-all;
+}
+.request-details > summary {
+  font-weight: 600;
+  font-size: 1.1em;
+  padding: .3em;
+}
+.request-details table {
+  border: 1px solid $border-color;
+  border-collapse: initial;
+  margin-bottom: 1em;
+}
+.request-details tbody > tr > td:first-of-type {
+  width: 13em;
+  font-weight: 600;
+  padding-left: .3em;
+}
+.request summary .label {
+  font-size: .8em;
+  margin-right: .5em;
+  padding: .35em;
+  min-width: 80px;
+  text-align: center;
+}
+.navigation {
+  @include hide-overflow;
+  width: 100%;
+  padding: .3em 2em;
+  background-color: #FFF;
+  font-size: .9em;
+  color: #AAA;
+  border-top: 1px solid $border-color;
+}
+.navigation:hover {
+  color: #555;
+}
+#requests > .navigation:first-of-type {
+  border-top: 0;
+}
+#filter-modal .modal-body {
+  padding-top: 0;
+}
+#filter-providers {
+  list-style-type: none;
+}
+#filter-providers  input {
+  margin-right: .5em;
+}
+.filters-active [data-target-modal="filter-modal"] {
+  color: #FF9800 !important;
+}
+body:not(.persist-disabled) #persist-enable,
+body.persist-disabled #persist-disable {
+  display: none;
+}
+#persist-enable { color: #F44336; }

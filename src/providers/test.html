@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="./providers.js"></script>
+<script>
+
+        var url = 'https://test.tt.omtrdc.net/foobar/mbox/ajax/?test=true&foo=bar&screenWidth=1234&mboxVersion=61';
+        console.log(url, OmnibugProvider.checkUrl(url));
+        console.log(OmnibugProvider.getProviderForUrl(url));
+        console.log(OmnibugProvider.parseUrl(url, "phil-test=123&abc&xyz=098"));
+
+        url = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&AQE=1";
+        var foo = OmnibugProvider.parseUrl(url);
+        console.log(foo);
+/*
+        url = "https://sap.d1.sc.omtrdc.net/b/ss/sapcomglobal,sapcomrollup,sapglobal/1/JS-2.5.0/s16899704473368?AQB=1&ndh=1&pf=1&t=7%2F0%2F2018%2014%3A40%3A13%200%20420&mid=27908794156756632503675174115517617937&aamlh=9&ce=UTF-8&ns=sap&pageName=sap%3A%2Findex.html&g=https%3A%2F%2Fwww.sap.com%2Findex.html&c.&a.&contentType=video&media.&channel=www.sap.com&playerName=HTML5%20Basic%20Player&length=162&.media&.a&.c&events=event23%2Cevent56%2Cevent9%2Cevent200&products=%3B%3B%3B%3Bevent23%3D1&v1=sap%3Aglo&v5=https%3A%2F%2Fwww.sap.com%2Findex.html%23&c9=logN&v9=logN&v21=sap%3A544e38a5-c67c-0010-82c7-eda71af511fa&c44=VID%7CPlay&v44=VID%7CPlay&c45=https%3A%2F%2Fwww.sap.com%2Findex.html%23&v45=%2B1&v48=57dc2397f19711e792fae36cacebaad4&c50=sap%3Adtm_1dx%3A2018.01.03%7Cgl%3ADTM_AM%3A2017.12.28%7CAA%3A2.5.0%7Cmbox%3A61%20%28legacy%29%7Cmcid%3A2.5.0&c56=US%20Manufacturer%20Goes%20Digital%20with%20SAP&v56=US%20Manufacturer%20Goes%20Digital%20with%20SAP&v57=1%3AM%3A0-25&v58=HTML5%20Basic%20Player&c72=D%3Devents&v92=D%3Dmid&pe=m_s&pev3=video&c.&a.&activitymap.&page=sap%3A%2Findex.html&link=Watch%20the%20video&region=main&pageIDType=1&.activitymap&.a&.c&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=227AC2D754DCAB340A4C98C6%40AdobeOrg&AQE=1";
+        console.log("sap", OmnibugProvider.parseUrl(url));
+        */
+</script>
+
+<script>
+    function convert(old) {
+        let converted = {};
+        for(let param in old) {
+            if(!old.hasOwnProperty(param)) continue;
+
+            converted[param] = {name: old[param], group: "General"};
+        }
+        return JSON.stringify(converted, null, "\t");
+    }
+</script>
+</body>
+</html>

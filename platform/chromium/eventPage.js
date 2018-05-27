@@ -40,16 +40,10 @@
      * Load settings when storage has changed
      */
     browser.storage.onChanged.addListener((changes, storageType) => {
-        if(OmnibugSettings.storage_key in changes)
-        {
-            setCachedSettings(changes[OmnibugSettings.storage_key]);
-            tabs.forEach((tab) => {
-                tab.port.postMessage({
-                    "event": "settings",
-                    "data":  cached.settings
-                });
-            })
+        if(settings.storage_key in changes) {
+            setCachedSettings(changes[settings.storage_key].newValue);
         }
+        sendSettingsToTabs(tabs);
     });
 
     /**
@@ -65,6 +59,9 @@
         {
             return;
         }
+        let tabList = {};
+        tabList[port.id] = port;
+        sendSettingsToTabs(tabList);
         tabs = port.init(tabs);
     });
 
@@ -87,19 +84,21 @@
                         "tab":       details.tabId,
                         "timestamp": details.timeStamp,
                         "type":      details.type,
-                        "url":       details.url
+                        "url":       details.url,
+                        "postData":  ""
                     },
                     "event": "webRequest"
-                },
-                postData = "";
+                };
 
-            if(details.method === "POST") {
-                postData =  String.fromCharCode.apply( null, new Uint8Array( data.requestBody.raw[0].bytes ) );
+            // Grab any POST data that is included
+            if(details.method === "POST" && details.requestBody && details.requestBody.raw && details.requestBody.raw[0]) {
+                data.request.postData = String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes));
             }
 
+            // Parse the URL and join our request info to the parsed data
             data = Object.assign(
                 data,
-                OmnibugProvider.parseUrl(details.url, postData)
+                OmnibugProvider.parseUrl(data.request.url, data.request.postData)
             );
 
             console.log("Matched URL, sending data to devtools", data);
@@ -112,11 +111,11 @@
     /**
      * Listen for all navigations that occur on a top-level frame
      */
-    browser.webNavigation.onBeforeNavigate.addListener(
+    browser.webNavigation.onCommitted.addListener(
         (details) => {
             if(isValidTab(details.tabId) && details.frameId === 0) {
                 // We have a page load within a tab we care about, send a message to the devtools with the info
-                console.log("webNavigation.onBeforeNavigate called", details);
+                console.log("webNavigation.onCommitted called", details);
                 tabs[details.tabId].port.postMessage({
                     "request": {
                         "tab":       details.tabId,
@@ -137,6 +136,21 @@
      */
     function isValidTab(tabId) {
         return (tabId !== -1 && tabId in tabs);
+    }
+
+    /**
+     * Send new settings values to all tabs
+     *
+     * @param tabs
+     */
+    function sendSettingsToTabs(tabs) {
+        console.log("Sending settings to tabs", cached.settings);
+        Object.values(tabs).forEach((tab) => {
+            tab.port.postMessage({
+                "event": "settings",
+                "data":  cached.settings
+            });
+        });
     }
 
     /**

@@ -1,1181 +1,1507 @@
-/*
- * Omnibug
- * Provider data
+/**
+ * Generic Base Provider
  *
- * This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
- * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send
- * a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041,
- * USA.
- *
+ * @class
  */
-var OmnibugProvider = {
-    /**
-     * Gathers each provider's pattern and concatenates (with alternation)
-     */
-    getDefaultPattern: function() {
-        var patterns = [];
-        for( var key in this ) {
-            if( this.hasOwnProperty( key ) && typeof( this[key] ) !== "function" ) {
-                patterns.push( this[key].pattern.source );
-            }
-        }
-        return new RegExp( patterns.join( "|" ) );
-    },
+/* exported BaseProvider */
+class BaseProvider
+{
+    constructor()
+    {
+        this._key        = "";
+        this._pattern    = /.*/;
+        this._name       = "";
+        this._type       = "";
+    }
 
     /**
-     * Return a map of key->display name of providers
+     * Get the Provider's key
+     *
+     * @returns {string}
      */
-    getProviders: function() {
-        var providers = {};
-        for( var key in this ) {
-            if( this.hasOwnProperty( key ) && typeof( this[key] ) !== "function" ) {
-                providers[key] = this[key].name;
-            }
-        }
-        return providers;
-
-    },
+    get key()
+    {
+        return this._key;
+    }
 
     /**
-     * Return a map of key->pattern
+     * Get the Provider's type
+     *
+     * @returns {string}
      */
-    getPatterns: function() {
-        var patterns = {};
-        for( var key in this ) {
-            if( this.hasOwnProperty( key ) && typeof( this[key] ) !== "function" ) {
-                patterns[key] = this[key].pattern.source;
-            }
-        }
-        return patterns;
-    },
-
-    /**
-     * Return the provider for a URL, if any
-     */
-    getProviderForUrl: function( url ) {
-        for( var key in this ) {
-            if( this.hasOwnProperty( key ) && typeof( this[key] ) !== "function" && url.match( this[key].pattern ) ) {
-                return this[key];
-            }
-        }
-        return {
-              key: "UNKNOWN"
-            , name: "Unknown"
-            , pattern: /^5831c14e26a2ded99d98782c15e92d62f195d9bcf53869f4d412cff5a074e5246c99916ada7ad760$/
-            , keys: {
-            },
-            handleQueryParam: function( name, value, rv, raw ) {
-                return false;
-            }
+    get type()
+    {
+        let types = {
+            "analytics":    "Analytics",
+            "testing":      "UX Testing",
+            "tagmanager":   "Tag Manager",
+            "visitorid":    "Visitor Identification"
         };
-    },
-
+        return types[this._type] || "Unknown";
+    }
 
     /**
-     * Providers
-     * Ordered by pattern match specificity (decreasing)
+     * Get the Provider's RegExp pattern
+     *
+     * @returns {RegExp}
      */
+    get pattern()
+    {
+        return this._pattern;
+    }
 
-    AUDIENCEMANAGER: {
-        key: "AUDIENCEMANAGER"
-        , name: "Adobe Audience Manager"
-        , pattern: /demdex\.net\//
-        , keys: {
-            d_orgid:  "Adobe Organization ID"
-          , d_rtbd:   "Return Method"
-          , d_cb:     "Callback property"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-            } else {
-                return false;
-            }
-            return true;
-        },
-        handleCustom: function( url, rv, raw ) {
-            if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
-                raw["rsid"] = RegExp.$1.split( "," );
+    /**
+     * Get the Provider's name
+     *
+     * @returns {string}
+     */
+    get name()
+    {
+        return this._name;
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {};
+    }
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {};
+    }
+
+    /**
+     * Check if this provider should parse the given URL
+     *
+     * @param {string}  rawUrl   A URL to check against
+     *
+     * @returns {Boolean}
+     */
+    checkUrl(rawUrl)
+    {
+        return this.pattern.test(rawUrl);
+    }
+
+    /**
+     * Parse a given URL into human-readable output
+     *
+     * @param {string}  rawUrl      A URL to check against
+     * @param {string}  postData    POST data, if applicable
+     *
+     * @return {{provider: {name: string, key: string, type: string}, data: Array}}
+     */
+    parseUrl(rawUrl, postData = "")
+    {
+        let url = new URL(rawUrl),
+            data = [],
+            params = new URLSearchParams(url.search),
+            postParams = this.parsePostData(postData);
+
+        // Handle POST data first, if applicable (treat as query params)
+        postParams.forEach((pair) => {
+            params.append(pair[0], pair[1]);
+        });
+
+        for(let param of params)
+        {
+            let key = param[0],
+                value = param[1],
+                result = this.handleQueryParam(key, value);
+            if(typeof result === "object") {
+                data.push(result);
             }
         }
-    },
 
-    KISSMETRICS : {
-          key: "KISSMETRICS"
-        , name: "KISSmetrics"
-        , pattern: /api\.mixpanel\.com\/track\//
-        , keys: {
+        let customData = this.handleCustom(url);
+        if(typeof customData === "object" && customData !== null)
+        {
+            if(customData.length) {
+                data = data.concat(customData);
+            } else {
+                data.push(customData);
+            }
+        }
+
+        return {
+            "provider": {
+                "name":    this.name,
+                "key":     this.key,
+                "type":    this.type,
+                "columns": this.columnMapping
+            },
+            "data": data
+        };
+    }
+
+    /**
+     * Parse any POST data into param key/value pairs
+     *
+     * @param postData
+     * @return {Array}
+     */
+    parsePostData(postData = "")
+    {
+        let params = [];
+        // Handle POST data first, if applicable (treat as query params)
+        if(typeof postData === "string" && postData !== "")
+        {
+            let keyPairs = postData.split("&");
+            keyPairs.forEach((keyPair) => {
+                let splitPair = keyPair.split("=");
+                params.push([splitPair[0], decodeURIComponent(splitPair[1] || "")]);
+            });
+        }
+        return params;
+    }
+
+    /**
+     * Parse a given URL parameter into human-readable form
+     *
+     * @param {string}  name
+     * @param {string}  value
+     * @returns {{}}
+     */
+    handleQueryParam(name, value)
+    {
+        let param = this.keys[name] || {};
+        return {
+            "key":   name,
+            "field": param.name || name,
+            "value": value,
+            "group": param.group || "Other"
+        };
+    }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param    {string}   url
+     *
+     * @returns {void|Array}
+     */
+    handleCustom(url)
+    {
+
+    }
+}
+/**
+ * Omnibug Provider Factory
+ *
+ * @type {{addProvider, getProviders, checkUrl, getProviderForUrl, parseUrl, defaultPattern}}
+ */
+/* exported OmnibugProvider */
+var OmnibugProvider = (function() {
+
+    var providers = {},
+        defaultPattern = [],
+        defaultPatternRegex = new RegExp();
+
+    /**
+     * Return the provider for a specified url
+     *
+     * @param url
+     *
+     * @returns {typeof BaseProvider}
+     */
+    let getProviderForUrl = (url) => {
+        for(let provider in providers) {
+            if(!providers.hasOwnProperty(provider)) {
+                continue;
+            }
+            if(providers[provider].checkUrl(url)) {
+                return providers[provider];
+            }
+        }
+        return new BaseProvider();
+    };
+
+    return {
+
+        /**
+         * Add a new provider
+         *
+         * @param {typeof BaseProvider} provider
+         */
+        "addProvider": (provider) => {
+            providers[provider.key] = provider;
+            defaultPattern.push(provider.pattern);
+            defaultPatternRegex = new RegExp(defaultPattern.map((el) => {
+                return el.source;
+            }).join("|"));
         },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name === "data" ) {
-                var obj = atob( value );
-                try {
-                    var parsed = JSON.parse( obj );
-                    for( var k in parsed ) {
-                        if( parsed.hasOwnProperty( k ) ) {
-                            if( typeof( parsed[k] ) === "object" ) {
-                                for( var innerK in parsed[k] ) {
-                                    if( parsed[k].hasOwnProperty( innerK ) ) {
-                                        rv[this.key] = rv[this.key] || {};
-                                        rv[this.key][k] = rv[this.key][k] || {};
-                                        rv[this.key][k][innerK] = parsed[k][innerK];
-                                        raw[innerK] = parsed[k][innerK];
-                                    }
-                                }
-                            } else {
-                                rv[this.key] = rv[this.key] || {};
-                                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                                rv[this.key][this.name][k] = parsed[k];
-                                raw[k] = parsed[k];
-                            }
-                        }
-                    }
-                } catch( e ) {
-                    // noop
+
+        /**
+         * Returns a list of all added providers
+         *
+         * @returns {{}}
+         */
+        "getProviders": () => {
+            return providers;
+        },
+
+        /**
+         * Checks if a URL should be parsed or not
+         *
+         * @param {string}  url   URL to check against
+         *
+         * @returns {boolean}
+         */
+        "checkUrl": (url) => {
+            return defaultPatternRegex.test(url);
+        },
+
+        /**
+         * Return the provider for a specified url
+         *
+         * @param url
+         *
+         * @returns {typeof BaseProvider}
+         */
+        "getProviderForUrl": getProviderForUrl,
+
+        /**
+         * Parse a URL into a JSON object
+         *
+         * @param {string}  url         URL to be parsed
+         * @param {string}  postData    POST data, if applicable
+         *
+         * @returns {{provider, data}}
+         */
+        "parseUrl": (url, postData = "") => {
+            return getProviderForUrl(url).parseUrl(url, postData);
+        },
+
+        /**
+         * Return the patterns for all (enabled) providers
+         *
+         * @param   {void|[]}  enabledProviders    Providers that are enabled
+         *
+         * @returns {RegExp}
+         */
+        "getPattern": (enabledProviders) => {
+            if(!enabledProviders || !enabledProviders.length) {
+                return defaultPatternRegex;
+            }
+
+            let patterns = [];
+            enabledProviders.forEach((provider) => {
+                if(providers[provider]) {
+                    patterns.push(providers[provider].pattern.source);
                 }
-
-                return true;
-            } else if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
+            });
+            return new RegExp(patterns.join("|"));
         }
-    },
+    };
+})();
+/**
+ * Adobe Analytics
+ * http://www.adobe.com/data-analytics-cloud/analytics.html
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class AdobeAnalyticsProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "ADOBEANALYTICS";
+        this._pattern    = /\/b\/ss\/|\.2o7\.net\/|\.sc\d?\.omtrdc\.net\//;
+        this._name       = "Adobe Analytics";
+        this._type       = "analytics";
+    }
 
-    TORBIT : {
-          key: "TORBIT"
-        , name: "Torbit Insight"
-        , pattern: /insight-beacon\.torbit\.com/
-        , keys: {
-              onready: "onready"
-            , onload:    "onload"
-            , frontend: "frontend"
-            , total_load_time: "Total load time"
-            , red_t: "red_t"
-            , cache_t: "Cache time"
-            , dns_t: "DNS time"
-            , tcp_t: "TCP time"
-            , b_wait_t: "b_wait_t"
-            , b_tran_t: "b_tran_t"
-            , onready_t: "onready time"
-            , onload_t: "onload time"
-            , scr_proc_t: "scr_proc_t"
-            , src: "src"
-            , tbtim: "tbtim"
-            , conversion: "conversion"
-            , tags: "tags"
-            , v: "v"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    QUANTSERVE : {
-          key: "QUANTSERVE"
-        , name: "Quantcast"
-        , pattern: /pixel\.quantserve\.com\/pixel/
-        , keys: {
-              ref: "Referrer"
-            , tzo: "Time zone offset"
-            , dst: "Daylight savings time active?"
-            , sr:  "Screen resolution"
-            , et:  "Timestamp"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    MARKETO : {
-          key: "MARKETO"
-        , name: "Marketo"
-        , pattern: /mktoresp.com\/webevents\/visitWebPage/
-        , keys: {
-              _mchNc: "Timestamp"
-            , _mchCn: "_mchCn"
-            , _mchId: "ID"
-            , _mchTk: "_mchTk"
-            , _mchHo: "Hostname"
-            , _mchPo: "_mchPo"
-            , _mchRu: "Request URL"
-            , _mchPc: "Scheme"
-            , _mchHa: "_mchHa"
-            , _mchRe: "Referrer"
-            , _mchQp: "_mchQp"
-            , _mchVr: "_mchVr"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    NEWRELIC : {
-          key: "NEWRELIC"
-        , name: "NewRelic"
-        , pattern: /beacon.*\.newrelic\.com\//
-        , keys: {
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name === "perf" ) {
-                try {
-                    var parsed = JSON.parse( value );
-                    for( var k in parsed ) {
-                        if( parsed.hasOwnProperty( k ) ) {
-                            if( typeof( parsed[k] ) === "object" ) {
-                                for( var innerK in parsed[k] ) {
-                                    if( parsed[k].hasOwnProperty( innerK ) ) {
-                                        rv[this.key] = rv[this.key] || {};
-                                        rv[this.key][k] = rv[this.key][k] || {};
-                                        rv[this.key][k][innerK] = parsed[k][innerK];
-                                        raw[innerK] = parsed[k][innerK];
-                                    }
-                                }
-                            } else {
-                                rv[this.key] = rv[this.key] || {};
-                                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                                rv[this.key][this.name][k] = parsed[k];
-                                raw[k] = parsed[k];
-                            }
-                        }
-                    }
-                } catch( e ) {
-                    // noop
-                }
-
-                return true;
-            } else if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    KRUX : {
-          key: "KRUX"
-        , name: "Krux"
-        , pattern: /beacon\.krxd\.net\/pixel\.gif/
-        , keys: {
-              geo_country: "Country"
-            , geo_region:  "Region"
-            , geo_city:    "City"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    OPTIMIZELY : {
-          key: "OPTIMIZELY"
-        , name: "Optimizely"
-        , pattern: /optimizely\.com\/event/
-        , keys: {
-              t: "Timestamp"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    SOPHUS3 : {
-          key: "SOPHUS3"
-        , name: "sophus3"
-        , pattern: /sophus3\.com\/i|sophus3\.com\/d/
-        , keys: {
-              r:      "Referrer URL"
-            , tagv:   "Script Version"
-            , Ts:     "Time Stamp"
-            , sr:     "Screen Resolution"
-            , sw:     "Screen Width"
-            , ah:     "Actual Height"
-            , aw:     "Actual Width"
-            , sh:     "Screen Height"
-            , pd:     "Pixel Depth"
-            , cd:     "Colour Depth"
-            , siteID: "SiteID"
-            , ts:     "Ts"
-            , "location": "Location"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    DOUBLECLICK : {
-          key: "DOUBLECLICK"
-        , name: "Doubleclick"
-        , pattern: /\.doubleclick\.net\/(ad|r|pcs|gampad)/
-        , keys: {
-              cat: "Category"
-            , kwd: "Keywords"
-            , sz:  "Size"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    ADOBETARGET : {
-        key: "ADOBETARGET"
-        , name: "Adobe Target"
-        , pattern: /\.tt\.omtrdc\.net\//
-        , keys: {
-            mbox:              "Mbox Name"
-            , mboxType:          "Mbox Type"
-            , mboxCount:         "Mbox Count"
-            , mboxId:            "Mbox ID"
-            , mboxSession:       "Mbox Session"
-            , mboxPC:            "Mbox PC ID"
-            , mboxPage:          "Mbox Page ID"
-            , clientCode:        "Client Code"
-            , mboxHost:          "Page Host"
-            , mboxURL:           "Page URL"
-            , mboxReferrer:      "Page Referrer"
-            , screenHeight:      "Screen Height"
-            , screenWidth:       "Screen Width"
-            , browserWidth:      "Browser Width"
-            , browserHeight:     "Browser Height"
-            , browserTimeOffset: "Browser Timezone Offset"
-            , colorDepth:        "Browser Color Depth"
-            , mboxXDomain:       "CrossDomain Enabled"
-            , mboxTime:          "Timestamp"
-            , mboxVersion:       "Library Version"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        },
-        handleCustom: function( url, rv, raw ) {
-            var matches =  url.match( /\/([^\/]+)\/mbox\/([^\/\?]+)/ );
-            if(matches !== null && matches.length === 3) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name]["clientCode"] = matches[1];
-                rv[this.key][this.name]["mboxType"] = matches[2];
-                raw["clientCode"] = matches[1];
-                raw["mboxType"] = matches[2];
-            }
-        }
-    },
-
-    URCHIN: {
-          key: "URCHIN"
-        , name: "Google Analytics"
-        , pattern: /__utm\.gif/
-        , keys: {
-              utmac:  "Account string"
-            , utmcc:  "Cookie values"
-            , utmcn:  "New campaign session?"
-            , utmcr:  "Repeat campaign visit?"
-            , utmcs:  "Browser language encoding"
-            , utmdt:  "Page title"
-            , utme:   "Extensible parameter"
-            , utmfl:  "Flash version"
-            , utmhn:  "Host name"
-            , utmipc: "Product code/SKU"
-            , utmipn: "Product name"
-            , utmipr: "Unit price"
-            , utmiqt: "Quantity"
-            , utmiva: "Item variations"
-            , utmje:  "Java-enabled browser?"
-            , utmn:   "Unique ID"
-            , utmp:   "Page request"
-            , utmr:   "Referrer URL"
-            , utmsc:  "Screen color depth"
-            , utmsr:  "Screen resolution"
-            , utmt:   "Request type"
-            , utmtci: "Billing city"
-            , utmtco: "Billing country"
-            , utmtid: "Order ID"
-            , utmtrg: "Billing region"
-            , utmtsp: "Shipping cost"
-            , utmtst: "Affiliation"
-            , utmtto: "Order Total"
-            , utmttx: "Tax"
-            , utmul:  "Browser language"
-            , utmwv:  "Tracking code version"
-            , utmhid: "AdSense Hit ID"
-            , utms:   "Requests made this session"
-            , utmu:   "Client usage/Error data"
-            , utmip:  "IP address"
-            , utmvp:  "Viewport resolution"
-            , utmni:  "Non-interaction event"
-            , utmcsr: "Campaign source"
-            , utmccn: "Campaign name"
-            , utmcmd: "Campaign medium"
-            , utmctr: "Campaign term/key phrase"
-            , utmcct: "Campaign content"
-            , utmsa:  "Social action"
-            , utmsid: "Social destination"
-            , utmsn:  "Social network name"
-            , utmht:  "Time dispatched"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys || name.match( /^utm.*/ ) ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    OMNITURE: {
-          key: "OMNITURE"
-        , name: "Adobe Analytics"
-        , pattern: /\/b\/ss\/|2o7/
-        , keys: {
-              ns:     "Visitor namespace"
-            , ndh:    "Image sent from JS?"
-            , ch:     "Channel"
-            , v0:     "Campaign"
-            , r:      "Referrer URL"
-            , ce:     "Character set"
-            , cl:     "Cookie lifetime"
-            , g:      "Current URL"
-            , j:      "JavaScript version"
-            , bw:     "Browser width"
-            , bh:     "Browser height"
-            , s:      "Screen resolution"
-            , c:      "Screen color depth"
-            , ct:     "Connection type"
-            , p:      "Netscape plugins"
-            , k:      "Cookies enabled?"
-            , hp:     "Home page?"
-            , pid:    "Page ID"
-            , pidt:   "Page ID type"
-            , oid:    "Object ID"
-            , oidt:   "Object ID type"
-            , ot:     "Object tag name"
-            , pe:     "Link type"
-            , pev1:   "Link URL"
-            , pev2:   "Link name"
-            , pev3:   "Video milestone"
-            , c1:     "Prop1"
-            , h1:     "Hierarchy var1"
-            , h2:     "Hierarchy var2"
-            , h3:     "Hierarchy var3"
-            , h4:     "Hierarchy var4"
-            , h5:     "Hierarchy var5"
-            , v1:     "EVar1"
-            , cc:     "Currency code"
-            , t:      "Browser time"  // "[d/m/yyyy]   [hh:mm:ss]  [weekday]  [time zone offset]"
-            , v:      "Javascript-enabled browser?"
-            , pccr:   "Prevent infinite redirects"
-            , vid:    "Visitor ID"
-            , vidn:   "New visitor ID"
-            , fid:    "Fallback Visitor ID"
-            , mid:    "Marketing Cloud Visitor ID"
-            , aid:    "Legacy Visitor ID"
-            , cdp:    "Cookie domain periods"
-            , pageName: "Page name"
-            , pageType: "Page type"
-            , server: "Server"
-            , events: "Events"
-            , products: "Products"
-            , purchaseID: "Purchase ID"
-            , state:  "Visitor state"
-            , vmk:    "Visitor migration key"
-            , vvp:    "Variable provider"
-            , xact:   "Transaction ID"
-            , zip:    "ZIP/Postal code"
-            , rsid:   "Report Suites"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            var _name;
-            if( name.match( /^c(\d+)$/ ) || name.match( /^prop(\d+)$/i ) ) {
-                // props
-                _name = "Custom Traffic Variables";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["prop"+RegExp.$1] = value;
-                raw["prop"+RegExp.$1] = value;
-            } else if( name.match( /^v(\d+)$/ ) || name.match( /^evar(\d+)$/i ) ) {
-                // eVars
-                _name = "Conversion Variables";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["eVar"+RegExp.$1] = value;
-                raw["eVar"+RegExp.$1] = value;
-            } else if( name.match( /^\[?AQB\]?$/ ) || name.match( /^\[?AQE\]?$/ ) ) {
-                // noop; skip Omniture's [AQB] and [AQE] elements
-                raw[name] = value;
-            } else if( name in this.keys ) {
-                // anything else
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-            } else {
-                return false;
-            }
-            return true;
-        },
-        handleCustom: function( url, rv, raw ) {
-            if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
-                raw["rsid"] = RegExp.$1.split( "," );
-            }
-        }
-    },
-
-    VISITORAPI: {
-        key: "VISITORAPI"
-        , name: "Adobe Visitor API"
-        , pattern: /\/id\?callback=s_c_il/
-        , keys: {
-            mcorgid:     "Adobe Organization ID"
-            , mid:       "Visitor ID"
-            , callback:  "Callback property"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-            } else {
-                return false;
-            }
-            return true;
-        },
-        handleCustom: function( url, rv, raw ) {
-            if( url.match( /\/b\/ss\/([\w,]+)\// ) ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name]["rsid"] = RegExp.$1.split( "," );
-                raw["rsid"] = RegExp.$1.split( "," );
-            }
-        }
-    },
-
-    MONIFORCE: {
-          key: "MONIFORCE"
-        , name: "Moniforce"
-        , pattern: /moniforce\.gif/
-        , keys: {
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys || name.match( /^mfinfo/ ) ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    WEBTRENDS: {
-          key: "WEBTRENDS"
-        , name: "WebTrends"
-        , pattern: /dcs\.gif/
-        , keys: {
-              "WT.vt_tlv":   "Time of last visit (SDC)"
-            , "WT.vt_f_tlv": "Time of last visit (cookie)"
-            , "WT.vt_f_tlh": "Time of last hit"
-            , "WT.vt_d":     "First visitor hit today (EA)"
-            , "WT.vt_a_d":   "First visitor hit today (ARDS)"
-            , "WT.vt_f_d":   "First visitor hit today (cookie)"
-            , "WT.vt_s":     "First visitor hit this session"
-            , "WT.vt_a_s":   "First visitor hit this account"
-            , "WT.vt_f_s":   "First visitor hit this session (cookie)"
-            , "WT.vt_f":     "First visitor hit (cookie)"
-            , "WT.vt_f_a":   "First visitor hit this account (cookie)"
-            , "WT.vt_sid":   "Session ID (deprecated)"
-            , "WT.vtid":     "Session ID"
-            , "WT.vtvs":     "Visitor session (timestamp)"
-            , "WT.co":       "Client accepting cookies?"
-            , "WT.co_d":     "Session stitching ID"
-            , "WT.co_a":     "Multi account rollup ID"
-            , "WT.co_f":     "Visitor session ID"
-            , "WT.tu":       "Metrics URL truncated?"
-            , "WT.hdr":      "Custom HTTP header tracking"
-            , "WT.tv":       "Webtrends JS tag version"
-            , "WT.site":     "Site ID"
-            , "WT.tsrc":     "Custom traffic source"
-            , "WT.dl":       "Event type" // http://help.webtrends.com/en/analytics9admin/event_tracking.html
-            , "WT.nv":       "Parent element ID/class"
-            , "WT.es":       "Event source"
-            , "WT.dcs_id":   "DCS ID"
-            , "WT.ti":       "Page title"
-            , "WT.sp":       "Parent/child split"
-            , "WT.srch":     "Search engine type"
-            , "WT.tz":       "Time zone"
-            , "WT.bh":       "Browsing hour"
-            , "WT.ul":       "User language"
-            , "WT.cd":       "Color depth"
-            , "WT.sr":       "Screen resolution"
-            , "WT.jo":       "Java enabled?"
-            , "WT.js":       "Javascript enabled?"
-            , "WT.jv":       "Javascript version"
-            , "WT.ct":       "Connection type"
-            , "WT.hp":       "Is home page?"
-            , "WT.bs":       "Browser size"
-            , "WT.fi":       "Flash installed?"
-            , "WT.fv":       "Flash version"
-            , "WT.le":       "Language encoding"
-            , "WT.mle":      "Meta languate encoding"
-            , "WT.em":       "Encoding method"
-            , "WT.slv":      "Silverlight version"
-            , "WT.ssl":      "SSL connection?"
-            , "WT.dcsvid":   "Stored visitor"
-            // more available here: http://www.webtrendstraining.net/content/data%20collection/documents/Webtrends%20Query%20Parameter%20Reference.pdf
-
-            , "dcssip":      "Hostname"
-            , "dcsuri":      "Source or destination URI"
-            , "dcsqry":      "Query String"
-            , "dcsdat":      "Timestamp"
-            , "dcsaut":      "Authorized user?"
-            , "dcsmet":      "Method"
-            , "dcssta":      "HTTP Status code"
-            , "dcsbyt":      "Bytes transferred"
-            , "dcsref":      "Referrer URL"
-            , "dcsredirect": "Cookie detection (internal)"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys || name.match( /^WT\./ ) || name.match( /^dcs/ ) ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    COREMETRICS : {
-          key: "COREMETRICS"
-        , name: "Core Metrics"
-        , pattern: /eluminate\/?\?.*tid=/
-        , keys: {
-            // http://www.akravitz.com/master-list-of-coremetrics-query-strings/
-              at:   "Action tag ID" //  (at 5 = Shop Action 5, at 9 = Shop Action 9)
-            , bp:   "Base price"
-            , cat:  "Conversion action type" // (1=initiated event, 2=completed event)
-            , cc:   "Currency code"
-            , ccid: "Conversion event category ID"
-            , cd:   "Registration code"
-            , cg:    "Category"
-            , ci:    "Client ID"
-            , cid:   "Conversion event ID"
-            , cjen:  "JSF parameter enabled"
-            , cjsid: "JSF session ID"
-            , cjuid: "JSF user ID"
-            , cjvf:  "JSF valid"
-            , cm_re: "Real estate tracking"
-            , cm_sp: "Site promotions tracking"
-            , cpt:   "Conversion points for conversion events"
-            , ct:    "Billing city"
-            , cy:    "Billing country"
-            , ec:    "Character set encoding"
-            , ecat:  "Element category"
-            , eid:   "Element ID"
-            , em:    "Email address"
-            , fi:    "Form inputs"
-            , hr:    "HREF"
-            , je:    "Java enabled?"
-            , jv:    "Javascript version"
-            , lp:    "Landing page"
-            , nm:    "Name of link"
-            , on:    "Order number"
-            , or11:  "Order attributes"
-            , osk:   "Order SKU"
-            , pc:    "Page view?"
-            , pd:    "Color depth"
-            , pflg:  "Product or page element?" // (product = 1, page = 0)
-            , pi:    "Page ID"
-            , pm:    "Product name"
-            , pr:    "Product number"
-            , qt:    "Quantity"
-            , rf:    "Referring URL"
-            , rnd:   "Random (cache-buster)"
-            , sa:    "Billing state"
-            , se:    "Search start page"
-            , sg:    "Shipping"
-            , sh:    "Screen height"
-            , sr:    "Number of search results"
-            , st:    "Session start time"
-            , sw:    "Screen width"
-            , sx11:  "Custom shop fields"
-            , tid:   "Tag ID/type" // see values in URL above (@TODO: decode?)
-            , tr:    "Total revenue"
-            , tz:    "Time zone"
-            , ul:    "Page URL"
-            , vn1:   "Coremetrics library version"
-            , vn2:   "Coremetrics library version 2"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            var _name;
-            if( name.match( /^rg(\d+)$/ ) ) {
-                _name = "Registration Tag Attributes";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["rg"+RegExp.$1] = value;
-            } else if( name.match( /^c_a(\d+)$/ ) ) {
-                _name = "Conversion Event Tag Attributes";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["c_a"+RegExp.$1] = value;
-            } else if( name.match( /^cm_mmca(\d+)$/ ) ) {
-                _name = "Marketing Tags";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["cm_mmca"+RegExp.$1] = value;
-            } else if( name.match( /^cx(\d+)$/ ) ) {
-                _name = "Conversion Events";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["cx"+RegExp.$1] = value;
-            } else if( name.match( /^e_a(\d+)$/ ) ) {
-                _name = "Element Tag Attributes";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["e_a"+RegExp.$1] = value;
-            } else if( name.match( /^np(\d+)$/ ) ) {
-                _name = "Technical Browser Properties";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["np"+RegExp.$1] = unescape( value );
-            } else if( name.match( /^o_a(\d+)$/ ) ) {
-                _name = "Order Tag Attributes";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["o_a"+RegExp.$1] = value;
-            } else if( name.match( /^pr_a(\d+)$/ ) ) {
-                _name = "Product View Tag Attributes";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["pr_a"+RegExp.$1] = value;
-            } else if( name.match( /^pv_a(\d+)$/ ) ) {
-                _name = "Page View Tag Attributes";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["pv_a"+RegExp.$1] = value;
-            } else if( name.match( /^s_a(\d+)$/ ) ) {
-                _name = "Shop Tag Attributes";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][_name] = rv[this.key][_name] || {};
-                rv[this.key][_name]["s_a"+RegExp.$1] = value;
-            } else if( name in this.keys ) {
-                // anything else
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-            } else {
-                return false;
-            }
-            raw[name] = value;
-            return true;
-        }
-    },
-
-    ATINTERNET : {
-          key: "ATINTERNET"
-        , name: "AT Internet"
-        , pattern: /\.xiti/
-        , keys: {
-              r:    "Screen resolution/depth"
-            , p:    "Page name"
-            , s:    "Site number"
-            , s2:   "Site level 2"
-            , lng:  "Language"
-            , ref:  "Referrer"
-            , re:   "Viewport resolution"
-            , dest: "Destination URL"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    FBLIKE : {
-          key: "FBLIKE"
-        , name: "Facebook"
-        , pattern: /facebook.*\/like\.php/
-        , keys: {
-              api_key:     "api_key"
-            , locale:      "locale"
-            , sdk:         "sdk"
-            , channel_url: "channel_url"
-            , href:        "href"
-            , node_type:   "node_type"
-            , width:       "width"
-            , font:        "Font"
-            , layout:      "Layout"
-            , colorscheme: "Color scheme"
-            , show_faces:  "Show faces?"
-            , send:        "send"
-            , extended_social_context: "Extended social context"
-            , action:      "Action"
-            , height:      "Height"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    CROWDFACTORY : {
-          key: "CROWDFACTORY"
-        , name: "Marketo Crowdfactory"
-        , pattern: /\/tracker\/track\.gif/
-        , keys: {
-              cf_eventid:   "cf_eventid"
-            , cachebust:    "Cache buster"
-            , subscriber:   "Subscriber"
-            , product:      "Product"
-            , topcommunity: "topcommunity"
-            , cflog_unk:    "cflog_unk"
-            , html_escape:  "HTML escape?"
-            , session:      "Session"
-            , _mkto_trk:    "_mkto_trk"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    ZAIUS : {
-        key: "ZAIUS"
-        , name: "Zaius"
-        , pattern: /(jumbe|zaius)\.gif/
-        , keys: {
-            event_type:             "Event Type",
-            vdl_action:             "Action",
-            action:                 "Action",
-            vuid:                   "Unique User ID",
-            customer_id:            "Customer ID",
-            tracker_id:             "Tracker ID",
-            page:                   "Page URL",
-            title:                  "Page Title",
-            new_user:               "New User",
-            product_id:             "Product ID",
-            order_id:               "Order ID",
-            hostname:               "Host Name",
-            landing:                "Landing Page",
-            referrer:               "Referrer",
-            keywords:               "Keywords",
-            source:                 "Source",
-            medium:                 "Medium",
-            campaign:               "Campaign",
-            content:                "Content",
-            search_term:            "Search Term",
-            paginate_result_count:  "Paginate Result Count",
-            paginate_page_number:   "Paginate Page Number",
-            filter_field:           "Filter Field",
-            filter_value:           "Filter Value",
-            sort_direction:         "Sort Direction",
-            sort_field:             "Sort Field",
-            carousel_scroll:        "Carousel Scroll",
-            carousel_page_number:   "Carousel Page Number",
-            resolution:             "Screen Resolution",
-            viewport:               "Window Resolution",
-            color_depth:            "Color Depth",
-            language:               "Language",
-            character_set:          "Character Set",
-            java:                   "Java Enabled",
-            flash:                  "Flash Version",
-            vtsrc:                  "Source Info",
-            days_since_last_visit:  "Days Since Last Visit",
-            redirect_time:          "Redirect Time (ms)",
-            domain_lookup_time:     "Domain Lookup Time (ms)",
-            server_connect_time:    "Server Connect Time (ms)",
-            server_response_time:   "Server Response Time (ms)",
-            page_download_time:     "Page Download Time (ms)",
-            page_load_time:         "Page Load Time (ms)",
-            total_load_time:        "Total Load Time (ms)",
-            version:                "Zaius JS Version",
-            zaius_js_version:       "Zaius JS Version",
-            name:                   "Name",
-            first_name:             "Customer First Name",
-            last_name:              "Customer Last Name",
-            email:                  "Customer Email",
-            email_status:           "Customer Email Status",
-            phone:                  "Customer Phone",
-            street1:                "Customer Street 1",
-            street2:                "Customer Street 2",
-            city:                   "Customer City",
-            state:                  "Customer State",
-            zip:                    "Customer Zipcode",
-            country:                "Customer Country",
-            timezone:               "Customer Timezone",
-            total:                  "Order Total",
-            discount:               "Order Discount",
-            subtotal:               "Order Subtotal",
-            tax:                    "Order Tax",
-            shipping:               "Order Shipping",
-            brand:                  "Brand",
-            category:               "Category",
-            u:                      "Time"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            if ( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-                return true;
-            }
-            return false;
-        }
-    },
-
-    UNIVERSALANALYTICS : {
-        key: "UNIVERSALANALYTICS"
-        , name: "Universal Analytics"
-        , pattern: /\/collect\/?\?/
-        , keys: {
-            v:      "Protocol Version"
-            , tid:    "Tracking ID"
-            , aip:    "Anonymize IP"
-            , qt:     "Queue Time"
-            , z:      "Cache Buster"
-            , cid:    "Client ID"
-            , sc:     "Session Control"
-            , dr:     "Document Referrer"
-            , cn:     "Campaign Name"
-            , cs:     "Campaign Source"
-            , cm:     "Campaign Medium"
-            , ck:     "Campaign Keyword"
-            , cc:     "Campaign Content"
-            , ci:     "Campaign ID"
-            , gclid:  "Google AdWords ID"
-            , dclid:  "Google Display Ads ID"
-            , sr:     "Screen Resolution"
-            , vp:     "Viewport Size"
-            , de:     "Document Encoding"
-            , sd:     "Screen Colors"
-            , ul:     "User Language"
-            , je:     "Java Enabled"
-            , fl:     "Flash Version"
-            , t:      "Hit Type"
-            , ni:     "Non-Interaction Hit"
-            , dl:     "Document location URL"
-            , dh:     "Document Host Name"
-            , dp:     "Document Path"
-            , dt:     "Document Title"
-            , cd:     "Content Description"
-            , an:     "Application Name"
-            , av:     "Application Version"
-            , ec:     "Event Category"
-            , ea:     "Event Action"
-            , el:     "Event Label"
-            , ev:     "Event Value"
-            , ti:     "Transaction ID"
-            , ta:     "Transaction Affiliation"
-            , tr:     "Transaction Revenue"
-            , ts:     "Transaction Shipping"
-            , tt:     "Transaction Tax"
-            , "in":   "Item Name"
-            , ip:     "Item Price"
-            , iq:     "Item Quantity"
-            , ic:     "Item Code"
-            , iv:     "Item Category"
-            , cu:     "Currency Code"
-            , sn:     "Social Network"
-            , sa:     "Social Action"
-            , st:     "Social Action Target"
-            , utc:    "User Timing Category"
-            , utv:    "User Timing Variable Name"
-            , utt:    "User Timing Time"
-            , utl:    "User timing Label"
-            , plt:    "Page load time"
-            , dns:    "DNS time"
-            , pdt:    "Page download time"
-            , rrt:    "Redirect response time"
-            , tcp:    "TCP connect time"
-            , srt:    "Server response time"
-            , exd:    "Exception description"
-            , exf:    "Is exception fatal?"
-            , ds:     "Data Source"
-            , uid:    "User ID"
-            , linkid: "Link ID"
-            , pa:     "Product Action"
-            , tcc:    "Coupon Code"
-            , pal:    "Product Action List"
-            , cos:    "Checkout Step"
-            , col:    "Checkout Step Option"
-            , promoa: "Promotion Action"
-            , xid:    "Content Experiment ID"
-            , xvar:    "Content Experiment Variant"
-        },
-        handleQueryParam: function( name, value, rv, raw ) {
-            var groupName, groupItem, lookup = {};
-            if( /^cd(\d+)$/.test( name ) ) {
-                groupName = "Custom Dimensions";
-                groupItem = "Custom Dimension ";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][groupName] = rv[this.key][groupName] || {};
-                rv[this.key][groupName][groupItem + RegExp.$1] = value;
-                raw[groupItem + RegExp.$1] = value;
-            } else if( /^cm(\d+)$/.test( name ) ) {
-                groupName = "Custom Metrics";
-                groupItem = "Custom Metric ";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][groupName] = rv[this.key][groupName] || {};
-                rv[this.key][groupName][groupItem + RegExp.$1] = value;
-                raw[groupItem + RegExp.$1] = value;
-            } else if( /^cg(\d+)$/.test( name ) ) {
-                groupName = "Content Groups";
-                groupItem = "Content Group ";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][groupName] = rv[this.key][groupName] || {};
-                rv[this.key][groupName][groupItem + RegExp.$1] = value;
-                raw[groupItem + RegExp.$1] = value;
-            } else if( /^promo(\d+)([a-z]{2})$/.test( name ) ) {
-                lookup = {"id": "ID", "nm": "Name", "cr": "Creative", "ps": "Position"};
-                groupName = "Promotions";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][groupName] = rv[this.key][groupName] || {};
-                groupItem = "Promo " + RegExp.$1 + " " + (lookup[RegExp.$2]||"");
-                rv[this.key][groupName][groupItem] = value;
-                raw[groupItem] = value;
-            } else if( /^pr(\d+)([a-z]{2})$/.test( name ) ) {
-                lookup = {"id": "ID", "nm": "Name", "br": "Brand", "ca": "Category", "va": "Variant", "pr": "Price",
-                    "qt": "Quantity", "cc": "Coupon Code", "ps": "Position"};
-                groupName = "Products";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][groupName] = rv[this.key][groupName] || {};
-                groupItem = "Product " + RegExp.$1 + " " + (lookup[RegExp.$2]||"");
-                rv[this.key][groupName][groupItem] = value;
-                raw[groupItem] = value;
-            } else if( /^pr(\d+)(cd|cm)(\d+)$/.test( name ) ) {
-                lookup = {"cd": "Custom Dimension", "cm": "Custom Metric"};
-                groupName = "Products";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][groupName] = rv[this.key][groupName] || {};
-                groupItem = "Product " + RegExp.$1 + " " + (lookup[RegExp.$2]||"") + " " + RegExp.$3;
-                rv[this.key][groupName][groupItem] = value;
-                raw[groupItem] = value;
-            } else if( /^il(\d+)nm$/.test( name ) ) {
-                groupName = "Product Impressions";
-                groupItem = "Impression List ";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][groupName] = rv[this.key][groupName] || {};
-                rv[this.key][groupName][groupItem + RegExp.$1] = value;
-                raw[groupItem + RegExp.$1] = value;
-            } else if( /^il(\d+)pi(\d+)(cd|cm)(\d+)$/.test( name ) ) {
-                lookup =  {"cd": "Custom Dimension", "cm": "Custom Metric"};
-                groupName = "Product Impressions";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][groupName] = rv[this.key][groupName] || {};
-                groupItem = "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + (lookup[RegExp.$3]||"") + " " + RegExp.$4;
-                rv[this.key][groupName][groupItem] = value;
-                raw[groupItem] = value;
-            } else if( /^il(\d+)pi(\d+)([a-z]{2})$/.test( name ) ) {
-                lookup = {"id": "ID", "nm": "Name", "br": "Brand", "ca": "Category", "va": "Variant", "pr": "Price", "ps": "Position"};
-                groupName = "Product Impressions";
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][groupName] = rv[this.key][groupName] || {};
-                groupItem = "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + (lookup[RegExp.$3]||"");
-                rv[this.key][groupName][groupItem] = value;
-                raw[groupItem] = value;
-            } else if( name in this.keys ) {
-                rv[this.key] = rv[this.key] || {};
-                rv[this.key][this.name] = rv[this.key][this.name] || {};
-                rv[this.key][this.name][name] = value;
-                raw[name] = value;
-            } else {
-                return false;
-            }
-            return true;
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "rsid",
+            "requestType":  "requestType"
         }
     }
-};
 
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+            "ns": {
+                "name": "Visitor namespace",
+                "group": "General"
+            },
+            "ndh": {
+                "name": "Image sent from JS?",
+                "group": "General"
+            },
+            "ch": {
+                "name": "Channel",
+                "group": "General"
+            },
+            "v0": {
+                "name": "Campaign",
+                "group": "General"
+            },
+            "r": {
+                "name": "Referrer URL",
+                "group": "General"
+            },
+            "ce": {
+                "name": "Character set",
+                "group": "General"
+            },
+            "cl": {
+                "name": "Cookie lifetime",
+                "group": "General"
+            },
+            "g": {
+                "name": "Current URL",
+                "group": "General"
+            },
+            "j": {
+                "name": "JavaScript version",
+                "group": "General"
+            },
+            "bw": {
+                "name": "Browser width",
+                "group": "General"
+            },
+            "bh": {
+                "name": "Browser height",
+                "group": "General"
+            },
+            "s": {
+                "name": "Screen resolution",
+                "group": "General"
+            },
+            "c": {
+                "name": "Screen color depth",
+                "group": "General"
+            },
+            "ct": {
+                "name": "Connection type",
+                "group": "General"
+            },
+            "p": {
+                "name": "Netscape plugins",
+                "group": "General"
+            },
+            "k": {
+                "name": "Cookies enabled?",
+                "group": "General"
+            },
+            "hp": {
+                "name": "Home page?",
+                "group": "General"
+            },
+            "pid": {
+                "name": "Page ID",
+                "group": "General"
+            },
+            "pidt": {
+                "name": "Page ID type",
+                "group": "General"
+            },
+            "oid": {
+                "name": "Object ID",
+                "group": "General"
+            },
+            "oidt": {
+                "name": "Object ID type",
+                "group": "General"
+            },
+            "ot": {
+                "name": "Object tag name",
+                "group": "General"
+            },
+            "pe": {
+                "name": "Link type",
+                "group": "General"
+            },
+            "pev1": {
+                "name": "Link URL",
+                "group": "General"
+            },
+            "pev2": {
+                "name": "Link name",
+                "group": "General"
+            },
+            "pev3": {
+                "name": "Video milestone",
+                "group": "General"
+            },
+            "cc": {
+                "name": "Currency code",
+                "group": "General"
+            },
+            "t": {
+                "name": "Browser time",
+                "group": "General"
+            },
+            "v": {
+                "name": "Javascript-enabled browser?",
+                "group": "General"
+            },
+            "pccr": {
+                "name": "Prevent infinite redirects",
+                "group": "General"
+            },
+            "vid": {
+                "name": "Visitor ID",
+                "group": "General"
+            },
+            "vidn": {
+                "name": "New visitor ID",
+                "group": "General"
+            },
+            "fid": {
+                "name": "Fallback Visitor ID",
+                "group": "General"
+            },
+            "mid": {
+                "name": "Marketing Cloud Visitor ID",
+                "group": "General"
+            },
+            "aid": {
+                "name": "Legacy Visitor ID",
+                "group": "General"
+            },
+            "cdp": {
+                "name": "Cookie domain periods",
+                "group": "General"
+            },
+            "pageName": {
+                "name": "Page name",
+                "group": "General"
+            },
+            "pageType": {
+                "name": "Page type",
+                "group": "General"
+            },
+            "server": {
+                "name": "Server",
+                "group": "General"
+            },
+            "events": {
+                "name": "Events",
+                "group": "General"
+            },
+            "products": {
+                "name": "Products",
+                "group": "General"
+            },
+            "purchaseID": {
+                "name": "Purchase ID",
+                "group": "General"
+            },
+            "state": {
+                "name": "Visitor state",
+                "group": "General"
+            },
+            "vmk": {
+                "name": "Visitor migration key",
+                "group": "General"
+            },
+            "vvp": {
+                "name": "Variable provider",
+                "group": "General"
+            },
+            "xact": {
+                "name": "Transaction ID",
+                "group": "General"
+            },
+            "zip": {
+                "name": "ZIP/Postal code",
+                "group": "General"
+            },
+            "rsid": {
+                "name": "Report Suites",
+                "group": "General"
+            },
+            "requestType": {
+                "hidden": true
+            }
+        };
+    }
+
+    /**
+     * Parse a given URL into human-readable output
+     *
+     * @param {string}  rawUrl   A URL to check against
+     * @param {string}  postData    POST data, if applicable
+     *
+     * @return {{provider: {name: string, key: string, type: string}, data: Array}}
+     */
+    parseUrl(rawUrl, postData = "")
+    {
+        let url = new URL(rawUrl),
+            data = [],
+            stacked = [],
+            params = new URLSearchParams(url.search),
+            postParams = this.parsePostData(postData);
+
+        // Handle POST data first, if applicable (treat as query params)
+        postParams.forEach((pair) => {
+            params.append(pair[0], pair[1]);
+        });
+
+        for(let param of params)
+        {
+            let key = param[0],
+                value = param[1];
+
+            // Stack context data params
+            if (/\.$/.test(key)) {
+                stacked.push(key);
+                continue;
+            }
+            if (/^\./.test(key)) {
+                stacked.pop();
+                continue;
+            }
+
+            let stackedParam = stacked.join("") + key,
+                result = this.handleQueryParam(stackedParam, value);
+            if(typeof result === "object") {
+                data.push(result);
+            }
+        }
+
+        let customData = this.handleCustom(url);
+        if(typeof customData === "object" && customData !== null)
+        {
+            if(customData.length) {
+                data = data.concat(customData);
+            } else {
+                data.push(customData);
+            }
+        }
+
+        return {
+            "provider": {
+                "name": this.name,
+                "key":  this.key,
+                "type": this.type,
+                "columns": this.columnMapping
+            },
+            "data": data
+        };
+    }
+
+    /**
+     * Parse a given URL parameter into human-readable form
+     *
+     * @param {string}  name
+     * @param {string}  value
+     *
+     * @returns {void|{}}
+     */
+    handleQueryParam(name, value)
+    {
+        let result = {};
+        if(/^(?:c|prop)(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "prop" + RegExp.$1,
+                "value": value,
+                "group": "Custom Traffic Variables (props)"
+            };
+        } else if(/^(?:v|eVar)(\d+)$/i.test(name) && name !== "v0") {
+            result = {
+                "key":   name,
+                "field": "eVar" + RegExp.$1,
+                "value": value,
+                "group": "Custom Conversion Variables (eVars)"
+            };
+        } else if(/^(?:h|hier)(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Hierarchy " + RegExp.$1,
+                "value": value,
+                "group": "Hierarchy Variables"
+            };
+        } else if(name.indexOf(".a.media.") > 0) {
+            result = {
+                "key":   name,
+                "field": name.split(".").pop(),
+                "value": value,
+                "group": "Media Module"
+            };
+        } else if(name.indexOf(".a.activitymap.") > 0) {
+            result = {
+                "key":   name,
+                "field": name.split(".").pop(),
+                "value": value,
+                "group": "Activity Map"
+            };
+        } else if(name.indexOf(".") > 0) {
+            result = {
+                "key":   name,
+                "field": name.split(".").pop(),
+                "value": value,
+                "group": "Context Data"
+            };
+        } else if(/^(AQB|AQE)$/i.test(name)) {
+            // ignore
+            return;
+        } else {
+            result = super.handleQueryParam(name, value);
+        }
+        return result;
+    }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param {string} url
+     *
+     * @returns {Array}
+     */
+    handleCustom(url)
+    {
+        let results = [],
+            rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//),
+            pev2 = url.searchParams.get("pe"),
+            requestType = "Page View";
+        if(rsid) {
+            results.push({
+                "key":   "rsid",
+                "field": this.keys.rsid ? this.keys.rsid.name : "Report Suites",
+                "value": rsid[1],
+                "group": this.keys.rsid ? this.keys.rsid.group : "General",
+            });
+        }
+
+        // Handle s.tl calls
+        if(pev2 === "lnk_e") {
+            requestType = "Exit Click";
+        } else if(pev2 === "lnk_d") {
+            requestType = "Download Click";
+        } else if(pev2 === "lnk_o") {
+            requestType = "Other Click";
+        }
+        results.push({
+            "key":   "requestType",
+            "value": requestType,
+            "hidden": true
+        });
+        return results;
+    }
+}
+/**
+ * Adobe Audience Manager
+ * http://www.adobe.com/data-analytics-cloud/audience-manager.html
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class AdobeAudienceManagerProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "ADOBEAUDIENCEMANAGER";
+        this._pattern    = /demdex\.net\//;
+        this._name       = "Adobe Audience Manager";
+        this._type       = "visitorid";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account": "d_orgid"
+        }
+    }
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+            "d_orgid": {
+                "name": "Adobe Organization ID",
+                "group": "General"
+            },
+            "d_rtbd": {
+                "name": "Return Method",
+                "group": "General"
+            },
+            "d_cb": {
+                "name": "Callback property",
+                "group": "General"
+            }
+        };
+    }
+}
+/**
+ * Adobe Target
+ * http://www.adobe.com/marketing-cloud/target.html
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class AdobeTargetProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "ADOBETARGET";
+        this._pattern    = /\.tt\.omtrdc\.net\//;
+        this._name       = "Adobe Target";
+        this._type       = "testing";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "mbox",
+            "requestType":  "mboxType"
+        }
+    }
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+            "mbox": {
+                "name": "Mbox Name",
+                "group": "General"
+            },
+            "mboxType": {
+                "name": "Mbox Type",
+                "group": "General"
+            },
+            "mboxCount": {
+                "name": "Mbox Count",
+                "group": "General"
+            },
+            "mboxId": {
+                "name": "Mbox ID",
+                "group": "General"
+            },
+            "mboxSession": {
+                "name": "Mbox Session",
+                "group": "General"
+            },
+            "mboxPC": {
+                "name": "Mbox PC ID",
+                "group": "General"
+            },
+            "mboxPage": {
+                "name": "Mbox Page ID",
+                "group": "General"
+            },
+            "clientCode": {
+                "name": "Client Code",
+                "group": "General"
+            },
+            "mboxHost": {
+                "name": "Page Host",
+                "group": "General"
+            },
+            "mboxURL": {
+                "name": "Page URL",
+                "group": "General"
+            },
+            "mboxReferrer": {
+                "name": "Page Referrer",
+                "group": "General"
+            },
+            "screenHeight": {
+                "name": "Screen Height",
+                "group": "General"
+            },
+            "screenWidth": {
+                "name": "Screen Width",
+                "group": "General"
+            },
+            "browserWidth": {
+                "name": "Browser Width",
+                "group": "General"
+            },
+            "browserHeight": {
+                "name": "Browser Height",
+                "group": "General"
+            },
+            "browserTimeOffset": {
+                "name": "Browser Timezone Offset",
+                "group": "General"
+            },
+            "colorDepth": {
+                "name": "Browser Color Depth",
+                "group": "General"
+            },
+            "mboxXDomain": {
+                "name": "CrossDomain Enabled",
+                "group": "General"
+            },
+            "mboxTime": {
+                "name": "Timestamp",
+                "group": "General"
+            },
+            "mboxVersion": {
+                "name": "Library Version",
+                "group": "General"
+            }
+        };
+    }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param {URL} url
+     *
+     * @returns {void|Array}
+     */
+    handleCustom(url)
+    {
+        let matches =  url.pathname.match( /\/([^\/]+)\/mbox\/([^\/?]+)/ ),
+            mboxName = "",
+            results = [];
+        if(matches !== null && matches.length === 3) {
+            results.push({
+                "key":   "clientCode",
+                "field": "Client Code",
+                "value": matches[1],
+                "group": "General"
+            });
+            results.push({
+                "key":   "mboxType",
+                "field": "Mbox Type",
+                "value": matches[2],
+                "group": "General"
+            });
+        }
+
+        return results;
+    }
+}
+/**
+ * Optimizely
+ * https://www.optimizely.com/
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class OptimizelyXProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "OPTIMIZELYX";
+        this._pattern    = /\.optimizely\.com\/log\/event/;
+        this._name       = "Optimizely X";
+        this._type       = "testing";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "mbox"
+        }
+    }
+
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+
+        };
+    }
+
+    /**
+     * Parse any POST data into param key/value pairs
+     *
+     * @param postData
+     * @return {Array}
+     */
+    parsePostData(postData = "")
+    {
+        let params = [],
+            parsed = {};
+        if(typeof postData === "string" && postData !== "")
+        {
+            try
+            {
+                parsed = JSON.parse(postData);
+
+                /* Based on https://stackoverflow.com/a/19101235 */
+                function recurse (cur, prop)
+                {
+                    if (Object(cur) !== cur)
+                    {
+                        params.push([prop, cur]);
+                    }
+                    else if (Array.isArray(cur))
+                    {
+                        for(var i=0, l=cur.length; i<l; i++)
+                        {
+                            recurse(cur[i], prop + "[" + i + "]");
+                        }
+                        if (l === 0)
+                        {
+                            params.push([prop, ""]);
+                        }
+                    }
+                    else
+                    {
+                        let isEmpty = true;
+                        for (let p in cur)
+                        {
+                            if(!cur.hasOwnProperty(p)) { continue; }
+                            isEmpty = false;
+                            recurse(cur[p], prop ? prop+"."+p : p);
+                        }
+                        if (isEmpty && prop)
+                        {
+                            params.push([prop, ""]);
+                        }
+                    }
+                }
+                recurse(parsed, "");
+            }
+            catch(e)
+            {
+                console.error("postData is not JSON", e.message);
+            }
+        }
+        return params;
+    }
+}
+/**
+ * Universal Analytics
+ * https://developers.google.com/analytics/devguides/collection/analyticsjs/
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class UniversalAnalyticsProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "UNIVERSALANALYTICS";
+        this._pattern    = /\.(google-analytics\.com|doubleclick\.net)\/(r\/)?collect[\/?]/;
+        this._name       = "Universal Analytics";
+        this._type       = "analytics";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":     "tid",
+            "requestType": "omnibug_requestType"
+        }
+    }
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+            "v": {
+                "name": "Protocol Version",
+                "group": "General"
+            },
+            "tid": {
+                "name": "Tracking ID",
+                "group": "General"
+            },
+            "aip": {
+                "name": "Anonymize IP",
+                "group": "General"
+            },
+            "qt": {
+                "name": "Queue Time",
+                "group": "General"
+            },
+            "z": {
+                "name": "Cache Buster",
+                "group": "General"
+            },
+            "cid": {
+                "name": "Client ID",
+                "group": "General"
+            },
+            "sc": {
+                "name": "Session Control",
+                "group": "General"
+            },
+            "dr": {
+                "name": "Document Referrer",
+                "group": "General"
+            },
+            "cn": {
+                "name": "Campaign Name",
+                "group": "Campaign"
+            },
+            "cs": {
+                "name": "Campaign Source",
+                "group": "Campaign"
+            },
+            "cm": {
+                "name": "Campaign Medium",
+                "group": "Campaign"
+            },
+            "ck": {
+                "name": "Campaign Keyword",
+                "group": "Campaign"
+            },
+            "cc": {
+                "name": "Campaign Content",
+                "group": "Campaign"
+            },
+            "ci": {
+                "name": "Campaign ID",
+                "group": "Campaign"
+            },
+            "gclid": {
+                "name": "Google AdWords ID",
+                "group": "Campaign"
+            },
+            "dclid": {
+                "name": "Google Display Ads ID",
+                "group": "Campaign"
+            },
+            "sr": {
+                "name": "Screen Resolution",
+                "group": "General"
+            },
+            "vp": {
+                "name": "Viewport Size",
+                "group": "General"
+            },
+            "de": {
+                "name": "Document Encoding",
+                "group": "General"
+            },
+            "sd": {
+                "name": "Screen Colors",
+                "group": "General"
+            },
+            "ul": {
+                "name": "User Language",
+                "group": "General"
+            },
+            "je": {
+                "name": "Java Enabled",
+                "group": "General"
+            },
+            "fl": {
+                "name": "Flash Version",
+                "group": "General"
+            },
+            "t": {
+                "name": "Hit Type",
+                "group": "General"
+            },
+            "ni": {
+                "name": "Non-Interaction Hit",
+                "group": "Events"
+            },
+            "dl": {
+                "name": "Document location URL",
+                "group": "General"
+            },
+            "dh": {
+                "name": "Document Host Name",
+                "group": "General"
+            },
+            "dp": {
+                "name": "Document Path",
+                "group": "General"
+            },
+            "dt": {
+                "name": "Document Title",
+                "group": "General"
+            },
+            "cd": {
+                "name": "Content Description",
+                "group": "General"
+            },
+            "an": {
+                "name": "Application Name",
+                "group": "General"
+            },
+            "av": {
+                "name": "Application Version",
+                "group": "General"
+            },
+            "ec": {
+                "name": "Event Category",
+                "group": "Events"
+            },
+            "ea": {
+                "name": "Event Action",
+                "group": "Events"
+            },
+            "el": {
+                "name": "Event Label",
+                "group": "Events"
+            },
+            "ev": {
+                "name": "Event Value",
+                "group": "Events"
+            },
+            "ti": {
+                "name": "Transaction ID",
+                "group": "Ecommerce"
+            },
+            "ta": {
+                "name": "Transaction Affiliation",
+                "group": "Ecommerce"
+            },
+            "tr": {
+                "name": "Transaction Revenue",
+                "group": "Ecommerce"
+            },
+            "ts": {
+                "name": "Transaction Shipping",
+                "group": "Ecommerce"
+            },
+            "tt": {
+                "name": "Transaction Tax",
+                "group": "Ecommerce"
+            },
+            "in": {
+                "name": "Item Name",
+                "group": "Ecommerce"
+            },
+            "ip": {
+                "name": "Item Price",
+                "group": "Ecommerce"
+            },
+            "iq": {
+                "name": "Item Quantity",
+                "group": "Ecommerce"
+            },
+            "ic": {
+                "name": "Item Code",
+                "group": "Ecommerce"
+            },
+            "iv": {
+                "name": "Item Category",
+                "group": "Ecommerce"
+            },
+            "cu": {
+                "name": "Currency Code",
+                "group": "Ecommerce"
+            },
+            "sn": {
+                "name": "Social Network",
+                "group": "Events"
+            },
+            "sa": {
+                "name": "Social Action",
+                "group": "Events"
+            },
+            "st": {
+                "name": "Social Action Target",
+                "group": "Events"
+            },
+            "utc": {
+                "name": "User Timing Category",
+                "group": "Timing"
+            },
+            "utv": {
+                "name": "User Timing Variable Name",
+                "group": "Timing"
+            },
+            "utt": {
+                "name": "User Timing Time",
+                "group": "Timing"
+            },
+            "utl": {
+                "name": "User timing Label",
+                "group": "Timing"
+            },
+            "plt": {
+                "name": "Page load time",
+                "group": "Timing"
+            },
+            "dns": {
+                "name": "DNS time",
+                "group": "Timing"
+            },
+            "pdt": {
+                "name": "Page download time",
+                "group": "Timing"
+            },
+            "rrt": {
+                "name": "Redirect response time",
+                "group": "Timing"
+            },
+            "tcp": {
+                "name": "TCP connect time",
+                "group": "Timing"
+            },
+            "srt": {
+                "name": "Server response time",
+                "group": "Timing"
+            },
+            "exd": {
+                "name": "Exception description",
+                "group": "Events"
+            },
+            "exf": {
+                "name": "Is exception fatal?",
+                "group": "Events"
+            },
+            "ds": {
+                "name": "Data Source",
+                "group": "General"
+            },
+            "uid": {
+                "name": "User ID",
+                "group": "General"
+            },
+            "linkid": {
+                "name": "Link ID",
+                "group": "General"
+            },
+            "pa": {
+                "name": "Product Action",
+                "group": "Ecommerce"
+            },
+            "tcc": {
+                "name": "Coupon Code",
+                "group": "Ecommerce"
+            },
+            "pal": {
+                "name": "Product Action List",
+                "group": "Ecommerce"
+            },
+            "cos": {
+                "name": "Checkout Step",
+                "group": "Ecommerce"
+            },
+            "col": {
+                "name": "Checkout Step Option",
+                "group": "Ecommerce"
+            },
+            "promoa": {
+                "name": "Promotion Action",
+                "group": "Ecommerce"
+            },
+            "xid": {
+                "name": "Content Experiment ID",
+                "group": "Google Optimize"
+            },
+            "xvar": {
+                "name": "Content Experiment Variant",
+                "group": "Google Optimize"
+            },
+            "requestType": {
+                "hidden": true
+            }
+        };
+    }
+
+    /**
+     * Parse a given URL parameter into human-readable form
+     *
+     * @param {string}  name
+     * @param {string}  value
+     *
+     * @returns {void|{}}
+     */
+    handleQueryParam(name, value)
+    {
+        let result = {};
+        if(/^cd(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Custom Dimension " + RegExp.$1,
+                "value": value,
+                "group": "Custom Dimensions"
+            };
+        } else if(/^cm(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Custom Metric " + RegExp.$1,
+                "value": value,
+                "group": "Custom Metrics"
+            };
+        } else if(/^cg(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Content Group " + RegExp.$1,
+                "value": value,
+                "group": "Content Groups"
+            };
+        } else if(/^promo(\d+)([a-z]{2})$/i.test(name)) {
+            let lookup = {
+                    "id": "ID",
+                    "nm": "Name",
+                    "cr": "Creative",
+                    "ps": "Position"
+                },
+                type = lookup[RegExp.$2] || "";
+            result = {
+                "key":   name,
+                "field": "Promotion " + RegExp.$1 + " " + type,
+                "value": value,
+                "group": "Promotions"
+            };
+        } else if(/^pr(\d+)([a-z]{2})$/i.test(name)) {
+            let lookup = {
+                    "id": "ID",
+                    "nm": "Name",
+                    "br": "Brand",
+                    "ca": "Category",
+                    "va": "Variant",
+                    "pr": "Price",
+                    "qt": "Quantity",
+                    "cc": "Coupon Code",
+                    "ps": "Position"
+                },
+                type = lookup[RegExp.$2] || "";
+            result = {
+                "key":   name,
+                "field": "Product " + RegExp.$1 + " " + type,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else if(/^pr(\d+)(cd|cm)(\d+)$/i.test(name)) {
+            let lookup = {
+                    "cd": "Custom Dimension",
+                    "cm": "Custom Metric"
+                },
+                type = lookup[RegExp.$2] || "";
+            result = {
+                "key":   name,
+                "field": "Product " + RegExp.$1 + " " + type,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else if(/^il(\d+)nm$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "Impression List " + RegExp.$1,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else if(/^il(\d+)pi(\d+)(cd|cm)(\d+)$/i.test(name)) {
+            let lookup = {
+                    "cd": "Custom Dimension",
+                    "cm": "Custom Metric"
+                },
+                type = lookup[RegExp.$3] || "";
+            result = {
+                "key":   name,
+                "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type + " " + RegExp.$4,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else if(/^il(\d+)pi(\d+)([a-z]{2})$/i.test(name))
+        {
+            let lookup = {
+                    "id": "ID",
+                    "nm": "Name",
+                    "br": "Brand",
+                    "ca": "Category",
+                    "va": "Variant",
+                    "pr": "Price",
+                    "ps": "Position"
+                },
+                type = lookup[RegExp.$3] || "";
+            result = {
+                "key": name,
+                "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type,
+                "value": value,
+                "group": "Ecommerce"
+            };
+        } else {
+            result = super.handleQueryParam(name, value);
+        }
+        return result;
+    }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param {string} url
+     *
+     * @returns {Array}
+     */
+    handleCustom(url)
+    {
+        let results = [],
+            hitType = url.searchParams.get("t") || "page view",
+            requestType = "";
+
+        hitType = hitType.toLowerCase();
+        if(hitType === "pageview" || hitType === "screenview") {
+            requestType = "Page View";
+        } else if(hitType === "transaction" || hitType === "item") {
+            requestType = "Ecommerce " + hitType.charAt(0).toUpperCase() + hitType.slice(1);
+        } else if(hitType === "dc") {
+            requestType = "DoubleClick";
+        } else {
+            requestType = hitType.charAt(0).toUpperCase() + hitType.slice(1);
+        }
+        results.push({
+            "key":    "omnibug_requestType",
+            "value":  requestType,
+            "hidden": true
+        });
+
+        return results;
+    }
+}
+OmnibugProvider.addProvider(new AdobeAnalyticsProvider());
+OmnibugProvider.addProvider(new AdobeAudienceManagerProvider());
+OmnibugProvider.addProvider(new AdobeTargetProvider());
+OmnibugProvider.addProvider(new OptimizelyXProvider());
+OmnibugProvider.addProvider(new UniversalAnalyticsProvider());

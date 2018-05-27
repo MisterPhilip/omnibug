@@ -678,7 +678,7 @@ class AdobeAnalyticsProvider extends BaseProvider
         let results = [],
             rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//),
             pev2 = url.searchParams.get("pe"),
-            requestType = "Page Load";
+            requestType = "Page View";
         if(rsid) {
             results.push({
                 "key":   "rsid",
@@ -689,12 +689,12 @@ class AdobeAnalyticsProvider extends BaseProvider
         }
 
         // Handle s.tl calls
-        if(pev2 === "e") {
-            requestType = "Click Event: Exit";
-        } else if(pev2 === "d") {
-            requestType = "Click Event: Download";
-        } else if(pev2 === "o") {
-            requestType = "Click Event: Other";
+        if(pev2 === "lnk_e") {
+            requestType = "Exit Click";
+        } else if(pev2 === "lnk_d") {
+            requestType = "Download Click";
+        } else if(pev2 === "lnk_o") {
+            requestType = "Other Click";
         }
         results.push({
             "key":   "requestType",
@@ -704,7 +704,6 @@ class AdobeAnalyticsProvider extends BaseProvider
         return results;
     }
 }
-OmnibugProvider.addProvider(new AdobeAnalyticsProvider());
 /**
  * Adobe Audience Manager
  * http://www.adobe.com/data-analytics-cloud/audience-manager.html
@@ -758,7 +757,6 @@ class AdobeAudienceManagerProvider extends BaseProvider
         };
     }
 }
-OmnibugProvider.addProvider(new AdobeAnalyticsProvider());
 /**
  * Adobe Target
  * http://www.adobe.com/marketing-cloud/target.html
@@ -911,7 +909,6 @@ class AdobeTargetProvider extends BaseProvider
         return results;
     }
 }
-OmnibugProvider.addProvider(new AdobeTargetProvider());
 /**
  * Optimizely
  * https://www.optimizely.com/
@@ -1014,7 +1011,6 @@ class OptimizelyXProvider extends BaseProvider
         return params;
     }
 }
-OmnibugProvider.addProvider(new OptimizelyXProvider());
 /**
  * Universal Analytics
  * https://developers.google.com/analytics/devguides/collection/analyticsjs/
@@ -1042,7 +1038,7 @@ class UniversalAnalyticsProvider extends BaseProvider
     {
         return {
             "account":     "tid",
-            "requestType": "requestType"
+            "requestType": "omnibug_requestType"
         }
     }
 
@@ -1466,24 +1462,46 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "value": value,
                 "group": "Ecommerce"
             };
-        } else if(name === "t") {
-            let type = "";
-            if(value === "pageview" || value === "screenview") {
-                type = "Page View";
-            } else if(value === "transaction" || value === "item") {
-                type = "Ecommerce " + value.charAt(0).toUpperCase() + value.slice(1);
-            } else {
-                type = value.charAt(0).toUpperCase() + value.slice(1);
-            }
-            result = {
-                "key":    "requestType",
-                "value":  type,
-                "hidden": true
-            };
         } else {
             result = super.handleQueryParam(name, value);
         }
         return result;
     }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param {string} url
+     *
+     * @returns {Array}
+     */
+    handleCustom(url)
+    {
+        let results = [],
+            hitType = url.searchParams.get("t") || "page view",
+            requestType = "";
+
+        hitType = hitType.toLowerCase();
+        if(hitType === "pageview" || hitType === "screenview") {
+            requestType = "Page View";
+        } else if(hitType === "transaction" || hitType === "item") {
+            requestType = "Ecommerce " + hitType.charAt(0).toUpperCase() + hitType.slice(1);
+        } else if(hitType === "dc") {
+            requestType = "DoubleClick";
+        } else {
+            requestType = hitType.charAt(0).toUpperCase() + hitType.slice(1);
+        }
+        results.push({
+            "key":    "omnibug_requestType",
+            "value":  requestType,
+            "hidden": true
+        });
+
+        return results;
+    }
 }
+OmnibugProvider.addProvider(new AdobeAnalyticsProvider());
+OmnibugProvider.addProvider(new AdobeAudienceManagerProvider());
+OmnibugProvider.addProvider(new AdobeTargetProvider());
+OmnibugProvider.addProvider(new OptimizelyXProvider());
 OmnibugProvider.addProvider(new UniversalAnalyticsProvider());
