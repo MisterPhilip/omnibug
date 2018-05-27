@@ -10,7 +10,7 @@
      */
     browser.devtools.panels.create(
         "Omnibug",
-        "./assets/images/o-32.png",
+        "./assets/images/blue-32.png",
         "./devtools/panel.html"
     ).then((panel) => {
         let queuedMessages = [],

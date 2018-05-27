@@ -148,36 +148,38 @@ window.Omnibug = (() => {
 
         // Start the export process
         let colDelim = (fileType === "csv") ? `","` : `"\t"`,
-            exportText = "";
+            exportText = exportData.map((request) => {
+                let row = [];
+                if(request.event === "webNavigation") {
+                    row = [
+                        "Navigation",
+                        "",
+                        "",
+                        ""
+                    ];
+                } else {
+                    console.log(request);
+                    let account = getMappedColumnValue("account", request),
+                        requestType = getMappedColumnValue("requestType", request);
 
-        exportText = exportData.map((request) => {
-            let row = [];
-            if(request.event === "webNavigation") {
-                row = [
-                    "Navigation",
-                    "",
-                    "",
-                    ""
-                ];
-            } else {
-                let account = getMappedColumnValue("account", request);
-                row = [
-                    "",
-                    request.provider.name,
-                    account,
-                    request.request.id
-                ];
-            }
-            row.push(request.request.url.replace(/"/g, `\\"`));
-            row.push((new Date(request.request.timestamp)).toString());
-            return `"` + row.join(colDelim) + `"`;
-        }).join("\n");
-        exportText = `"` + ["Event Type", "Provider", "Account", "Request ID", "URL", "Timestamp"].join(colDelim) + `"\n` + exportText;
+                    row = [
+                        requestType,
+                        request.provider.name,
+                        account,
+                        request.request.id
+                    ];
+                }
+                row.push(request.request.url.replace(/"/g, `\\"`));
+                row.push((new Date(request.request.timestamp)).toString());
+                return `"` + row.join(colDelim) + `"`;
+            }).join("\n");
+        // Add any headers
+        exportText = `"` + ["Omnibug v0.6.0", "Exported " + (new Date()).toString()].join(colDelim) + `"\n`
+                   + `"` + ["Event Type", "Provider", "Account", "Request ID", "URL", "Timestamp"].join(colDelim) + `"\n` + exportText;
 
 
         // Generate the file to download
         let link = d.createElement("a"),
-            json = JSON.stringify(exportData),
             blob = new Blob([exportText], {type: `text/${fileType}`}),
             url = window.URL.createObjectURL(blob);
         d.body.appendChild(link);
