@@ -758,6 +758,178 @@ class AdobeAudienceManagerProvider extends BaseProvider
     }
 }
 /**
+ * Adobe Heartbeat
+ * https://marketing.adobe.com/resources/help/en_US/sc/appmeasurement/hbvideo/
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class AdobeHeartbeatProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "ADOBEHEARTBEAT";
+        this._pattern    = /\.hb\.omtrdc\.net\//;
+        this._name       = "Adobe Heartbeat";
+        this._type       = "analytics";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "s:sc:rsid",
+            "requestType":  "omnibug_requestType"
+        }
+    }
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+            "s:asset:video_id": {
+                "name": "Content ID",
+                "group": "General"
+            },
+            "l:asset:length": {
+                "name": "Video Length",
+                "group": "General"
+            },
+            "s:stream:type": {
+                "name": "Content Type",
+                "group": "General"
+            },
+            "s:event:sid": {
+                "name": "Video Session ID",
+                "group": "General"
+            },
+            "s:sp:player_name": {
+                "name": "Content Player Name",
+                "group": "General"
+            },
+            "s:sp:channel": {
+                "name": "Content Channel",
+                "group": "General"
+            },
+            "s:asset:name": {
+                "name": "Video Name",
+                "group": "General"
+            },
+            "s:sp:sdk": {
+                "name": "SDK Version",
+                "group": "General"
+            },
+            "s:sp:hb_version": {
+                "name": "VHL Version",
+                "group": "General"
+            },
+            "s:meta:a.media.show": {
+                "name": "Show",
+                "group": "General"
+            },
+            "s:meta:a.media.format": {
+                "name": "Stream Format",
+                "group": "General"
+            },
+            "s:meta:a.media.season": {
+                "name": "Season",
+                "group": "General"
+            },
+            "s:meta:a.media.episode": {
+                "name": "Episode",
+                "group": "General"
+            },
+            "s:meta:a.media.asset": {
+                "name": "Asset ID",
+                "group": "General"
+            },
+            "s:meta:a.media.genre": {
+                "name": "Genre",
+                "group": "General"
+            },
+            "s:meta:a.media.airDate": {
+                "name": "First Air Date",
+                "group": "General"
+            },
+            "s:meta:a.media.digitalDate": {
+                "name": "First Digital Date",
+                "group": "General"
+            },
+            "s:meta:a.media.rating": {
+                "name": "Content Rating",
+                "group": "General"
+            },
+            "s:meta:a.media.originator": {
+                "name": "Originator",
+                "group": "General"
+            },
+            "s:meta:a.media.network": {
+                "name": "Network",
+                "group": "General"
+            },
+            "s:meta:a.media.type": {
+                "name": "Show Type",
+                "group": "General"
+            },
+            "s:meta:a.media.pass.mvpd": {
+                "name": "MVPD",
+                "group": "General"
+            },
+            "s:meta:a.media.pass.auth": {
+                "name": "Authorized",
+                "group": "General"
+            },
+            "s:meta:a.media.dayPart": {
+                "name": "Day Part",
+                "group": "General"
+            },
+            "s:meta:a.media.feed": {
+                "name": "Video Feed Type",
+                "group": "General"
+            },
+            "s:meta:a.media.adload": {
+                "name": "Ad Load Type",
+                "group": "General"
+            },
+            "s:event:type": {
+                "name": "Event Type",
+                "group": "General"
+            },
+            "omnibug_requestType": {
+                "hidden": true
+            }
+        };
+    }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param {string} url
+     *
+     * @returns {Array}
+     */
+    handleCustom(url)
+    {
+        let results = [],
+            event = url.searchParams.get("s:event:type");
+        results.push({
+            "key":   "omnibug_requestType",
+            "value": event.charAt(0).toUpperCase() + event.slice(1),
+            "hidden": true
+        });
+        return results;
+    }
+}
+/**
  * Adobe Target
  * http://www.adobe.com/marketing-cloud/target.html
  *
@@ -1009,6 +1181,145 @@ class OptimizelyXProvider extends BaseProvider
             }
         }
         return params;
+    }
+}
+/**
+ * Segment
+ * https://segment.com/
+ *
+ * @class
+ * @extends BaseProvider
+ */
+class SegmentProvider extends BaseProvider
+{
+    constructor()
+    {
+        super();
+        this._key        = "SEGMENT";
+        this._pattern    = /api\.segment\.io\//;
+        this._name       = "Segment";
+        this._type       = "analytics";
+    }
+
+    /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "requestType":  "omnibug_requestType"
+        }
+    }
+
+    /**
+     * Get all of the available URL parameter keys
+     *
+     * @returns {{}}
+     */
+    get keys()
+    {
+        return {
+
+        };
+    }
+
+    /**
+     * Parse any POST data into param key/value pairs
+     *
+     * @param postData
+     * @return {Array}
+     */
+    parsePostData(postData = "")
+    {
+        let params = [],
+            parsed = {};
+        if(typeof postData === "string" && postData !== "")
+        {
+            try
+            {
+                parsed = JSON.parse(postData);
+
+                /* Based on https://stackoverflow.com/a/19101235 */
+                function recurse (cur, prop)
+                {
+                    if (Object(cur) !== cur)
+                    {
+                        params.push([prop, cur]);
+                    }
+                    else if (Array.isArray(cur))
+                    {
+                        for(var i=0, l=cur.length; i<l; i++)
+                        {
+                            recurse(cur[i], prop + "[" + i + "]");
+                        }
+                        if (l === 0)
+                        {
+                            params.push([prop, ""]);
+                        }
+                    }
+                    else
+                    {
+                        let isEmpty = true;
+                        for (let p in cur)
+                        {
+                            if(!cur.hasOwnProperty(p)) { continue; }
+                            isEmpty = false;
+                            recurse(cur[p], prop ? prop+"."+p : p);
+                        }
+                        if (isEmpty && prop)
+                        {
+                            params.push([prop, ""]);
+                        }
+                    }
+                }
+                recurse(parsed, "");
+            }
+            catch(e)
+            {
+                console.error("postData is not JSON", e.message);
+            }
+        }
+        return params;
+    }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param {string} url
+     *
+     * @returns {Array}
+     */
+    handleCustom(url)
+    {
+        let results = [],
+            action = url.pathname.match(/\/v1\/([^\/]+)$/);
+        if(action) {
+            let type = action[1].toLowerCase();
+            if(type === "p" || type === "page") {
+                type = "Page";
+            } else if(type === "i" || type === "identify") {
+                type = "Identify";
+            } else if(type === "t" || type === "track") {
+                type = "Track";
+            } else if(type === "s" || type === "screen") {
+                type = "Screen";
+            } else if(type === "g" || type === "group") {
+                type = "Group";
+            } else if(type === "a" || type === "alias") {
+                type = "Alias";
+            } else if(type === "b" || type === "batch") {
+                type = "Batch";
+            }
+
+            results.push({
+                "key":   "omnibug_requestType",
+                "value": type,
+                "hidden": true
+            });
+        }
+        return results;
     }
 }
 /**
@@ -1502,6 +1813,8 @@ class UniversalAnalyticsProvider extends BaseProvider
 }
 OmnibugProvider.addProvider(new AdobeAnalyticsProvider());
 OmnibugProvider.addProvider(new AdobeAudienceManagerProvider());
+OmnibugProvider.addProvider(new AdobeHeartbeatProvider());
 OmnibugProvider.addProvider(new AdobeTargetProvider());
 OmnibugProvider.addProvider(new OptimizelyXProvider());
+OmnibugProvider.addProvider(new SegmentProvider());
 OmnibugProvider.addProvider(new UniversalAnalyticsProvider());
