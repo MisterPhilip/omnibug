@@ -283,12 +283,13 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask("build-compress", "Compress build files into extension .zip", function(browser) {
-        grunt.config.requires(browser);
-        let options = grunt.config(browser);
+        grunt.config.requires(browser, "extension");
+        let options = grunt.config(browser),
+            extensionOptions = grunt.config("extension");
 
         grunt.config.set("compress." + browser, {
             options: {
-                archive: "./build/" + browser + "_" + options.version + ".zip"
+                archive: "./build/" + browser + "_" + extensionOptions.version + ".zip"
             },
             files: [
                 {
