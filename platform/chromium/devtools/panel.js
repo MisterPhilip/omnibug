@@ -1083,7 +1083,7 @@ window.Omnibug = (() => {
             }).join("\n");
         // Add any headers
         exportText = `"` + ["Omnibug v0.6.0", "Exported " + (new Date()).toString()].join(colDelim) + `"\n`
-                   + `"` + ["Event Type", "Provider", "Account", "Request ID", "URL", "POST Data", "Timestamp"].join(colDelim) + `"\n` + exportText;
+                   + `"` + ["Event Type", "Provider", "Account", "Request ID", "Request URL", "POST Data", "Timestamp"].join(colDelim) + `"\n` + exportText;
 
 
         // Generate the file to download
@@ -1321,9 +1321,7 @@ window.Omnibug = (() => {
         data.sort((a, b) => {
             let aKey = a.field.toLowerCase(),
                 bKey = b.field.toLowerCase();
-            if(aKey < bKey) { return -1; }
-            if(aKey > bKey) { return 1; }
-            return 0;
+            return aKey.localeCompare(bKey, "standard", {"numeric": true});
         }).forEach((row) => {
             let tableRow = createElement("tr", [], {"data-parameter-key": row.key}),
                 name = createElement("td"),

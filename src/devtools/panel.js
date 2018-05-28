@@ -417,9 +417,7 @@ window.Omnibug = (() => {
         data.sort((a, b) => {
             let aKey = a.field.toLowerCase(),
                 bKey = b.field.toLowerCase();
-            if(aKey < bKey) { return -1; }
-            if(aKey > bKey) { return 1; }
-            return 0;
+            return aKey.localeCompare(bKey, "standard", {"numeric": true});
         }).forEach((row) => {
             let tableRow = createElement("tr", [], {"data-parameter-key": row.key}),
                 name = createElement("td"),
