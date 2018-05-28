@@ -128,8 +128,8 @@ window.Omnibug = (() => {
            exportData = exportData.filter((request) => {
                if(request.event === "webNavigation") { return true; }
                let account = getMappedColumnValue("account", request);
-               return filters.providers[request.provider.key] === true &&
-                      account.indexOf(filters.account) !== -1;
+               return filters.providers[request.provider.key] === true
+                   && ((!filters.account && !account) || (account && account.indexOf(filters.account) !== -1));
            });
         }
 
@@ -173,12 +173,13 @@ window.Omnibug = (() => {
                     ];
                 }
                 row.push(request.request.url.replace(/"/g, `\\"`));
+                row.push(request.request.postData);
                 row.push((new Date(request.request.timestamp)).toString());
                 return `"` + row.join(colDelim) + `"`;
             }).join("\n");
         // Add any headers
         exportText = `"` + ["##OMNIBUG_NAME## v##OMNIBUG_VERSION##", "Exported " + (new Date()).toString()].join(colDelim) + `"\n`
-                   + `"` + ["Event Type", "Provider", "Account", "Request ID", "URL", "Timestamp"].join(colDelim) + `"\n` + exportText;
+                   + `"` + ["Event Type", "Provider", "Account", "Request ID", "Request URL", "POST Data", "Timestamp"].join(colDelim) + `"\n` + exportText;
 
 
         // Generate the file to download
