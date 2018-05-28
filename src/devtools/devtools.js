@@ -18,7 +18,7 @@
             port;
 
         port = browser.runtime.connect({
-            name: "omnibug-" + browser.devtools.inspectedWindow.tabId
+            name: "##OMNIBUG_KEY##-" + browser.devtools.inspectedWindow.tabId
         });
 
         /**
