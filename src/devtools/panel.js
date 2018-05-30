@@ -16,7 +16,7 @@ window.Omnibug = (() => {
         settings = (new OmnibugSettings).defaults,
         requestPanel = d.getElementById("requests"),
         noRequests = d.getElementById("no-requests"),
-        filters = {"providers": {}, "account": ""},
+        filters = {"providers": {}, "account": "", "accountType": "contains"},
         persist = true,
         recordedData = [],
         allProviders = OmnibugProvider.getProviders();
@@ -62,11 +62,18 @@ window.Omnibug = (() => {
     });
 
     // Add our listener for the account filter
-    let filterAccount = d.getElementById("filter-account");
+    let filterAccount = d.getElementById("filter-account"),
+        filterAccountType = d.getElementById("filter-account-type");
     filterAccount.addEventListener("input", (event) => {
         // event.preventDefault();
         let accountFilter = event.target.value;
         filters.account = accountFilter.replace(/[^0-9a-zA-Z_ .,-]/g, "");
+        updateFiltersStyles();
+    });
+    filterAccountType.addEventListener("change", (event) => {
+        // event.preventDefault();
+        let accountFilterType = event.target.value;
+        filters.accountType = ["contains", "starts", "ends", "exact"].indexOf(accountFilterType) === -1 ? "contains" : accountFilterType;
         updateFiltersStyles();
     });
     filterAccount.addEventListener("keypress", (event) => {
@@ -592,7 +599,8 @@ window.Omnibug = (() => {
 
         // Add account filter, if applicable
         if(filters.account) {
-            styleSheet.sheet.insertRule(`.request:not([data-account*="${filters.account}" i]) { display: none; }`);
+            let filterMap = {"contains": "*", "starts": "^", "ends": "$", "exact": ""};
+            styleSheet.sheet.insertRule(`.request:not([data-account${filterMap[filters.accountType]}="${filters.account}" i]) { display: none; }`);
         }
 
         // Show the user that filters are (in)active
