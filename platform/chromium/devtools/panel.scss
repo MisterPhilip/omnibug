@@ -98,9 +98,10 @@ details > summary {
   border: 1px solid $border-color;
   border-collapse: initial;
   margin-bottom: 1em;
+  table-layout: fixed;
 }
 .request-details tbody > tr > td:first-of-type {
-  width: 13em;
+  width: 14em;
   font-weight: 600;
   padding-left: .3em;
 }
@@ -110,6 +111,12 @@ details > summary {
   padding: .35em;
   min-width: 80px;
   text-align: center;
+}
+.parameter-key, .parameter-field {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .navigation {
   @include hide-overflow;

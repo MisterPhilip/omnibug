@@ -51,6 +51,9 @@ class OmnibugSettings
             // show navigation requests
             showNavigation: true,
 
+            // Toggle text wrapping
+            wrapText: true,
+
             // colors
             color_load        : "#dbedff",
             color_click       : "#f1ffdb",

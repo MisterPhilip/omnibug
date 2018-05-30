@@ -427,9 +427,10 @@ window.Omnibug = (() => {
             return aKey.localeCompare(bKey, "standard", {"numeric": true});
         }).forEach((row) => {
             let tableRow = createElement("tr", [], {"data-parameter-key": row.key}),
-                name = createElement("td"),
-                nameKey = createElement("span", ["parameter-key"], {"title": row.field}),
-                nameField = createElement("span", ["parameter-field"], {"title": row.key}),
+                title = `${row.field} (${row.key})`,
+                name = createElement("td", [], {"title": title}),
+                nameKey = createElement("span", ["parameter-key"]),
+                nameField = createElement("span", ["parameter-field"]),
                 value = createElement("td", ["parameter-value"]);
 
             nameKey.innerText = row.key;
@@ -493,6 +494,12 @@ window.Omnibug = (() => {
                 highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]",
                 rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; }`;
             styleSheet.sheet.insertRule(rule);
+        }
+
+        // Wrap text or truncate with ellipsis
+        if(!settings.wrapText) {
+            styleSheet.sheet.insertRule(`.parameter-value {white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;}`, styleSheet.sheet.cssRules.length);
+            styleSheet.sheet.insertRule(`.parameter-value:hover {white-space: normal; overflow: visible;  height:auto;}`, styleSheet.sheet.cssRules.length);
         }
 
         // Background colors
