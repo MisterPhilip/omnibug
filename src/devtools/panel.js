@@ -182,11 +182,14 @@ window.Omnibug = (() => {
                 row.push(request.request.url.replace(/"/g, `\\"`));
                 row.push(request.request.postData);
                 row.push((new Date(request.request.timestamp)).toString());
+                if(settings.showNotes) {
+                    row.push(request.request.note);
+                }
                 return `"` + row.join(colDelim) + `"`;
             }).join("\n");
         // Add any headers
         exportText = `"` + ["##OMNIBUG_NAME## v##OMNIBUG_VERSION##", "Exported " + (new Date()).toString()].join(colDelim) + `"\n`
-                   + `"` + ["Event Type", "Provider", "Account", "Request ID", "Request URL", "POST Data", "Timestamp"].join(colDelim) + `"\n` + exportText;
+                   + `"` + ["Event Type", "Provider", "Account", "Request ID", "Request URL", "POST Data", "Timestamp", "Notes"].join(colDelim) + `"\n` + exportText;
 
 
         // Generate the file to download
@@ -219,6 +222,24 @@ window.Omnibug = (() => {
 
     // Load up the default settings
     loadSettings(settings);
+
+    /**
+     * Listener for note changes
+     * @param event
+     */
+    function noteListener(event) {
+        let input = event.target,
+            requestParent = input.closest("details.request"),
+            id = requestParent.getAttribute("data-request-id"),
+            timestamp = requestParent.getAttribute("data-timestamp"),
+            index = recordedData.findIndex((request) => {
+                return request.event === "webRequest" && String(request.request.id) === id && String(request.request.timestamp) === timestamp;
+            });
+        if(index !== -1) {
+            // this _should_ always be true...
+            recordedData[index].request.note = input.value;
+        }
+    }
 
     /**
      * Shortcut to creating an HTML element
@@ -302,6 +323,7 @@ window.Omnibug = (() => {
         let details = createElement("details", ["request"], {
                         "data-request-id": request.request.id,
                         "data-provider": request.provider.key,
+                        "data-timestamp": request.request.timestamp,
                         "data-account": ""
                       }),
             summary = createElement("summary"),
@@ -372,6 +394,13 @@ window.Omnibug = (() => {
         let redirectWarning = createElement("div", ["redirect", "toast", "toast-warning"]);
         redirectWarning.innerText = "This request was redirected, thus the data may not be the final data sent to the provider.";
         body.appendChild(redirectWarning);
+
+        // Add the note field & listener
+        let noteWrapper = createElement("div", ["form-group", "request-note"]),
+            noteInput = createElement("input", ["form-input"], {"type": "text", "placeholder": "Enter a note about this request…"});
+        noteInput.addEventListener("input", noteListener);
+        noteWrapper.appendChild(noteInput);
+        body.appendChild(noteWrapper);
 
         let requestSummary = [];
         Object.entries(request.request).forEach((info) => {
@@ -500,6 +529,11 @@ window.Omnibug = (() => {
         if(!settings.wrapText) {
             styleSheet.sheet.insertRule(`.parameter-value {white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;}`, styleSheet.sheet.cssRules.length);
             styleSheet.sheet.insertRule(`.parameter-value:hover {white-space: normal; overflow: visible;  height:auto;}`, styleSheet.sheet.cssRules.length);
+        }
+
+        // Hide note field if disabled
+        if(!settings.showNotes) {
+            styleSheet.sheet.insertRule(`.request-note {display: none;}`, styleSheet.sheet.cssRules.length);
         }
 
         // Background colors

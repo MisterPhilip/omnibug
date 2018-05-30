@@ -54,6 +54,9 @@ class OmnibugSettings
             // Toggle text wrapping
             wrapText: true,
 
+            // Allow note taking (used for exports)
+            showNotes: false,
+
             // colors
             color_load        : "#dbedff",
             color_click       : "#f1ffdb",

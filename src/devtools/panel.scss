@@ -112,6 +112,16 @@ details > summary {
   min-width: 80px;
   text-align: center;
 }
+.request-note input {
+  height: 1.4rem;
+  padding: 0.1rem 0.2rem;
+  background: none;
+  border: 0;
+}
+.request-note input:hover, .request-note input:focus {
+  background: #fff;
+  transition: background 0.5s linear;
+}
 .parameter-key, .parameter-field {
   display: block;
   white-space: nowrap;
