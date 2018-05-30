@@ -488,10 +488,12 @@ window.Omnibug = (() => {
         clearStyles(styleSheet);
 
         // Highlight colors
-        let highlightPrefix = "[data-parameter-key=\"",
-            highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]",
-            rule = `${highlightKeys} { background-color: ${settings.color_highlight}; }`;
-        styleSheet.sheet.insertRule(rule);
+        if(settings.highlightKeys.length) {
+            let highlightPrefix = "[data-parameter-key=\"",
+                highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]",
+                rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; }`;
+            styleSheet.sheet.insertRule(rule);
+        }
 
         // Background colors
         styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click}; }`, styleSheet.sheet.cssRules.length);
