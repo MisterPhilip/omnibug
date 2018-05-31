@@ -17,13 +17,19 @@ test("AdobeTargetProvider pattern should match Adobe Target domains", t => {
             "https://omnibug.tt.omtrdc.net/m2/omnibug/mbox/standard",
             "http://omnibug.tt.omtrdc.net/m2/omnibug/mbox/json",
             "https://omnibug.tt.omtrdc.net/m2/omnibug/mbox/json"
+        ],
+        ignoreUrls = [
+            "https://omnibug.io/testing",
+            "https://cdn.tt.omtrdc.net/cdn/target.js"
         ];
 
     urls.forEach((url) => {
         t.true(provider.checkUrl(url));
     });
 
-    t.false(provider.checkUrl("https://omnibug.io/testing"), "Provider should not match on non-provider based URLs");
+    ignoreUrls.forEach((url) => {
+        t.false(provider.checkUrl(url), "Provider should not match on non-provider based URLs");
+    });
 });
 
 test("OmnibugProvider returns AdobeAnalytics", t => {

@@ -942,7 +942,7 @@ class AdobeTargetProvider extends BaseProvider
     {
         super();
         this._key        = "ADOBETARGET";
-        this._pattern    = /\.tt\.omtrdc\.net\//;
+        this._pattern    = /\.tt\.omtrdc\.net\/(?!cdn\/)/;
         this._name       = "Adobe Target";
         this._type       = "testing";
     }
@@ -1049,6 +1049,30 @@ class AdobeTargetProvider extends BaseProvider
                 "group": "General"
             }
         };
+    }
+
+    /**
+     * Parse a given URL parameter into human-readable form
+     *
+     * @param {string}  name
+     * @param {string}  value
+     *
+     * @returns {void|{}}
+     */
+    handleQueryParam(name, value)
+    {
+        let result = {};
+        if(name.indexOf("profile.") === 0) {
+            result = {
+                "key":   name,
+                "field": name.slice(8),
+                "value": value,
+                "group": "Profile Attributes"
+            };
+        } else {
+            result = super.handleQueryParam(name, value);
+        }
+        return result;
     }
 
     /**

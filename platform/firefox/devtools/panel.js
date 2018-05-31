@@ -232,14 +232,12 @@ window.Omnibug = (() => {
             requestParent = input.closest("details.request"),
             id = requestParent.getAttribute("data-request-id"),
             timestamp = requestParent.getAttribute("data-timestamp"),
-            index = recordedData.findIndex((request) => {
-                console.log("recordedData", request);
-                return request.event === "webRequest" && String(request.request.id) === id && String(request.request.timestamp) === timestamp;
+            request = recordedData.find((r) => {
+                return r.event === "webRequest" && String(r.request.id) === id && String(r.request.timestamp) === timestamp;
             });
-        console.log("noteListener", id, timestamp, index, input.value);
-        if(index !== -1) {
-            // this _should_ always be true...
-            recordedData[index].request.note = input.value;
+        if(typeof request !== "undefined") {
+            // this _should_ always trigger, but just in case...
+            request.request.note = input.value;
         }
     }
 
@@ -350,22 +348,26 @@ window.Omnibug = (() => {
             colTime = createElement("div", ["column", "col-6", "col-lg-4", "col-md-4", "col-sm-2"]),
             providerTitle = request.provider.name;
 
+        let requestTypeEl = createElement("span", ["label"]),
+            requestTypeValue;
+
         // Add the provider name & request type (if applicable)
         if(request.provider.columns.requestType) {
-            let requestTypeEl = createElement("span", ["label"]),
-                requestTypeValue = request.data.find((el) => {
-                    return el.key === request.provider.columns.requestType;
-                });
-
-            // Verify the column / data exists, if so add it as a label
-            if(requestTypeValue) {
-                requestTypeEl.setAttribute("data-request-type", requestTypeValue.value);
-                requestTypeEl.innerText = requestTypeValue.value;
-                colTitleWrapper.appendChild(requestTypeEl);
-                providerTitle += " - " + requestTypeValue.value;
-            }
+            requestTypeValue = request.data.find((el) => {
+                return el.key === request.provider.columns.requestType;
+            });
         }
+        if(!requestTypeValue) {
+            requestTypeValue = {"value": "Other"};
+        }
+
+        // Verify the column / data exists, if so add it as a label
+        requestTypeEl.setAttribute("data-request-type", requestTypeValue.value);
+        requestTypeEl.innerText = requestTypeValue.value;
+        colTitleWrapper.appendChild(requestTypeEl);
+        providerTitle += " - " + requestTypeValue.value;
         colTitleSpan.innerText = request.provider.name;
+
         colTitleWrapper.setAttribute("title", providerTitle);
         colTitleRedirect.appendChild(colTitleRedirectIcon);
         colTitleWrapper.appendChild(colTitleSpan);
@@ -397,8 +399,9 @@ window.Omnibug = (() => {
         redirectWarning.innerText = "This request was redirected, thus the data may not be the final data sent to the provider.";
         body.appendChild(redirectWarning);
 
+        // Add the note field & listener
         let noteWrapper = createElement("div", ["form-group", "request-note"]),
-            noteInput = createElement("input", ["form-input"], {"type": "text", "placeholder": "Enter a note about this request&hellip;"});
+            noteInput = createElement("input", ["form-input"], {"type": "text", "placeholder": "Enter a note about this request…"});
         noteInput.addEventListener("input", noteListener);
         noteWrapper.appendChild(noteInput);
         body.appendChild(noteWrapper);
