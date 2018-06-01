@@ -71,6 +71,16 @@ class BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -137,7 +147,8 @@ class BaseProvider
                 "name":    this.name,
                 "key":     this.key,
                 "type":    this.type,
-                "columns": this.columnMapping
+                "columns": this.columnMapping,
+                "groups":  this.groups
             },
             "data": data
         };
@@ -178,7 +189,7 @@ class BaseProvider
             "key":   name,
             "field": param.name || name,
             "value": value,
-            "group": param.group || "Other"
+            "group": param.group || "other"
         };
     }
 
@@ -335,6 +346,45 @@ class AdobeAnalyticsProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general", 
+                "name": "General"
+            }, 
+            {
+                "key": "props",
+                "name": "Custom Traffic Variables (props)"
+            }, 
+            {
+                "key": "eVars",
+                "name": "Custom Conversion Variables (eVars)"
+            }, 
+            {
+                "key": "hier",
+                "name": "Hierarchy Variables"
+            }, 
+            {
+                "key": "media",
+                "name": "Media Module"
+            }, 
+            {
+                "key": "activity",
+                "name": "Activity Map"
+            }, 
+            {
+                "key": "context",
+                "name": "Context Data"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -344,195 +394,195 @@ class AdobeAnalyticsProvider extends BaseProvider
         return {
             "ns": {
                 "name": "Visitor namespace",
-                "group": "General"
+                "group": "general"
             },
             "ndh": {
                 "name": "Image sent from JS?",
-                "group": "General"
+                "group": "general"
             },
             "ch": {
                 "name": "Channel",
-                "group": "General"
+                "group": "general"
             },
             "v0": {
                 "name": "Campaign",
-                "group": "General"
+                "group": "general"
             },
             "r": {
                 "name": "Referrer URL",
-                "group": "General"
+                "group": "general"
             },
             "ce": {
                 "name": "Character set",
-                "group": "General"
+                "group": "general"
             },
             "cl": {
                 "name": "Cookie lifetime",
-                "group": "General"
+                "group": "general"
             },
             "g": {
                 "name": "Current URL",
-                "group": "General"
+                "group": "general"
             },
             "j": {
                 "name": "JavaScript version",
-                "group": "General"
+                "group": "general"
             },
             "bw": {
                 "name": "Browser width",
-                "group": "General"
+                "group": "general"
             },
             "bh": {
                 "name": "Browser height",
-                "group": "General"
+                "group": "general"
             },
             "s": {
                 "name": "Screen resolution",
-                "group": "General"
+                "group": "general"
             },
             "c": {
                 "name": "Screen color depth",
-                "group": "General"
+                "group": "general"
             },
             "ct": {
                 "name": "Connection type",
-                "group": "General"
+                "group": "general"
             },
             "p": {
                 "name": "Netscape plugins",
-                "group": "General"
+                "group": "general"
             },
             "k": {
                 "name": "Cookies enabled?",
-                "group": "General"
+                "group": "general"
             },
             "hp": {
                 "name": "Home page?",
-                "group": "General"
+                "group": "general"
             },
             "pid": {
                 "name": "Page ID",
-                "group": "General"
+                "group": "general"
             },
             "pidt": {
                 "name": "Page ID type",
-                "group": "General"
+                "group": "general"
             },
             "oid": {
                 "name": "Object ID",
-                "group": "General"
+                "group": "general"
             },
             "oidt": {
                 "name": "Object ID type",
-                "group": "General"
+                "group": "general"
             },
             "ot": {
                 "name": "Object tag name",
-                "group": "General"
+                "group": "general"
             },
             "pe": {
                 "name": "Link type",
-                "group": "General"
+                "group": "general"
             },
             "pev1": {
                 "name": "Link URL",
-                "group": "General"
+                "group": "general"
             },
             "pev2": {
                 "name": "Link name",
-                "group": "General"
+                "group": "general"
             },
             "pev3": {
                 "name": "Video milestone",
-                "group": "General"
+                "group": "general"
             },
             "cc": {
                 "name": "Currency code",
-                "group": "General"
+                "group": "general"
             },
             "t": {
                 "name": "Browser time",
-                "group": "General"
+                "group": "general"
             },
             "v": {
                 "name": "Javascript-enabled browser?",
-                "group": "General"
+                "group": "general"
             },
             "pccr": {
                 "name": "Prevent infinite redirects",
-                "group": "General"
+                "group": "general"
             },
             "vid": {
                 "name": "Visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "vidn": {
                 "name": "New visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "fid": {
                 "name": "Fallback Visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "mid": {
                 "name": "Marketing Cloud Visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "aid": {
                 "name": "Legacy Visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "cdp": {
                 "name": "Cookie domain periods",
-                "group": "General"
+                "group": "general"
             },
             "pageName": {
                 "name": "Page name",
-                "group": "General"
+                "group": "general"
             },
             "pageType": {
                 "name": "Page type",
-                "group": "General"
+                "group": "general"
             },
             "server": {
                 "name": "Server",
-                "group": "General"
+                "group": "general"
             },
             "events": {
                 "name": "Events",
-                "group": "General"
+                "group": "general"
             },
             "products": {
                 "name": "Products",
-                "group": "General"
+                "group": "general"
             },
             "purchaseID": {
                 "name": "Purchase ID",
-                "group": "General"
+                "group": "general"
             },
             "state": {
                 "name": "Visitor state",
-                "group": "General"
+                "group": "general"
             },
             "vmk": {
                 "name": "Visitor migration key",
-                "group": "General"
+                "group": "general"
             },
             "vvp": {
                 "name": "Variable provider",
-                "group": "General"
+                "group": "general"
             },
             "xact": {
                 "name": "Transaction ID",
-                "group": "General"
+                "group": "general"
             },
             "zip": {
                 "name": "ZIP/Postal code",
-                "group": "General"
+                "group": "general"
             },
             "rsid": {
                 "name": "Report Suites",
-                "group": "General"
+                "group": "general"
             },
             "requestType": {
                 "hidden": true
@@ -598,7 +648,8 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "name": this.name,
                 "key":  this.key,
                 "type": this.type,
-                "columns": this.columnMapping
+                "columns": this.columnMapping,
+                "groups":  this.groups
             },
             "data": data
         };
@@ -620,42 +671,42 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "prop" + RegExp.$1,
                 "value": value,
-                "group": "Custom Traffic Variables (props)"
+                "group": "props"
             };
         } else if(/^(?:v|eVar)(\d+)$/i.test(name) && name !== "v0") {
             result = {
                 "key":   name,
                 "field": "eVar" + RegExp.$1,
                 "value": value,
-                "group": "Custom Conversion Variables (eVars)"
+                "group": "eVars"
             };
         } else if(/^(?:h|hier)(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": "Hierarchy " + RegExp.$1,
                 "value": value,
-                "group": "Hierarchy Variables"
+                "group": "hier"
             };
         } else if(name.indexOf(".a.media.") > 0) {
             result = {
                 "key":   name,
                 "field": name.split(".").pop(),
                 "value": value,
-                "group": "Media Module"
+                "group": "media"
             };
         } else if(name.indexOf(".a.activitymap.") > 0) {
             result = {
                 "key":   name,
                 "field": name.split(".").pop(),
                 "value": value,
-                "group": "Activity Map"
+                "group": "activity"
             };
         } else if(name.indexOf(".") > 0) {
             result = {
                 "key":   name,
                 "field": name.split(".").pop(),
                 "value": value,
-                "group": "Context Data"
+                "group": "context"
             };
         } else if(/^(AQB|AQE)$/i.test(name)) {
             // ignore
@@ -684,7 +735,7 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "key":   "rsid",
                 "field": this.keys.rsid ? this.keys.rsid.name : "Report Suites",
                 "value": rsid[1],
-                "group": this.keys.rsid ? this.keys.rsid.group : "General",
+                "group": this.keys.rsid ? this.keys.rsid.group : "general",
             });
         }
 
@@ -735,6 +786,21 @@ class AdobeAudienceManagerProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general",
+                "name": "General"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -744,15 +810,15 @@ class AdobeAudienceManagerProvider extends BaseProvider
         return {
             "d_orgid": {
                 "name": "Adobe Organization ID",
-                "group": "General"
+                "group": "general"
             },
             "d_rtbd": {
                 "name": "Return Method",
-                "group": "General"
+                "group": "general"
             },
             "d_cb": {
                 "name": "Callback property",
-                "group": "General"
+                "group": "general"
             }
         };
     }
@@ -789,6 +855,21 @@ class AdobeHeartbeatProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general",
+                "name": "General"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -798,111 +879,111 @@ class AdobeHeartbeatProvider extends BaseProvider
         return {
             "s:asset:video_id": {
                 "name": "Content ID",
-                "group": "General"
+                "group": "general"
             },
             "l:asset:length": {
                 "name": "Video Length",
-                "group": "General"
+                "group": "general"
             },
             "s:stream:type": {
                 "name": "Content Type",
-                "group": "General"
+                "group": "general"
             },
             "s:event:sid": {
                 "name": "Video Session ID",
-                "group": "General"
+                "group": "general"
             },
             "s:sp:player_name": {
                 "name": "Content Player Name",
-                "group": "General"
+                "group": "general"
             },
             "s:sp:channel": {
                 "name": "Content Channel",
-                "group": "General"
+                "group": "general"
             },
             "s:asset:name": {
                 "name": "Video Name",
-                "group": "General"
+                "group": "general"
             },
             "s:sp:sdk": {
                 "name": "SDK Version",
-                "group": "General"
+                "group": "general"
             },
             "s:sp:hb_version": {
                 "name": "VHL Version",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.show": {
                 "name": "Show",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.format": {
                 "name": "Stream Format",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.season": {
                 "name": "Season",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.episode": {
                 "name": "Episode",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.asset": {
                 "name": "Asset ID",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.genre": {
                 "name": "Genre",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.airDate": {
                 "name": "First Air Date",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.digitalDate": {
                 "name": "First Digital Date",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.rating": {
                 "name": "Content Rating",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.originator": {
                 "name": "Originator",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.network": {
                 "name": "Network",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.type": {
                 "name": "Show Type",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.pass.mvpd": {
                 "name": "MVPD",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.pass.auth": {
                 "name": "Authorized",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.dayPart": {
                 "name": "Day Part",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.feed": {
                 "name": "Video Feed Type",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.adload": {
                 "name": "Ad Load Type",
-                "group": "General"
+                "group": "general"
             },
             "s:event:type": {
                 "name": "Event Type",
-                "group": "General"
+                "group": "general"
             },
             "omnibug_requestType": {
                 "hidden": true
@@ -961,6 +1042,25 @@ class AdobeTargetProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general",
+                "name": "General"
+            },
+            {
+                "key": "profile",
+                "name": "Profile Attributes"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -970,83 +1070,83 @@ class AdobeTargetProvider extends BaseProvider
         return {
             "mbox": {
                 "name": "Mbox Name",
-                "group": "General"
+                "group": "general"
             },
             "mboxType": {
                 "name": "Mbox Type",
-                "group": "General"
+                "group": "general"
             },
             "mboxCount": {
                 "name": "Mbox Count",
-                "group": "General"
+                "group": "general"
             },
             "mboxId": {
                 "name": "Mbox ID",
-                "group": "General"
+                "group": "general"
             },
             "mboxSession": {
                 "name": "Mbox Session",
-                "group": "General"
+                "group": "general"
             },
             "mboxPC": {
                 "name": "Mbox PC ID",
-                "group": "General"
+                "group": "general"
             },
             "mboxPage": {
                 "name": "Mbox Page ID",
-                "group": "General"
+                "group": "general"
             },
             "clientCode": {
                 "name": "Client Code",
-                "group": "General"
+                "group": "general"
             },
             "mboxHost": {
                 "name": "Page Host",
-                "group": "General"
+                "group": "general"
             },
             "mboxURL": {
                 "name": "Page URL",
-                "group": "General"
+                "group": "general"
             },
             "mboxReferrer": {
                 "name": "Page Referrer",
-                "group": "General"
+                "group": "general"
             },
             "screenHeight": {
                 "name": "Screen Height",
-                "group": "General"
+                "group": "general"
             },
             "screenWidth": {
                 "name": "Screen Width",
-                "group": "General"
+                "group": "general"
             },
             "browserWidth": {
                 "name": "Browser Width",
-                "group": "General"
+                "group": "general"
             },
             "browserHeight": {
                 "name": "Browser Height",
-                "group": "General"
+                "group": "general"
             },
             "browserTimeOffset": {
                 "name": "Browser Timezone Offset",
-                "group": "General"
+                "group": "general"
             },
             "colorDepth": {
                 "name": "Browser Color Depth",
-                "group": "General"
+                "group": "general"
             },
             "mboxXDomain": {
                 "name": "CrossDomain Enabled",
-                "group": "General"
+                "group": "general"
             },
             "mboxTime": {
                 "name": "Timestamp",
-                "group": "General"
+                "group": "general"
             },
             "mboxVersion": {
                 "name": "Library Version",
-                "group": "General"
+                "group": "general"
             }
         };
     }
@@ -1067,7 +1167,7 @@ class AdobeTargetProvider extends BaseProvider
                 "key":   name,
                 "field": name.slice(8),
                 "value": value,
-                "group": "Profile Attributes"
+                "group": "profile"
             };
         } else {
             result = super.handleQueryParam(name, value);
@@ -1092,13 +1192,13 @@ class AdobeTargetProvider extends BaseProvider
                 "key":   "clientCode",
                 "field": "Client Code",
                 "value": matches[1],
-                "group": "General"
+                "group": "general"
             });
             results.push({
                 "key":   "mboxType",
                 "field": "Mbox Type",
                 "value": matches[2],
-                "group": "General"
+                "group": "general"
             });
         }
 
@@ -1378,6 +1478,57 @@ class UniversalAnalyticsProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general",
+                "name": "General"
+            },
+            {
+                "key": "campaign",
+                "name": "Campaign"
+            },
+            {
+                "key": "events",
+                "name": "Events"
+            },
+            {
+                "key": "ecommerce",
+                "name": "Ecommerce"
+            },
+            {
+                "key": "timing",
+                "name": "Timing"
+            },
+            {
+                "key": "dimension",
+                "name": "Custom Dimensions"
+            },
+            {
+                "key": "metric",
+                "name": "Custom Metrics"
+            },
+            {
+                "key": "promo",
+                "name": "Promotions"
+            },
+            {
+                "key": "optimize",
+                "name": "Google Optimize"
+            },
+            {
+                "key": "contentgroup",
+                "name": "Content Group"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -1387,295 +1538,295 @@ class UniversalAnalyticsProvider extends BaseProvider
         return {
             "v": {
                 "name": "Protocol Version",
-                "group": "General"
+                "group": "general"
             },
             "tid": {
                 "name": "Tracking ID",
-                "group": "General"
+                "group": "general"
             },
             "aip": {
                 "name": "Anonymize IP",
-                "group": "General"
+                "group": "general"
             },
             "qt": {
                 "name": "Queue Time",
-                "group": "General"
+                "group": "general"
             },
             "z": {
                 "name": "Cache Buster",
-                "group": "General"
+                "group": "general"
             },
             "cid": {
                 "name": "Client ID",
-                "group": "General"
+                "group": "general"
             },
             "sc": {
                 "name": "Session Control",
-                "group": "General"
+                "group": "general"
             },
             "dr": {
                 "name": "Document Referrer",
-                "group": "General"
+                "group": "general"
             },
             "cn": {
                 "name": "Campaign Name",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "cs": {
                 "name": "Campaign Source",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "cm": {
                 "name": "Campaign Medium",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "ck": {
                 "name": "Campaign Keyword",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "cc": {
                 "name": "Campaign Content",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "ci": {
                 "name": "Campaign ID",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "gclid": {
                 "name": "Google AdWords ID",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "dclid": {
                 "name": "Google Display Ads ID",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "sr": {
                 "name": "Screen Resolution",
-                "group": "General"
+                "group": "general"
             },
             "vp": {
                 "name": "Viewport Size",
-                "group": "General"
+                "group": "general"
             },
             "de": {
                 "name": "Document Encoding",
-                "group": "General"
+                "group": "general"
             },
             "sd": {
                 "name": "Screen Colors",
-                "group": "General"
+                "group": "general"
             },
             "ul": {
                 "name": "User Language",
-                "group": "General"
+                "group": "general"
             },
             "je": {
                 "name": "Java Enabled",
-                "group": "General"
+                "group": "general"
             },
             "fl": {
                 "name": "Flash Version",
-                "group": "General"
+                "group": "general"
             },
             "t": {
                 "name": "Hit Type",
-                "group": "General"
+                "group": "general"
             },
             "ni": {
                 "name": "Non-Interaction Hit",
-                "group": "Events"
+                "group": "events"
             },
             "dl": {
                 "name": "Document location URL",
-                "group": "General"
+                "group": "general"
             },
             "dh": {
                 "name": "Document Host Name",
-                "group": "General"
+                "group": "general"
             },
             "dp": {
                 "name": "Document Path",
-                "group": "General"
+                "group": "general"
             },
             "dt": {
                 "name": "Document Title",
-                "group": "General"
+                "group": "general"
             },
             "cd": {
                 "name": "Content Description",
-                "group": "General"
+                "group": "general"
             },
             "an": {
                 "name": "Application Name",
-                "group": "General"
+                "group": "general"
             },
             "av": {
                 "name": "Application Version",
-                "group": "General"
+                "group": "general"
             },
             "ec": {
                 "name": "Event Category",
-                "group": "Events"
+                "group": "events"
             },
             "ea": {
                 "name": "Event Action",
-                "group": "Events"
+                "group": "events"
             },
             "el": {
                 "name": "Event Label",
-                "group": "Events"
+                "group": "events"
             },
             "ev": {
                 "name": "Event Value",
-                "group": "Events"
+                "group": "events"
             },
             "ti": {
                 "name": "Transaction ID",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "ta": {
                 "name": "Transaction Affiliation",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "tr": {
                 "name": "Transaction Revenue",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "ts": {
                 "name": "Transaction Shipping",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "tt": {
                 "name": "Transaction Tax",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "in": {
                 "name": "Item Name",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "ip": {
                 "name": "Item Price",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "iq": {
                 "name": "Item Quantity",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "ic": {
                 "name": "Item Code",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "iv": {
                 "name": "Item Category",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "cu": {
                 "name": "Currency Code",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "sn": {
                 "name": "Social Network",
-                "group": "Events"
+                "group": "events"
             },
             "sa": {
                 "name": "Social Action",
-                "group": "Events"
+                "group": "events"
             },
             "st": {
                 "name": "Social Action Target",
-                "group": "Events"
+                "group": "events"
             },
             "utc": {
                 "name": "User Timing Category",
-                "group": "Timing"
+                "group": "timing"
             },
             "utv": {
                 "name": "User Timing Variable Name",
-                "group": "Timing"
+                "group": "timing"
             },
             "utt": {
                 "name": "User Timing Time",
-                "group": "Timing"
+                "group": "timing"
             },
             "utl": {
                 "name": "User timing Label",
-                "group": "Timing"
+                "group": "timing"
             },
             "plt": {
                 "name": "Page load time",
-                "group": "Timing"
+                "group": "timing"
             },
             "dns": {
                 "name": "DNS time",
-                "group": "Timing"
+                "group": "timing"
             },
             "pdt": {
                 "name": "Page download time",
-                "group": "Timing"
+                "group": "timing"
             },
             "rrt": {
                 "name": "Redirect response time",
-                "group": "Timing"
+                "group": "timing"
             },
             "tcp": {
                 "name": "TCP connect time",
-                "group": "Timing"
+                "group": "timing"
             },
             "srt": {
                 "name": "Server response time",
-                "group": "Timing"
+                "group": "timing"
             },
             "exd": {
                 "name": "Exception description",
-                "group": "Events"
+                "group": "events"
             },
             "exf": {
                 "name": "Is exception fatal?",
-                "group": "Events"
+                "group": "events"
             },
             "ds": {
                 "name": "Data Source",
-                "group": "General"
+                "group": "general"
             },
             "uid": {
                 "name": "User ID",
-                "group": "General"
+                "group": "general"
             },
             "linkid": {
                 "name": "Link ID",
-                "group": "General"
+                "group": "general"
             },
             "pa": {
                 "name": "Product Action",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "tcc": {
                 "name": "Coupon Code",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "pal": {
                 "name": "Product Action List",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "cos": {
                 "name": "Checkout Step",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "col": {
                 "name": "Checkout Step Option",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "promoa": {
                 "name": "Promotion Action",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "xid": {
                 "name": "Content Experiment ID",
-                "group": "Google Optimize"
+                "group": "optimize"
             },
             "xvar": {
                 "name": "Content Experiment Variant",
-                "group": "Google Optimize"
+                "group": "optimize"
             },
             "requestType": {
                 "hidden": true
@@ -1699,21 +1850,21 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Custom Dimension " + RegExp.$1,
                 "value": value,
-                "group": "Custom Dimensions"
+                "group": "dimension"
             };
         } else if(/^cm(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": "Custom Metric " + RegExp.$1,
                 "value": value,
-                "group": "Custom Metrics"
+                "group": "metric"
             };
         } else if(/^cg(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": "Content Group " + RegExp.$1,
                 "value": value,
-                "group": "Content Groups"
+                "group": "contentgroup"
             };
         } else if(/^promo(\d+)([a-z]{2})$/i.test(name)) {
             let lookup = {
@@ -1727,7 +1878,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Promotion " + RegExp.$1 + " " + type,
                 "value": value,
-                "group": "Promotions"
+                "group": "promo"
             };
         } else if(/^pr(\d+)([a-z]{2})$/i.test(name)) {
             let lookup = {
@@ -1746,7 +1897,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Product " + RegExp.$1 + " " + type,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else if(/^pr(\d+)(cd|cm)(\d+)$/i.test(name)) {
             let lookup = {
@@ -1758,14 +1909,14 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Product " + RegExp.$1 + " " + type,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else if(/^il(\d+)nm$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": "Impression List " + RegExp.$1,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else if(/^il(\d+)pi(\d+)(cd|cm)(\d+)$/i.test(name)) {
             let lookup = {
@@ -1777,7 +1928,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type + " " + RegExp.$4,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else if(/^il(\d+)pi(\d+)([a-z]{2})$/i.test(name))
         {
@@ -1795,7 +1946,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key": name,
                 "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else {
             result = super.handleQueryParam(name, value);

@@ -30,6 +30,45 @@ class AdobeAnalyticsProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general", 
+                "name": "General"
+            }, 
+            {
+                "key": "props",
+                "name": "Custom Traffic Variables (props)"
+            }, 
+            {
+                "key": "eVars",
+                "name": "Custom Conversion Variables (eVars)"
+            }, 
+            {
+                "key": "hier",
+                "name": "Hierarchy Variables"
+            }, 
+            {
+                "key": "media",
+                "name": "Media Module"
+            }, 
+            {
+                "key": "activity",
+                "name": "Activity Map"
+            }, 
+            {
+                "key": "context",
+                "name": "Context Data"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -39,195 +78,195 @@ class AdobeAnalyticsProvider extends BaseProvider
         return {
             "ns": {
                 "name": "Visitor namespace",
-                "group": "General"
+                "group": "general"
             },
             "ndh": {
                 "name": "Image sent from JS?",
-                "group": "General"
+                "group": "general"
             },
             "ch": {
                 "name": "Channel",
-                "group": "General"
+                "group": "general"
             },
             "v0": {
                 "name": "Campaign",
-                "group": "General"
+                "group": "general"
             },
             "r": {
                 "name": "Referrer URL",
-                "group": "General"
+                "group": "general"
             },
             "ce": {
                 "name": "Character set",
-                "group": "General"
+                "group": "general"
             },
             "cl": {
                 "name": "Cookie lifetime",
-                "group": "General"
+                "group": "general"
             },
             "g": {
                 "name": "Current URL",
-                "group": "General"
+                "group": "general"
             },
             "j": {
                 "name": "JavaScript version",
-                "group": "General"
+                "group": "general"
             },
             "bw": {
                 "name": "Browser width",
-                "group": "General"
+                "group": "general"
             },
             "bh": {
                 "name": "Browser height",
-                "group": "General"
+                "group": "general"
             },
             "s": {
                 "name": "Screen resolution",
-                "group": "General"
+                "group": "general"
             },
             "c": {
                 "name": "Screen color depth",
-                "group": "General"
+                "group": "general"
             },
             "ct": {
                 "name": "Connection type",
-                "group": "General"
+                "group": "general"
             },
             "p": {
                 "name": "Netscape plugins",
-                "group": "General"
+                "group": "general"
             },
             "k": {
                 "name": "Cookies enabled?",
-                "group": "General"
+                "group": "general"
             },
             "hp": {
                 "name": "Home page?",
-                "group": "General"
+                "group": "general"
             },
             "pid": {
                 "name": "Page ID",
-                "group": "General"
+                "group": "general"
             },
             "pidt": {
                 "name": "Page ID type",
-                "group": "General"
+                "group": "general"
             },
             "oid": {
                 "name": "Object ID",
-                "group": "General"
+                "group": "general"
             },
             "oidt": {
                 "name": "Object ID type",
-                "group": "General"
+                "group": "general"
             },
             "ot": {
                 "name": "Object tag name",
-                "group": "General"
+                "group": "general"
             },
             "pe": {
                 "name": "Link type",
-                "group": "General"
+                "group": "general"
             },
             "pev1": {
                 "name": "Link URL",
-                "group": "General"
+                "group": "general"
             },
             "pev2": {
                 "name": "Link name",
-                "group": "General"
+                "group": "general"
             },
             "pev3": {
                 "name": "Video milestone",
-                "group": "General"
+                "group": "general"
             },
             "cc": {
                 "name": "Currency code",
-                "group": "General"
+                "group": "general"
             },
             "t": {
                 "name": "Browser time",
-                "group": "General"
+                "group": "general"
             },
             "v": {
                 "name": "Javascript-enabled browser?",
-                "group": "General"
+                "group": "general"
             },
             "pccr": {
                 "name": "Prevent infinite redirects",
-                "group": "General"
+                "group": "general"
             },
             "vid": {
                 "name": "Visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "vidn": {
                 "name": "New visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "fid": {
                 "name": "Fallback Visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "mid": {
                 "name": "Marketing Cloud Visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "aid": {
                 "name": "Legacy Visitor ID",
-                "group": "General"
+                "group": "general"
             },
             "cdp": {
                 "name": "Cookie domain periods",
-                "group": "General"
+                "group": "general"
             },
             "pageName": {
                 "name": "Page name",
-                "group": "General"
+                "group": "general"
             },
             "pageType": {
                 "name": "Page type",
-                "group": "General"
+                "group": "general"
             },
             "server": {
                 "name": "Server",
-                "group": "General"
+                "group": "general"
             },
             "events": {
                 "name": "Events",
-                "group": "General"
+                "group": "general"
             },
             "products": {
                 "name": "Products",
-                "group": "General"
+                "group": "general"
             },
             "purchaseID": {
                 "name": "Purchase ID",
-                "group": "General"
+                "group": "general"
             },
             "state": {
                 "name": "Visitor state",
-                "group": "General"
+                "group": "general"
             },
             "vmk": {
                 "name": "Visitor migration key",
-                "group": "General"
+                "group": "general"
             },
             "vvp": {
                 "name": "Variable provider",
-                "group": "General"
+                "group": "general"
             },
             "xact": {
                 "name": "Transaction ID",
-                "group": "General"
+                "group": "general"
             },
             "zip": {
                 "name": "ZIP/Postal code",
-                "group": "General"
+                "group": "general"
             },
             "rsid": {
                 "name": "Report Suites",
-                "group": "General"
+                "group": "general"
             },
             "requestType": {
                 "hidden": true
@@ -293,7 +332,8 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "name": this.name,
                 "key":  this.key,
                 "type": this.type,
-                "columns": this.columnMapping
+                "columns": this.columnMapping,
+                "groups":  this.groups
             },
             "data": data
         };
@@ -315,42 +355,42 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "prop" + RegExp.$1,
                 "value": value,
-                "group": "Custom Traffic Variables (props)"
+                "group": "props"
             };
         } else if(/^(?:v|eVar)(\d+)$/i.test(name) && name !== "v0") {
             result = {
                 "key":   name,
                 "field": "eVar" + RegExp.$1,
                 "value": value,
-                "group": "Custom Conversion Variables (eVars)"
+                "group": "eVars"
             };
         } else if(/^(?:h|hier)(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": "Hierarchy " + RegExp.$1,
                 "value": value,
-                "group": "Hierarchy Variables"
+                "group": "hier"
             };
         } else if(name.indexOf(".a.media.") > 0) {
             result = {
                 "key":   name,
                 "field": name.split(".").pop(),
                 "value": value,
-                "group": "Media Module"
+                "group": "media"
             };
         } else if(name.indexOf(".a.activitymap.") > 0) {
             result = {
                 "key":   name,
                 "field": name.split(".").pop(),
                 "value": value,
-                "group": "Activity Map"
+                "group": "activity"
             };
         } else if(name.indexOf(".") > 0) {
             result = {
                 "key":   name,
                 "field": name.split(".").pop(),
                 "value": value,
-                "group": "Context Data"
+                "group": "context"
             };
         } else if(/^(AQB|AQE)$/i.test(name)) {
             // ignore
@@ -379,7 +419,7 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "key":   "rsid",
                 "field": this.keys.rsid ? this.keys.rsid.name : "Report Suites",
                 "value": rsid[1],
-                "group": this.keys.rsid ? this.keys.rsid.group : "General",
+                "group": this.keys.rsid ? this.keys.rsid.group : "general",
             });
         }
 

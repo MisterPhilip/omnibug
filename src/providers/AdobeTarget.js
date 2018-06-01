@@ -30,6 +30,25 @@ class AdobeTargetProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general",
+                "name": "General"
+            },
+            {
+                "key": "profile",
+                "name": "Profile Attributes"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -39,83 +58,83 @@ class AdobeTargetProvider extends BaseProvider
         return {
             "mbox": {
                 "name": "Mbox Name",
-                "group": "General"
+                "group": "general"
             },
             "mboxType": {
                 "name": "Mbox Type",
-                "group": "General"
+                "group": "general"
             },
             "mboxCount": {
                 "name": "Mbox Count",
-                "group": "General"
+                "group": "general"
             },
             "mboxId": {
                 "name": "Mbox ID",
-                "group": "General"
+                "group": "general"
             },
             "mboxSession": {
                 "name": "Mbox Session",
-                "group": "General"
+                "group": "general"
             },
             "mboxPC": {
                 "name": "Mbox PC ID",
-                "group": "General"
+                "group": "general"
             },
             "mboxPage": {
                 "name": "Mbox Page ID",
-                "group": "General"
+                "group": "general"
             },
             "clientCode": {
                 "name": "Client Code",
-                "group": "General"
+                "group": "general"
             },
             "mboxHost": {
                 "name": "Page Host",
-                "group": "General"
+                "group": "general"
             },
             "mboxURL": {
                 "name": "Page URL",
-                "group": "General"
+                "group": "general"
             },
             "mboxReferrer": {
                 "name": "Page Referrer",
-                "group": "General"
+                "group": "general"
             },
             "screenHeight": {
                 "name": "Screen Height",
-                "group": "General"
+                "group": "general"
             },
             "screenWidth": {
                 "name": "Screen Width",
-                "group": "General"
+                "group": "general"
             },
             "browserWidth": {
                 "name": "Browser Width",
-                "group": "General"
+                "group": "general"
             },
             "browserHeight": {
                 "name": "Browser Height",
-                "group": "General"
+                "group": "general"
             },
             "browserTimeOffset": {
                 "name": "Browser Timezone Offset",
-                "group": "General"
+                "group": "general"
             },
             "colorDepth": {
                 "name": "Browser Color Depth",
-                "group": "General"
+                "group": "general"
             },
             "mboxXDomain": {
                 "name": "CrossDomain Enabled",
-                "group": "General"
+                "group": "general"
             },
             "mboxTime": {
                 "name": "Timestamp",
-                "group": "General"
+                "group": "general"
             },
             "mboxVersion": {
                 "name": "Library Version",
-                "group": "General"
+                "group": "general"
             }
         };
     }
@@ -136,7 +155,7 @@ class AdobeTargetProvider extends BaseProvider
                 "key":   name,
                 "field": name.slice(8),
                 "value": value,
-                "group": "Profile Attributes"
+                "group": "profile"
             };
         } else {
             result = super.handleQueryParam(name, value);
@@ -161,13 +180,13 @@ class AdobeTargetProvider extends BaseProvider
                 "key":   "clientCode",
                 "field": "Client Code",
                 "value": matches[1],
-                "group": "General"
+                "group": "general"
             });
             results.push({
                 "key":   "mboxType",
                 "field": "Mbox Type",
                 "value": matches[2],
-                "group": "General"
+                "group": "general"
             });
         }
 

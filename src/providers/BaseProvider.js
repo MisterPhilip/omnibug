@@ -71,6 +71,16 @@ class BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -137,7 +147,8 @@ class BaseProvider
                 "name":    this.name,
                 "key":     this.key,
                 "type":    this.type,
-                "columns": this.columnMapping
+                "columns": this.columnMapping,
+                "groups":  this.groups
             },
             "data": data
         };
@@ -178,7 +189,7 @@ class BaseProvider
             "key":   name,
             "field": param.name || name,
             "value": value,
-            "group": param.group || "Other"
+            "group": param.group || "other"
         };
     }
 

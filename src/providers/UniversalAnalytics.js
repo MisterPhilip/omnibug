@@ -30,6 +30,57 @@ class UniversalAnalyticsProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general",
+                "name": "General"
+            },
+            {
+                "key": "campaign",
+                "name": "Campaign"
+            },
+            {
+                "key": "events",
+                "name": "Events"
+            },
+            {
+                "key": "ecommerce",
+                "name": "Ecommerce"
+            },
+            {
+                "key": "timing",
+                "name": "Timing"
+            },
+            {
+                "key": "dimension",
+                "name": "Custom Dimensions"
+            },
+            {
+                "key": "metric",
+                "name": "Custom Metrics"
+            },
+            {
+                "key": "promo",
+                "name": "Promotions"
+            },
+            {
+                "key": "optimize",
+                "name": "Google Optimize"
+            },
+            {
+                "key": "contentgroup",
+                "name": "Content Group"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -39,295 +90,295 @@ class UniversalAnalyticsProvider extends BaseProvider
         return {
             "v": {
                 "name": "Protocol Version",
-                "group": "General"
+                "group": "general"
             },
             "tid": {
                 "name": "Tracking ID",
-                "group": "General"
+                "group": "general"
             },
             "aip": {
                 "name": "Anonymize IP",
-                "group": "General"
+                "group": "general"
             },
             "qt": {
                 "name": "Queue Time",
-                "group": "General"
+                "group": "general"
             },
             "z": {
                 "name": "Cache Buster",
-                "group": "General"
+                "group": "general"
             },
             "cid": {
                 "name": "Client ID",
-                "group": "General"
+                "group": "general"
             },
             "sc": {
                 "name": "Session Control",
-                "group": "General"
+                "group": "general"
             },
             "dr": {
                 "name": "Document Referrer",
-                "group": "General"
+                "group": "general"
             },
             "cn": {
                 "name": "Campaign Name",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "cs": {
                 "name": "Campaign Source",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "cm": {
                 "name": "Campaign Medium",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "ck": {
                 "name": "Campaign Keyword",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "cc": {
                 "name": "Campaign Content",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "ci": {
                 "name": "Campaign ID",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "gclid": {
                 "name": "Google AdWords ID",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "dclid": {
                 "name": "Google Display Ads ID",
-                "group": "Campaign"
+                "group": "campaign"
             },
             "sr": {
                 "name": "Screen Resolution",
-                "group": "General"
+                "group": "general"
             },
             "vp": {
                 "name": "Viewport Size",
-                "group": "General"
+                "group": "general"
             },
             "de": {
                 "name": "Document Encoding",
-                "group": "General"
+                "group": "general"
             },
             "sd": {
                 "name": "Screen Colors",
-                "group": "General"
+                "group": "general"
             },
             "ul": {
                 "name": "User Language",
-                "group": "General"
+                "group": "general"
             },
             "je": {
                 "name": "Java Enabled",
-                "group": "General"
+                "group": "general"
             },
             "fl": {
                 "name": "Flash Version",
-                "group": "General"
+                "group": "general"
             },
             "t": {
                 "name": "Hit Type",
-                "group": "General"
+                "group": "general"
             },
             "ni": {
                 "name": "Non-Interaction Hit",
-                "group": "Events"
+                "group": "events"
             },
             "dl": {
                 "name": "Document location URL",
-                "group": "General"
+                "group": "general"
             },
             "dh": {
                 "name": "Document Host Name",
-                "group": "General"
+                "group": "general"
             },
             "dp": {
                 "name": "Document Path",
-                "group": "General"
+                "group": "general"
             },
             "dt": {
                 "name": "Document Title",
-                "group": "General"
+                "group": "general"
             },
             "cd": {
                 "name": "Content Description",
-                "group": "General"
+                "group": "general"
             },
             "an": {
                 "name": "Application Name",
-                "group": "General"
+                "group": "general"
             },
             "av": {
                 "name": "Application Version",
-                "group": "General"
+                "group": "general"
             },
             "ec": {
                 "name": "Event Category",
-                "group": "Events"
+                "group": "events"
             },
             "ea": {
                 "name": "Event Action",
-                "group": "Events"
+                "group": "events"
             },
             "el": {
                 "name": "Event Label",
-                "group": "Events"
+                "group": "events"
             },
             "ev": {
                 "name": "Event Value",
-                "group": "Events"
+                "group": "events"
             },
             "ti": {
                 "name": "Transaction ID",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "ta": {
                 "name": "Transaction Affiliation",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "tr": {
                 "name": "Transaction Revenue",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "ts": {
                 "name": "Transaction Shipping",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "tt": {
                 "name": "Transaction Tax",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "in": {
                 "name": "Item Name",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "ip": {
                 "name": "Item Price",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "iq": {
                 "name": "Item Quantity",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "ic": {
                 "name": "Item Code",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "iv": {
                 "name": "Item Category",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "cu": {
                 "name": "Currency Code",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "sn": {
                 "name": "Social Network",
-                "group": "Events"
+                "group": "events"
             },
             "sa": {
                 "name": "Social Action",
-                "group": "Events"
+                "group": "events"
             },
             "st": {
                 "name": "Social Action Target",
-                "group": "Events"
+                "group": "events"
             },
             "utc": {
                 "name": "User Timing Category",
-                "group": "Timing"
+                "group": "timing"
             },
             "utv": {
                 "name": "User Timing Variable Name",
-                "group": "Timing"
+                "group": "timing"
             },
             "utt": {
                 "name": "User Timing Time",
-                "group": "Timing"
+                "group": "timing"
             },
             "utl": {
                 "name": "User timing Label",
-                "group": "Timing"
+                "group": "timing"
             },
             "plt": {
                 "name": "Page load time",
-                "group": "Timing"
+                "group": "timing"
             },
             "dns": {
                 "name": "DNS time",
-                "group": "Timing"
+                "group": "timing"
             },
             "pdt": {
                 "name": "Page download time",
-                "group": "Timing"
+                "group": "timing"
             },
             "rrt": {
                 "name": "Redirect response time",
-                "group": "Timing"
+                "group": "timing"
             },
             "tcp": {
                 "name": "TCP connect time",
-                "group": "Timing"
+                "group": "timing"
             },
             "srt": {
                 "name": "Server response time",
-                "group": "Timing"
+                "group": "timing"
             },
             "exd": {
                 "name": "Exception description",
-                "group": "Events"
+                "group": "events"
             },
             "exf": {
                 "name": "Is exception fatal?",
-                "group": "Events"
+                "group": "events"
             },
             "ds": {
                 "name": "Data Source",
-                "group": "General"
+                "group": "general"
             },
             "uid": {
                 "name": "User ID",
-                "group": "General"
+                "group": "general"
             },
             "linkid": {
                 "name": "Link ID",
-                "group": "General"
+                "group": "general"
             },
             "pa": {
                 "name": "Product Action",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "tcc": {
                 "name": "Coupon Code",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "pal": {
                 "name": "Product Action List",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "cos": {
                 "name": "Checkout Step",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "col": {
                 "name": "Checkout Step Option",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "promoa": {
                 "name": "Promotion Action",
-                "group": "Ecommerce"
+                "group": "ecommerce"
             },
             "xid": {
                 "name": "Content Experiment ID",
-                "group": "Google Optimize"
+                "group": "optimize"
             },
             "xvar": {
                 "name": "Content Experiment Variant",
-                "group": "Google Optimize"
+                "group": "optimize"
             },
             "requestType": {
                 "hidden": true
@@ -351,21 +402,21 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Custom Dimension " + RegExp.$1,
                 "value": value,
-                "group": "Custom Dimensions"
+                "group": "dimension"
             };
         } else if(/^cm(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": "Custom Metric " + RegExp.$1,
                 "value": value,
-                "group": "Custom Metrics"
+                "group": "metric"
             };
         } else if(/^cg(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": "Content Group " + RegExp.$1,
                 "value": value,
-                "group": "Content Groups"
+                "group": "contentgroup"
             };
         } else if(/^promo(\d+)([a-z]{2})$/i.test(name)) {
             let lookup = {
@@ -379,7 +430,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Promotion " + RegExp.$1 + " " + type,
                 "value": value,
-                "group": "Promotions"
+                "group": "promo"
             };
         } else if(/^pr(\d+)([a-z]{2})$/i.test(name)) {
             let lookup = {
@@ -398,7 +449,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Product " + RegExp.$1 + " " + type,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else if(/^pr(\d+)(cd|cm)(\d+)$/i.test(name)) {
             let lookup = {
@@ -410,14 +461,14 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Product " + RegExp.$1 + " " + type,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else if(/^il(\d+)nm$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": "Impression List " + RegExp.$1,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else if(/^il(\d+)pi(\d+)(cd|cm)(\d+)$/i.test(name)) {
             let lookup = {
@@ -429,7 +480,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type + " " + RegExp.$4,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else if(/^il(\d+)pi(\d+)([a-z]{2})$/i.test(name))
         {
@@ -447,7 +498,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "key": name,
                 "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type,
                 "value": value,
-                "group": "Ecommerce"
+                "group": "ecommerce"
             };
         } else {
             result = super.handleQueryParam(name, value);

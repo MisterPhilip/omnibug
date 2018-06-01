@@ -29,6 +29,21 @@ class AdobeAudienceManagerProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general",
+                "name": "General"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -38,15 +53,15 @@ class AdobeAudienceManagerProvider extends BaseProvider
         return {
             "d_orgid": {
                 "name": "Adobe Organization ID",
-                "group": "General"
+                "group": "general"
             },
             "d_rtbd": {
                 "name": "Return Method",
-                "group": "General"
+                "group": "general"
             },
             "d_cb": {
                 "name": "Callback property",
-                "group": "General"
+                "group": "general"
             }
         };
     }

@@ -422,11 +422,17 @@ window.Omnibug = (() => {
                 groups[val].push(item);
             }
             return groups;
-        }, {"Summary": requestSummary});
+        }, {"summary": requestSummary});
 
-        Object.entries(data).forEach((dataGroup) => {
-            let panel = buildRequestPanel(dataGroup[0], dataGroup[1], !settings.showFullNames);
-            body.appendChild(panel);
+        let groups = request.provider.groups || [];
+        groups.unshift({"key": "summary", "name": "Summary"});
+        groups.push({"key": "other", "name": "Other"});
+
+        groups.forEach((group) => {
+            if (data[group.key]) {
+                let panel = buildRequestPanel(group.name, data[group.key], !settings.showFullNames);
+                body.appendChild(panel);
+            }
         });
         details.appendChild(body);
 

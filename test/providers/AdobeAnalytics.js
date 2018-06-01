@@ -60,7 +60,7 @@ test("Provider returns props/eVars", t => {
     t.is(typeof prop14, "object", "Prop14 exists");
     t.is(prop14.field, "prop14", "Field is prop14");
     t.is(prop14.value, "guest", "Value is correct & decoded");
-    t.is(prop14.group, "Custom Traffic Variables (props)");
+    t.is(prop14.group, "props");
 
     let eVar3 = results.data.find((result) => {
         return result.key === "v3";
@@ -69,7 +69,7 @@ test("Provider returns props/eVars", t => {
     t.is(typeof eVar3, "object", "eVar3 exists");
     t.is(eVar3.field, "eVar3", "Field is prop14");
     t.is(eVar3.value, "omnibug:home", "Value is correct & decoded");
-    t.is(eVar3.group, "Custom Conversion Variables (eVars)");
+    t.is(eVar3.group, "eVars");
 });
 
 test("Provider returns rsid", t => {
@@ -101,7 +101,7 @@ test("Provider returns POST data", t => {
     t.is(typeof pageName, "object", "pageName exists");
     t.is(pageName.field, "Page name", "Field is Page name");
     t.is(pageName.value, "omnibug:home", "Value is decoded to omnibug:home");
-    t.is(pageName.group, "General");
+    t.is(pageName.group, "general");
 });
 
 

@@ -30,6 +30,21 @@ class AdobeHeartbeatProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the group names & order
+     *
+     * @returns {*[]}
+     */
+    get groups()
+    {
+        return [
+            {
+                "key": "general",
+                "name": "General"
+            }
+        ];
+    }
+
+    /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
@@ -39,111 +54,111 @@ class AdobeHeartbeatProvider extends BaseProvider
         return {
             "s:asset:video_id": {
                 "name": "Content ID",
-                "group": "General"
+                "group": "general"
             },
             "l:asset:length": {
                 "name": "Video Length",
-                "group": "General"
+                "group": "general"
             },
             "s:stream:type": {
                 "name": "Content Type",
-                "group": "General"
+                "group": "general"
             },
             "s:event:sid": {
                 "name": "Video Session ID",
-                "group": "General"
+                "group": "general"
             },
             "s:sp:player_name": {
                 "name": "Content Player Name",
-                "group": "General"
+                "group": "general"
             },
             "s:sp:channel": {
                 "name": "Content Channel",
-                "group": "General"
+                "group": "general"
             },
             "s:asset:name": {
                 "name": "Video Name",
-                "group": "General"
+                "group": "general"
             },
             "s:sp:sdk": {
                 "name": "SDK Version",
-                "group": "General"
+                "group": "general"
             },
             "s:sp:hb_version": {
                 "name": "VHL Version",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.show": {
                 "name": "Show",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.format": {
                 "name": "Stream Format",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.season": {
                 "name": "Season",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.episode": {
                 "name": "Episode",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.asset": {
                 "name": "Asset ID",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.genre": {
                 "name": "Genre",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.airDate": {
                 "name": "First Air Date",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.digitalDate": {
                 "name": "First Digital Date",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.rating": {
                 "name": "Content Rating",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.originator": {
                 "name": "Originator",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.network": {
                 "name": "Network",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.type": {
                 "name": "Show Type",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.pass.mvpd": {
                 "name": "MVPD",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.pass.auth": {
                 "name": "Authorized",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.dayPart": {
                 "name": "Day Part",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.feed": {
                 "name": "Video Feed Type",
-                "group": "General"
+                "group": "general"
             },
             "s:meta:a.media.adload": {
                 "name": "Ad Load Type",
-                "group": "General"
+                "group": "general"
             },
             "s:event:type": {
                 "name": "Event Type",
-                "group": "General"
+                "group": "general"
             },
             "omnibug_requestType": {
                 "hidden": true
