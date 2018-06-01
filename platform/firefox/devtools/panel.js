@@ -385,7 +385,7 @@ window.Omnibug = (() => {
         summaryColumns.appendChild(colAccount);
 
         // Add the timestamp
-        let timestamp = new Date(request.request.timestamp);
+        let timestamp = new Date(request.request.timestamp).toLocaleString();
         colTime.innerText = timestamp;
         colTime.setAttribute("title", timestamp);
         summaryColumns.appendChild(colTime);
@@ -442,7 +442,10 @@ window.Omnibug = (() => {
      * @return {HTMLElement}
      */
     function buildRequestPanel(title, data = [], useKey = false) {
-        let wrapper = createElement("details", ["request-details"], {"open": "open"});
+        let wrapper = createElement("details", ["request-details"]);
+        if(title !== "Summary") {
+            wrapper.setAttribute("open", "open");
+        }
 
         // Add the summary (title)
         let summary = createElement("summary");
