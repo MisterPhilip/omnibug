@@ -57,6 +57,9 @@ class OmnibugSettings
             // Allow note taking (used for exports)
             showNotes: false,
 
+            // Should newest or oldest entries show first?
+            requestSortOrder: "asc",
+
             // colors
             color_load        : "#dbedff",
             color_click       : "#f1ffdb",

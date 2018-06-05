@@ -1442,6 +1442,11 @@ window.Omnibug = (() => {
             styleSheet.sheet.insertRule(rule);
         }
 
+        // Reverse the direction of the entries to show newest first
+        if(settings.requestSortOrder === "desc") {
+            styleSheet.sheet.insertRule(`#requests {display: flex; flex-direction: column-reverse;}`, styleSheet.sheet.cssRules.length);
+        }
+
         // Wrap text or truncate with ellipsis
         if(!settings.wrapText) {
             styleSheet.sheet.insertRule(`.parameter-value {white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;}`, styleSheet.sheet.cssRules.length);

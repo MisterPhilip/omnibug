@@ -90,6 +90,27 @@
 
             <fieldset>
                 <div class="row">
+                    <div class="col-label">Request sort order</div>
+                    <div class="col">
+                        <div>
+                            <label title="Descriptions" for="requestSortOrderAsc">
+                                <input type="radio" name="requestSortOrder" id="requestSortOrderAsc" data-bind-property="requestSortOrder" value="asc" />
+                                Oldest requests first
+                            </label>
+                        </div>
+                        <div>
+                            <label title="Descriptions" for="requestSortOrderDesc">
+                                <input type="radio" name="requestSortOrder" id="requestSortOrderDesc"  data-bind-property="requestSortOrder" value="desc" />
+                                Newest requests first
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <p class="help">You can sort the requests either by newest first, or oldest first.</p>
+            </fieldset>
+
+            <fieldset>
+                <div class="row">
                     <div class="col-label">Parameter display style</div>
                     <div class="col">
                         <div>
