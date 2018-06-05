@@ -2803,10 +2803,28 @@ nav.navbar {
     color: #e85600; }
 
 .request:nth-of-type(odd) {
-  background-color: #fafafa; }
+  background-color: #FAFAFA; }
 
 .request:nth-of-type(even) {
-  background-color: #f0f0f0; }
+  background-color: #ededed; }
+
+@keyframes request-highlight-odd {
+  40% {
+    background: #ddeefd; }
+  100% {
+    background: #FAFAFA; } }
+
+@keyframes request-highlight-even {
+  40% {
+    background: #c9e5fc; }
+  100% {
+    background: #ededed; } }
+
+.request:nth-of-type(odd):not([open]) {
+  animation: request-highlight-odd 1.2s; }
+
+.request:nth-of-type(even):not([open]) {
+  animation: request-highlight-even 1.2s; }
 
 .request[open],
 .request[open] > summary {

@@ -86,10 +86,32 @@ nav.navbar {
   }
 }
 .request:nth-of-type(odd) {
-  background-color: #fafafa;
+  background-color: $body-background-color;
 }
 .request:nth-of-type(even) {
-  background-color: #f0f0f0;
+  background-color: darken($body-background-color, 5%);
+}
+@keyframes request-highlight-odd {
+  40% {
+    background: lighten($primary-color-light, 7%);
+  }
+  100% {
+    background: $body-background-color;
+  }
+}
+@keyframes request-highlight-even {
+  40% {
+    background: lighten($primary-color-light, 3%);
+  }
+  100% {
+    background: darken($body-background-color, 5%);
+  }
+}
+.request:nth-of-type(odd):not([open]) {
+  animation: request-highlight-odd 1.2s;
+}
+.request:nth-of-type(even):not([open]) {
+  animation: request-highlight-even 1.2s;
 }
 .request[open],
 .request[open] > summary {
