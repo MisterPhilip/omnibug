@@ -44,7 +44,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "babel-register": "^6.26.0",
     "coveralls": "^3.0.0",
-    "grunt": "~1.0.1",
+    "grunt": "^1.0.3",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-concat": "^1.0.1",
@@ -52,7 +52,7 @@
     "grunt-contrib-jshint": "~1.1.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-text-replace": "^0.4.0",
-    "nyc": "^11.4.1",
+    "nyc": "^11.9.0",
     "url-search-params": "^0.10.0"
   },
   "homepage": "https://omnibug.io/",
@@ -60,6 +60,7 @@
     "grunt-sass": "^2.1.0",
     "jshint-html-reporter": "^0.2.5",
     "node-sass": "^4.7.2",
+    "npm": "^6.1.0",
     "spectre.css": "^0.5.1"
   }
 }
