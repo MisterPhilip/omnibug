@@ -65,10 +65,18 @@ window.Omnibug = (() => {
         element.addEventListener("click", (event) => {
             event.preventDefault();
 
-            let target = element.closest(".modal");
+            let target = element.closest(".modal"),
+                modal = target.getAttribute("id");
             if(target) {
                 target.classList.remove("active");
-                track(["send", "event", "modal", "close", target.getAttribute("id")]);
+                if(modal === "filter-modal") {
+                    let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
+                        return !provider[1] && (settings.enabledProviders.indexOf(provider[0]) > -1);
+                    });
+                    track(["send", "event", "filter requests", "account", (filters.account === "") ? "no filter" : filters.accountType]);
+                    track(["send", "event", "filter requests", "hidden providers", hiddenProviders.length]);
+                }
+                track(["send", "event", "modal", "close", modal]);
             }
         })
     });
@@ -110,7 +118,12 @@ window.Omnibug = (() => {
             providers = d.querySelectorAll(`#filter-providers > li:not(.d-none) input[type="checkbox"]`);
         providers.forEach((provider) => {
             provider.checked = checked;
+            if(filters.providers.hasOwnProperty(provider.value)) {
+                filters.providers[provider.value] = checked;
+            }
         });
+        track(["send", "event", "filter requests", ((checked) ? "show" : "hide") + " all"]);
+        updateFiltersStyles();
     });
 
     // Add our filter
@@ -679,7 +692,7 @@ window.Omnibug = (() => {
             providerList.appendChild(wrapper);
 
             // Add our event listener
-            input.addEventListener("change", (event) => {
+            input.addEventListener("input", (event) => {
                 let checkbox = event.target,
                     providerKey = checkbox.value;
                 filters.providers[providerKey] = checkbox.checked;
@@ -704,6 +717,8 @@ window.Omnibug = (() => {
         // Clear out any existing styles
         clearStyles(styleSheet);
 
+        console.log("providers", filters.providers);
+
         // Figure out what providers are hidden
         let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
             return !provider[1] && (settings.enabledProviders.indexOf(provider[0]) > -1);
@@ -714,20 +729,12 @@ window.Omnibug = (() => {
         // Add hidden providers, if any
         if(hiddenProviders.length) {
             styleSheet.sheet.insertRule(`${hiddenProviders.join(", ")} { display: none; }`);
-
-            if(!fromBuilder) {
-                track(["send", "event", "filter requests", "hidden providers", hiddenProviders.length]);
-            }
         }
 
         // Add account filter, if applicable
         if(filters.account) {
             let filterMap = {"contains": "*", "starts": "^", "ends": "$", "exact": ""};
             styleSheet.sheet.insertRule(`.request:not([data-account${filterMap[filters.accountType]}="${filters.account}" i]) { display: none; }`);
-
-            if(!fromBuilder) {
-                track(["send", "event", "filter requests", "account", filterMap[filters.accountType]]);
-            }
         }
 
         // Show the user that filters are (in)active
