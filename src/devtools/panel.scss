@@ -212,10 +212,16 @@ nav.navbar {
 }
 #filter-providers {
   list-style-type: none;
-
+  margin-top: 0;
   input {
     margin-right: .5em;
   }
+}
+#provider-select-all-wrapper {
+  margin: 0.8rem 0 0 0.8rem;
+  border-bottom: 1px solid $border-color;
+  padding-bottom: .2rem;
+  font-weight: bold;
 }
 .filters-active [data-target-modal="filter-modal"] {
   color: #FF9800 !important;

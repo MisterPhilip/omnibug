@@ -2884,7 +2884,7 @@ nav.navbar {
   border: 0; }
 
 .request-note input:hover, .request-note .request-note input:focus {
-  background: #fff;
+  background: #FFF;
   transition: background 0.5s linear; }
 
 .parameter-key, .parameter-field {
@@ -2914,9 +2914,16 @@ nav.navbar {
   padding-top: 0; }
 
 #filter-providers {
-  list-style-type: none; }
+  list-style-type: none;
+  margin-top: 0; }
   #filter-providers input {
     margin-right: .5em; }
+
+#provider-select-all-wrapper {
+  margin: 0.8rem 0 0 0.8rem;
+  border-bottom: 1px solid #e7e9ed;
+  padding-bottom: .2rem;
+  font-weight: bold; }
 
 .filters-active [data-target-modal="filter-modal"] {
   color: #FF9800 !important; }

@@ -987,6 +987,16 @@ window.Omnibug = (() => {
         }
     });
 
+    // Select all/none
+    let filterProviderSelectBulk = d.getElementById("provider-select-all");
+    filterProviderSelectBulk.addEventListener("change", (event) => {
+        let checked = event.target.checked,
+            providers = d.querySelectorAll(`#filter-providers > li:not(.d-none) input[type="checkbox"]`);
+        providers.forEach((provider) => {
+            provider.checked = checked;
+        });
+    });
+
     // Add our filter
     d.getElementById("provider-search").addEventListener("input", (event) => {
         let searchTerm = (event.target.value || "").toLowerCase(),
@@ -996,11 +1006,11 @@ window.Omnibug = (() => {
             let name = provider.getAttribute("data-provider") || "";
             if(name.toLowerCase().indexOf(searchTerm) >= 0)
             {
-                provider.setAttribute("style", "display:block;");
+                provider.classList.remove("d-none");
             }
             else
             {
-                provider.setAttribute("style", "display:none;");
+                provider.classList.add("d-none");
             }
         });
     });
@@ -1514,7 +1524,7 @@ window.Omnibug = (() => {
                 label.setAttribute("title", "This provider is currently disabled and requests for this provider will never be shown. You can re-enable it within the settings");
             } else {
                 if(filters.providers[providerKey]) {
-                    input.setAttribute("checked", "checked");
+                    input.checked = true;
                 }
             }
 
