@@ -2782,7 +2782,6 @@ nav.navbar {
     padding: 5px 0;
     position: sticky;
     top: 0;
-    background-color: inherit;
     z-index: 100; }
     .request > summary .container {
       margin-top: -1.5em;
@@ -2802,10 +2801,12 @@ nav.navbar {
   .request .redirected:focus .redirect-icon {
     color: #e85600; }
 
-.request:nth-of-type(odd) {
+.request:nth-of-type(odd),
+.request:nth-of-type(odd) > summary {
   background-color: #FAFAFA; }
 
-.request:nth-of-type(even) {
+.request:nth-of-type(even),
+.request:nth-of-type(even) > summary {
   background-color: #ededed; }
 
 @keyframes request-highlight-odd {

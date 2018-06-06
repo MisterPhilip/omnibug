@@ -56,7 +56,6 @@ nav.navbar {
     padding: 5px 0;
     position: sticky;
     top: 0;
-    background-color: inherit;
     z-index: 100;
 
     .container {
@@ -85,10 +84,12 @@ nav.navbar {
     color: $error-color;
   }
 }
-.request:nth-of-type(odd) {
+.request:nth-of-type(odd),
+.request:nth-of-type(odd) > summary {
   background-color: $body-background-color;
 }
-.request:nth-of-type(even) {
+.request:nth-of-type(even),
+.request:nth-of-type(even) > summary {
   background-color: darken($body-background-color, 5%);
 }
 @keyframes request-highlight-odd {
