@@ -10,21 +10,21 @@ label.radio {
   display: block;
   margin: 3px 0;
 }
-#app > header {
+body > header {
   padding: 1em 0;
   text-align: center;
 }
-#app > header img,
-#app > header h1 {
+body > header img,
+body > header h1 {
   display: inline-block;
 }
-#app > header img {
+body > header img {
   vertical-align: middle;
 }
-#app > header h1 {
+body > header h1 {
   margin: 0 0 0 20px;
 }
-#app > header .help {
+body > header .help {
   padding-top: 0.25em;
   font-size: 1em;
 }

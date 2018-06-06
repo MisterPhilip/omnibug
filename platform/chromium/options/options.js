@@ -924,13 +924,11 @@
             if(prop === "highlightKeys")
             {
                 // do something special with these
-                let template = document.getElementById("highlight-parameter-template").innerHTML,
-                    paramList = document.getElementById("highlight-params");
+                let paramList = document.getElementById("highlight-params");
 
-                paramList.innerHTML = "";
-
+                clearChildren(paramList);
                 value.forEach((param) => {
-                    paramList.innerHTML += template.replace(/##PARAMETER##/g, param).replace(/##HIGHLIGHT_COLOR##/g, target.color_highlight);
+                    paramList.appendChild(createHighlightParam(param));
                 });
             }
             else
@@ -955,12 +953,6 @@
                             input.value = value;
                             let bindingStyle = input.getAttribute("data-bind-style") || "background-color";
                             input.nextElementSibling.setAttribute("style", `${bindingStyle}: ${value}`);
-                            if(prop === "color_highlight") {
-                                let paramList = document.querySelectorAll("#highlight-params li");
-                                paramList.forEach((param) => {
-                                    param.setAttribute("style", `background-color: ${value}`);
-                                })
-                            }
                         }
                         else
                         {
@@ -976,8 +968,10 @@
                         });
                     }
                 }
-
             }
+
+            // Update any dynamic styles on the page
+            updateDynamicStyles();
         },
         /**
          * Retrieve the current value
@@ -1058,6 +1052,24 @@
         });
     });
 
+    document.getElementById("addParam").addEventListener("change", (event) => {
+        event.preventDefault();
+
+        let newParam = event.target.value,
+            paramList = document.getElementById("highlight-params");
+
+        if(newParam.trim() !== "" && settings.highlightKeys.indexOf(newParam) === -1) {
+            paramList.appendChild(createHighlightParam(newParam));
+
+            console.log("ADD PARAM", JSON.stringify(settings.highlightKeys),  JSON.stringify(settingsObj.highlightKeys));
+            settings.highlightKeys.push(newParam);
+            console.log("ADDED PARAMS", JSON.stringify(settings.highlightKeys),  JSON.stringify(settingsObj.highlightKeys));
+            settingsProvider.save(settingsObj);
+        }
+
+        event.target.value = "";
+    });
+
     document.getElementById("provider-search").addEventListener("input", (event) => {
         console.log("provider-search", event.target.value);
         let searchTerm = (event.target.value || "").toLowerCase(),
@@ -1082,4 +1094,79 @@
         loadSettingsIntoProxy(defaults);
         settingsProvider.save(defaults);
     });
+
+    function createHighlightParam(param) {
+        let li = createElement("li"),
+            text = createElement("span"),
+            remove = createElement("span", ["remove"], {"title": "Remove"});
+
+        text.innerText = param;
+        remove.innerHTML = "&times;";
+
+        remove.addEventListener("click", (event) => {
+            event.preventDefault();
+            settings.highlightKeys = settingsObj.highlightKeys = settingsObj.highlightKeys.filter(item => item !== param);
+            settingsProvider.save(settingsObj);
+        });
+
+        li.appendChild(text);
+        li.appendChild(remove);
+
+        return li;
+    }
+
+    /**
+     * Load in new settings/styles
+     */
+    function updateDynamicStyles() {
+        let styleSheet = document.getElementById("settingsStyles");
+
+        // Clear out any existing rules
+        clearStyles(styleSheet);
+
+        // Add any rules
+        styleSheet.sheet.insertRule(`#highlight-params > li { background-color: ${settings.color_highlight} !important; }`, styleSheet.sheet.cssRules.length);
+    }
+
+
+    /**
+     * Shortcut to creating an HTML element
+     *
+     * @param type          String
+     * @param classList     []
+     * @param attributes    []
+     * @return {HTMLElement}
+     */
+    function createElement(type, classList = [], attributes = {}) {
+        let element = document.createElement(type);
+        if(classList.length) {
+            element.classList.add(...classList);
+        }
+        Object.entries(attributes).forEach((attribute) => {
+            element.setAttribute(...attribute);
+        });
+        return element;
+    }
+
+    /**
+     * Removes all styles from a stylesheet
+     *
+     * @param styleSheet
+     */
+    function clearStyles(styleSheet) {
+        while(styleSheet.sheet.cssRules.length) {
+            styleSheet.sheet.removeRule(0);
+        }
+    }
+
+    /**
+     * Remove all the pesky children for an element
+     *
+     * @param element
+     */
+    function clearChildren(element) {
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+    }
 }());
