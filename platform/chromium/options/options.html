@@ -204,17 +204,6 @@
 
         <fieldset class="color">
             <div class="row">
-                <label for="color_prev">Previous page</label>
-                <div class="col">
-                    <input type="color" id="color_prev" data-bind-property="color_prev" data-bind-style="background-color" />
-                    <span class="example">Example</span>
-                </div>
-            </div>
-            <p class="help">The background color for events that happened on the last page.</p>
-        </fieldset>
-
-        <fieldset class="color">
-            <div class="row">
                 <label for="color_quotes">Quotes</label>
                 <div class="col">
                     <input type="color" id="color_quotes" data-bind-property="color_quotes" data-bind-style="color" />
@@ -222,6 +211,17 @@
                 </div>
             </div>
             <p class="help">The color for quotes that surround values (if enabled in the "Add quotes around values" setting above).</p>
+        </fieldset>
+
+        <fieldset>
+            <div class="row">
+                <label for="allowTracking">Send usage stats</label>
+                <div class="col">
+                    <input type="checkbox" name="allowTracking" id="allowTracking" data-bind-property="allowTracking" />
+                </div>
+            </div>
+            <p class="help">Checking this will send usage data to Google Analytics for the Omnibug developers to understand how users are interacting with the extension.<br />
+                No information about the user, the page, or request details will be sent.</p>
         </fieldset>
 
         <fieldset id="reset">

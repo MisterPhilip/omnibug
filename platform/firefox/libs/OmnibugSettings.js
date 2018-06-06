@@ -60,10 +60,12 @@ class OmnibugSettings
             // Should newest or oldest entries show first?
             requestSortOrder: "asc",
 
+            // Allow tracking?
+            allowTracking: true,
+
             // colors
             color_load        : "#dbedff",
             color_click       : "#f1ffdb",
-            color_prev        : "#ffd5de",
             color_quotes      : "#ff0000",
             color_highlight   : "#ffff00",
             color_redirect    : "#eeeeee",

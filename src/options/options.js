@@ -1,6 +1,15 @@
 /* globals OmnibugProvider */
 (function() {
 
+    // Setup GA tracker
+    window.GoogleAnalyticsObject = "tracker";
+    window.tracker = function(){ (window.tracker.q = window.tracker.q||[]).push(arguments), window.tracker.l=1*new Date(); };
+
+    tracker("create", "##OMNIBUG_UA_ACCOUNT##", "auto");
+    tracker("set", "checkProtocolTask", ()=>{});
+    tracker("set", "dimension1", "##OMNIBUG_VERSION##");
+    tracker("send", "pageview", "/settings");
+
     /**
      * Setup a proxy handler to observe changes to the settings object
      *
@@ -129,8 +138,10 @@
                     console.log(value, input.checked, index);
                     if(!input.checked && index >= 0) {
                         valArray.splice(index, 1);
+                        track(["send", "event", "settings", "enabledProviders", `removed: ${value}`]);
                     } else if(input.checked && index === -1) {
                         valArray.push(value);
+                        track(["send", "event", "settings", "enabledProviders", `added: ${value}`]);
                     }
                     value = valArray;
                 } else if(type === "checkbox") {
@@ -144,8 +155,22 @@
                 // Update the object (and thus update any other elements attached to the field) & save the settings
                 settings[field] = value;
                 settingsProvider.save(settingsObj);
+
+                if(field !== "enabledProviders" && field !== "highlightKeys") {
+                    track(["send", "event", "settings", field, String(value)], (field === "allowTracking"));
+                }
             });
         });
+
+
+        // Track the settings page, if allowed
+        if(settings.allowTracking) {
+            // Load GA script
+            (function(o,m,n,i,b,u,g){o['GoogleAnalyticsObject']=b;o[b]=o[b]||function(){
+                (o[b].q=o[b].q||[]).push(arguments)},o[b].l=1*new Date();u=m.createElement(n),
+                g=m.getElementsByTagName(n)[0];u.async=1;u.src=i;g.parentNode.insertBefore(u,g)
+            })(window,document,'script','https://www.google-analytics.com/analytics.js','tracker');
+        }
     });
 
     document.getElementById("addParam").addEventListener("change", (event) => {
@@ -157,10 +182,10 @@
         if(newParam.trim() !== "" && settings.highlightKeys.indexOf(newParam) === -1) {
             paramList.appendChild(createHighlightParam(newParam));
 
-            console.log("ADD PARAM", JSON.stringify(settings.highlightKeys),  JSON.stringify(settingsObj.highlightKeys));
             settings.highlightKeys.push(newParam);
-            console.log("ADDED PARAMS", JSON.stringify(settings.highlightKeys),  JSON.stringify(settingsObj.highlightKeys));
             settingsProvider.save(settingsObj);
+
+            track(["send", "event", "settings", "highlightKeys", `added: ${newParam}`]);
         }
 
         event.target.value = "";
@@ -189,6 +214,10 @@
         let defaults = settingsProvider.defaults;
         loadSettingsIntoProxy(defaults);
         settingsProvider.save(defaults);
+
+        if(settings.allowTracking) {
+            track(["send", "event", "settings", "reset"]);
+        }
     });
 
     function createHighlightParam(param) {
@@ -203,6 +232,7 @@
             event.preventDefault();
             settings.highlightKeys = settingsObj.highlightKeys = settingsObj.highlightKeys.filter(item => item !== param);
             settingsProvider.save(settingsObj);
+            track(["send", "event", "settings", "highlightKeys", `removed: ${value}`]);
         });
 
         li.appendChild(text);
@@ -263,6 +293,18 @@
     function clearChildren(element) {
         while (element.firstChild) {
             element.removeChild(element.firstChild);
+        }
+    }
+
+    /**
+     * GA Tracking
+     *
+     * @param data
+     * @param force
+     */
+    function track(data, force = false) {
+        if(settings.allowTracking || force) {
+            tracker.apply(window, data);
         }
     }
 }());

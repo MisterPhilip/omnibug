@@ -6,7 +6,8 @@ module.exports = function(grunt) {
             "name": "Omnibug",
             "version": "0.6.0",
             "storageKey": "omnibug",
-            "feedbackUrl": "https://omnibug.io/feedback"
+            "feedbackUrl": "https://omnibug.io/feedback",
+            "analyticsID": "UA-114343677-3"
         },
         "chrome": {
             "usePolyfill": true,
@@ -280,6 +281,10 @@ module.exports = function(grunt) {
                     {
                         "from": "##OMNIBUG_FEEDBACK_URL##",
                         "to": extensionOptions.feedbackUrl
+                    },
+                    {
+                        "from": "##OMNIBUG_UA_ACCOUNT##",
+                        "to": extensionOptions.analyticsID
                     }
                 ]
             };
