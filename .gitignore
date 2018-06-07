@@ -26,8 +26,8 @@ build/
 
 # Generated files
 src/providers.js
+platform/
 
 # Ignore built CSS files
 .sass-cache/
 src/**/*.css
-platform/**/*.scss
