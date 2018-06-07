@@ -88,10 +88,6 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "name": "Channel",
                 "group": "general"
             },
-            "v0": {
-                "name": "Campaign",
-                "group": "general"
-            },
             "r": {
                 "name": "Referrer URL",
                 "group": "general"
@@ -357,7 +353,7 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "value": value,
                 "group": "props"
             };
-        } else if(/^(?:v|eVar)(\d+)$/i.test(name) && name !== "v0") {
+        } else if(/^(?:v|eVar)(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": "eVar" + RegExp.$1,
