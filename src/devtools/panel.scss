@@ -84,16 +84,14 @@ nav.navbar {
     color: $error-color;
   }
 }
-.request:nth-of-type(odd),
-.request:nth-of-type(odd) > summary {
+.request:nth-of-type(odd) {
   background-color: $body-background-color;
 }
-.request:nth-of-type(even),
-.request:nth-of-type(even) > summary {
+.request:nth-of-type(even) {
   background-color: darken($body-background-color, 5%);
 }
 @keyframes request-highlight-odd {
-  40% {
+  0% {
     background: lighten($primary-color-light, 7%);
   }
   100% {
@@ -101,7 +99,7 @@ nav.navbar {
   }
 }
 @keyframes request-highlight-even {
-  40% {
+  0% {
     background: lighten($primary-color-light, 3%);
   }
   100% {
@@ -117,6 +115,9 @@ nav.navbar {
 .request[open],
 .request[open] > summary {
   border-bottom: 1px solid #dedede;
+}
+.request[open] > summary {
+  background-color: $primary-color-light;
 }
 .request:not(.redirected) .redirect {
   display: none;

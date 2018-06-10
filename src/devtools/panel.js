@@ -450,8 +450,13 @@ window.Omnibug = (() => {
         summary.appendChild(summaryContainer);
         details.appendChild(summary);
 
-        let redirectWarning = createElement("div", ["redirect", "toast", "toast-warning"]);
-        redirectWarning.innerText = "This request was redirected, thus the data may not be the final data sent to the provider.";
+        let redirectWarning = createElement("div", ["redirect", "toast", "toast-warning"]),
+            redirectSpan = createElement("span"),
+            redirectHelpLink = createElement("a", [], {"target": "_blank", "href": "https://omnibug.io/help/redirected-entries"});
+        redirectSpan.innerText = "This request was redirected, thus the data may not be the final data sent to the provider. ";
+        redirectHelpLink.innerText = "Learn more.";
+        redirectWarning.appendChild(redirectSpan);
+        redirectWarning.appendChild(redirectHelpLink);
         body.appendChild(redirectWarning);
 
         // Add the note field & listener
