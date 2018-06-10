@@ -238,12 +238,16 @@ window.Omnibug = (() => {
 
 
         // Generate the file to download
-        let link = d.createElement("a"),
-            blob = new Blob([exportText], {type: `text/${fileType}`}),
+        let blob = new Blob([exportText], {type: `text/${fileType}`}),
             url = window.URL.createObjectURL(blob);
+
+        let link = createElement("a", {
+            "attributes": {
+                "href": url,
+                "download": filename
+            }
+        });
         d.body.appendChild(link);
-        link.href = url;
-        link.download = filename;
 
         // Force the download
         link.click();
@@ -294,25 +298,6 @@ window.Omnibug = (() => {
             // this _should_ always trigger, but just in case...
             request.request.note = input.value;
         }
-    }
-
-    /**
-     * Shortcut to creating an HTML element
-     *
-     * @param type          String
-     * @param classList     []
-     * @param attributes    []
-     * @return {HTMLElement}
-     */
-    function createElement(type, classList = [], attributes = {}) {
-        let element = d.createElement(type);
-        if(classList.length) {
-            element.classList.add(...classList);
-        }
-        Object.entries(attributes).forEach((attribute) => {
-            element.setAttribute(...attribute);
-        });
-        return element;
     }
 
     function clearRequests( ) {
@@ -375,13 +360,15 @@ window.Omnibug = (() => {
      * @return {HTMLElement}
      */
     function buildRequest(request) {
-        let details = createElement("details", ["request"], {
-                        "data-request-id": request.request.id,
-                        "data-provider": request.provider.key,
-                        "data-timestamp": request.request.timestamp,
-                        "data-account": ""
-                      }),
-            summary = createElement("summary"),
+        let details = createElement("details", {
+                "classes": ["request"],
+                "attributes": {
+                    "data-request-id": request.request.id,
+                    "data-provider": request.provider.key,
+                    "data-timestamp": request.request.timestamp,
+                    "data-account": ""
+                }
+            }),
             body = createElement("div");
 
         // Update any redirected entries
@@ -393,18 +380,27 @@ window.Omnibug = (() => {
         }
 
         // Add the summary (title)
-        let summaryContainer = createElement("div", ["container"]),
-            summaryColumns = createElement("div", ["columns"]),
-            colTitleWrapper = createElement("div", ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-5"]),
-            colTitleSpan = createElement("span"),
-            colTitleRedirect = createElement("small", ["redirect", "redirect-icon"], {"title": "This entry was redirected."}),
-            colTitleRedirectIcon = createElement("i", ["fas", "fa-sync"]),
-            colAccount = createElement("div", ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-5"]),
-            colTime = createElement("div", ["column", "col-6", "col-lg-4", "col-md-4", "col-sm-2"]),
-            providerTitle = request.provider.name;
-
-        let requestTypeEl = createElement("span", ["label"]),
+        let colTitleSpan = createElement("span", {
+                "attributes": {
+                    "title": request.provider.name
+                },
+                "text": request.provider.name
+            }),
+            colTitleRedirectIcon = createElement("i", {
+                "classes": ["fas", "fa-sync"]
+            }),
+            colTitleRedirect = createElement("small", {
+                "classes": ["redirect", "redirect-icon"],
+                "attributes": {
+                    "title": "This entry was redirected."
+                },
+                "children": [colTitleRedirectIcon]
+            }),
+            colAccount = createElement("div", {
+                "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-5"]
+            }),
             requestTypeValue;
+
 
         // Add the provider name & request type (if applicable)
         if(request.provider.columns.requestType) {
@@ -416,18 +412,21 @@ window.Omnibug = (() => {
             requestTypeValue = {"value": "Other"};
         }
 
-        // Verify the column / data exists, if so add it as a label
-        requestTypeEl.setAttribute("data-request-type", requestTypeValue.value);
-        requestTypeEl.innerText = requestTypeValue.value;
-        colTitleWrapper.appendChild(requestTypeEl);
-        providerTitle += " - " + requestTypeValue.value;
-        colTitleSpan.innerText = request.provider.name;
+        let requestTypeEl = createElement("span", {
+                "classes": ["label"],
+                "attributes": {
+                    "data-request-type": requestTypeValue.value,
+                },
+                "text": requestTypeValue.value
+            });
 
-        colTitleWrapper.setAttribute("title", providerTitle);
-        colTitleRedirect.appendChild(colTitleRedirectIcon);
-        colTitleWrapper.appendChild(colTitleSpan);
-        colTitleWrapper.appendChild(colTitleRedirect);
-        summaryColumns.appendChild(colTitleWrapper);
+        let colTitleWrapper = createElement("div", {
+                "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-5"],
+                "children": [requestTypeEl, colTitleSpan, colTitleRedirect],
+                "attributes": {
+                    "title": request.provider.name + " - " + requestTypeValue.value
+                }
+            });
 
         // Add the account ID, if it exists
         let accountValue = getMappedColumnValue("account", request);
@@ -437,33 +436,60 @@ window.Omnibug = (() => {
             colAccount.setAttribute("title", accountValue);
             details.setAttribute("data-account", accountValue);
         }
-        summaryColumns.appendChild(colAccount);
 
         // Add the timestamp
-        let timestamp = new Date(request.request.timestamp).toLocaleString();
-        colTime.innerText = timestamp;
-        colTime.setAttribute("title", timestamp);
-        summaryColumns.appendChild(colTime);
+        let timestamp = new Date(request.request.timestamp).toLocaleString(),
+            colTime = createElement("div", {
+                "classes": ["column", "col-6", "col-lg-4", "col-md-4", "col-sm-2"],
+                "text": timestamp,
+                "attributes": {
+                    "title": timestamp
+                }
+            });
+
+        // Wrap everything
+        let summaryColumns = createElement("div", {
+                "classes": ["columns"],
+                "children": [colTitleWrapper, colAccount, colTime]
+            }),
+            summaryContainer = createElement("div", {
+                "classes": ["container"],
+                "children": [summaryColumns]
+            }),
+            summary = createElement("summary", {
+                "children": [summaryContainer]
+            });
 
         // Append our summary
-        summaryContainer.appendChild(summaryColumns);
-        summary.appendChild(summaryContainer);
         details.appendChild(summary);
 
-        let redirectWarning = createElement("div", ["redirect", "toast", "toast-warning"]),
-            redirectSpan = createElement("span"),
-            redirectHelpLink = createElement("a", [], {"target": "_blank", "href": "https://omnibug.io/help/redirected-entries"});
-        redirectSpan.innerText = "This request was redirected, thus the data may not be the final data sent to the provider. ";
-        redirectHelpLink.innerText = "Learn more.";
-        redirectWarning.appendChild(redirectSpan);
-        redirectWarning.appendChild(redirectHelpLink);
+        let redirectHelpLink = createElement("a", {
+                "attributes": {
+                    "target": "_blank",
+                    "href": "https://omnibug.io/help/redirected-entries"
+                },
+                "text": "Learn more."
+            }),
+            redirectWarning = createElement("div", {
+                "classes": ["redirect", "toast", "toast-warning"],
+                "text": "This request was redirected, thus the data may not be the final data sent to the provider. ",
+                "children": [redirectHelpLink]
+            });
         body.appendChild(redirectWarning);
 
         // Add the note field & listener
-        let noteWrapper = createElement("div", ["form-group", "request-note"]),
-            noteInput = createElement("input", ["form-input"], {"type": "text", "placeholder": "Enter a note about this request…"});
+        let noteInput = createElement("input", {
+                "classes": ["form-input"],
+                "attributes": {
+                    "type": "text",
+                    "placeholder": "Enter a note about this request…"
+                }
+            }),
+            noteWrapper = createElement("div", {
+                "classes": ["form-group", "request-note"],
+                "children": [noteInput]
+            });
         noteInput.addEventListener("input", noteListener);
-        noteWrapper.appendChild(noteInput);
         body.appendChild(noteWrapper);
 
         let requestSummary = [];
@@ -508,7 +534,9 @@ window.Omnibug = (() => {
      * @return {HTMLElement}
      */
     function buildRequestPanel(title, data = [], useKey = false) {
-        let wrapper = createElement("details", ["request-details"]);
+        let wrapper = createElement("details", {
+            "classes": ["request-details"]
+        });
         if(title !== "Summary") {
             wrapper.setAttribute("open", "open");
         }
@@ -519,8 +547,7 @@ window.Omnibug = (() => {
         wrapper.appendChild(summary);
 
         // Setup the table
-        let table = createElement("table", ["table", "table-striped", "table-hover"]),
-            tableBody = createElement("tbody");
+        let tableBody = createElement("tbody");
 
         // Loop through each of the data objects to create a new table row
         data.sort((a, b) => {
@@ -528,27 +555,39 @@ window.Omnibug = (() => {
                 bKey = b.field.toLowerCase();
             return aKey.localeCompare(bKey, "standard", {"numeric": true});
         }).forEach((row) => {
-            let tableRow = createElement("tr", [], {"data-parameter-key": row.key}),
-                title = `${row.field} (${row.key})`,
-                name = createElement("td", [], {"title": title}),
-                nameKey = createElement("span", ["parameter-key"]),
-                nameField = createElement("span", ["parameter-field"]),
-                value = createElement("td", ["parameter-value"]);
+            let nameKey = createElement("span", {
+                    "classes": ["parameter-key"],
+                    "text": row.key
+                }),
+                nameField = createElement("span", {
+                    "classes": ["parameter-field"],
+                    "text": row.field
+                }),
+                value = createElement("td", {
+                    "classes": ["parameter-value"],
+                    "text": row.value
+                }),
+                name = createElement("td", {
+                    "attributes": {
+                        "title": `${row.field} (${row.key})`
+                    },
+                    "children": [nameKey, nameField]
+                }),
+                tableRow = createElement("tr", {
+                    "attributes": {
+                        "data-parameter-key": row.key
+                    },
+                    "children": [name, value]
+                });
 
-            nameKey.innerText = row.key;
-            nameField.innerText = row.field;
-            value.innerText = row.value;
-
-            name.appendChild(nameKey,);
-            name.appendChild(nameField);
-
-            tableRow.appendChild(name);
-            tableRow.appendChild(value);
             tableBody.appendChild(tableRow);
         });
 
         // Append the final results
-        table.appendChild(tableBody);
+        let table = createElement("table", {
+                "classes": ["table", "table-striped", "table-hover"],
+                "children": [tableBody]
+            });
         wrapper.appendChild(table);
 
         return wrapper;
@@ -560,8 +599,10 @@ window.Omnibug = (() => {
      * @param navigation
      */
     function addNavigation(navigation) {
-        let request = createElement("div", ["navigation", "noselect"]);
-        request.innerText = "Navigated to " + navigation.request.url;
+        let request = createElement("div", {
+            "classes": ["navigation", "noselect"],
+            "text": "Navigated to " + navigation.request.url
+        });
 
         // check if we need to clear any existing requests out first...
         if(!persist) {
@@ -672,10 +713,29 @@ window.Omnibug = (() => {
             if(!allProviders.hasOwnProperty(providerKey)) { continue; }
 
             // Create our DOM elements
-            let wrapper = createElement("li", [], {"data-provider": providerKey}),
-                input = createElement("input", [], {"type": "checkbox", "id": `filter-provider-${providerKey}`}),
-                label = createElement("label", ["noselect"], {"for": `filter-provider-${providerKey}`}),
-                span = createElement("span");
+            let input = createElement("input", {
+                    "attributes": {
+                        "type": "checkbox",
+                        "id": `filter-provider-${providerKey}`,
+                        "value": providerKey
+                    },
+                }),
+                span = createElement("span", {
+                    "text": allProviders[providerKey].name
+                }),
+                label = createElement("label", {
+                    "classes": ["noselect"],
+                    "attributes": {
+                        "for": `filter-provider-${providerKey}`
+                    },
+                    "children": [input, span]
+                }),
+                wrapper = createElement("li", {
+                    "attributes": {
+                        "data-provider": providerKey
+                    },
+                    "children": [label]
+                });
 
             // Check if the user has the provider enabled or not
             if(settings.enabledProviders.indexOf(providerKey) === -1) {
@@ -688,12 +748,6 @@ window.Omnibug = (() => {
                 }
             }
 
-            // Set our values and setup the DOM structure
-            span.innerText = allProviders[providerKey].name;
-            input.value = providerKey;
-            label.appendChild(input);
-            label.appendChild(span);
-            wrapper.appendChild(label);
             providerList.appendChild(wrapper);
 
             // Add our event listener
@@ -747,28 +801,6 @@ window.Omnibug = (() => {
             d.body.classList.add("filters-active");
         } else {
             d.body.classList.remove("filters-active");
-        }
-    }
-
-    /**
-     * Removes all styles from a stylesheet
-     *
-     * @param styleSheet
-     */
-    function clearStyles(styleSheet) {
-        while(styleSheet.sheet.cssRules.length) {
-            styleSheet.sheet.removeRule(0);
-        }
-    }
-
-    /**
-     * Remove all the pesky children for an element
-     *
-     * @param element
-     */
-    function clearChildren(element) {
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
         }
     }
 

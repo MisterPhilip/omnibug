@@ -336,6 +336,16 @@ module.exports = function(grunt) {
                 ]
             }
         });
+        grunt.config.set("concat.test-helpers", {
+            "options": {
+                "footer": "\nexport { createElement, clearStyles, clearChildren };"
+            },
+            "files": {
+                "./test/helpers.js": [
+                    "./src/libs/helpers.js",
+                ]
+            }
+        });
 
         const sourceBasePath = "./src/providers/",
             ignoreFile = "!" + sourceBasePath + "providers.js";
@@ -368,7 +378,7 @@ module.exports = function(grunt) {
                     ignoreFile
                 ]}
         });
-        grunt.task.run(["clean:test", "concat:providers-test", "concat:test-port", "concat:test-settings"]);
+        grunt.task.run(["clean:test", "concat:providers-test", "concat:test-port", "concat:test-settings", "concat:test-helpers"]);
     });
 
     /**

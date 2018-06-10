@@ -221,12 +221,19 @@
     });
 
     function createHighlightParam(param) {
-        let li = createElement("li"),
-            text = createElement("span"),
-            remove = createElement("span", ["remove"], {"title": "Remove"});
-
-        text.innerText = param;
-        remove.innerHTML = "&times;";
+        let text = createElement("span", {
+                "text": param
+            }),
+            remove = createElement("span", {
+                "classes": ["remove"],
+                "attributes": {
+                    "title": "Remove"
+                },
+                "html": "&times;"
+            }),
+            li = createElement("li", {
+                "children": [text, remove]
+            });
 
         remove.addEventListener("click", (event) => {
             event.preventDefault();
@@ -234,9 +241,6 @@
             settingsProvider.save(settingsObj);
             track(["send", "event", "settings", "highlightKeys", `removed: ${value}`]);
         });
-
-        li.appendChild(text);
-        li.appendChild(remove);
 
         return li;
     }
@@ -252,48 +256,6 @@
 
         // Add any rules
         styleSheet.sheet.insertRule(`#highlight-params > li { background-color: ${settings.color_highlight} !important; }`, styleSheet.sheet.cssRules.length);
-    }
-
-
-    /**
-     * Shortcut to creating an HTML element
-     *
-     * @param type          String
-     * @param classList     []
-     * @param attributes    []
-     * @return {HTMLElement}
-     */
-    function createElement(type, classList = [], attributes = {}) {
-        let element = document.createElement(type);
-        if(classList.length) {
-            element.classList.add(...classList);
-        }
-        Object.entries(attributes).forEach((attribute) => {
-            element.setAttribute(...attribute);
-        });
-        return element;
-    }
-
-    /**
-     * Removes all styles from a stylesheet
-     *
-     * @param styleSheet
-     */
-    function clearStyles(styleSheet) {
-        while(styleSheet.sheet.cssRules.length) {
-            styleSheet.sheet.removeRule(0);
-        }
-    }
-
-    /**
-     * Remove all the pesky children for an element
-     *
-     * @param element
-     */
-    function clearChildren(element) {
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
-        }
     }
 
     /**
