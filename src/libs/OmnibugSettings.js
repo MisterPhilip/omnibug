@@ -5,13 +5,29 @@
 class OmnibugSettings
 {
     /**
+     * OmnibugSettings
+     *
+     * @param forcedBrowser force a browser object (great for testing)
+     */
+    constructor(forcedBrowser = null)
+    {
+        if(forcedBrowser !== null) {
+            this.browser = forcedBrowser;
+        } else if(typeof browser === "object") {
+            this.browser = browser;
+        } else {
+            throw new TypeError("Browser is missing");
+        }
+    }
+
+    /**
      * Get the current storage type
      *
      * @return {string}
      */
     get storage_type()
     {
-        return (browser.storage.sync) ? "sync" : "local";
+        return (this.browser.storage.sync) ? "sync" : "local";
     }
 
     get storage_key()
@@ -26,7 +42,7 @@ class OmnibugSettings
      */
     get defaults()
     {
-        return  {
+        return {
             // pattern to match in request url
             defaultPattern : OmnibugProvider.getPattern().source,
 
@@ -80,7 +96,7 @@ class OmnibugSettings
      */
     load()
     {
-        return browser.storage[this.storage_type].get(this.storage_key).then((settings) => {
+        return this.browser.storage[this.storage_type].get(this.storage_key).then((settings) => {
             return Object.assign(this.defaults, settings[this.storage_key]);
         }, () => {
             return this.defaults;
@@ -97,7 +113,7 @@ class OmnibugSettings
     {
         let settings = {};
         settings[this.storage_key] = Object.assign(this.defaults, newSettings);
-        browser.storage[this.storage_type].set(settings);
+        this.browser.storage[this.storage_type].set(settings);
 
         // Return the merged settings object
         return settings[this.storage_key];
@@ -127,7 +143,7 @@ class OmnibugSettings
 
         // Check if we have anything already in the sync storage
         // Values may already exist if the user has updated another one of their browsers but not this one
-        return browser.storage.sync.get(this.storage_key).then((syncSettings) => {
+        return this.browser.storage.sync.get(this.storage_key).then((syncSettings) => {
 
             // If we already have sync data, let's use that - since that version of the extension is most up-top-date
             if(syncSettings[this.storage_key]) {
@@ -135,7 +151,7 @@ class OmnibugSettings
             }
 
             // Nothing in the sync storage, check local for any data we should push to sync
-            return browser.storage.local.get(this.storage_key).then((localSettings) => {
+            return this.browser.storage.local.get(this.storage_key).then((localSettings) => {
                 return Object.assign(this.defaults, localSettings[this.storage_key] || {});
             }).catch((error) => {
                 // Something bad happened, just return the defaults as a fail-safe

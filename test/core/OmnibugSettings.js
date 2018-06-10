@@ -1,0 +1,88 @@
+import test from 'ava';
+
+const browser = require('sinon-chrome/webextensions');
+import { OmnibugSettings } from "./../OmnibugSettings.js";
+
+test.beforeEach(t => {
+    browser.flush();
+});
+
+test("OmnibugSettings should return a storage type", t => {
+    let settings = new OmnibugSettings(browser);
+
+    t.is(settings.storage_type, "sync");
+});
+
+test("OmnibugSettings should return a storage key", t => {
+    let settings = new OmnibugSettings(browser);
+
+    t.is(settings.storage_key, "##OMNIBUG_KEY##");
+});
+
+test("OmnibugSettings should return a list of defaults", t => {
+    let settings = new OmnibugSettings(browser);
+
+    t.is(typeof settings.defaults.defaultPattern, "string");
+    t.is(typeof settings.defaults.enabledProviders, "object");
+    t.is(typeof settings.defaults.highlightKeys, "object");
+    t.is(typeof settings.defaults.alwaysExpand, "boolean");
+    t.is(typeof settings.defaults.showQuotes, "boolean");
+    t.is(typeof settings.defaults.showRedirects, "boolean");
+    t.is(typeof settings.defaults.showFullNames, "boolean");
+    t.is(typeof settings.defaults.showNavigation, "boolean");
+    t.is(typeof settings.defaults.wrapText, "boolean");
+    t.is(typeof settings.defaults.showNotes, "boolean");
+    t.is(typeof settings.defaults.allowTracking, "boolean");
+    t.is(typeof settings.defaults.requestSortOrder, "string");
+    t.is(typeof settings.defaults.color_load, "string");
+    t.is(typeof settings.defaults.color_click, "string");
+    t.is(typeof settings.defaults.color_quotes, "string");
+    t.is(typeof settings.defaults.color_highlight, "string");
+    t.is(typeof settings.defaults.color_redirect, "string");
+    t.is(typeof settings.defaults.color_hover, "string");
+});
+
+test("OmnibugSettings should save defaults if nothing is passed", t => {
+    let settings = new OmnibugSettings(browser),
+        savedSettings = settings.save();
+
+    t.deepEqual(savedSettings, settings.defaults);
+});
+
+test("OmnibugSettings should save objects", t => {
+    let settings = new OmnibugSettings(browser),
+        savedSettings = settings.save({
+            "highlightKeys": ["foo", "bar"]
+        }),
+        finalObject = JSON.parse(JSON.stringify(settings.defaults));
+    finalObject.highlightKeys = ["foo", "bar"];
+
+    t.deepEqual(savedSettings, finalObject);
+});
+
+test("OmnibugSettings should restore to defaults", t => {
+    let settings = new OmnibugSettings(browser),
+        savedSettings = settings.save({
+            "highlightKeys": ["foo", "bar"]
+        }),
+        newObject = JSON.parse(JSON.stringify(settings.defaults));
+    newObject.highlightKeys = ["foo", "bar"];
+    t.deepEqual(savedSettings, newObject, "New items should be saved");
+
+    let savedDefaults = settings.restoreDefaults();
+    t.deepEqual(savedDefaults, settings.defaults, "Original defaults should be saved");
+});
+/*
+test("OmnibugSettings should load saved changes", async t => {
+    let settings = new OmnibugSettings(browser),
+        savedSettings = settings.save({
+            "highlightKeys": ["foo", "bar"]
+        }),
+        newObject = JSON.parse(JSON.stringify(settings.defaults));
+    newObject.highlightKeys = ["foo", "bar"];
+    t.deepEqual(savedSettings, newObject, "New items should be returned in the save call");
+
+    let loadedSettings = await settings.load();
+    t.deepEqual(loadedSettings, newObject, "Original defaults should be saved");
+});
+*/
