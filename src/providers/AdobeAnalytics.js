@@ -313,15 +313,7 @@ class AdobeAnalyticsProvider extends BaseProvider
             }
         }
 
-        let customData = this.handleCustom(url);
-        if(typeof customData === "object" && customData !== null)
-        {
-            if(customData.length) {
-                data = data.concat(customData);
-            } else {
-                data.push(customData);
-            }
-        }
+        data = data.concat(this.handleCustom(url));
 
         return {
             "provider": {

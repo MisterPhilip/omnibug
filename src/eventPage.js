@@ -15,31 +15,25 @@
     /**
      * Set/Load/Migrate settings when extension / browser is installed / updated.
      */
-    browser.runtime.onInstalled.addListener((details) => {
-        // Migrate from local storage to sync storage, if available
-        if(details.reason === "update" && details.previousVersion.indexOf("0.") === 0)
-        {
-            settings.migrate().then(setCachedSettings);
-        } else {
-            settings.load().then(setCachedSettings).then((settings) => {
-                // Make sure we save any settings, in case of fresh installs
-                settings.save(settings);
-            });
-        }
+    chrome.runtime.onInstalled.addListener((details) => {
+        settings.load()
+            .then(setCachedSettings)
+            .then((loaded) => {settings.save(loaded);});
     });
 
     /**
      * Load settings when extension is first run a session
      */
-    browser.runtime.onStartup.addListener(() => {
-        console.log("browser.runtime.onStartup");
+    chrome.runtime.onStartup.addListener(() => {
+        console.log("chrome.runtime.onStartup");
         settings.load().then(setCachedSettings);
     });
 
     /**
      * Load settings when storage has changed
      */
-    browser.storage.onChanged.addListener((changes, storageType) => {
+    chrome.storage.onChanged.addListener((changes, storageType) => {
+        console.log("onChanged", changes);
         if(settings.storage_key in changes) {
             setCachedSettings(changes[settings.storage_key].newValue);
         }
@@ -49,9 +43,11 @@
     /**
      * Accept incoming connections from our devtools panels
      */
-    browser.runtime.onConnect.addListener((details) => {
-        console.log("browser.runtime.onConnect", details);
+    chrome.runtime.onConnect.addListener(async(details) => {
+        console.log("chrome.runtime.onConnect", details);
         if(!cached.pattern) {
+            /*let loadedSettings = await settings.load();
+            setCachedSettings(loadedSettings);*/
             settings.load().then(setCachedSettings);
         }
         let port = new OmnibugPort(details);
@@ -68,7 +64,7 @@
     /**
      * Listen for all requests that match our providers
      */
-    browser.webRequest.onBeforeRequest.addListener(
+    chrome.webRequest.onBeforeRequest.addListener(
         (details) => {
             // Ignore any requests for windows where devtools isn't open
             if(!isValidTab(details.tabId) || !cached.pattern.test(details.url))
@@ -77,18 +73,18 @@
             }
 
             let data = {
-                    "request": {
-                        "initiator": details.initiator,
-                        "method":    details.method,
-                        "id":        details.requestId,
-                        "tab":       details.tabId,
-                        "timestamp": details.timeStamp,
-                        "type":      details.type,
-                        "url":       details.url,
-                        "postData":  ""
-                    },
-                    "event": "webRequest"
-                };
+                "request": {
+                    "initiator": details.initiator,
+                    "method":    details.method,
+                    "id":        details.requestId,
+                    "tab":       details.tabId,
+                    "timestamp": details.timeStamp,
+                    "type":      details.type,
+                    "url":       details.url,
+                    "postData":  ""
+                },
+                "event": "webRequest"
+            };
 
             // Grab any POST data that is included
             if(details.method === "POST" && details.requestBody && details.requestBody.raw && details.requestBody.raw[0]) {
@@ -111,7 +107,7 @@
     /**
      * Listen for all navigations that occur on a top-level frame
      */
-    browser.webNavigation.onCommitted.addListener(
+    chrome.webNavigation.onCommitted.addListener(
         (details) => {
             if(isValidTab(details.tabId) && details.frameId === 0) {
                 // We have a page load within a tab we care about, send a message to the devtools with the info
@@ -162,11 +158,11 @@
     function setCachedSettings(settings) {
         cached.settings = settings;
         cached.pattern = OmnibugProvider.getPattern(cached.settings.enabledProviders);
-        return cached.settings;
+        return settings;
     }
 
     /**
      * @TODO (or at least consider) adding these:
-     * - browser.webRequest.onHeadersReceived:      when a request's headers are returned (useful for seeing 3XX requests)
+     * - chrome.webRequest.onHeadersReceived:      when a request's headers are returned (useful for seeing 3XX requests)
      */
 })();

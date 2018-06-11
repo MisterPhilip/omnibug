@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { createElement, clearStyles, clearChildren } from "./../helpers.js";
+import { createElement, clearStyles, clearChildren } from "./../source/helpers.js";
 
 /*
  * --------- createElement ---------------------------------------------------------------------------------------------
@@ -28,6 +28,18 @@ test("createElement should add classes, if passed", t => {
     t.is(elementWithTwoClasses.classList.length, 2);
     t.true(elementWithTwoClasses.classList.contains("foo"));
     t.true(elementWithTwoClasses.classList.contains("bar"));
+});
+
+test("createElement should add a single class, if passed as a string", t => {
+    let elementWithoutClasses = createElement("div"),
+        elementWithOneClass = createElement("div", {
+            "classes": "foo"
+        });
+
+    t.is(elementWithoutClasses.classList.length, 0);
+
+    t.is(elementWithOneClass.classList.length, 1);
+    t.true(elementWithOneClass.classList.contains("foo"));
 });
 
 test("createElement should add attributes, if passed", t => {
@@ -87,6 +99,29 @@ test("createElement should add children, if passed", t => {
     t.is(elementWithoutChildren.children.length, 0);
     t.is(elementWithChildren.children.length, 2);
     t.is(elementWithChildren.children[0], child1, "Children should be added in the order provided");
+});
+
+test("createElement should add a child, if passed", t => {
+    let elementWithoutChildren = createElement("div"),
+        child1 = createElement("div"),
+        elementWithChildren = createElement("div", {
+            "children": child1
+        });
+
+    t.is(elementWithoutChildren.children.length, 0);
+    t.is(elementWithChildren.children.length, 1);
+});
+
+test("createElement should ignore if item not an HTML Element", t => {
+    let elementWithoutChildren = createElement("div"),
+        child1 = createElement("div"),
+        child2 = {"foo": "bar"},
+        elementWithChildren = createElement("div", {
+            "children": [child1, child2]
+        });
+
+    t.is(elementWithoutChildren.children.length, 0);
+    t.is(elementWithChildren.children.length, 1);
 });
 
 test("createElement should add classes, attributes, children, and text if passed", t => {

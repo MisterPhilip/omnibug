@@ -1,6 +1,7 @@
 import test from 'ava';
 
-import { OmnibugProvider, AdobeTargetProvider } from "./../providers.js";
+import { default as AdobeTargetProvider } from "./../source/providers/AdobeTarget.js";
+import { OmnibugProvider } from "./../source/providers.js";
 
 test("AdobeTargetProvider returns provider information", t => {
     let provider = new AdobeTargetProvider();
@@ -83,4 +84,40 @@ test("AdobeTargetProvider returns custom data", t => {
     t.is(mboxType.value, "standard", "Mbox type should be standard");
     t.is(clientCode.field, "Client Code", "Client code should be returned");
     t.is(clientCode.value, "omnibug", "Client code should be clientCode");
+});
+
+test("AdobeTargetProvider returns profile dataa", t => {
+    let provider = new AdobeTargetProvider(),
+        url = "http://omnibug.tt.omtrdc.net/m2/omnibug/mbox/standard?mboxHost=omnibug.io&mbox=foobar&profile.user=Philip&profile.account=123456";
+
+    let results = provider.parseUrl(url),
+        user = results.data.find((result) => {
+            return result.key === "profile.user";
+        }),
+        account = results.data.find((result) => {
+            return result.key === "profile.account";
+        });
+    t.is(user.field, "user");
+    t.is(user.value, "Philip");
+    t.is(user.group, "profile");
+    t.is(account.field, "account");
+    t.is(account.value, "123456");
+    t.is(account.group, "profile");
+});
+
+test("AdobeTargetProvider handles missing mbox or clientCode", t => {
+    let provider = new AdobeTargetProvider(),
+        url = "http://omnibug.tt.omtrdc.net/m2/omnibug/mbox/?mboxHost=omnibug.io&mbox=foobar";
+
+    let results = provider.parseUrl(url),
+        mboxType = results.data.find((result) => {
+            return result.key === "mboxType";
+        }),
+        clientCode = results.data.find((result) => {
+            return result.key === "clientCode";
+        });
+    t.is(typeof mboxType, "undefined", "Mbox type should be not returned");
+    // @TODO:
+    //t.is(clientCode.field, "Client Code", "Client code should be returned");
+    //t.is(clientCode.value, "omnibug", "Client code should be clientCode");
 });

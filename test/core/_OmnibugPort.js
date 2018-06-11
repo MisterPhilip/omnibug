@@ -1,7 +1,6 @@
 import test from 'ava';
 
-import { OmnibugPort } from "./../OmnibugPort.js";
-import { SamplePort } from "./../polyfills.js";
+import { OmnibugPort } from "./../source/OmnibugPort.js";
 
 test("OmnibugPort should return the name", t => {
     let sample = new SamplePort("omnibug-123"),

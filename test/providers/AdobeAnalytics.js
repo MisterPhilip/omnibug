@@ -1,6 +1,7 @@
 import test from 'ava';
 
-import { OmnibugProvider, AdobeAnalyticsProvider } from "./../providers.js";
+import { default as AdobeAnalyticsProvider } from "./../source/providers/AdobeAnalytics.js";
+import { OmnibugProvider } from "./../source/providers.js";
 
 test("Generic AA Provider Information", t => {
     let provider = new AdobeAnalyticsProvider();
@@ -86,6 +87,18 @@ test("Provider returns rsid", t => {
     t.is(rsid.value, "omnibug-test", "Value is correct & decoded");
 });
 
+test("Provider handles missing rsid", t => {
+    let provider = new AdobeAnalyticsProvider(),
+        url = "https://omnibug.d1.sc.omtrdc.net/b/ss/?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&AQE=1";
+
+    let results = provider.parseUrl(url),
+        rsid = results.data.find((result) => {
+            return result.key === "rsid";
+        });
+
+    t.is(typeof rsid, "undefined", "RSID does not exist");
+});
+
 test("Provider returns POST data", t => {
     let provider = new AdobeAnalyticsProvider(),
         url = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131",
@@ -104,6 +117,70 @@ test("Provider returns POST data", t => {
     t.is(pageName.group, "general");
 });
 
+test("Provider returns Activity Map", t => {
+    let provider = new AdobeAnalyticsProvider(),
+        url = "https://omnibug.d1.sc.omtrdc.net/b/ss/?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&AQE=1&c.&a.&activitymap.&page=Omnibug%20Home&link=HOME&region=nav&pageIDType=1&.activitymap&.a&.c";
 
-test.todo("Provider returns Activity Map");
-test.todo("Provider returns Context Data");
+    let results = provider.parseUrl(url),
+        activityMap = results.data.find((result) => {
+            return result.key === "c.a.activitymap.page";
+        });
+
+    t.is(typeof activityMap, "object", "Activity Map data exists");
+    t.is(activityMap.field, "page", "Field is page");
+    t.is(activityMap.value, "Omnibug Home", "Value is correct & decoded");
+});
+
+
+test("Provider returns correct request types", t => {
+    let provider = new AdobeAnalyticsProvider(),
+        pageView = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&AQE=1",
+        exitLink = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&pe=lnk_e&AQE=1",
+        downloadLink = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&pe=lnk_d&AQE=1",
+        otherLink = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&pe=lnk_o&AQE=1";
+
+    let pageViewResults = provider.parseUrl(pageView),
+        exitLinkResults = provider.parseUrl(exitLink),
+        downloadLinkResults = provider.parseUrl(downloadLink),
+        otherLinkResults = provider.parseUrl(otherLink),
+        pageViewRequestType = pageViewResults.data.find((result) => {
+            return result.key === "requestType";
+        }),
+        exitLinkRequestType = exitLinkResults.data.find((result) => {
+            return result.key === "requestType";
+        }),
+        downloadLinkRequestType = downloadLinkResults.data.find((result) => {
+            return result.key === "requestType";
+        }),
+        otherLinkRequestType = otherLinkResults.data.find((result) => {
+            return result.key === "requestType";
+        });
+
+    t.is(typeof pageViewRequestType, "object", "requestType exists");
+    t.is(pageViewRequestType.value, "Page View");
+
+    t.is(typeof exitLinkRequestType, "object", "requestType exists");
+    t.is(exitLinkRequestType.value, "Exit Click");
+
+    t.is(typeof downloadLinkRequestType, "object", "requestType exists");
+    t.is(downloadLinkRequestType.value, "Download Click");
+
+    t.is(typeof otherLinkRequestType, "object", "requestType exists");
+    t.is(otherLinkRequestType.value, "Other Click");
+});
+
+test("Provider returns Context Data", t => {
+    let provider = new AdobeAnalyticsProvider(),
+        url = "https://omnibug.d1.sc.omtrdc.net/b/ss/?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&AQE=1&c.&a.&foobar=testing123&.a&.c";
+
+    let results = provider.parseUrl(url),
+        activityMap = results.data.find((result) => {
+            return result.key === "c.a.foobar";
+        });
+
+    t.is(typeof activityMap, "object", "Context Data Found");
+    t.is(activityMap.field, "foobar");
+    t.is(activityMap.value, "testing123", "Value is correct & decoded");
+});
+
+test.todo("Provider returns media module");

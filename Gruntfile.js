@@ -10,19 +10,17 @@ module.exports = function(grunt) {
             "analyticsID": "UA-114343677-3"
         },
         "chrome": {
-            "usePolyfill": true,
             "folder": "chromium"
         },
         "firefox": {
             "gecko": "Omnibug@rosssimpson.com",
-            "usePolyfill": false,
             "folder": "firefox"
         },
         "clean": {
             "chrome": ["platform/chromium", "build/chrome_*.zip"],
             "firefox": ["platform/firefox", "build/firefox_*.zip"],
             "providers": ["src/providers.js"],
-            "test": ["test/*.js", "!test/polyfills.js"]
+            "test": ["test/source/**"]
         },
         "watch": {
             "providers": {
@@ -169,10 +167,6 @@ module.exports = function(grunt) {
             extensionOptions = grunt.config("extension"),
             manifest = grunt.file.readJSON("src/manifest.json");
 
-        if(browserOptions.usePolyfill) {
-            manifest.background.scripts.unshift("libs/browser-polyfill.js");
-        }
-
         manifest.name = extensionOptions.name;
         manifest.version = extensionOptions.version;
 
@@ -191,10 +185,6 @@ module.exports = function(grunt) {
             extensionOptions = grunt.config("extension"),
             manifest = grunt.file.readJSON("src/manifest.json");
 
-        if(browserOptions.usePolyfill) {
-            manifest.background.scripts.unshift("libs/browser-polyfill.js");
-        }
-
         manifest.name = extensionOptions.name;
         manifest.version = extensionOptions.version;
         manifest.applications.gecko.id = browserOptions.gecko;
@@ -212,9 +202,6 @@ module.exports = function(grunt) {
         grunt.config.requires(browser);
         let options = grunt.config(browser),
             filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*", "!*./*.scss"];
-        if(options.usePolyfill) {
-            filesToCopy.push("browser-polyfill.js");
-        }
 
         grunt.config.set("copy." + browser, {
             files: [
@@ -234,10 +221,6 @@ module.exports = function(grunt) {
         let destFiles = {},
             baseFiles = [];
 
-        if(options.usePolyfill)
-        {
-            baseFiles.push("src/libs/browser-polyfill.js");
-        }
         destFiles["platform/" + options.folder + "/options/options.js"] = baseFiles.concat(["src/options/options.js"]);
         destFiles["platform/" + options.folder + "/devtools/devtools.js"] = baseFiles.concat(["src/devtools/devtools.js"]);
         destFiles["platform/" + options.folder + "/devtools/panel.js"] = baseFiles.concat(["src/devtools/panel.js"]);
@@ -320,7 +303,7 @@ module.exports = function(grunt) {
                 "footer": "\nexport { OmnibugPort };"
             },
             "files": {
-                "./test/OmnibugPort.js": [
+                "./test/source/OmnibugPort.js": [
                     "./src/libs/OmnibugPort.js",
                 ]
             }
@@ -331,7 +314,7 @@ module.exports = function(grunt) {
                 "footer": "\nexport { OmnibugSettings };"
             },
             "files": {
-                "./test/OmnibugSettings.js": [
+                "./test/source/OmnibugSettings.js": [
                     "./src/libs/OmnibugSettings.js",
                 ]
             }
@@ -341,10 +324,51 @@ module.exports = function(grunt) {
                 "footer": "\nexport { createElement, clearStyles, clearChildren };"
             },
             "files": {
-                "./test/helpers.js": [
+                "./test/source/helpers.js": [
                     "./src/libs/helpers.js",
                 ]
             }
+        });
+
+        /*
+         * Splitting providers into 2 sections because:
+         * 1) we should individually test each provider to verify it's returning the right data
+         * 2) we still need to test the regex patterns to make sure that another provider isn't being greedy and matching what a different provider should
+         * 
+         * providers-test-individual sets up each provider with import/export under the /test/source/providers dir
+         *
+         * providers-test will setup the providers.js with all providers added to the OmnibugProvider object, and exports the OmnibugProvider
+         */
+        grunt.config.set("concat.providers-test-individual", {
+            "options": {
+                "banner":  "const { URL } = require(\"url\");\n" +
+                            "const URLSearchParams = require(\"url-search-params\");\n",
+                "process": function(source, filepath) {
+                    var className = filepath.replace("./src/providers/", "").split(".")[0],
+                        exportString = "";
+                    if(className === "OmnibugProvider") {
+                        source = `const BaseProvider = require("./BaseProvider.js").default;\n` + source;
+                        source = source.replace("var OmnibugProvider", "export var OmnibugProvider");
+                    } else if(className === "BaseProvider") {
+                        // do nothing for now
+                    } else {
+                        className += "Provider";
+                        source = `const BaseProvider =  require("./BaseProvider.js").default;\n` + source;
+                    }
+                    source = source.replace(`class ${className}`, `export default class ${className}`);
+                    return source;
+                    // return source + "\n" + exportString + `module.exports = ${className};`
+                }
+            },
+            "files": {}
+        });
+
+        grunt.file.expand("./src/providers/*.js").forEach(function (fileName) {
+            var className = fileName.replace("./src/providers/", "").split(".")[0],
+                concat = grunt.config.get("concat.providers-test-individual");
+
+            concat["files"][`./test/source/providers/${className}.js`] = fileName;
+            grunt.config.set('concat.providers-test-individual', concat);
         });
 
         const sourceBasePath = "./src/providers/",
@@ -368,17 +392,18 @@ module.exports = function(grunt) {
             "options": {
                 "banner":   "const { URL } = require(\"url\");\n" +
                 "var URLSearchParams = require(\"url-search-params\");\n",
-                "footer": `\n${providerInclude.join("\n")}\nexport { ${providers.join(", ")} };`
+                "footer": `\n${providerInclude.join("\n")}\nexport { OmnibugProvider };`
             },
             "files": {
-                "./test/providers.js": [
+                "./test/source/providers.js": [
                     sourceBasePath + "BaseProvider.js",
                     sourceBasePath + "OmnibugProvider.js",
                     sourceBasePath + "*.js",
                     ignoreFile
                 ]}
         });
-        grunt.task.run(["clean:test", "concat:providers-test", "concat:test-port", "concat:test-settings", "concat:test-helpers"]);
+
+        grunt.task.run(["clean:test", "concat:providers-test", "concat:providers-test-individual", "concat:test-port", "concat:test-settings", "concat:test-helpers"]);
     });
 
     /**

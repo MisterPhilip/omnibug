@@ -18,6 +18,7 @@ build/
 
 # Tests/Coverage
 .nyc_output/
+coverage/
 
 /test/*
 !/test/core

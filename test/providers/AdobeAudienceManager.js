@@ -1,6 +1,7 @@
 import test from 'ava';
 
-import { OmnibugProvider, AdobeAudienceManagerProvider } from "./../providers.js";
+import { default as AdobeAudienceManagerProvider } from "./../source/providers/AdobeAudienceManager.js";
+import { OmnibugProvider } from "./../source/providers.js";
 
 test.todo("AdobeAudienceManagerProvider returns provider information");
 test.todo("AdobeAudienceManagerProvider pattern should match the audience manager domain");

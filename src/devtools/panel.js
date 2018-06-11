@@ -43,7 +43,7 @@ window.Omnibug = (() => {
     d.querySelectorAll("a[href=\"#settings\"]").forEach((element) => {
         element.addEventListener("click", (event) => {
             event.preventDefault();
-            browser.runtime.openOptionsPage();
+            chrome.runtime.openOptionsPage();
         })
     });
 

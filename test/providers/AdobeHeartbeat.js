@@ -1,6 +1,7 @@
 import test from 'ava';
 
-import { OmnibugProvider, AdobeHeartbeatProvider } from "./../providers.js";
+import { default as AdobeHeartbeatProvider } from "./../source/providers/AdobeHeartbeat.js";
+import { OmnibugProvider } from "./../source/providers.js";
 
 test("AdobeHeartbeatProvider returns provider information", (t) => {
     let provider = new AdobeHeartbeatProvider();

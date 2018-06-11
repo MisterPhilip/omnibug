@@ -1,6 +1,7 @@
 import test from 'ava';
 
-import { OmnibugProvider, OptimizelyXProvider } from "./../providers.js";
+import { default as OptimizelyXProvider } from "./../source/providers/OptimizelyX.js";
+import { OmnibugProvider } from "./../source/providers.js";
 
 test("OptimizelyXProvider returns provider information", (t) => {
     let provider = new OptimizelyXProvider();

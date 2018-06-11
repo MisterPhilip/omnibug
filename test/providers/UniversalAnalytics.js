@@ -1,6 +1,7 @@
 import test from 'ava';
 
-import { OmnibugProvider, UniversalAnalyticsProvider } from "./../providers.js";
+import { default as UniversalAnalyticsProvider } from "./../source/providers/UniversalAnalytics.js";
+import { OmnibugProvider } from "./../source/providers.js";
 
 test.todo("UniversalAnalyticsProvider returns provider information");
 test.todo("UniversalAnalyticsProvider pattern should match various UA domains");

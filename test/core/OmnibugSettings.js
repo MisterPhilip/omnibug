@@ -1,26 +1,27 @@
 import test from 'ava';
 
-const browser = require('sinon-chrome/webextensions');
-import { OmnibugSettings } from "./../OmnibugSettings.js";
+const chrome = require('sinon-chrome/extensions');
+
+import { OmnibugSettings } from "./../source/OmnibugSettings.js";
 
 test.beforeEach(t => {
-    browser.flush();
+    chrome.flush();
 });
 
 test("OmnibugSettings should return a storage type", t => {
-    let settings = new OmnibugSettings(browser);
+    let settings = new OmnibugSettings(chrome);
 
     t.is(settings.storage_type, "sync");
 });
 
 test("OmnibugSettings should return a storage key", t => {
-    let settings = new OmnibugSettings(browser);
+    let settings = new OmnibugSettings(chrome);
 
     t.is(settings.storage_key, "##OMNIBUG_KEY##");
 });
 
 test("OmnibugSettings should return a list of defaults", t => {
-    let settings = new OmnibugSettings(browser);
+    let settings = new OmnibugSettings(chrome);
 
     t.is(typeof settings.defaults.defaultPattern, "string");
     t.is(typeof settings.defaults.enabledProviders, "object");
@@ -43,14 +44,14 @@ test("OmnibugSettings should return a list of defaults", t => {
 });
 
 test("OmnibugSettings should save defaults if nothing is passed", t => {
-    let settings = new OmnibugSettings(browser),
+    let settings = new OmnibugSettings(chrome),
         savedSettings = settings.save();
 
     t.deepEqual(savedSettings, settings.defaults);
 });
 
 test("OmnibugSettings should save objects", t => {
-    let settings = new OmnibugSettings(browser),
+    let settings = new OmnibugSettings(chrome),
         savedSettings = settings.save({
             "highlightKeys": ["foo", "bar"]
         }),
@@ -61,7 +62,7 @@ test("OmnibugSettings should save objects", t => {
 });
 
 test("OmnibugSettings should restore to defaults", t => {
-    let settings = new OmnibugSettings(browser),
+    let settings = new OmnibugSettings(chrome),
         savedSettings = settings.save({
             "highlightKeys": ["foo", "bar"]
         }),
@@ -72,17 +73,16 @@ test("OmnibugSettings should restore to defaults", t => {
     let savedDefaults = settings.restoreDefaults();
     t.deepEqual(savedDefaults, settings.defaults, "Original defaults should be saved");
 });
-/*
+
 test("OmnibugSettings should load saved changes", async t => {
-    let settings = new OmnibugSettings(browser),
+    let settings = new OmnibugSettings(chrome),
         savedSettings = settings.save({
             "highlightKeys": ["foo", "bar"]
-        }),
-        newObject = JSON.parse(JSON.stringify(settings.defaults));
-    newObject.highlightKeys = ["foo", "bar"];
-    t.deepEqual(savedSettings, newObject, "New items should be returned in the save call");
+        });
+    chrome.storage.sync.get.yields({"##OMNIBUG_KEY##": {
+        "highlightKeys": ["foo", "bar"]
+    }});
 
     let loadedSettings = await settings.load();
-    t.deepEqual(loadedSettings, newObject, "Original defaults should be saved");
+    t.deepEqual(loadedSettings, savedSettings);
 });
-*/

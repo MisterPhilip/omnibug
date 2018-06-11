@@ -13,8 +13,8 @@ class OmnibugSettings
     {
         if(forcedBrowser !== null) {
             this.browser = forcedBrowser;
-        } else if(typeof browser === "object") {
-            this.browser = browser;
+        } else if(typeof chrome === "object") {
+            this.browser = chrome;
         } else {
             throw new TypeError("Browser is missing");
         }
@@ -92,14 +92,14 @@ class OmnibugSettings
     /**
      * Load settings from the browser's storage (local or sync)
      *
-     * @return {Promise<*>}
+     * @returns {Promise}
      */
     load()
     {
-        return this.browser.storage[this.storage_type].get(this.storage_key).then((settings) => {
-            return Object.assign(this.defaults, settings[this.storage_key]);
-        }, () => {
-            return this.defaults;
+        return new Promise((resolve, reject) => {
+            this.browser.storage[this.storage_type].get(this.storage_key, (settings) => {
+                return resolve(Object.assign(this.defaults, settings[this.storage_key]));
+            });
         });
     }
 
@@ -136,40 +136,6 @@ class OmnibugSettings
      */
     migrate()
     {
-        // Verify the user can be migrated to sync storage
-        if(this.storage_type !== "sync") {
-            return this.load();
-        }
 
-        // Check if we have anything already in the sync storage
-        // Values may already exist if the user has updated another one of their browsers but not this one
-        return this.browser.storage.sync.get(this.storage_key).then((syncSettings) => {
-
-            // If we already have sync data, let's use that - since that version of the extension is most up-top-date
-            if(syncSettings[this.storage_key]) {
-                return Object.assign(this.defaults, syncSettings[this.storage_key]);
-            }
-
-            // Nothing in the sync storage, check local for any data we should push to sync
-            return this.browser.storage.local.get(this.storage_key).then((localSettings) => {
-                return Object.assign(this.defaults, localSettings[this.storage_key] || {});
-            }).catch((error) => {
-                // Something bad happened, just return the defaults as a fail-safe
-                console.error("Migration error from local:", error);
-                return this.defaults;
-            });
-
-        }).then((settings) => {
-
-            // Save whatever settings we get back (either sync or local)
-            return this.save(settings);
-
-        }).catch((error) => {
-
-            // Something bad happened, just return the defaults as a fail-safe
-            console.error("Migration error:", error);
-            return this.save();
-
-        });
     }
 }
