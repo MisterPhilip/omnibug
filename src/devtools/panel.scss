@@ -170,11 +170,15 @@ nav.navbar {
   }
 }
 .request summary .label {
+  display: block;
+  float: left;
   font-size: .8em;
   margin-right: .5em;
   padding: .35em;
-  min-width: 80px;
+  width: 80px;
   text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .request-note {
   input {

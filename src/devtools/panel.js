@@ -466,7 +466,7 @@ window.Omnibug = (() => {
         let redirectHelpLink = createElement("a", {
                 "attributes": {
                     "target": "_blank",
-                    "href": "https://omnibug.io/help/redirected-entries"
+                    "href": "https://omnibug.io/help/redirected-requests"
                 },
                 "text": "Learn more."
             }),

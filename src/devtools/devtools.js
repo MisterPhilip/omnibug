@@ -17,8 +17,8 @@
                 panelWindow,  // reference to devtools_panel.html's `window` object
                 port;
 
-            port = browser.runtime.connect({
-                name: "##OMNIBUG_KEY##-" + browser.devtools.inspectedWindow.tabId
+            port = chrome.runtime.connect({
+                name: "##OMNIBUG_KEY##-" + chrome.devtools.inspectedWindow.tabId
             });
 
             /**

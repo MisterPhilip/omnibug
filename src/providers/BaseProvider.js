@@ -35,7 +35,8 @@ class BaseProvider
             "analytics":    "Analytics",
             "testing":      "UX Testing",
             "tagmanager":   "Tag Manager",
-            "visitorid":    "Visitor Identification"
+            "visitorid":    "Visitor Identification",
+            "marketing":    "Marketing"
         };
         return types[this._type] || "Unknown";
     }
