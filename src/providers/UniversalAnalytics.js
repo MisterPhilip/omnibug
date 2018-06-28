@@ -509,14 +509,15 @@ class UniversalAnalyticsProvider extends BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @param {string} url
+     * @param    {string}   url
+     * @param    {object}   params
      *
      * @returns {Array}
      */
-    handleCustom(url)
+    handleCustom(url, params)
     {
         let results = [],
-            hitType = url.searchParams.get("t") || "page view",
+            hitType = params.get("t") || "page view",
             requestType = "";
 
         hitType = hitType.toLowerCase();

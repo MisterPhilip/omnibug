@@ -133,7 +133,7 @@ class BaseProvider
             }
         }
 
-        let customData = this.handleCustom(url);
+        let customData = this.handleCustom(url, params);
         if(typeof customData === "object" && customData !== null)
         {
             if(customData.length) {
@@ -198,10 +198,11 @@ class BaseProvider
      * Parse custom properties for a given URL
      *
      * @param    {string}   url
+     * @param    {object}   params
      *
      * @returns {void|Array}
      */
-    handleCustom(url)
+    handleCustom(url, params)
     {
 
     }

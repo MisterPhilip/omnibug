@@ -102,19 +102,25 @@ test("Provider handles missing rsid", t => {
 test("Provider returns POST data", t => {
     let provider = new AdobeAnalyticsProvider(),
         url = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131",
-        postData = "AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&AQE=1";
+        postData = "AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&pe=lnk_d&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&AQE=1";
 
     let results = provider.parseUrl(url, postData);
 
 
     let pageName = results.data.find((result) => {
-        return result.key === "pageName";
-    });
+            return result.key === "pageName";
+        }),
+        requestType = results.data.find((result) => {
+            return result.key === "requestType";
+        });
 
     t.is(typeof pageName, "object", "pageName exists");
     t.is(pageName.field, "Page name", "Field is Page name");
     t.is(pageName.value, "omnibug:home", "Value is decoded to omnibug:home");
     t.is(pageName.group, "general");
+
+    t.is(typeof requestType, "object");
+    t.is(requestType.value, "Download Click");
 });
 
 test("Provider returns Activity Map", t => {

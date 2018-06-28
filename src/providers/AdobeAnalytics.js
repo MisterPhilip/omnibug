@@ -313,7 +313,7 @@ class AdobeAnalyticsProvider extends BaseProvider
             }
         }
 
-        data = data.concat(this.handleCustom(url));
+        data = data.concat(this.handleCustom(url, params));
 
         return {
             "provider": {
@@ -392,15 +392,16 @@ class AdobeAnalyticsProvider extends BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @param {string} url
+     * @param    {string}   url
+     * @param    {object}   params
      *
      * @returns {Array}
      */
-    handleCustom(url)
+    handleCustom(url, params)
     {
         let results = [],
             rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//),
-            pev2 = url.searchParams.get("pe"),
+            pev2 = params.get("pe"),
             requestType = "Page View";
         if(rsid) {
             results.push({

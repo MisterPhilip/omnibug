@@ -102,11 +102,12 @@ class SegmentProvider extends BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @param {string} url
+     * @param    {string}   url
+     * @param    {object}   params
      *
      * @returns {Array}
      */
-    handleCustom(url)
+    handleCustom(url, params)
     {
         let results = [],
             action = url.pathname.match(/\/v1\/([^\/]+)$/);

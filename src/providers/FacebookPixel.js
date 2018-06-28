@@ -181,14 +181,15 @@ class FacebookPixelProvider extends BaseProvider
      * Parse custom properties for a given URL
      *
      * @param    {string}   url
+     * @param    {object}   params
      *
      * @returns {void|Array}
      */
-    handleCustom(url)
+    handleCustom(url, params)
     {
         let results = [],
-            content = url.searchParams.get("cd[contents]"),
-            requestType = url.searchParams.get("ev") || "";
+            content = params.get("cd[contents]"),
+            requestType = params.get("ev") || "";
         if(content) {
             try {
                 let jsonData = JSON.parse(content);

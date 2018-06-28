@@ -169,14 +169,15 @@ class AdobeHeartbeatProvider extends BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @param {string} url
+     * @param    {string}   url
+     * @param    {object}   params
      *
      * @returns {Array}
      */
-    handleCustom(url)
+    handleCustom(url, params)
     {
         let results = [],
-            event = url.searchParams.get("s:event:type");
+            event = params.get("s:event:type");
         results.push({
             "key":   "omnibug_requestType",
             "value": event.charAt(0).toUpperCase() + event.slice(1),

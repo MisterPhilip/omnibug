@@ -166,11 +166,12 @@ class AdobeTargetProvider extends BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @param {URL} url
+     * @param    {string}   url
+     * @param    {object}   params
      *
      * @returns {void|Array}
      */
-    handleCustom(url)
+    handleCustom(url, params)
     {
         let matches =  url.pathname.match( /\/([^\/]+)\/mbox\/([^\/?]+)/ ),
             mboxName = "",
