@@ -10,8 +10,8 @@
      */
     chrome.devtools.panels.create(
         "##OMNIBUG_NAME##",
-        "./assets/images/blue-32.png",
-        "./devtools/panel.html",
+        "../assets/images/blue-32.png",
+        "../devtools/panel.html",
         (panel) => {
             let queuedMessages = [],
                 panelWindow,  // reference to devtools_panel.html's `window` object

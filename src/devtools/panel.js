@@ -39,12 +39,17 @@ window.Omnibug = (() => {
         })
     });
 
+
     // Open settings from links in devtools
     d.querySelectorAll("a[href=\"#settings\"]").forEach((element) => {
-        element.addEventListener("click", (event) => {
-            event.preventDefault();
-            chrome.runtime.openOptionsPage();
-        })
+        if(!chrome || !chrome.runtime || !chrome.runtime.openOptionsPage) {
+            element.classList.add("d-none");
+        } else {
+            element.addEventListener("click", (event) => {
+                event.preventDefault();
+                chrome.runtime.openOptionsPage();
+            });
+        }
     });
 
     // Open modals
