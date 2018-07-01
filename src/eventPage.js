@@ -20,18 +20,8 @@
             .then(setCachedSettings)
             .then((loaded) => {settings.save(loaded);});
 
-        switch(details.reason) {
-            case "install":
-                chrome.tabs.create({url: `https://omnibug.io/installed?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=install`});
-            break;
-            case "update":
-                // Let's ignore minor patches - we don't want to annoy people with this opening every single time.
-                let newVersion = "##OMNIBUG_VERSION##".match(/^\d+\.\d+/),
-                    oldVersion = details.reason.match(/^\d+\.\d+/);
-                if(newVersion && oldVersion && newVersion[0] !== oldVersion[0]) {
-                    chrome.tabs.create({url: `https://omnibug.io/help/changelog?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=update&prev=${details.previousVersion}`});
-                }
-            break;
+        if(details.reason === "install") {
+            chrome.tabs.create({url: `https://omnibug.io/installed?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=install`});
         }
     });
 
