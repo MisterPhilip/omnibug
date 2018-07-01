@@ -3,11 +3,20 @@ module.exports = function(grunt) {
 
     grunt.config.init({
         "extension": {
-            "name": "Omnibug",
-            "version": "0.6.0",
-            "storageKey": "omnibug",
-            "feedbackUrl": "https://omnibug.io/feedback",
-            "analyticsID": "UA-114343677-3"
+            "beta": {
+                "name": "Omnibug (Beta)",
+                "version": "0.9.6",
+                "storageKey": "omnibug-beta",
+                "feedbackUrl": "https://omnibug.io/beta-feedback",
+                "analyticsID": "UA-114343677-3"
+            },
+            "production": {
+                "name": "Omnibug",
+                "version": "1.0.0",
+                "storageKey": "omnibug",
+                "feedbackUrl": "https://omnibug.io/feedback",
+                "analyticsID": "UA-114343677-2"
+            }
         },
         "chrome": {
             "folder": "chromium"
@@ -135,8 +144,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-text-replace');
     grunt.loadNpmTasks('grunt-sass');
 
-    grunt.registerTask("build-extensions", "Build the Chrome extension", (browsers = "") => {
-            let allowedBrowsers = ["chrome", "firefox"];
+    grunt.registerTask("build-beta", "Build the beta version", (browsers = "") => {
+        let allowedBrowsers = ["chrome", "firefox"];
         if(browsers === "") {
             browsers = allowedBrowsers;
         } else {
@@ -146,13 +155,13 @@ module.exports = function(grunt) {
         browsers.forEach((b) => {
             if(allowedBrowsers.indexOf(b) > -1) {
                 grunt.task.run(
-                    "clean:" + b,
+                    "clean:" + b + ":beta",
                     "sass",
-                    "build-copy:" + b,
-                    b + "-manifest",
-                    "build-concat:" + b,
-                    "build-placeholders:" + b,
-                    "build-compress:" + b
+                    "build-copy:" + b + ":beta",
+                    b + "-manifest:beta",
+                    "build-concat:" + b + ":beta",
+                    "build-placeholders:" + b + ":beta",
+                    "build-compress:" + b + ":beta"
                 );
             } else {
                 grunt.log.warn("Unknown browser " + b);
@@ -160,11 +169,37 @@ module.exports = function(grunt) {
         });
     });
 
-    grunt.registerTask("chrome-manifest", "Build the Chrome manifest.json file", function() {
-        grunt.config.requires("extension.version");
+
+    grunt.registerTask("build-production", "Build the extensions", (browsers = "") => {
+        let allowedBrowsers = ["chrome", "firefox"];
+        if(browsers === "") {
+            browsers = allowedBrowsers;
+        } else {
+            browsers = browsers.split(",");
+        }
+        grunt.task.run("build-providers");
+        browsers.forEach((b) => {
+            if(allowedBrowsers.indexOf(b) > -1) {
+                grunt.task.run(
+                    "clean:" + b + ":production",
+                    "sass",
+                    "build-copy:" + b + ":production",
+                    b + "-manifest:production",
+                    "build-concat:" + b + ":production",
+                    "build-placeholders:" + b + ":production",
+                    "build-compress:" + b + ":production"
+                );
+            } else {
+                grunt.log.warn("Unknown browser " + b);
+            }
+        });
+    });
+
+    grunt.registerTask("chrome-manifest", "Build the Chrome manifest.json file", function(version = "production") {
+        grunt.config.requires(`extension.${version}.version`);
 
         let browserOptions = grunt.config("chrome"),
-            extensionOptions = grunt.config("extension"),
+            extensionOptions = grunt.config(`extension.${version}`),
             manifest = grunt.file.readJSON("src/manifest.json");
 
         manifest.name = extensionOptions.name;
@@ -178,11 +213,11 @@ module.exports = function(grunt) {
         grunt.log.write("Created Chrome's manifest.json. ").ok();
     });
 
-    grunt.registerTask("firefox-manifest", "Build the Firefox manifest.json file", function() {
-        grunt.config.requires("extension.version", "firefox.gecko");
+    grunt.registerTask("firefox-manifest", "Build the Firefox manifest.json file", function(version = "production") {
+        grunt.config.requires(`extension.${version}.version`, "firefox.gecko");
 
         let browserOptions = grunt.config("firefox"),
-            extensionOptions = grunt.config("extension"),
+            extensionOptions = grunt.config(`extension.${version}`),
             manifest = grunt.file.readJSON("src/manifest.json");
 
         manifest.name = extensionOptions.name;
@@ -230,10 +265,10 @@ module.exports = function(grunt) {
         grunt.task.run("concat:" + browser);
     });
 
-    grunt.registerTask("build-placeholders", "Update placeholders in built files", function(browser) {
-        grunt.config.requires(browser, "extension");
+    grunt.registerTask("build-placeholders", "Update placeholders in built files", function(browser, version = "production") {
+        grunt.config.requires(browser, `extension.${version}`);
         let browserOptions = grunt.config(browser),
-            extensionOptions = grunt.config("extension"),
+            extensionOptions = grunt.config(`extension.${version}`),
             config = {
                 "src": [
                     "platform/" + browserOptions.folder + "/manifest.json",
@@ -247,7 +282,7 @@ module.exports = function(grunt) {
                 "replacements": [
                     {
                         "from": "##OMNIBUG_VERSION##",
-                        "to": "<%= pkg.version %>"
+                        "to": extensionOptions.version
                     },
                     {
                         "from": "##OMNIBUG_NAME##",
@@ -271,18 +306,19 @@ module.exports = function(grunt) {
                     }
                 ]
             };
+        console.log("##OMNIBUG_VERSION## :: " + extensionOptions.version);
         grunt.config.set("replace." + browser, config);
         grunt.task.run("replace:" + browser);
     });
 
-    grunt.registerTask("build-compress", "Compress build files into extension .zip", function(browser) {
-        grunt.config.requires(browser, "extension");
+    grunt.registerTask("build-compress", "Compress build files into extension .zip", function(browser, version = "production") {
+        grunt.config.requires(browser, `extension.${version}`);
         let options = grunt.config(browser),
-            extensionOptions = grunt.config("extension");
+            extensionOptions = grunt.config(`extension.${version}`);
 
         grunt.config.set("compress." + browser, {
             options: {
-                archive: "./build/" + browser + "_" + extensionOptions.version + ".zip"
+                archive: `./build/${browser}_${version}-${extensionOptions.version}.zip`
             },
             files: [
                 {
@@ -449,6 +485,8 @@ module.exports = function(grunt) {
     /*
      * Add aliases
      */
-    grunt.registerTask("default", ["build-extensions"]);
-    grunt.registerTask("build", ["build-extensions"]);
+    grunt.registerTask("default", ["build-production"]);
+    grunt.registerTask("build", ["build-production"]);
+    grunt.registerTask("production", ["build-production"]);
+    grunt.registerTask("beta", ["build-beta"]);
 };

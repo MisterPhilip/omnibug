@@ -1,9 +1,11 @@
 {
   "name": "omnibug",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "Omnibug Extension",
   "main": "Gruntfile.js",
   "scripts": {
+    "production": "grunt production",
+    "beta": "grunt beta",
     "build": "grunt build",
     "test": "grunt build-test-files && nyc --all ava",
     "postinstall": "grunt build"
