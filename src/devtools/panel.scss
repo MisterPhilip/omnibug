@@ -1,0 +1,239 @@
+@import "../assets/styles/base";
+
+html, body {
+  height: 100%;
+}
+body {
+  font-size: $font-size;
+  margin: 0 auto;
+  color: $body-font-color;
+  background-color: $body-background-color;
+  padding-top: 37px;
+  overflow: hidden;
+}
+body > header, nav.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 37px;
+}
+body > main {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+details > summary {
+  -moz-user-select: none;
+  user-select: none;
+  cursor: pointer;
+}
+nav.navbar {
+  background: $white;
+  border-bottom: 1px solid $border-color;
+
+  .navbar-section:last-of-type a.btn {
+    border-left: 1px solid #eee;
+  }
+
+  .btn.btn-link {
+    color: $primary-color;
+  }
+
+  .btn.btn-link:hover {
+    color: $primary-color-dark;
+  }
+}
+#no-requests {
+  animation: fadein 2s;
+  background-color: transparent;
+}
+.request {
+  width: 100%;
+  padding: 0 5px;
+
+  > summary {
+    padding: 5px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    .container {
+      margin-top: -1.5em;
+      margin-left: .75em;
+    }
+
+    .column {
+      @include hide-overflow;
+    }
+  }
+
+  > div {
+    font-size: .9em;
+    padding: 1em;
+  }
+
+  table td,
+  table th {
+    padding: .2rem .1rem;
+    word-break: break-all;
+  }
+
+  .redirected:hover .redirect-icon,
+  .redirected:focus .redirect-icon {
+    color: $error-color;
+  }
+}
+.request:nth-of-type(odd) {
+  background-color: $body-background-color;
+}
+.request:nth-of-type(even) {
+  background-color: darken($body-background-color, 5%);
+}
+@keyframes request-highlight-odd {
+  0% {
+    background: lighten($primary-color-light, 7%);
+  }
+  100% {
+    background: $body-background-color;
+  }
+}
+@keyframes request-highlight-even {
+  0% {
+    background: lighten($primary-color-light, 3%);
+  }
+  100% {
+    background: darken($body-background-color, 5%);
+  }
+}
+.request:nth-of-type(odd):not([open]) {
+  animation: request-highlight-odd 1.2s;
+}
+.request:nth-of-type(even):not([open]) {
+  animation: request-highlight-even 1.2s;
+}
+.request[open],
+.request[open] > summary {
+  border-bottom: 1px solid #dedede;
+}
+.request[open] > summary {
+  background-color: $primary-color-light;
+}
+.request:not(.redirected) .redirect {
+  display: none;
+}
+.request.redirected {
+  .redirect-icon {
+    margin-left: .5em;
+    color: $gray-color;
+  }
+  .request-note {
+    margin-top: 0.4rem;
+  }
+}
+.request.redirected:hover {
+  .redirect-icon {
+    color: $warning-color;
+  }
+}
+.request-details {
+  > summary {
+    font-weight: 600;
+    font-size: 1.1em;
+    padding: .3em .3em .3em .5em;
+    position: sticky;
+    top: 2.4em;
+    background-color: $bg-color-dark;
+    border: 1px solid #ddd;
+    border-bottom: 0;
+  }
+  table {
+    border: 1px solid $border-color;
+    border-bottom: 0;
+    border-collapse: initial;
+    table-layout: fixed;
+  }
+  tbody > tr > td:first-of-type {
+    width: 14em;
+    font-weight: 600;
+    padding-left: .3em;
+  }
+}
+.request-details:last-of-type {
+  > summary {
+    border-bottom: 1px solid #ddd;
+  }
+}
+.request-details[open] {
+  > summary {
+    border-bottom: 0;
+  }
+}
+.request summary .label {
+  display: block;
+  float: left;
+  font-size: .8em;
+  margin-right: .5em;
+  padding: .35em;
+  width: 80px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.request-note {
+  input {
+    height: 1.4rem;
+    padding: 0.1rem 0.2rem;
+    background: none;
+    border: 0;
+  }
+  input:hover, .request-note input:focus {
+    background: $white;
+    transition: background 0.5s linear;
+  }
+}
+.parameter-key, .parameter-field {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#requests .navigation {
+  @include hide-overflow;
+  width: 100%;
+  padding: .3em 2em;
+  background-color: $white;
+  font-size: .9em;
+  color: #AAA;
+  border-top: 1px solid $border-color;
+}
+#requests .navigation:hover {
+  color: #555;
+}
+#requests .navigation:first-of-type {
+  border-top: 0;
+}
+#filter-modal .modal-body {
+  padding-top: 0;
+}
+#filter-providers {
+  list-style-type: none;
+  margin-top: 0;
+  input {
+    margin-right: .5em;
+  }
+}
+#provider-select-all-wrapper {
+  margin: 0.8rem 0 0 0.8rem;
+  border-bottom: 1px solid $border-color;
+  padding-bottom: .2rem;
+  font-weight: bold;
+}
+.filters-active [data-target-modal="filter-modal"] {
+  color: #FF9800 !important;
+}
+body:not(.persist-disabled) #persist-enable,
+body.persist-disabled #persist-disable {
+  display: none;
+}
+#persist-enable { color: #F44336; }

@@ -15,3 +15,21 @@ build/
 
 # Grunt work
 .grunt/
+
+# Tests/Coverage
+.nyc_output/
+coverage/
+
+/test/*
+!/test/core
+!/test/providers
+!/test/helpers/
+!/test/polyfills.js
+
+# Generated files
+src/providers.js
+platform/
+
+# Ignore built CSS files
+.sass-cache/
+src/**/*.css

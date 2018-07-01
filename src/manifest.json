@@ -1,36 +1,45 @@
 {
     "manifest_version": 2,
-    "name": "Omnibug",
-    "version": "0.5.515",
+    "name": "##OMNIBUG_NAME##",
+    "version": "##OMNIBUG_VERSION##",
     "description": "Omnibug is a browser extension to decode and display outgoing web metrics requests.",
     "author": "Philip Lawrence",
     "icons": {
-        "16": "images/o-16.png",
-        "48": "images/o-48.png",
-        "128": "images/o-128.png"
+        "16": "assets/images/blue-16.png",
+        "48": "assets/images/blue-48.png",
+        "128": "assets/images/blue-128.png"
     },
     "background": {
         "scripts": [
-            "omnibugurl.js",
+            "libs/OmnibugSettings.js",
+            "libs/OmnibugPort.js",
             "providers.js",
             "eventPage.js"
         ],
         "persistent": true
     },
-    "devtools_page": "devtools.html",
-    "homepage_url": "https://omnibug.io/",
+    "devtools_page": "devtools/devtools.html",
+    "homepage_url": "https://omnibug.io/?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=homepage_url",
     "options_ui": {
-        "page": "options.html",
-        "chrome_style": true,
-        "browser_style": true
+        "page": "options/options.html"
     },
-    "options_page": "options.html",
+    "options_page": "options/options.html",
+    "browser_action": {
+        "default_icon": {
+            "16": "assets/images/blue-16.png",
+            "32": "assets/images/blue-32.png",
+            "48": "assets/images/blue-48.png"
+        },
+        "default_popup": "popup/popup.html"
+    },
     "permissions": [
         "tabs",
         "storage",
         "webRequest",
+        "webNavigation",
         "*://*/*"
     ],
+    "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
     "short_name": "Omnibug",
     "applications": {
         "gecko": {

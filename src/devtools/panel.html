@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./panel.css" />
+    <style type="text/css" id="settingsStyles"></style>
+    <style type="text/css" id="filterStyles"></style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <section class="navbar-section">
+                 <a href="#clear" class="btn btn-link tooltip tooltip-right" aria-label="Clear Requests" data-tooltip="Clear Requests"><i class="fas fa-trash"></i></a>
+            </section>
+            <section class="navbar-section">
+                <a href="#enable-persist" class="btn btn-link tooltip tooltip-left" id="persist-enable" data-tooltip="Click to persist requests across pages." aria-label="Requests will be cleared between page loads. Click to persist them instead."><i class="fas fa-history"></i></a>
+                <a href="#disable-persist" class="btn btn-link tooltip tooltip-left" id="persist-disable" data-tooltip="Click to clear requests between pages." aria-label="Requests are persisted across pages. Click to clear them between pages instead."><i class="fas fa-history"></i></a>
+                <a href="#filter-modal" class="btn btn-link tooltip tooltip-left" aria-label="Filter Requests" data-target-modal="filter-modal" data-tooltip="Filter Requests"><i class="fas fa-filter"></i></a>
+                <a href="#export-modal" class="btn btn-link tooltip tooltip-left" aria-label="Export Requests" data-target-modal="export-modal" data-tooltip="Export Requests"><i class="fas fa-download"></i></a>
+                <a href="#settings" class="btn btn-link tooltip tooltip-left" aria-label="Omnibug Settings" data-tooltip="Omnibug Settings"><i class="fas fa-cog"></i></a>
+                <a href="#about-modal" class="btn btn-link tooltip tooltip-left" aria-label="About" data-target-modal="about-modal" data-tooltip="About Omnibug"><i class="fas fa-question-circle"></i></a>
+            </section>
+        </nav>
+    </header>
+
+    <main>
+        <section id="requests">
+
+        </section>
+        <div class="empty" id="no-requests">
+            <div class="empty-icon">
+                <i class="icon icon-people"></i>
+            </div>
+            <p class="empty-title h4">No requests found yet</p>
+            <p class="empty-subtitle">Don't worry, we're still listening for requests from the page! <a href="https://omnibug.io/help/no-requests-found?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=devtools-help" target="_blank">Why am I seeing this?</a></p>
+            <div class="empty-action">
+                <div class="loading loading-lg"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal modal-lg" id="filter-modal">
+        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+                <div class="modal-title h5">Filter Requests</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <p>Here, you can add filters to only show certain requests. You can filter where an account ID contains certain text, show only selected providers, or both.</p>
+                    <div class="form-group container">
+                        <label class="form-label" for="filter-account">Filter by Account ID</label>
+                        <div class="columns">
+                            <div class="col col-3 col-md-4 col-xs-6">
+                                <select id="filter-account-type" class="form-input">
+                                    <option value="contains">Contains</option>
+                                    <option value="starts">Starts With</option>
+                                    <option value="ends">Ends With</option>
+                                    <option value="exact">Exactly Matches</option>
+                                </select>
+                            </div>
+                            <div class="col col-9 col-md-8 col-xs-6">
+                                <input type="text" id="filter-account" placeholder="Filter by Account ID&hellip;" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="provider-search">Show the following providers:</label>
+                        <input type="text" id="provider-search" placeholder="Search for a provider&hellip;" class="form-input">
+                    </div>
+                    <div class="form-group" id="provider-select-all-wrapper">
+                        <label class="noselect" for="provider-select-all">
+                            <input type="checkbox" name="provider-select-all" id="provider-select-all" checked="checked">
+                            Select All/None
+                        </label>
+                    </div>
+                    <ul id="filter-providers"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-lg" id="export-modal">
+        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <form action="#export-modal" method="POST" id="export-form">
+                <div class="modal-header">
+                    <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+                    <div class="modal-title h5">Export Requests</div>
+                </div>
+                <div class="modal-body">
+                    <div class="content">
+                        <p>You can export the requests collected as a comma or tab separated file.</p>
+                        <div class="form-group">
+                            <label class="form-label noselect" for="export-file-name">File Name</label>
+                            <input class="form-input" type="text" id="export-file-name" name="filename" placeholder="OmnibugExport">
+                            <p class="form-input-hint">The name of the file that will be downloaded. If one is not provided, it will be automatically generated.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-checkbox noselect">
+                                <input type="checkbox" checked="checked" name="useFilters">
+                                <i class="form-icon"></i> Use active filters
+                            </label>
+                            <p class="form-input-hint">Only show results from any active filters (e.g. certain providers or account.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-checkbox noselect">
+                                <input type="checkbox" checked="checked" name="showNavigation">
+                                <i class="form-icon"></i> Show navigation
+                            </label>
+                            <p class="form-input-hint">Include navigation requests as their own line item.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label noselect">File Type</label>
+                            <label class="form-radio noselect">
+                                <input type="radio" name="fileType" value="csv" checked>
+                                <i class="form-icon"></i> CSV
+                            </label>
+                            <label class="form-radio noselect">
+                                <input type="radio" name="fileType" value="tab">
+                                <i class="form-icon"></i> Tab
+                            </label>
+                            <p class="form-input-hint">Select the file type you'd like to download.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" type="submit">Export</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="about-modal">
+        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+                <div class="modal-title h5">About Omnibug</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <p>Omnibug is a plugin for the Google Chrome and Mozilla Firefox browsers to ease developing and
+                        debugging web metrics implementations. Each outgoing request (sent by the browser) is checked
+                        for a pattern; if a match occurs, the URL is displayed and decoded to show the details of the request.</p>
+                    <p>Find a bug, feature suggestion, or just have some feedback about Omnibug? <a href="##OMNIBUG_FEEDBACK_URL##" target="_blank">Drop us a note!</a></p>
+                    <p>Need help? Check out our <a href="https://omnibug.io/help?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=devtools-help" target="_blank">help section</a> for guides &amp; how to reach out to us!</p>
+                    <p>&copy; 2018 <a href="https://omnibug.io/?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=devtools-about" target="_blank">Omnibug</a>
+                        <a href="https://omnibug.io/help/changelog?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=devtools-about" target="_blank">v##OMNIBUG_VERSION##</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../providers.js"></script>
+    <script src="../libs/OmnibugSettings.js"></script>
+    <script src="../libs/helpers.js"></script>
+    <script src="./panel.js"></script>
+    <script src="../assets/icons/fa-solid.js"></script>
+    <script src="../assets/icons/fontawesome.js"></script>
+</body>
+</html>
+

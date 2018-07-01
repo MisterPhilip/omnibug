@@ -1,10 +1,60 @@
 {
   "name": "omnibug",
-  "version": "0.5.515",
+  "version": "1.0.0",
   "description": "Omnibug Extension",
   "main": "Gruntfile.js",
   "scripts": {
-    "test": "grunt travis"
+    "production": "grunt production",
+    "beta": "grunt beta",
+    "build": "grunt build",
+    "test": "grunt build-test-files && nyc --all ava",
+    "postinstall": "grunt build"
+  },
+  "ava": {
+    "files": [
+      "test/providers/*.js",
+      "test/core/*.js"
+    ],
+    "require": [
+      "babel-register",
+      "./test/helpers/setup-browser-env.js"
+    ],
+    "babel": {
+      "presets": "inherit"
+    }
+  },
+  "babel": {
+    "env": {
+      "test": {
+        "plugins": [
+          "istanbul"
+        ]
+      }
+    },
+    "presets": [
+      "@ava/stage-4",
+      "stage-2"
+    ]
+  },
+  "nyc": {
+    "require": [
+      "babel-register",
+      "babel-polyfill"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "exclude": [
+      "./tests/**",
+      "./platform/**",
+      "./.github/**",
+      "./node_modules/**",
+      "**/providers.js"
+    ],
+    "sourceMap": false,
+    "instrument": false,
+    "all": true
   },
   "repository": {
     "type": "git",
@@ -13,27 +63,41 @@
   "keywords": [
     "omnibug"
   ],
-  "author": "Philip Lawrence <omnibug@misterphilip.com>",
+  "author": "Philip Lawrence <philip@omnibug.io>",
   "license": "MIT",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/MisterPhilip/omnibug/issues"
   },
   "devDependencies": {
-    "grunt": "~1.0.1",
+    "ava": "^0.25.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-plugin-istanbul": "^4.1.6",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "browser-env": "^3.2.5",
+    "coveralls": "^3.0.0",
+    "grunt": "^1.0.3",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-jasmine": "^1.1.0",
     "grunt-contrib-jshint": "~1.1.0",
-    "grunt-contrib-nodeunit": "~1.0.0",
-    "grunt-contrib-uglify": "~3.1.0",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-template-jasmine-istanbul": "^0.5.0"
+    "grunt-text-replace": "^0.4.0",
+    "nyc": "^13.0.0",
+    "sinon-chrome": "^2.3.2",
+    "url-search-params": "^0.10.0"
   },
   "homepage": "https://omnibug.io/",
   "dependencies": {
-    "jshint-html-reporter": "^0.2.5"
+    "grunt-sass": "^2.1.0",
+    "jshint-html-reporter": "^0.2.5",
+    "node-sass": "^4.7.2",
+    "npm": "^6.1.0",
+    "spectre.css": "^0.5.1"
   }
 }
