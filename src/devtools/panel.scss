@@ -98,12 +98,28 @@ nav.navbar {
     background: $body-background-color;
   }
 }
+@keyframes dark-request-highlight-odd {
+  0% {
+    background: lighten($primary-color-light, 7%);
+  }
+  100% {
+    background: $dark-body-background-color;
+  }
+}
 @keyframes request-highlight-even {
   0% {
     background: lighten($primary-color-light, 3%);
   }
   100% {
     background: darken($body-background-color, 5%);
+  }
+}
+@keyframes dark-request-highlight-even {
+  0% {
+    background: lighten($primary-color-light, 3%);
+  }
+  100% {
+    background: darken($dark-body-background-color, 5%);
   }
 }
 .request:nth-of-type(odd):not([open]) {
@@ -237,3 +253,80 @@ body.persist-disabled #persist-disable {
   display: none;
 }
 #persist-enable { color: #F44336; }
+
+
+body.dark {
+  background-color: $dark-body-background-color;
+  color: $dark-body-font-color;
+  .empty {
+    color: $dark-body-font-color;
+  }
+
+
+  nav.navbar {
+    background-color: $dark-body-background-alt-color;
+    border-bottom: 1px solid $dark-body-background-color;
+    .navbar-section:last-of-type a.btn {
+      border-left: 1px solid $dark-body-background-color;
+    }
+  }
+
+  .request:nth-of-type(odd) {
+    background-color: $dark-body-background-color;
+  }
+  .request:nth-of-type(even) {
+    background-color: darken($dark-body-background-color, 5%);
+  }
+
+  .request:nth-of-type(odd):not([open]) {
+    animation: dark-request-highlight-odd 1.2s;
+  }
+  .request:nth-of-type(even):not([open]) {
+    animation: dark-request-highlight-even 1.2s;
+  }
+  #requests .navigation {
+    background-color: $dark-body-background-alt-color;
+    border-top: darken($dark-body-background-color, 10%);
+  }
+
+
+  .request-note input:hover,
+  .request-note input:focus {
+    background: lighten($dark-body-background-alt-color, 15%);
+  }
+
+  .modal-container {
+    background-color: $dark-body-background-alt-color;
+  }
+
+  .form-input {
+    background-color: $dark-body-background-color;
+    color: #ccc;
+    border: 1px solid #444;
+  }
+
+  .form-input::placeholder {
+    color: #666;
+  }
+  button.btn {
+    background-color: $primary-color-dark;
+  }
+
+  #persist-enable { color: #5b0000; }
+  .filters-active [data-target-modal="filter-modal"] {
+    color: #f27839 !important;
+  }
+
+  ::-webkit-scrollbar {
+    width: 15px;
+    background-color: $dark-body-background-color;
+    border: 1px solid #4b4b4b;
+  }
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: $dark-body-background-color;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: darken($dark-body-background-color, 5%);
+  }
+}

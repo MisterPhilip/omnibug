@@ -702,6 +702,12 @@ window.Omnibug = (() => {
         if(settings.showQuotes) {
             styleSheet.sheet.insertRule(`.parameter-value:before, .parameter-value:after { content: '"'; color: ${settings.color_quotes}; }`, styleSheet.sheet.cssRules.length);
         }
+
+        if(chrome.devtools.panels && chrome.devtools.panels.themeName === "dark") {
+            document.body.classList.add("dark");
+        } else {
+            document.body.classList.remove("dark");
+        }
     }
 
     /**
