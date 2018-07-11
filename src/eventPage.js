@@ -16,7 +16,7 @@
      * Set/Load/Migrate settings when extension / browser is installed / updated.
      */
     chrome.runtime.onInstalled.addListener((details) => {
-        settings.load()
+        settings.migrate()
             .then(setCachedSettings)
             .then((loaded) => {settings.save(loaded);});
 
@@ -161,7 +161,7 @@
      */
     function setCachedSettings(settings) {
         cached.settings = settings;
-        cached.pattern = OmnibugProvider.getPattern(cached.settings.enabledProviders);
+        cached.pattern = OmnibugProvider.getPattern(cached.settings.disabledProviders);
         return settings;
     }
 

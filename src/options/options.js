@@ -132,7 +132,7 @@
                 if(!settings.hasOwnProperty(field) || !type) { return; }
 
                 // Do some value manipulation as needed
-                if(field === "enabledProviders") {
+                if(field === "disabledProviders") {
                     let index = settings[field].indexOf(value),
                         valArray = settings[field].slice();
                     console.log(value, input.checked, index);
@@ -156,7 +156,7 @@
                 settings[field] = value;
                 settingsProvider.save(settingsObj);
 
-                if(field !== "enabledProviders" && field !== "highlightKeys") {
+                if(field !== "disabledProviders" && field !== "highlightKeys") {
                     track(["send", "event", "settings", field, String(value)], (field === "allowTracking"));
                 }
             });

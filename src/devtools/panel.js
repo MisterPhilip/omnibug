@@ -76,7 +76,7 @@ window.Omnibug = (() => {
                 target.classList.remove("active");
                 if(modal === "filter-modal") {
                     let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
-                        return !provider[1] && (settings.enabledProviders.indexOf(provider[0]) > -1);
+                        return !provider[1] && settings.disabledProviders.includes(provider[0]);
                     });
                     track(["send", "event", "filter requests", "account", (filters.account === "") ? "no filter" : filters.accountType]);
                     track(["send", "event", "filter requests", "hidden providers", hiddenProviders.length]);

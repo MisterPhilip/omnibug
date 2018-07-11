@@ -38,7 +38,7 @@ class OmnibugSettings
     /**
      * Get default setting values
      *
-     * @return {{defaultPattern: string, enabledProviders: string[], highlightKeys: string[], alwaysExpand: boolean, showQuotes: boolean, showRedirects: boolean, showFullNames: boolean, color_load: string, color_click: string, color_prev: string, color_quotes: string, color_hilite: string, color_redirect: string, color_hover: string}}
+     * @return {{defaultPattern: string, disabledProviders: string[], highlightKeys: string[], alwaysExpand: boolean, showQuotes: boolean, showRedirects: boolean, showFullNames: boolean, color_load: string, color_click: string, color_prev: string, color_quotes: string, color_hilite: string, color_redirect: string, color_hover: string}}
      */
     get defaults()
     {
@@ -47,7 +47,7 @@ class OmnibugSettings
             defaultPattern : OmnibugProvider.getPattern().source,
 
             // all providers (initially)
-            enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort(),
+            disabledProviders : [],
 
             // keys to highlight
             highlightKeys  : ["pageName", "ch", "events", "products"],
@@ -136,6 +136,20 @@ class OmnibugSettings
      */
     migrate()
     {
-
+        return this.load().then((settings) => {
+            if(settings.enabledProviders) {
+                let allProviders = Object.keys(OmnibugProvider.getProviders()),
+                    disabledProviders = [];
+                allProviders.forEach((provider) => {
+                    if(settings.enabledProviders.indexOf(provider.key) === -1) {
+                        disabledProviders.push(provider.key);
+                    }
+                });
+                delete settings.enabledProviders;
+                settings.disabledProviders = disabledProviders;
+                this.save(settings);
+            }
+            return settings;
+        });
     }
 }
