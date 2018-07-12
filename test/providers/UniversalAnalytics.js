@@ -16,6 +16,9 @@ test("UniversalAnalyticsProvider pattern should match various UA domains", t => 
         urls = [
             "https://www.google-analytics.com/collect?",
             "http://www.google-analytics.com/collect?",
+            "http://www.google-analytics.com/collect/",
+            "https://www.google-analytics.com/collect/?",
+            "https://www.google-analytics.com/collect",
             "https://stats.g.doubleclick.net/r/collect?",
             "http://stats.g.doubleclick.net/r/collect?"
         ];
@@ -68,6 +71,22 @@ test("UniversalAnalyticsProvider returns the hit type", t => {
 
     t.is(typeof dcRequestType, "object");
     t.is(dcRequestType.value, "DoubleClick");
+});
+
+test("UniversalAnalyticsProvider returns POST data", t => {
+    let provider = new UniversalAnalyticsProvider(),
+        url = "https://www.google-analytics.com/collect",
+        postData = "v=1&_v=j68&a=40871850&t=event&_s=2&dl=https%3A%2F%2Fomnibug.io%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%7C%20A%20Digital%20Marketing%20Debugging%20Tool&sd=24-bit&sr=2560x1440&vp=2560x1307&je=0&ec=exit%20link&ea=click&el=https%3A%2F%2Ftwitter.com%2Fomnibug&_u=CACAAUAB~&jid=&gjid=&cid=191425359.1527202446&tid=UA-17508125-8&_gid=1457163284.1531235778&gtm=u6c&z=1127167073";
+
+    let results = provider.parseUrl(url, postData);
+
+    let eventCategory = results.data.find((result) => {
+        return result.key === "ec";
+    });
+    t.is(typeof eventCategory, "object");
+    t.is(eventCategory.field, "Event Category");
+    t.is(eventCategory.value, "exit link");
+    t.is(eventCategory.group, "events");
 });
 
 test("UniversalAnalyticsProvider returns custom dimensions/metrics", t => {
