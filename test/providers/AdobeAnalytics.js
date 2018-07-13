@@ -143,12 +143,14 @@ test("Provider returns correct request types", t => {
         pageView = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&AQE=1",
         exitLink = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&pe=lnk_e&AQE=1",
         downloadLink = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&pe=lnk_d&AQE=1",
-        otherLink = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&pe=lnk_o&AQE=1";
+        otherLink = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&pe=lnk_o&AQE=1",
+        mediaLink = "https://omnibug.d1.sc.omtrdc.net/b/ss/omnibug-test/1/JS-2.1.0-D7QN/s78921068678131?AQB=1&ndh=1&pf=1&t=9%2F0%2F2018%2016%3A16%3A47%202%20420&D=D%3D&mid=27914645550662449863676805716141562873&aamlh=9&ce=UTF-8&ns=omnibug&pageName=omnibug%3Ahome&g=https%3A%2F%2Fomnibug.io%2F&server=omnibug.io&aamb=XXXpRz8krg2tLO6pguXWp5olkAcUniQYPHaMWWgdJ3xzPWQmdj0y&h1=omnibug%2Chome&v3=omnibug%3Ahome&v5=%2B1&c14=guest&v14=guest&c20=tuesday%7C6%3A00pm&v20=D%3Dc20&c50=glo%3A2017.04.25&v90=27914645550662449863676805716141562873&s=2560x1440&c=24&j=1.6&v=N&k=Y&bw=2560&bh=1309&mcorgid=1ECE43625269ABXXXXXXXXXX%40AdobeOrg&pe=m_s&AQE=1";
 
     let pageViewResults = provider.parseUrl(pageView),
         exitLinkResults = provider.parseUrl(exitLink),
         downloadLinkResults = provider.parseUrl(downloadLink),
         otherLinkResults = provider.parseUrl(otherLink),
+        mediaLinkResults = provider.parseUrl(mediaLink),
         pageViewRequestType = pageViewResults.data.find((result) => {
             return result.key === "requestType";
         }),
@@ -159,6 +161,9 @@ test("Provider returns correct request types", t => {
             return result.key === "requestType";
         }),
         otherLinkRequestType = otherLinkResults.data.find((result) => {
+            return result.key === "requestType";
+        }),
+        mediaLinkRequestType = mediaLinkResults.data.find((result) => {
             return result.key === "requestType";
         });
 
@@ -173,6 +178,9 @@ test("Provider returns correct request types", t => {
 
     t.is(typeof otherLinkRequestType, "object", "requestType exists");
     t.is(otherLinkRequestType.value, "Other Click");
+
+    t.is(typeof mediaLinkRequestType, "object", "requestType exists");
+    t.is(mediaLinkRequestType.value, "Media");
 });
 
 test("Provider returns Context Data", t => {

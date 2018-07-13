@@ -419,6 +419,8 @@ class AdobeAnalyticsProvider extends BaseProvider
             requestType = "Download Click";
         } else if(pev2 === "lnk_o") {
             requestType = "Other Click";
+        } else if(/^m_/.test(pev2)) {
+            requestType = "Media";
         }
         results.push({
             "key":   "requestType",
