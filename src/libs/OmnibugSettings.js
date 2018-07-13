@@ -79,6 +79,9 @@ class OmnibugSettings
             // Allow tracking?
             allowTracking: true,
 
+            // Theme
+            theme: "auto",
+
             // colors
             color_load        : "#dbedff",
             color_click       : "#f1ffdb",

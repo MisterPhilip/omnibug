@@ -703,7 +703,15 @@ window.Omnibug = (() => {
             styleSheet.sheet.insertRule(`.parameter-value:before, .parameter-value:after { content: '"'; color: ${settings.color_quotes}; }`, styleSheet.sheet.cssRules.length);
         }
 
-        if(chrome.devtools.panels && chrome.devtools.panels.themeName === "dark") {
+        // Themes
+        let theme = settings.theme;
+        if(settings.theme === "auto") {
+            if(chrome.devtools.panels && chrome.devtools.panels.themeName === "dark") {
+                theme = "dark";
+            }
+        }
+
+        if(theme === "dark") {
             document.body.classList.add("dark");
         } else {
             document.body.classList.remove("dark");

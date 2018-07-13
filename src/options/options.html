@@ -108,6 +108,33 @@
 
         <fieldset>
             <div class="row">
+                <div class="col-label">Theme</div>
+                <div class="col">
+                    <div>
+                        <label title="Omnibug Theme" for="themeAuto">
+                            <input type="radio" name="theme" id="themeAuto" data-bind-property="theme" value="auto" />
+                            Automatic (based on browser settings)
+                        </label>
+                    </div>
+                    <div>
+                        <label title="Omnibug Theme" for="themeLight">
+                            <input type="radio" name="theme" id="themeLight"  data-bind-property="theme" value="light" />
+                            Light
+                        </label>
+                    </div>
+                    <div>
+                        <label title="Omnibug Theme" for="themeDark">
+                            <input type="radio" name="theme" id="themeDark"  data-bind-property="theme" value="dark" />
+                            Dark
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <p class="help">You can force a certain theme to show up, or use ##BROWSER##'s settings.</p>
+        </fieldset>
+
+        <fieldset>
+            <div class="row">
                 <div class="col-label">Parameter display style</div>
                 <div class="col">
                     <div>
