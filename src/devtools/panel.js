@@ -627,7 +627,8 @@ window.Omnibug = (() => {
      * @param fromStorage
      */
     function loadSettings(newSettings, fromStorage = false) {
-        let styleSheet = d.getElementById("settingsStyles");
+        let styleSheet = d.getElementById("settingsStyles"),
+            defaults = (new OmnibugSettings).defaults;
 
         settings = newSettings;
 
@@ -654,8 +655,26 @@ window.Omnibug = (() => {
         if(settings.highlightKeys.length) {
             let highlightPrefix = "[data-parameter-key=\"",
                 highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]",
+                rule = "";
+
+            if(defaults.color_highlight !== settings.color_highlight) {
+                rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; } `;
+                styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
+            } else {
+                rule = `${highlightKeys} { background-color: #ffff00 !important; } `;
+                styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
+
+                // Add in dark theme
+                highlightPrefix = `.dark ${highlightPrefix}`;
+                highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]";
+                rule = ` ${highlightKeys} { background-color: rgba(47, 132, 218, 0.75) !important; color: #ddd; } `;
+                styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
+            }
+
+            if(defaults.color_highlight !== settings.color_highlight) {
                 rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; }`;
-            styleSheet.sheet.insertRule(rule);
+                styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
+            }
         }
 
         // Reverse the direction of the entries to show newest first
@@ -675,11 +694,18 @@ window.Omnibug = (() => {
         }
 
         // Background colors
-        styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click}; }`, styleSheet.sheet.cssRules.length);
-        styleSheet.sheet.insertRule(`[data-request-type="Page View"] { background-color: ${settings.color_load}; }`, styleSheet.sheet.cssRules.length);
-        styleSheet.sheet.insertRule(`details.request.redirected [data-request-type] { background-color: ${settings.color_redirect}; }`, styleSheet.sheet.cssRules.length);
-        styleSheet.sheet.insertRule(`[data-request-type="previous"] { background-color: ${settings.color_prev}; }`, styleSheet.sheet.cssRules.length);
-        styleSheet.sheet.insertRule(`request:hover > summary { background-color: ${settings.color_hover}; }`, styleSheet.sheet.cssRules.length);
+        if(defaults.color_click !== settings.color_click) {
+            styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click} !important; }`, styleSheet.sheet.cssRules.length);
+        }
+        if(defaults.color_load !== settings.color_load) {
+            styleSheet.sheet.insertRule(`[data-request-type="Page View"] { background-color: ${settings.color_load} !important; }`, styleSheet.sheet.cssRules.length);
+        }
+        if(defaults.color_redirect !== settings.color_redirect) {
+            styleSheet.sheet.insertRule(`details.request.redirected [data-request-type] { background-color: ${settings.color_redirect} !important; }`, styleSheet.sheet.cssRules.length);
+        }
+        if(defaults.color_hover !== settings.color_hover) {
+            styleSheet.sheet.insertRule(`.request .table-hover tbody tr:hover { background-color: ${settings.color_hover} !important; }`, styleSheet.sheet.cssRules.length);
+        }
 
         // Key vs. name
         if(settings.showFullNames) {

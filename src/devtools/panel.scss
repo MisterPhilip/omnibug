@@ -53,7 +53,7 @@ nav.navbar {
   padding: 0 5px;
 
   > summary {
-    padding: 5px 0;
+    padding: 5px;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -100,7 +100,7 @@ nav.navbar {
 }
 @keyframes dark-request-highlight-odd {
   0% {
-    background: lighten($primary-color-light, 7%);
+    background: #555;
   }
   100% {
     background: $dark-body-background-color;
@@ -116,7 +116,7 @@ nav.navbar {
 }
 @keyframes dark-request-highlight-even {
   0% {
-    background: lighten($primary-color-light, 3%);
+    background: #555;
   }
   100% {
     background: darken($dark-body-background-color, 5%);
@@ -254,6 +254,11 @@ body.persist-disabled #persist-disable {
 }
 #persist-enable { color: #F44336; }
 
+/* Default colors, can be overridden in settings*/
+[data-request-type] { background-color: #f1ffdb; }
+[data-request-type="Page View"] { background-color: #dbedff; }
+details.request.redirected [data-request-type] { background-color: #eeeeee; }
+.request .table-hover tbody tr:hover > summary { background-color: #cccccc; }
 
 body.dark {
   background-color: $dark-body-background-color;
@@ -262,6 +267,15 @@ body.dark {
     color: $dark-body-font-color;
   }
 
+
+  /* Default colors, can be overridden in settings*/
+  [data-request-type] { background-color: #AED581; color: #333; }
+  [data-request-type="Page View"] { background-color: #90CAF9; }
+  details.request.redirected [data-request-type] { background-color: #333; color: #999; }
+
+  .table.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #2a2a2a;
+  }
 
   nav.navbar {
     background-color: $dark-body-background-alt-color;
@@ -288,7 +302,29 @@ body.dark {
     background-color: $dark-body-background-alt-color;
     border-top: darken($dark-body-background-color, 10%);
   }
+  .request-details table {
+    border-color: #111;
+  }
+  .request-details table td {
+    border-bottom: 0;
+  }
+  .request .table-hover tbody tr:hover {
+    background-color: #555;
+    color: #ddd;
+  }
 
+  .request-details > summary {
+    background-color: #3a3a3a;
+    color: #2dd4c7;
+    border-color: #111;
+  }
+  .request[open] > summary {
+    background-color: rgba(47, 132, 218, 0.75);
+    color: #eee;
+  }
+  .request[open], .request[open] > summary {
+    border-color: #000;
+  }
 
   .request-note input:hover,
   .request-note input:focus {
@@ -310,11 +346,13 @@ body.dark {
   }
   button.btn {
     background-color: $primary-color-dark;
+    color: #ccc;
   }
-
-  #persist-enable { color: #5b0000; }
   .filters-active [data-target-modal="filter-modal"] {
     color: #f27839 !important;
+  }
+  .modal-title {
+    color: #2dd4c7;
   }
 
   ::-webkit-scrollbar {
@@ -323,8 +361,8 @@ body.dark {
     border: 1px solid #4b4b4b;
   }
   ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    background-color: $dark-body-background-color;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #333;
   }
   ::-webkit-scrollbar-thumb {
     background-color: darken($dark-body-background-color, 5%);

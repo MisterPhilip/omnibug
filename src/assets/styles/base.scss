@@ -67,7 +67,7 @@ label.disabled input {
 }
 .modal:target .modal-overlay,
 .modal.active .modal-overlay {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.75);
 }
 .modal-lg .modal-container .modal-body {
   max-height: 80vh;
