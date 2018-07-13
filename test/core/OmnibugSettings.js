@@ -35,6 +35,7 @@ test("OmnibugSettings should return a list of defaults", t => {
     t.is(typeof settings.defaults.showNotes, "boolean");
     t.is(typeof settings.defaults.allowTracking, "boolean");
     t.is(typeof settings.defaults.requestSortOrder, "string");
+    t.is(typeof settings.defaults.theme, "string");
     t.is(typeof settings.defaults.color_load, "string");
     t.is(typeof settings.defaults.color_click, "string");
     t.is(typeof settings.defaults.color_quotes, "string");

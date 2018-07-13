@@ -6,6 +6,11 @@ $white:                    #FFF;
 
 $secondary-color:          #03A9F4;
 $body-background-color:    #FAFAFA;
+
+$dark-body-background-color:    #242424;
+$dark-body-background-alt-color: #333;
+$dark-body-font-color:          #999;
+
 $font-size:   14px;
 
 $base-font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
@@ -60,8 +65,9 @@ label.disabled,
 label.disabled input {
   cursor: not-allowed;
 }
-.modal.modal-lg .modal-overlay {
-  background: rgba(0, 0, 0, 0.3);
+.modal:target .modal-overlay,
+.modal.active .modal-overlay {
+  background: rgba(0, 0, 0, 0.75);
 }
 .modal-lg .modal-container .modal-body {
   max-height: 80vh;
