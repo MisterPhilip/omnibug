@@ -147,70 +147,116 @@
             <p class="help">Checking this will show a field for each request for you to enter notes into. These notes will be included in your export.</p>
         </fieldset>
 
+        <fieldset>
+            <div class="row">
+                <div class="col-label">Theme</div>
+                <div class="col">
+                    <div>
+                        <label title="Omnibug Theme" for="themeAuto">
+                            <input type="radio" name="theme" id="themeAuto" data-bind-property="theme" value="auto" />
+                            Automatic (based on browser settings)
+                        </label>
+                    </div>
+                    <div>
+                        <label title="Omnibug Theme" for="themeLight">
+                            <input type="radio" name="theme" id="themeLight"  data-bind-property="theme" value="light" />
+                            Light
+                        </label>
+                    </div>
+                    <div>
+                        <label title="Omnibug Theme" for="themeDark">
+                            <input type="radio" name="theme" id="themeDark"  data-bind-property="theme" value="dark" />
+                            Dark
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <p class="help">You can force a certain theme to show up, or use ##BROWSER##'s settings.</p>
+        </fieldset>
+
         <fieldset class="color">
             <div class="row">
                 <label for="color_load">Page load event</label>
                 <div class="col">
-                    <input type="color" id="color_load" data-bind-property="color_load" data-bind-style="background-color" />
+                    <input type="color" id="color_load" data-bind-property="color_load" data-bind-style="background-color"  list="colors_load" />
                     <span class="example" >Example</span>
+                    <datalist id="colors_load">
+                        <option>#dbedff</option>
+                    </datalist>
                 </div>
             </div>
-            <p class="help">The background color for page load events.</p>
+            <p class="help">You can override the background color for page load events.</p>
         </fieldset>
 
         <fieldset class="color">
             <div class="row">
                 <label for="color_click">Click event</label>
                 <div class="col">
-                    <input type="color" id="color_click" data-bind-property="color_click" data-bind-style="background-color" />
+                    <input type="color" id="color_click" data-bind-property="color_click" data-bind-style="background-color" list="colors_click" />
                     <span class="example">Example</span>
+                    <datalist id="colors_click">
+                        <option>#f1ffdb</option>
+                    </datalist>
                 </div>
             </div>
-            <p class="help">The background color for click events.</p>
+            <p class="help">You can override the background color for click events.</p>
         </fieldset>
 
         <fieldset class="color">
             <div class="row">
                 <label for="color_highlight">Highlighted parameter</label>
                 <div class="col">
-                    <input type="color" id="color_highlight" data-bind-property="color_highlight" data-bind-style="background-color" />
+                    <input type="color" id="color_highlight" data-bind-property="color_highlight" data-bind-style="background-color" list="colors_highlight" />
                     <span class="example">Example</span>
+                    <datalist id="colors_highlight">
+                        <option>#ffff00</option>
+                        <option>#2f84da</option>
+                    </datalist>
                 </div>
             </div>
-            <p class="help">The background color for parameters that are highlighted (see "Highlight parameters" setting above).</p>
+            <p class="help">You can override the background color for parameters that are highlighted (see "Highlight parameters" setting above).</p>
         </fieldset>
 
         <fieldset class="color">
             <div class="row">
                 <label for="color_hover">Row hover</label>
                 <div class="col">
-                    <input type="color" id="color_hover" data-bind-property="color_hover" data-bind-style="background-color" />
+                    <input type="color" id="color_hover" data-bind-property="color_hover" data-bind-style="background-color" list="colors_hover" />
                     <span class="example">Example</span>
+                    <datalist id="colors_hover">
+                        <option>#cccccc</option>
+                    </datalist>
                 </div>
             </div>
-            <p class="help">The background color for when you hover over a row.</p>
+            <p class="help">You can override the background color for when you hover over a row.</p>
         </fieldset>
 
         <fieldset class="color">
             <div class="row">
                 <label for="color_redirect">Redirected event</label>
                 <div class="col">
-                    <input type="color" id="color_redirect" data-bind-property="color_redirect" data-bind-style="background-color" />
+                    <input type="color" id="color_redirect" data-bind-property="color_redirect" data-bind-style="background-color" list="colors_redirect" />
                     <span class="example">Example</span>
+                    <datalist id="colors_redirect">
+                        <option>#eeeeee</option>
+                    </datalist>
                 </div>
             </div>
-            <p class="help">The background color requests that were redirected (meaning there could be multiple of the same requests).</p>
+            <p class="help">You can override the background color requests that were redirected (meaning there could be multiple of the same requests).</p>
         </fieldset>
 
         <fieldset class="color">
             <div class="row">
                 <label for="color_quotes">Quotes</label>
                 <div class="col">
-                    <input type="color" id="color_quotes" data-bind-property="color_quotes" data-bind-style="color" />
+                    <input type="color" id="color_quotes" data-bind-property="color_quotes" data-bind-style="color" list="colors_quotes" />
                     <span class="example">"<span style="color: #555555 !important;">Example</span>"</span>
+                    <datalist id="colors_quotes">
+                        <option>#ff0000</option>
+                    </datalist>
                 </div>
             </div>
-            <p class="help">The color for quotes that surround values (if enabled in the "Add quotes around values" setting above).</p>
+            <p class="help">You can override the color for quotes that surround values (if enabled in the "Add quotes around values" setting above).</p>
         </fieldset>
 
         <fieldset>
