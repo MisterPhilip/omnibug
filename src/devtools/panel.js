@@ -632,17 +632,33 @@ window.Omnibug = (() => {
 
         settings = newSettings;
 
-        if(!storageLoadedSettings && fromStorage && settings.allowTracking) {
-            // Load GA script
-            (function(o,m,n,i,b,u,g){o['GoogleAnalyticsObject']=b;o[b]=o[b]||function(){
-                (o[b].q=o[b].q||[]).push(arguments)},o[b].l=1*new Date();u=m.createElement(n),
-                g=m.getElementsByTagName(n)[0];u.async=1;u.src=i;g.parentNode.insertBefore(u,g)
-            })(window,document,'script','https://www.google-analytics.com/analytics.js','tracker');
+        let theme = settings.theme,
+            themeType = settings.theme === "auto" ? "auto" : "manual";
+        if(settings.theme === "auto") {
+            if(chrome.devtools.panels && chrome.devtools.panels.themeName === "dark") {
+                theme = "dark";
+            } else {
+                theme = "light";
+            }
+        }
+
+        if(settings.allowTracking) {
+            if(!storageLoadedSettings && fromStorage) {
+                // Load GA script
+                (function(o,m,n,i,b,u,g){o['GoogleAnalyticsObject']=b;o[b]=o[b]||function(){
+                    (o[b].q=o[b].q||[]).push(arguments)},o[b].l=1*new Date();u=m.createElement(n),
+                    g=m.getElementsByTagName(n)[0];u.async=1;u.src=i;g.parentNode.insertBefore(u,g)
+                })(window,document,'script','https://www.google-analytics.com/analytics.js','tracker');
+            }
             tracker("set", "dimension2", String(settings.showRedirects));
             tracker("set", "dimension3", String(settings.showNavigation));
             tracker("set", "dimension4", String(settings.showNotes));
-            tracker("send", "pageview", "/panel");
-            storageLoadedSettings = true;
+            tracker("set", "dimension7", `${themeType}: ${theme}`);
+
+            if(!storageLoadedSettings && fromStorage) {
+                tracker("send", "pageview", "/panel");
+                storageLoadedSettings = true;
+            }
         }
 
         // Build the filter list
@@ -730,13 +746,6 @@ window.Omnibug = (() => {
         }
 
         // Themes
-        let theme = settings.theme;
-        if(settings.theme === "auto") {
-            if(chrome.devtools.panels && chrome.devtools.panels.themeName === "dark") {
-                theme = "dark";
-            }
-        }
-
         if(theme === "dark") {
             document.body.classList.add("dark");
         } else {
