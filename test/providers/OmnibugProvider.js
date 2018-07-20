@@ -33,9 +33,10 @@ test("Patterns should exist", t => {
 
 test("Patterns should only return for enabled providers", t => {
     OmnibugProvider.addProvider(new OmnibugTestProvider());
-    let defaultPattern = OmnibugProvider.getPattern(["OMNIBUG-TEST-PROVIDER"]);
+    OmnibugProvider.addProvider(new OmnibugTestProvider2());
+    let testPattern = OmnibugProvider.getPattern({"OMNIBUG-TEST-PROVIDER": {"enabled": false}, "OMNIBUG-TEST-PROVIDER-2": {"enabled": true}});
 
-    t.is(defaultPattern.source, /omnibug\-test\-provider\-321789/.source, "Default pattern should be a RegExp object");
+    t.is(testPattern.source, /omnibug\-test\-provider\-321789/.source, "Pattern should be a RegExp object");
 });
 
 test("Providers should be returned", t => {

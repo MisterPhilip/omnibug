@@ -24,7 +24,7 @@ test("OmnibugSettings should return a list of defaults", t => {
     let settings = new OmnibugSettings(chrome);
 
     t.is(typeof settings.defaults.defaultPattern, "string");
-    t.is(typeof settings.defaults.disabledProviders, "object");
+    t.is(typeof settings.defaults.providers, "object");
     t.is(typeof settings.defaults.highlightKeys, "object");
     t.is(typeof settings.defaults.alwaysExpand, "boolean");
     t.is(typeof settings.defaults.showQuotes, "boolean");
