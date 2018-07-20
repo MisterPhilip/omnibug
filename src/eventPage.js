@@ -161,7 +161,7 @@
      */
     function setCachedSettings(settings) {
         cached.settings = settings;
-        cached.pattern = OmnibugProvider.getPattern(cached.settings.disabledProviders);
+        cached.pattern = OmnibugProvider.getPattern(cached.settings.providers);
         return settings;
     }
 

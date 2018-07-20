@@ -42,12 +42,17 @@ class OmnibugSettings
      */
     get defaults()
     {
+        let providers = {};
+        Object.keys(OmnibugProvider.getProviders()).forEach((provider) => {
+            providers[provider] = {"enabled": true};
+        });
+
         return {
             // pattern to match in request url
             defaultPattern : OmnibugProvider.getPattern().source,
 
             // all providers (initially)
-            disabledProviders : [],
+            providers : providers,
 
             // keys to highlight
             highlightKeys  : ["pageName", "ch", "events", "products"],
@@ -137,19 +142,20 @@ class OmnibugSettings
     migrate()
     {
         return this.load().then((settings) => {
-            if(settings.enabledProviders) {
+            if(settings.enabledProviders && typeof settings.providers === "undefined") {
                 let allProviders = Object.keys(OmnibugProvider.getProviders()),
-                    disabledProviders = [];
+                    providers = {};
                 allProviders.forEach((provider) => {
-                    if(settings.enabledProviders.indexOf(provider.key) === -1) {
-                        disabledProviders.push(provider.key);
-                    }
+                    console.log("settings migration", provider, settings.enabledProviders.includes(provider));
+                    providers[provider] = {
+                        "enabled": settings.enabledProviders.includes(provider)
+                    };
                 });
-                delete settings.enabledProviders;
-                settings.disabledProviders = disabledProviders;
-                this.save(settings);
+                // We'll remove this later, in case anything goes wrong in the migration phase:
+                /* delete settings.enabledProviders; */
+                settings.providers = providers;
             }
-            return settings;
+            return this.save(settings);
         });
     }
 }
