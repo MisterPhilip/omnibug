@@ -346,7 +346,7 @@ module.exports = function(grunt) {
         });
         grunt.config.set("concat.test-settings", {
             "options": {
-                "banner": "import { OmnibugProvider } from \"./providers.js\"\n",
+                "banner": "import { OmnibugProvider } from \"./providers.js\"\nconst chrome = require('sinon-chrome/extensions');\n",
                 "footer": "\nexport { OmnibugSettings };"
             },
             "files": {

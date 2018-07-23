@@ -6,18 +6,10 @@ class OmnibugSettings
 {
     /**
      * OmnibugSettings
-     *
-     * @param forcedBrowser force a browser object (great for testing)
      */
-    constructor(forcedBrowser = null)
+    constructor()
     {
-        if(forcedBrowser !== null) {
-            this.browser = forcedBrowser;
-        } else if(typeof chrome === "object") {
-            this.browser = chrome;
-        } else {
-            throw new TypeError("Browser is missing");
-        }
+        this.browser = chrome;
     }
 
     /**
@@ -84,6 +76,9 @@ class OmnibugSettings
             // Allow tracking?
             allowTracking: true,
 
+            // Migration version
+            migrationIndex: 0,
+
             // colors
             color_load        : "#dbedff",
             color_click       : "#f1ffdb",
@@ -142,7 +137,7 @@ class OmnibugSettings
     migrate()
     {
         return this.load().then((settings) => {
-            if(settings.enabledProviders && typeof settings.providers === "undefined") {
+            if(typeof settings.enabledProviders === "object" && settings.migrationIndex < 1) {
                 let allProviders = Object.keys(OmnibugProvider.getProviders()),
                     providers = {};
                 allProviders.forEach((provider) => {
@@ -154,6 +149,7 @@ class OmnibugSettings
                 // We'll remove this later, in case anything goes wrong in the migration phase:
                 /* delete settings.enabledProviders; */
                 settings.providers = providers;
+                settings.migrationIndex = 1;
             }
             return this.save(settings);
         });

@@ -9,19 +9,19 @@ test.beforeEach(t => {
 });
 
 test("OmnibugSettings should return a storage type", t => {
-    let settings = new OmnibugSettings(chrome);
+    let settings = new OmnibugSettings();
 
     t.is(settings.storage_type, "sync");
 });
 
 test("OmnibugSettings should return a storage key", t => {
-    let settings = new OmnibugSettings(chrome);
+    let settings = new OmnibugSettings();
 
     t.is(settings.storage_key, "##OMNIBUG_KEY##");
 });
 
 test("OmnibugSettings should return a list of defaults", t => {
-    let settings = new OmnibugSettings(chrome);
+    let settings = new OmnibugSettings();
 
     t.is(typeof settings.defaults.defaultPattern, "string");
     t.is(typeof settings.defaults.providers, "object");
@@ -44,14 +44,14 @@ test("OmnibugSettings should return a list of defaults", t => {
 });
 
 test("OmnibugSettings should save defaults if nothing is passed", t => {
-    let settings = new OmnibugSettings(chrome),
+    let settings = new OmnibugSettings(),
         savedSettings = settings.save();
 
     t.deepEqual(savedSettings, settings.defaults);
 });
 
 test("OmnibugSettings should save objects", t => {
-    let settings = new OmnibugSettings(chrome),
+    let settings = new OmnibugSettings(),
         savedSettings = settings.save({
             "highlightKeys": ["foo", "bar"]
         }),
@@ -62,7 +62,7 @@ test("OmnibugSettings should save objects", t => {
 });
 
 test("OmnibugSettings should restore to defaults", t => {
-    let settings = new OmnibugSettings(chrome),
+    let settings = new OmnibugSettings(),
         savedSettings = settings.save({
             "highlightKeys": ["foo", "bar"]
         }),
@@ -75,7 +75,7 @@ test("OmnibugSettings should restore to defaults", t => {
 });
 
 test("OmnibugSettings should load saved changes", async t => {
-    let settings = new OmnibugSettings(chrome),
+    let settings = new OmnibugSettings(),
         savedSettings = settings.save({
             "highlightKeys": ["foo", "bar"]
         });
@@ -85,4 +85,23 @@ test("OmnibugSettings should load saved changes", async t => {
 
     let loadedSettings = await settings.load();
     t.deepEqual(loadedSettings, savedSettings);
+});
+
+
+test("OmnibugSettings should migrate", async t => {
+    let settings = new OmnibugSettings();
+    chrome.storage.sync.get.yields({"##OMNIBUG_KEY##": {
+        "enabledProviders": ["ADOBEANALYTICS"]
+    }});
+
+    let loadedSettings1 = await settings.migrate();
+    t.true(loadedSettings1.providers.ADOBEANALYTICS.enabled);
+    t.equals(loadedSettings1.migrationIndex, 1);
+
+    chrome.storage.sync.get.yields({"##OMNIBUG_KEY##": {
+        "enabledProviders": ["ADOBEANALYTICS"],
+        "migrationIndex": 1
+    }});
+    let loadedSettings2 = await settings.migrate();
+    t.true(loadedSettings2.providers.ADOBEANALYTICS.enabled);
 });
