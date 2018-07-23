@@ -144,7 +144,6 @@ class OmnibugSettings
                 let allProviders = Object.keys(OmnibugProvider.getProviders()),
                     providers = {};
                 allProviders.forEach((provider) => {
-                    console.log("settings migration", provider, settings.enabledProviders.includes(provider));
                     providers[provider] = {
                         "enabled": settings.enabledProviders.includes(provider)
                     };

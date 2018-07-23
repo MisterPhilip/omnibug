@@ -97,7 +97,7 @@ test("OmnibugSettings should migrate", async t => {
 
     let loadedSettings1 = await settings.migrate();
     t.true(loadedSettings1.providers.ADOBEANALYTICS.enabled);
-    t.equals(loadedSettings1.migrationIndex, 1);
+    t.is(loadedSettings1.migrationIndex, 1);
 
     chrome.storage.sync.get.yields({"##OMNIBUG_KEY##": {
         "enabledProviders": ["ADOBEANALYTICS"],
