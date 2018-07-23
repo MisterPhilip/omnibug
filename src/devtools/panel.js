@@ -76,7 +76,7 @@ window.Omnibug = (() => {
                 target.classList.remove("active");
                 if(modal === "filter-modal") {
                     let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
-                        return !provider[1] && (settings.enabledProviders.indexOf(provider[0]) > -1);
+                        return !provider[1] && settings.disabledProviders.includes(provider[0]);
                     });
                     track(["send", "event", "filter requests", "account", (filters.account === "") ? "no filter" : filters.accountType]);
                     track(["send", "event", "filter requests", "hidden providers", hiddenProviders.length]);
@@ -792,7 +792,7 @@ window.Omnibug = (() => {
                 });
 
             // Check if the user has the provider enabled or not
-            if(settings.enabledProviders.indexOf(providerKey) === -1) {
+            if(!settings.providers[providerKey].enabled) {
                 input.setAttribute("disabled", "disabled");
                 label.classList.add("disabled");
                 label.setAttribute("title", "This provider is currently disabled and requests for this provider will never be shown. You can re-enable it within the settings");
@@ -834,7 +834,7 @@ window.Omnibug = (() => {
 
         // Figure out what providers are hidden
         let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
-            return !provider[1] && (settings.enabledProviders.indexOf(provider[0]) > -1);
+            return !provider[1] && (settings.providers[provider[0]].enabled);
         }).map((provider) => {
             return `.request[data-provider="${provider[0]}"]`;
         });

@@ -14,6 +14,16 @@ class OmnibugTestProvider extends BaseProvider {
         this._type       = "analytics";
     }
 }
+class OmnibugTestProvider2 extends BaseProvider {
+    constructor()
+    {
+        super();
+        this._key        = "OMNIBUG-TEST-PROVIDER-2";
+        this._pattern    = /omnibug\-test\-provider\-321789/;
+        this._name       = "Omnibug Test Provider 2";
+        this._type       = "analytics";
+    }
+}
 
 test("Patterns should exist", t => {
     let defaultPattern = OmnibugProvider.getPattern();
@@ -23,9 +33,10 @@ test("Patterns should exist", t => {
 
 test("Patterns should only return for enabled providers", t => {
     OmnibugProvider.addProvider(new OmnibugTestProvider());
-    let defaultPattern = OmnibugProvider.getPattern(["OMNIBUG-TEST-PROVIDER", "EXAMPLE-THAT-DOESNT-EXIST"]);
+    OmnibugProvider.addProvider(new OmnibugTestProvider2());
+    let testPattern = OmnibugProvider.getPattern({"OMNIBUG-TEST-PROVIDER": {"enabled": false}, "OMNIBUG-TEST-PROVIDER-2": {"enabled": true}});
 
-    t.is(defaultPattern.source, /omnibug\-test\-provider\-6548713/.source, "Default pattern should be a RegExp object");
+    t.is(testPattern.source, /omnibug\-test\-provider\-321789/.source, "Pattern should be a RegExp object");
 });
 
 test("Providers should be returned", t => {

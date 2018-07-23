@@ -24,7 +24,7 @@
          * @param value     New Value
          */
         set: (target, prop, value) => {
-            console.log(`setting ${prop} to ${value}`);
+            console.log(`setting ${prop}`, value);
             target[prop] = value;
             if(prop === "highlightKeys")
             {
@@ -35,6 +35,16 @@
                 value.forEach((param) => {
                     paramList.appendChild(createHighlightParam(param));
                 });
+            }
+            else if(prop === "providers")
+            {
+                let inputs = document.querySelectorAll(`input[data-bind-property="providers-enabled"]`);
+                inputs.forEach((input) => {
+                    input.checked = (target["providers"][input.value].enabled);
+                });
+            }
+            else if(prop === "providers-enabled") {
+                return;
             }
             else
             {
@@ -129,21 +139,19 @@
                     value = input.value;
 
                 // Validate the input attributes
-                if(!settings.hasOwnProperty(field) || !type) { return; }
+                if((field !== "providers-enabled" && !settings.hasOwnProperty(field)) || !type) { return; }
 
                 // Do some value manipulation as needed
-                if(field === "enabledProviders") {
-                    let index = settings[field].indexOf(value),
-                        valArray = settings[field].slice();
-                    console.log(value, input.checked, index);
-                    if(!input.checked && index >= 0) {
-                        valArray.splice(index, 1);
-                        track(["send", "event", "settings", "enabledProviders", `removed: ${value}`]);
-                    } else if(input.checked && index === -1) {
-                        valArray.push(value);
-                        track(["send", "event", "settings", "enabledProviders", `added: ${value}`]);
+                if(field === "providers-enabled") {
+                    if(!input.checked && settings["providers"][value].enabled) {
+                        settings["providers"][value].enabled = false;
+                        track(["send", "event", "settings", "providers", `removed: ${value}`]);
+                    } else if(input.checked && !settings["providers"][value].enabled) {
+                        settings["providers"][value].enabled = true;
+                        track(["send", "event", "settings", "providers", `added: ${value}`]);
                     }
-                    value = valArray;
+                    field = "providers";
+                    value = settings["providers"];
                 } else if(type === "checkbox") {
                     value = input.checked;
                 } else if(type === "color") {
@@ -152,11 +160,13 @@
                     }
                 }
 
+                console.log("updating " + field);
+
                 // Update the object (and thus update any other elements attached to the field) & save the settings
                 settings[field] = value;
                 settingsProvider.save(settingsObj);
 
-                if(field !== "enabledProviders" && field !== "highlightKeys") {
+                if(field !== "providers" && field !== "highlightKeys") {
                     track(["send", "event", "settings", field, String(value)], (field === "allowTracking"));
                 }
             });

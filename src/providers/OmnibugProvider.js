@@ -85,18 +85,14 @@ var OmnibugProvider = (function() {
         /**
          * Return the patterns for all (enabled) providers
          *
-         * @param   {void|[]}  enabledProviders    Providers that are enabled
+         * @param   {void|{}}  providerInfo    Providers that are disabled
          *
          * @returns {RegExp}
          */
-        "getPattern": (enabledProviders) => {
-            if(!enabledProviders || !enabledProviders.length) {
-                return defaultPatternRegex;
-            }
-
+        "getPattern": (providerInfo = {}) => {
             let patterns = [];
-            enabledProviders.forEach((provider) => {
-                if(providers[provider]) {
+            Object.keys(providers).forEach((provider) => {
+                if(typeof providerInfo[provider] === "undefined" || providerInfo[provider].enabled) {
                     patterns.push(providers[provider].pattern.source);
                 }
             });
