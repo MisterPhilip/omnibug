@@ -400,21 +400,21 @@ class UniversalAnalyticsProvider extends BaseProvider
         if(/^cd(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
-                "field": "Custom Dimension " + RegExp.$1,
+                "field": `Custom Dimension ${RegExp.$1}`,
                 "value": value,
                 "group": "dimension"
             };
         } else if(/^cm(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
-                "field": "Custom Metric " + RegExp.$1,
+                "field": `Custom Metric ${RegExp.$1}`,
                 "value": value,
                 "group": "metric"
             };
         } else if(/^cg(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
-                "field": "Content Group " + RegExp.$1,
+                "field": `Content Group ${RegExp.$1}`,
                 "value": value,
                 "group": "contentgroup"
             };
@@ -428,7 +428,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 type = lookup[RegExp.$2] || "";
             result = {
                 "key":   name,
-                "field": "Promotion " + RegExp.$1 + " " + type,
+                "field": `Promotion ${RegExp.$1} ${type}`,
                 "value": value,
                 "group": "promo"
             };
@@ -447,7 +447,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 type = lookup[RegExp.$2] || "";
             result = {
                 "key":   name,
-                "field": "Product " + RegExp.$1 + " " + type,
+                "field": `Product ${RegExp.$1} ${type}`,
                 "value": value,
                 "group": "ecommerce"
             };
@@ -459,14 +459,14 @@ class UniversalAnalyticsProvider extends BaseProvider
                 type = lookup[RegExp.$2] || "";
             result = {
                 "key":   name,
-                "field": "Product " + RegExp.$1 + " " + type,
+                "field": `Product ${RegExp.$1} ${type} ${RegExp.$2}`,
                 "value": value,
                 "group": "ecommerce"
             };
         } else if(/^il(\d+)nm$/i.test(name)) {
             result = {
                 "key":   name,
-                "field": "Impression List " + RegExp.$1,
+                "field": `Impression List ${RegExp.$1}`,
                 "value": value,
                 "group": "ecommerce"
             };
@@ -478,7 +478,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 type = lookup[RegExp.$3] || "";
             result = {
                 "key":   name,
-                "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type + " " + RegExp.$4,
+                "field": `Impression List ${RegExp.$1} Product ${RegExp.$2} ${type} ${RegExp.$4}`,
                 "value": value,
                 "group": "ecommerce"
             };
@@ -496,7 +496,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 type = lookup[RegExp.$3] || "";
             result = {
                 "key": name,
-                "field": "Impression List " + RegExp.$1 + " Product " + RegExp.$2 + " " + type,
+                "field": `Impression List ${RegExp.$1} Product ${RegExp.$2} ${type}`,
                 "value": value,
                 "group": "ecommerce"
             };
