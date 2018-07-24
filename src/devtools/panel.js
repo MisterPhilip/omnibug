@@ -20,15 +20,8 @@ window.Omnibug = (() => {
         persist = true,
         storageLoadedSettings = false,
         recordedData = [],
-        allProviders = OmnibugProvider.getProviders();
-
-    // Setup GA tracker
-    window.GoogleAnalyticsObject = "tracker";
-    window.tracker = function(){ (window.tracker.q = window.tracker.q||[]).push(arguments), window.tracker.l=1*new Date(); };
-
-    tracker("create", "##OMNIBUG_UA_ACCOUNT##", "auto");
-    tracker("set", "checkProtocolTask", ()=>{});
-    tracker("set", "dimension1", "##OMNIBUG_VERSION##");
+        allProviders = OmnibugProvider.getProviders(),
+        tracker = new OmnibugTracker;
 
 
     // Clear all requests
@@ -60,7 +53,7 @@ window.Omnibug = (() => {
             let target = d.getElementById(element.getAttribute("data-target-modal"));
             if(target) {
                 target.classList.add("active");
-                track(["send", "event", "modal", "open", element.getAttribute("data-target-modal").replace(/^#/, '')]);
+                tracker.track(["send", "event", "modal", "open", element.getAttribute("data-target-modal").replace(/^#/, '')]);
             }
         })
     });
@@ -78,10 +71,10 @@ window.Omnibug = (() => {
                     let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
                         return !provider[1] && settings.disabledProviders.includes(provider[0]);
                     });
-                    track(["send", "event", "filter requests", "account", (filters.account === "") ? "no filter" : filters.accountType]);
-                    track(["send", "event", "filter requests", "hidden providers", hiddenProviders.length]);
+                    tracker.track(["send", "event", "filter requests", "account", (filters.account === "") ? "no filter" : filters.accountType]);
+                    tracker.track(["send", "event", "filter requests", "hidden providers", hiddenProviders.length]);
                 }
-                track(["send", "event", "modal", "close", modal]);
+                tracker.track(["send", "event", "modal", "close", modal]);
             }
         })
     });
@@ -89,7 +82,7 @@ window.Omnibug = (() => {
     // Add tracking to top nav
     d.querySelectorAll("header > nav a").forEach((element) => {
         element.addEventListener("click", (event) => {
-            track(["send", "event", "top nav", element.getAttribute("href").replace("#", "")]);
+            tracker.track(["send", "event", "top nav", element.getAttribute("href").replace("#", "")]);
         });
     });
 
@@ -127,7 +120,7 @@ window.Omnibug = (() => {
                 filters.providers[provider.value] = checked;
             }
         });
-        track(["send", "event", "filter requests", ((checked) ? "show" : "hide") + " all"]);
+        tracker.track(["send", "event", "filter requests", ((checked) ? "show" : "hide") + " all"]);
         updateFiltersStyles();
     });
 
@@ -261,7 +254,7 @@ window.Omnibug = (() => {
         // Clean up
         link.remove();
 
-        track(["send", {
+        tracker.track(["send", {
             "hitType": "event",
             "eventCategory": "export data",
             "eventAction": fileType,
@@ -642,21 +635,19 @@ window.Omnibug = (() => {
             }
         }
 
+        tracker.updateAllowTracking(settings.allowTracking);
+
         if(settings.allowTracking) {
             if(!storageLoadedSettings && fromStorage) {
-                // Load GA script
-                (function(o,m,n,i,b,u,g){o['GoogleAnalyticsObject']=b;o[b]=o[b]||function(){
-                    (o[b].q=o[b].q||[]).push(arguments)},o[b].l=1*new Date();u=m.createElement(n),
-                    g=m.getElementsByTagName(n)[0];u.async=1;u.src=i;g.parentNode.insertBefore(u,g)
-                })(window,document,'script','https://www.google-analytics.com/analytics.js','tracker');
+                tracker.init(settings.allowTracking);
             }
-            tracker("set", "dimension2", String(settings.showRedirects));
-            tracker("set", "dimension3", String(settings.showNavigation));
-            tracker("set", "dimension4", String(settings.showNotes));
-            tracker("set", "dimension7", `${themeType}: ${theme}`);
+            tracker.track(["set", "dimension2", String(settings.showRedirects)], true);
+            tracker.track(["set", "dimension3", String(settings.showNavigation)], true);
+            tracker.track(["set", "dimension4", String(settings.showNotes)], true);
+            tracker.track(["set", "dimension7", `${themeType}: ${theme}`], true);
 
             if(!storageLoadedSettings && fromStorage) {
-                tracker("send", "pageview", "/panel");
+                tracker.track(["send", "pageview", "/panel"]);
                 storageLoadedSettings = true;
             }
         }
@@ -809,7 +800,7 @@ window.Omnibug = (() => {
                 let checkbox = event.target,
                     providerKey = checkbox.value;
                 filters.providers[providerKey] = checkbox.checked;
-                track(["send", "event", "filter requests", ((checkbox.checked) ? "show" : "hide") + "provider", providerKey]);
+                tracker.track(["send", "event", "filter requests", ((checkbox.checked) ? "show" : "hide") + "provider", providerKey]);
                 updateFiltersStyles();
             });
 
@@ -855,18 +846,6 @@ window.Omnibug = (() => {
             d.body.classList.add("filters-active");
         } else {
             d.body.classList.remove("filters-active");
-        }
-    }
-
-    /**
-     * GA Tracking
-     *
-     * @param data
-     * @param force
-     */
-    function track(data, force = false) {
-        if(settings.allowTracking || force) {
-            tracker.apply(window, data);
         }
     }
 

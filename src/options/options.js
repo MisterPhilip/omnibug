@@ -2,13 +2,7 @@
 (function() {
 
     // Setup GA tracker
-    window.GoogleAnalyticsObject = "tracker";
-    window.tracker = function(){ (window.tracker.q = window.tracker.q||[]).push(arguments), window.tracker.l=1*new Date(); };
-
-    tracker("create", "##OMNIBUG_UA_ACCOUNT##", "auto");
-    tracker("set", "checkProtocolTask", ()=>{});
-    tracker("set", "dimension1", "##OMNIBUG_VERSION##");
-    tracker("send", "pageview", "/settings");
+    let tracker = new OmnibugTracker();
 
     /**
      * Setup a proxy handler to observe changes to the settings object
@@ -131,6 +125,10 @@
         // Update the settings page with our loaded settings
         loadSettingsIntoProxy(loadedSettings);
 
+        // Load GA script
+        tracker.init(loadedSettings.allowTracking);
+        tracker.track(["send", "pageview", "/settings"]);
+
         // Add listeners to all of the inputs for 2-way binding
         document.querySelectorAll("input[data-bind-property]").forEach((input) => {
             input.addEventListener("change", (event) => {
@@ -145,10 +143,10 @@
                 if(field === "providers-enabled") {
                     if(!input.checked && settings["providers"][value].enabled) {
                         settings["providers"][value].enabled = false;
-                        track(["send", "event", "settings", "providers", `removed: ${value}`]);
+                        tracker.track(["send", "event", "settings", "providers", `removed: ${value}`]);
                     } else if(input.checked && !settings["providers"][value].enabled) {
                         settings["providers"][value].enabled = true;
-                        track(["send", "event", "settings", "providers", `added: ${value}`]);
+                        tracker.track(["send", "event", "settings", "providers", `added: ${value}`]);
                     }
                     field = "providers";
                     value = settings["providers"];
@@ -166,22 +164,18 @@
                 settings[field] = value;
                 settingsProvider.save(settingsObj);
 
+                tracker.init(settings.allowTracking);
+
                 if(field !== "providers" && field !== "highlightKeys") {
-                    track(["send", "event", "settings", field, String(value)], (field === "allowTracking"));
+                    tracker.track(["send", "event", "settings", field, String(value)], (field === "allowTracking"));
                 }
             });
         });
-
-
-        // Track the settings page, if allowed
-        if(settings.allowTracking) {
-            // Load GA script
-            (function(o,m,n,i,b,u,g){o['GoogleAnalyticsObject']=b;o[b]=o[b]||function(){
-                (o[b].q=o[b].q||[]).push(arguments)},o[b].l=1*new Date();u=m.createElement(n),
-                g=m.getElementsByTagName(n)[0];u.async=1;u.src=i;g.parentNode.insertBefore(u,g)
-            })(window,document,'script','https://www.google-analytics.com/analytics.js','tracker');
-        }
     });
+
+    if(!OmnibugTracker.browserTrackingEnabled) {
+        document.getElementById("trackerWrapper").classList.add("d-none");
+    }
 
     document.getElementById("addParam").addEventListener("change", (event) => {
         event.preventDefault();
@@ -195,7 +189,7 @@
             settings.highlightKeys.push(newParam);
             settingsProvider.save(settingsObj);
 
-            track(["send", "event", "settings", "highlightKeys", `added: ${newParam}`]);
+            tracker.track(["send", "event", "settings", "highlightKeys", `added: ${newParam}`]);
         }
 
         event.target.value = "";
@@ -226,7 +220,7 @@
         settingsProvider.save(defaults);
 
         if(settings.allowTracking) {
-            track(["send", "event", "settings", "reset"]);
+            tracker.track(["send", "event", "settings", "reset"]);
         }
     });
 
@@ -249,7 +243,7 @@
             event.preventDefault();
             settings.highlightKeys = settingsObj.highlightKeys = settingsObj.highlightKeys.filter(item => item !== param);
             settingsProvider.save(settingsObj);
-            track(["send", "event", "settings", "highlightKeys", `removed: ${value}`]);
+            tracker.track(["send", "event", "settings", "highlightKeys", `removed: ${param}`]);
         });
 
         return li;
@@ -266,17 +260,5 @@
 
         // Add any rules
         styleSheet.sheet.insertRule(`#highlight-params > li { background-color: ${settings.color_highlight} !important; }`, styleSheet.sheet.cssRules.length);
-    }
-
-    /**
-     * GA Tracking
-     *
-     * @param data
-     * @param force
-     */
-    function track(data, force = false) {
-        if(settings.allowTracking || force) {
-            tracker.apply(window, data);
-        }
     }
 }());
