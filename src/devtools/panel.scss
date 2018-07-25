@@ -263,6 +263,13 @@ body.persist-disabled #persist-disable {
   display: none;
 }
 #persist-enable { color: #F44336; }
+td.parameter-value {
+  position: relative;
+}
+#context-menu {
+  z-index: 9999;
+  position: absolute;
+}
 
 /* Default colors, can be overridden in settings*/
 [data-request-type] { background-color: #f1ffdb; }

@@ -86,6 +86,36 @@ window.Omnibug = (() => {
         });
     });
 
+    d.addEventListener('contextmenu', function(e) {
+        let tableRow = e.target.closest("tr[data-parameter-key]");
+        if(tableRow) {
+            console.log("contextmenu", tableRow.getBoundingClientRect());
+
+            // This was a right click on a data row
+            e.preventDefault();
+            let parameterKey = tableRow.getAttribute("data-parameter-key"),
+                parameterName = tableRow.querySelector(".parameter-field").innerText,
+                parameterValue = tableRow.querySelector(".parameter-value");
+
+            let popover = d.getElementById("context-menu");
+            popover.classList.remove("d-none");
+            popover.querySelectorAll(".context-menu-parameter-key-pair").forEach((elem) => {
+                elem.innerText = `${parameterName} (${parameterKey})`;
+            });
+            popover.querySelectorAll(".context-menu-parameter-name").forEach((elem) => {
+                elem.innerText = parameterName;
+            });
+            parameterValue.appendChild(popover);
+        }
+    });
+    d.addEventListener("click", function(e) {
+        if(!e.target.hasAttribute("data-context-menu")) {
+            let popover = d.getElementById("context-menu");
+            popover.classList.add("d-none");
+        }
+    });
+
+
 
     // Add our listener for the account filter
     let filterAccount = d.getElementById("filter-account"),
