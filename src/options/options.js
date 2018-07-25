@@ -107,14 +107,29 @@
 
     // Show all available providers
     let providers = OmnibugProvider.getProviders(),
-        providersList = document.getElementById("providers-list"),
-        providerTemplate = document.getElementById("providers-template");
+        providersList = document.getElementById("providers-list");
     for(let provider in providers)
     {
         if(!providers.hasOwnProperty(provider)) { continue; }
-        let template = providerTemplate.innerHTML;
-        template = template.replace(/##PROVIDER##/g, providers[provider].name).replace(/##VALUE##/g, provider);
-        providersList.innerHTML += template;
+        let input = createElement("input", {
+                "attributes": {
+                    "type": "checkbox",
+                    "data-bind-property": "providers-enabled",
+                    "id": `provider-${provider}`,
+                    "value": provider
+                }
+            }),
+            labelText = createElement("span", {
+                "text": providers[provider].name
+            }),
+            label = createElement("label", {
+                "attributes": {
+                    "style": "display:block;",
+                    "data-provider": providers[provider].name
+                },
+                "children": [input, labelText]
+            });
+        providersList.appendChild(label);
     }
 
     // Grab the default settings & load in the user's settings
@@ -231,9 +246,10 @@
             remove = createElement("span", {
                 "classes": ["remove"],
                 "attributes": {
-                    "title": "Remove"
+                    "title": "Remove",
+                    "aria-label": "Remove"
                 },
-                "html": "&times;"
+                "text": "\u00D7"
             }),
             li = createElement("li", {
                 "children": [text, remove]

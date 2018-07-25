@@ -28,11 +28,6 @@ const createElement = (type, options = {}) => {
         element.appendChild(textNode);
     }
 
-    // Add any HTML
-    if(options.html) {
-        element.insertAdjacentHTML("beforeend", options.html);
-    }
-
     // Add any children
     if(typeof options.children === "object" && options.children.length) {
         options.children.forEach((child) => {

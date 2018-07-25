@@ -32,14 +32,7 @@
                 <div class="col-label">Enabled providers</div>
                 <div class="col">
                     <input type="text" id="provider-search" placeholder="Search for a provider&hellip;">
-                    <div id="providers-list">
-                        <script type="text/html" id="providers-template">
-                            <label style="display:block;" data-provider="##PROVIDER##">
-                                <input type="checkbox" data-bind-property="providers-enabled" id="provider-##VALUE##" value="##VALUE##" />
-                                ##PROVIDER##
-                            </label>
-                        </script>
-                    </div>
+                    <div id="providers-list"></div>
                 </div>
             </div>
             <p class="help">Select the providers (marketing / analytics tools) to be shown within Omnibug.</p>
