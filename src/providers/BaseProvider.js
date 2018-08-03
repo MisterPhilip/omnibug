@@ -159,7 +159,7 @@ class BaseProvider
      * Parse any POST data into param key/value pairs
      *
      * @param postData
-     * @return {Array}
+     * @return {Array|Object}
      */
     parsePostData(postData = "")
     {
@@ -171,6 +171,11 @@ class BaseProvider
             keyPairs.forEach((keyPair) => {
                 let splitPair = keyPair.split("=");
                 params.push([splitPair[0], decodeURIComponent(splitPair[1] || "")]);
+            });
+        } else if(typeof postData === "object") {
+            Object.entries(postData).forEach((entry) => {
+                // @TODO: consider handling multiple values passed?
+                params.push([entry[0], entry[1].toString()]);
             });
         }
         return params;

@@ -2,6 +2,7 @@ import test from 'ava';
 
 import { default as AdobeTargetProvider } from "./../source/providers/AdobeTarget.js";
 import { OmnibugProvider } from "./../source/providers.js";
+import {default as AdobeAnalyticsProvider} from "../source/providers/AdobeAnalytics";
 
 test("AdobeTargetProvider returns provider information", t => {
     let provider = new AdobeTargetProvider();
@@ -109,6 +110,7 @@ test("AdobeTargetProvider handles missing mbox or clientCode", t => {
     let provider = new AdobeTargetProvider(),
         url = "http://omnibug.tt.omtrdc.net/m2/omnibug/mbox/?mboxHost=omnibug.io&mbox=foobar";
 
+
     let results = provider.parseUrl(url),
         mboxType = results.data.find((result) => {
             return result.key === "mboxType";
@@ -120,4 +122,27 @@ test("AdobeTargetProvider handles missing mbox or clientCode", t => {
     // @TODO:
     //t.is(clientCode.field, "Client Code", "Client code should be returned");
     //t.is(clientCode.value, "omnibug", "Client code should be clientCode");
+});
+
+test("Provider returns POST data", t => {
+    let provider = new AdobeTargetProvider(),
+        url = "http://omnibug.tt.omtrdc.net/m2/omnibug/mbox/json",
+        postData = {"mbox": ["target_global_mbox"], "mboxVersion": ["1.3.0"], "profile.testing": ["testing123"]};
+
+    let results = provider.parseUrl(url, postData);
+
+    let mboxVersion = results.data.find((result) => {
+            return result.key === "mboxVersion";
+        }),
+        profileTesting = results.data.find((result) => {
+            return result.key === "profile.testing";
+        });
+
+    t.is(typeof mboxVersion, "object");
+    t.is(mboxVersion.field, "Library Version");
+    t.is(mboxVersion.value, "1.3.0");
+    t.is(mboxVersion.group, "general");
+
+    t.is(typeof profileTesting, "object");
+    t.is(profileTesting.value, "testing123");
 });

@@ -223,7 +223,11 @@ window.Omnibug = (() => {
                     ];
                 }
                 row.push(request.request.url.replace(/"/g, `\\"`));
-                row.push(request.request.postData);
+                if(typeof request.request.postData !== "string") {
+                    row.push(JSON.stringify(request.request.postData));
+                } else {
+                    row.push(request.request.postData);
+                }
                 row.push((new Date(request.request.timestamp)).toString());
                 if(settings.showNotes) {
                     row.push(request.request.note);
