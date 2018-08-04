@@ -44,11 +44,12 @@
         <div class="modal-container">
             <div class="modal-header">
                 <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
-                <div class="modal-title h5">Filter Requests</div>
+                <div class="modal-title h4">Filter Requests</div>
             </div>
             <div class="modal-body">
                 <div class="content">
-                    <p>Here, you can add filters to only show certain requests. You can filter where an account ID contains certain text, show only selected providers, or both.</p>
+                    <p>Here, you can add filters to only show certain requests. You can filter where an account ID contains certain text, show only selected providers, or both.
+                        You can permanently hide providers in the extension settings, under <em>Enabled Providers</em>.</p>
                     <div class="form-group container">
                         <label class="form-label" for="filter-account">Filter by Account ID</label>
                         <div class="columns">
@@ -66,7 +67,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="provider-search">Show the following providers:</label>
+                        <label class="form-label" for="provider-search">Show only the following providers:</label>
                         <input type="text" id="provider-search" placeholder="Search for a provider&hellip;" class="form-input">
                     </div>
                     <div class="form-group" id="provider-select-all-wrapper">
@@ -87,7 +88,7 @@
             <form action="#export-modal" method="POST" id="export-form">
                 <div class="modal-header">
                     <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
-                    <div class="modal-title h5">Export Requests</div>
+                    <div class="modal-title h4">Export Requests</div>
                 </div>
                 <div class="modal-body">
                     <div class="content">
@@ -102,14 +103,12 @@
                                 <input type="checkbox" checked="checked" name="useFilters">
                                 <i class="form-icon"></i> Use active filters
                             </label>
-                            <p class="form-input-hint">Only show results from any active filters (e.g. certain providers or account.</p>
                         </div>
                         <div class="form-group">
                             <label class="form-checkbox noselect">
                                 <input type="checkbox" checked="checked" name="showNavigation">
-                                <i class="form-icon"></i> Show navigation
+                                <i class="form-icon"></i> Include navigation requests
                             </label>
-                            <p class="form-input-hint">Include navigation requests as their own line item.</p>
                         </div>
                         <div class="form-group">
                             <label class="form-label noselect">File Type</label>
@@ -121,7 +120,6 @@
                                 <input type="radio" name="fileType" value="tab">
                                 <i class="form-icon"></i> Tab
                             </label>
-                            <p class="form-input-hint">Select the file type you'd like to download.</p>
                         </div>
                     </div>
                 </div>
@@ -137,7 +135,7 @@
         <div class="modal-container">
             <div class="modal-header">
                 <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
-                <div class="modal-title h5">About Omnibug</div>
+                <div class="modal-title h4">About Omnibug</div>
             </div>
             <div class="modal-body">
                 <div class="content">

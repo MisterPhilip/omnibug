@@ -231,6 +231,12 @@ nav.navbar {
 #requests .navigation:first-of-type {
   border-top: 0;
 }
+.modal-header {
+  padding-bottom: 0;
+}
+.modal-footer {
+  padding-top: 0;
+}
 #filter-modal .modal-body {
   padding-top: 0;
 }
