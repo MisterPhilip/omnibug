@@ -11,7 +11,7 @@ class AdobeAudienceManagerProvider extends BaseProvider
     {
         super();
         this._key        = "ADOBEAUDIENCEMANAGER";
-        this._pattern    = /demdex\.net\//;
+        this._pattern    = /demdex\.net\/|\/id\?(?=.*d_visid_ver=)(?=.*mcorgid=)/;
         this._name       = "Adobe Audience Manager";
         this._type       = "visitorid";
     }
@@ -24,7 +24,7 @@ class AdobeAudienceManagerProvider extends BaseProvider
     get columnMapping()
     {
         return {
-            "account": "d_orgid"
+            "account": "omnibug_account"
         }
     }
 
@@ -62,7 +62,40 @@ class AdobeAudienceManagerProvider extends BaseProvider
             "d_cb": {
                 "name": "Callback property",
                 "group": "general"
+            },
+            "mcorgid": {
+                "name": "Adobe Organization ID",
+                "group": "general"
+            },
+            "d_visid_ver": {
+                "name": "Experience Cloud ID Version",
+                "group": "general"
             }
         };
+    }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param    {string}   url
+     * @param    {object}   params
+     *
+     * @returns {Array}
+     */
+    handleCustom(url, params)
+    {
+        let results = [],
+            accountID = "";
+        if(params.get("d_orgid")) {
+            accountID = params.get("d_orgid");
+        } else if(params.get("mcorgid")) {
+            accountID = params.get("mcorgid");
+        }
+        results.push({
+            "key":   "omnibug_account",
+            "value": accountID,
+            "hidden": true
+        });
+        return results;
     }
 }
