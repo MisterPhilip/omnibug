@@ -101,9 +101,13 @@ class OmnibugSettings
     {
         return new Promise((resolve, reject) => {
             this.browser.storage[this.storage_type].get(this.storage_key, (settings) => {
-                Object.keys(this.defaults.providers).forEach((key) => {
-                    settings[this.storage_key].providers[key] = Object.assign(this.defaults.providers[key], settings[this.storage_key].providers[key]);
-                });
+                if(!settings[this.storage_key].providers) {
+                    settings[this.storage_key].providers = this.defaults.providers;
+                } else {
+                    Object.keys(this.defaults.providers).forEach((key) => {
+                        settings[this.storage_key].providers[key] = Object.assign(this.defaults.providers[key], settings[this.storage_key].providers[key]);
+                    });
+                }
                 return resolve(Object.assign(this.defaults, settings[this.storage_key]));
             });
         });
