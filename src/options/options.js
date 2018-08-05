@@ -107,30 +107,46 @@
 
     // Show all available providers
     let providers = OmnibugProvider.getProviders(),
-        providersList = document.getElementById("providers-list");
-    for(let provider in providers)
-    {
-        if(!providers.hasOwnProperty(provider)) { continue; }
-        let input = createElement("input", {
-                "attributes": {
-                    "type": "checkbox",
-                    "data-bind-property": "providers-enabled",
-                    "id": `provider-${provider}`,
-                    "value": provider
-                }
-            }),
-            labelText = createElement("span", {
-                "text": providers[provider].name
-            }),
-            label = createElement("label", {
-                "attributes": {
-                    "style": "display:block;",
-                    "data-provider": providers[provider].name
-                },
-                "children": [input, labelText]
-            });
-        providersList.appendChild(label);
+        providerList = document.getElementById("providers-list"),
+        groups = {};
+    for(let provider in providers) {
+        if (!providers.hasOwnProperty(provider)) {
+            continue;
+        }
+        groups[providers[provider].type] = groups[providers[provider].type] || [];
+        groups[providers[provider].type].push(providers[provider]);
     }
+
+    Object.keys(groups).sort().forEach((groupKey) => {
+        let groupSummary = createElement("summary", {
+                "text": groupKey
+            }),
+            groupDetails = createElement("details", {
+                "children": [groupSummary]
+            });
+        groups[groupKey].forEach((provider) => {
+            let input = createElement("input", {
+                    "attributes": {
+                        "type": "checkbox",
+                        "data-bind-property": "providers-enabled",
+                        "id": `provider-${provider.key}`,
+                        "value": provider.key
+                    }
+                }),
+                labelText = createElement("span", {
+                    "text": provider.name
+                }),
+                label = createElement("label", {
+                    "attributes": {
+                        "style": "display:block;",
+                        "data-provider": provider.name
+                    },
+                    "children": [input, labelText]
+                });
+            groupDetails.appendChild(label);
+        });
+        providerList.appendChild(groupDetails);
+    });
 
     // Grab the default settings & load in the user's settings
     let settingsProvider = new OmnibugSettings();
@@ -213,7 +229,19 @@
     document.getElementById("provider-search").addEventListener("input", (event) => {
         console.log("provider-search", event.target.value);
         let searchTerm = (event.target.value || "").toLowerCase(),
-            providers = document.querySelectorAll("#providers-list > label");
+            providersList = document.getElementById("providers-list"),
+            providerDetails = document.querySelectorAll("#providers-list > details"),
+            providers = document.querySelectorAll("#providers-list label[data-provider]");
+
+        if(searchTerm) {
+            providersList.classList.add("searching");
+        } else {
+            providersList.classList.remove("searching");
+        }
+
+        providerDetails.forEach((element) => {
+            element.open = searchTerm !== "";
+        });
 
         providers.forEach((provider) => {
             let name = provider.getAttribute("data-provider") || "";
