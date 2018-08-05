@@ -81,7 +81,8 @@ test("OmnibugSettings should load saved changes", async t => {
             "highlightKeys": ["foo", "bar"]
         });
     chrome.storage.sync.get.yields({"##OMNIBUG_KEY##": {
-        "highlightKeys": ["foo", "bar"]
+        "highlightKeys": ["foo", "bar"],
+        "providers": {}
     }});
 
     let loadedSettings = await settings.load();
@@ -92,7 +93,8 @@ test("OmnibugSettings should load saved changes", async t => {
 test("OmnibugSettings should migrate", async t => {
     let settings = new OmnibugSettings();
     chrome.storage.sync.get.yields({"##OMNIBUG_KEY##": {
-        "enabledProviders": ["ADOBEANALYTICS"]
+        "enabledProviders": ["ADOBEANALYTICS"],
+            "providers": {}
     }});
 
     let loadedSettings1 = await settings.migrate();
@@ -101,6 +103,7 @@ test("OmnibugSettings should migrate", async t => {
 
     chrome.storage.sync.get.yields({"##OMNIBUG_KEY##": {
         "enabledProviders": ["ADOBEANALYTICS"],
+        "providers": {},
         "migrationIndex": 1
     }});
     let loadedSettings2 = await settings.migrate();
