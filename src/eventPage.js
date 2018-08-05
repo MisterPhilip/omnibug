@@ -115,7 +115,7 @@
     /**
      * Listen for all navigations that occur on a top-level frame
      */
-    chrome.webNavigation.onCommitted.addListener(
+    chrome.webNavigation.onBeforeNavigate.addListener(
         (details) => {
             if(isValidTab(details.tabId) && details.frameId === 0) {
                 // We have a page load within a tab we care about, send a message to the devtools with the info
