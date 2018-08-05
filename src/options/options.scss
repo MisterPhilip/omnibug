@@ -107,10 +107,29 @@ input[type="text"]:focus {
 ::placeholder {
   color: #bbb;
 }
-.provider-group-label {
-  padding: .2em;
-  background-color: #ededed;
-  margin-bottom: 5px;
+#providers-list details {
+  border-bottom: 1px solid $border-color;
+}
+#providers-list details:last-of-type {
+  border-bottom: 0;
+}
+#providers-list details > summary {
+  padding: .2em .2em .2em .5em;
+  cursor: pointer;
+  font-weight: bold;
+}
+#providers-list details label:first-of-type {
+  margin-top: .2em;
+}
+#providers-list label[data-provider] {
+  padding: .1em;
+  margin-left: 1em;
+}
+#providers-list label[data-provider] input[type="checkbox"] {
+  margin-right: .5em;
+}
+#providers-list.searching details > summary {
+  opacity: .5;
 }
 .provider {
   cursor: pointer;

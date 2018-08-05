@@ -1,4 +1,6 @@
 @import "../assets/styles/base";
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
 
 html, body {
   height: 100%;
@@ -228,6 +230,12 @@ nav.navbar {
 }
 #requests .navigation:first-of-type {
   border-top: 0;
+}
+.modal-header {
+  padding-bottom: 0;
+}
+.modal-footer {
+  padding-top: 0;
 }
 #filter-modal .modal-body {
   padding-top: 0;

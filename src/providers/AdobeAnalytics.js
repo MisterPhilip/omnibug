@@ -11,7 +11,7 @@ class AdobeAnalyticsProvider extends BaseProvider
     {
         super();
         this._key        = "ADOBEANALYTICS";
-        this._pattern    = /\/b\/ss\/|\.2o7\.net\/|\.sc\d?\.omtrdc\.net\//;
+        this._pattern    = /\/b\/ss\/|\.2o7\.net\/|\.sc\d?\.omtrdc\.net\/(?!id)/;
         this._name       = "Adobe Analytics";
         this._type       = "analytics";
     }

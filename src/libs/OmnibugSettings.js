@@ -6,18 +6,10 @@ class OmnibugSettings
 {
     /**
      * OmnibugSettings
-     *
-     * @param forcedBrowser force a browser object (great for testing)
      */
-    constructor(forcedBrowser = null)
+    constructor()
     {
-        if(forcedBrowser !== null) {
-            this.browser = forcedBrowser;
-        } else if(typeof chrome === "object") {
-            this.browser = chrome;
-        } else {
-            throw new TypeError("Browser is missing");
-        }
+        this.browser = chrome;
     }
 
     /**
@@ -38,16 +30,21 @@ class OmnibugSettings
     /**
      * Get default setting values
      *
-     * @return {{defaultPattern: string, enabledProviders: string[], highlightKeys: string[], alwaysExpand: boolean, showQuotes: boolean, showRedirects: boolean, showFullNames: boolean, color_load: string, color_click: string, color_prev: string, color_quotes: string, color_hilite: string, color_redirect: string, color_hover: string}}
+     * @return {{defaultPattern: string, disabledProviders: string[], highlightKeys: string[], alwaysExpand: boolean, showQuotes: boolean, showRedirects: boolean, showFullNames: boolean, color_load: string, color_click: string, color_prev: string, color_quotes: string, color_hilite: string, color_redirect: string, color_hover: string}}
      */
     get defaults()
     {
+        let providers = {};
+        Object.keys(OmnibugProvider.getProviders()).forEach((provider) => {
+            providers[provider] = {"enabled": true};
+        });
+
         return {
             // pattern to match in request url
             defaultPattern : OmnibugProvider.getPattern().source,
 
             // all providers (initially)
-            enabledProviders : Object.keys( OmnibugProvider.getProviders() ).sort(),
+            providers : providers,
 
             // keys to highlight
             highlightKeys  : ["pageName", "ch", "events", "products"],
@@ -82,6 +79,9 @@ class OmnibugSettings
             // Theme
             theme: "auto",
 
+            // Migration version
+            migrationIndex: 0,
+
             // colors
             color_load        : "#dbedff",
             color_click       : "#f1ffdb",
@@ -101,6 +101,9 @@ class OmnibugSettings
     {
         return new Promise((resolve, reject) => {
             this.browser.storage[this.storage_type].get(this.storage_key, (settings) => {
+                Object.keys(this.defaults.providers).forEach((key) => {
+                    settings[this.storage_key].providers[key] = Object.assign(this.defaults.providers[key], settings[this.storage_key].providers[key]);
+                });
                 return resolve(Object.assign(this.defaults, settings[this.storage_key]));
             });
         });
@@ -139,6 +142,21 @@ class OmnibugSettings
      */
     migrate()
     {
-
+        return this.load().then((settings) => {
+            if(typeof settings.enabledProviders === "object" && settings.migrationIndex < 1) {
+                let allProviders = Object.keys(OmnibugProvider.getProviders()),
+                    providers = {};
+                allProviders.forEach((provider) => {
+                    providers[provider] = {
+                        "enabled": settings.enabledProviders.includes(provider)
+                    };
+                });
+                // We'll remove this later, in case anything goes wrong in the migration phase:
+                /* delete settings.enabledProviders; */
+                settings.providers = providers;
+                settings.migrationIndex = 1;
+            }
+            return this.save(settings);
+        });
     }
 }

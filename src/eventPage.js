@@ -16,12 +16,12 @@
      * Set/Load/Migrate settings when extension / browser is installed / updated.
      */
     chrome.runtime.onInstalled.addListener((details) => {
-        settings.load()
+        settings.migrate()
             .then(setCachedSettings)
             .then((loaded) => {settings.save(loaded);});
 
         if(details.reason === "install") {
-            chrome.tabs.create({url: `https://omnibug.io/installed?utm_source=extension&utm_medium=chrome&utm_campaign=install`});
+            chrome.tabs.create({url: `https://omnibug.io/installed?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=install`});
         }
     });
 
@@ -91,8 +91,12 @@
             };
 
             // Grab any POST data that is included
-            if(details.method === "POST" && details.requestBody && details.requestBody.raw && details.requestBody.raw[0]) {
-                data.request.postData = String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes));
+            if(details.method === "POST" && details.requestBody) {
+                if(details.requestBody.raw && details.requestBody.raw[0]) {
+                    data.request.postData = String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes));
+                } else if(typeof details.requestBody.formData === "object") {
+                    data.request.postData = details.requestBody.formData;
+                }
             }
 
             // Parse the URL and join our request info to the parsed data
@@ -111,7 +115,7 @@
     /**
      * Listen for all navigations that occur on a top-level frame
      */
-    chrome.webNavigation.onCommitted.addListener(
+    chrome.webNavigation.onBeforeNavigate.addListener(
         (details) => {
             if(isValidTab(details.tabId) && details.frameId === 0) {
                 // We have a page load within a tab we care about, send a message to the devtools with the info
@@ -161,7 +165,7 @@
      */
     function setCachedSettings(settings) {
         cached.settings = settings;
-        cached.pattern = OmnibugProvider.getPattern(cached.settings.enabledProviders);
+        cached.pattern = OmnibugProvider.getPattern(cached.settings.providers);
         return settings;
     }
 

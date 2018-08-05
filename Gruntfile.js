@@ -12,18 +12,20 @@ module.exports = function(grunt) {
             },
             "production": {
                 "name": "Omnibug",
-                "version": "1.1.1",
+                "version": "1.2.0",
                 "storageKey": "omnibug",
                 "feedbackUrl": "https://omnibug.io/feedback",
                 "analyticsID": "UA-114343677-2"
             }
         },
         "chrome": {
-            "folder": "chromium"
+            "folder": "chromium",
+            "tracking": true
         },
         "firefox": {
             "gecko": "Omnibug@rosssimpson.com",
-            "folder": "firefox"
+            "folder": "firefox",
+            "tracking": false
         },
         "clean": {
             "chrome": ["platform/chromium", "build/chrome_*.zip"],
@@ -228,6 +230,7 @@ module.exports = function(grunt) {
         delete manifest.options_ui.chrome_style;
         delete manifest.options_page;
         delete manifest.background.persistent;
+        delete manifest.content_security_policy;
 
         grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Firefox's manifest.json. ").ok();
@@ -236,7 +239,21 @@ module.exports = function(grunt) {
     grunt.registerTask("build-copy", "Copy over the source files to the build directory", function(browser) {
         grunt.config.requires(browser);
         let options = grunt.config(browser),
-            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*", "popup/*.*", "!*./*.scss"];
+            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*", "!libs/OmnibugTracker.*", "popup/*.*", "!**/*.scss", "!assets/styles/**"],
+            trackingLib = {
+                expand: true,
+                cwd: "src/libs/",
+                src: [],
+                dest: "./platform/" + options.folder + "/libs",
+                rename: function(path, name) {
+                    return path + "/OmnibugTracker.js";
+                }
+            };
+        if(options.tracking) {
+            trackingLib.src.push("OmnibugTracker.js");
+        } else {
+            trackingLib.src.push("OmnibugTracker.disabled.js");
+        }
 
         grunt.config.set("copy." + browser, {
             files: [
@@ -245,7 +262,8 @@ module.exports = function(grunt) {
                     cwd: "src/",
                     src: filesToCopy,
                     dest: "./platform/" + options.folder
-                }
+                },
+                trackingLib
             ]});
         grunt.task.run("copy:" + browser);
     });
@@ -346,7 +364,7 @@ module.exports = function(grunt) {
         });
         grunt.config.set("concat.test-settings", {
             "options": {
-                "banner": "import { OmnibugProvider } from \"./providers.js\"\n",
+                "banner": "import { OmnibugProvider } from \"./providers.js\"\nconst chrome = require('sinon-chrome/extensions');\n",
                 "footer": "\nexport { OmnibugSettings };"
             },
             "files": {
@@ -362,6 +380,16 @@ module.exports = function(grunt) {
             "files": {
                 "./test/source/helpers.js": [
                     "./src/libs/helpers.js",
+                ]
+            }
+        });
+        grunt.config.set("concat.test-tracker", {
+            "options": {
+                "footer": "\nexport { OmnibugTracker };"
+            },
+            "files": {
+                "./test/source/OmnibugTracker.js": [
+                    "./src/libs/OmnibugTracker.js",
                 ]
             }
         });
@@ -439,7 +467,7 @@ module.exports = function(grunt) {
                 ]}
         });
 
-        grunt.task.run(["clean:test", "concat:providers-test", "concat:providers-test-individual", "concat:test-port", "concat:test-settings", "concat:test-helpers"]);
+        grunt.task.run(["clean:test", "concat:providers-test", "concat:providers-test-individual", "concat:test-port", "concat:test-settings", "concat:test-helpers", "concat:test-tracker"]);
     });
 
     /**

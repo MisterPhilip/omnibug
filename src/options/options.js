@@ -2,13 +2,7 @@
 (function() {
 
     // Setup GA tracker
-    window.GoogleAnalyticsObject = "tracker";
-    window.tracker = function(){ (window.tracker.q = window.tracker.q||[]).push(arguments), window.tracker.l=1*new Date(); };
-
-    tracker("create", "##OMNIBUG_UA_ACCOUNT##", "auto");
-    tracker("set", "checkProtocolTask", ()=>{});
-    tracker("set", "dimension1", "##OMNIBUG_VERSION##");
-    tracker("send", "pageview", "/settings");
+    let tracker = new OmnibugTracker();
 
     /**
      * Setup a proxy handler to observe changes to the settings object
@@ -24,7 +18,7 @@
          * @param value     New Value
          */
         set: (target, prop, value) => {
-            console.log(`setting ${prop} to ${value}`);
+            console.log(`setting ${prop}`, value);
             target[prop] = value;
             if(prop === "highlightKeys")
             {
@@ -35,6 +29,16 @@
                 value.forEach((param) => {
                     paramList.appendChild(createHighlightParam(param));
                 });
+            }
+            else if(prop === "providers")
+            {
+                let inputs = document.querySelectorAll(`input[data-bind-property="providers-enabled"]`);
+                inputs.forEach((input) => {
+                    input.checked = (target["providers"][input.value].enabled);
+                });
+            }
+            else if(prop === "providers-enabled") {
+                return;
             }
             else
             {
@@ -103,15 +107,46 @@
 
     // Show all available providers
     let providers = OmnibugProvider.getProviders(),
-        providersList = document.getElementById("providers-list"),
-        providerTemplate = document.getElementById("providers-template");
-    for(let provider in providers)
-    {
-        if(!providers.hasOwnProperty(provider)) { continue; }
-        let template = providerTemplate.innerHTML;
-        template = template.replace(/##PROVIDER##/g, providers[provider].name).replace(/##VALUE##/g, provider);
-        providersList.innerHTML += template;
+        providerList = document.getElementById("providers-list"),
+        groups = {};
+    for(let provider in providers) {
+        if (!providers.hasOwnProperty(provider)) {
+            continue;
+        }
+        groups[providers[provider].type] = groups[providers[provider].type] || [];
+        groups[providers[provider].type].push(providers[provider]);
     }
+
+    Object.keys(groups).sort().forEach((groupKey) => {
+        let groupSummary = createElement("summary", {
+                "text": groupKey
+            }),
+            groupDetails = createElement("details", {
+                "children": [groupSummary]
+            });
+        groups[groupKey].forEach((provider) => {
+            let input = createElement("input", {
+                    "attributes": {
+                        "type": "checkbox",
+                        "data-bind-property": "providers-enabled",
+                        "id": `provider-${provider.key}`,
+                        "value": provider.key
+                    }
+                }),
+                labelText = createElement("span", {
+                    "text": provider.name
+                }),
+                label = createElement("label", {
+                    "attributes": {
+                        "style": "display:block;",
+                        "data-provider": provider.name
+                    },
+                    "children": [input, labelText]
+                });
+            groupDetails.appendChild(label);
+        });
+        providerList.appendChild(groupDetails);
+    });
 
     // Grab the default settings & load in the user's settings
     let settingsProvider = new OmnibugSettings();
@@ -121,6 +156,10 @@
         // Update the settings page with our loaded settings
         loadSettingsIntoProxy(loadedSettings);
 
+        // Load GA script
+        tracker.init(loadedSettings.allowTracking);
+        tracker.track(["send", "pageview", "/settings"]);
+
         // Add listeners to all of the inputs for 2-way binding
         document.querySelectorAll("input[data-bind-property]").forEach((input) => {
             input.addEventListener("change", (event) => {
@@ -129,21 +168,19 @@
                     value = input.value;
 
                 // Validate the input attributes
-                if(!settings.hasOwnProperty(field) || !type) { return; }
+                if((field !== "providers-enabled" && !settings.hasOwnProperty(field)) || !type) { return; }
 
                 // Do some value manipulation as needed
-                if(field === "enabledProviders") {
-                    let index = settings[field].indexOf(value),
-                        valArray = settings[field].slice();
-                    console.log(value, input.checked, index);
-                    if(!input.checked && index >= 0) {
-                        valArray.splice(index, 1);
-                        track(["send", "event", "settings", "enabledProviders", `removed: ${value}`]);
-                    } else if(input.checked && index === -1) {
-                        valArray.push(value);
-                        track(["send", "event", "settings", "enabledProviders", `added: ${value}`]);
+                if(field === "providers-enabled") {
+                    if(!input.checked && settings["providers"][value].enabled) {
+                        settings["providers"][value].enabled = false;
+                        tracker.track(["send", "event", "settings", "providers", `removed: ${value}`]);
+                    } else if(input.checked && !settings["providers"][value].enabled) {
+                        settings["providers"][value].enabled = true;
+                        tracker.track(["send", "event", "settings", "providers", `added: ${value}`]);
                     }
-                    value = valArray;
+                    field = "providers";
+                    value = settings["providers"];
                 } else if(type === "checkbox") {
                     value = input.checked;
                 } else if(type === "color") {
@@ -152,26 +189,24 @@
                     }
                 }
 
+                console.log("updating " + field);
+
                 // Update the object (and thus update any other elements attached to the field) & save the settings
                 settings[field] = value;
                 settingsProvider.save(settingsObj);
 
-                if(field !== "enabledProviders" && field !== "highlightKeys") {
-                    track(["send", "event", "settings", field, String(value)], (field === "allowTracking"));
+                tracker.init(settings.allowTracking);
+
+                if(field !== "providers" && field !== "highlightKeys") {
+                    tracker.track(["send", "event", "settings", field, String(value)], (field === "allowTracking"));
                 }
             });
         });
-
-
-        // Track the settings page, if allowed
-        if(settings.allowTracking) {
-            // Load GA script
-            (function(o,m,n,i,b,u,g){o['GoogleAnalyticsObject']=b;o[b]=o[b]||function(){
-                (o[b].q=o[b].q||[]).push(arguments)},o[b].l=1*new Date();u=m.createElement(n),
-                g=m.getElementsByTagName(n)[0];u.async=1;u.src=i;g.parentNode.insertBefore(u,g)
-            })(window,document,'script','https://www.google-analytics.com/analytics.js','tracker');
-        }
     });
+
+    if(!OmnibugTracker.browserTrackingEnabled) {
+        document.getElementById("trackerWrapper").classList.add("d-none");
+    }
 
     document.getElementById("addParam").addEventListener("change", (event) => {
         event.preventDefault();
@@ -185,7 +220,7 @@
             settings.highlightKeys.push(newParam);
             settingsProvider.save(settingsObj);
 
-            track(["send", "event", "settings", "highlightKeys", `added: ${newParam}`]);
+            tracker.track(["send", "event", "settings", "highlightKeys", `added: ${newParam}`]);
         }
 
         event.target.value = "";
@@ -194,7 +229,19 @@
     document.getElementById("provider-search").addEventListener("input", (event) => {
         console.log("provider-search", event.target.value);
         let searchTerm = (event.target.value || "").toLowerCase(),
-            providers = document.querySelectorAll("#providers-list > label");
+            providersList = document.getElementById("providers-list"),
+            providerDetails = document.querySelectorAll("#providers-list > details"),
+            providers = document.querySelectorAll("#providers-list label[data-provider]");
+
+        if(searchTerm) {
+            providersList.classList.add("searching");
+        } else {
+            providersList.classList.remove("searching");
+        }
+
+        providerDetails.forEach((element) => {
+            element.open = searchTerm !== "";
+        });
 
         providers.forEach((provider) => {
             let name = provider.getAttribute("data-provider") || "";
@@ -216,7 +263,7 @@
         settingsProvider.save(defaults);
 
         if(settings.allowTracking) {
-            track(["send", "event", "settings", "reset"]);
+            tracker.track(["send", "event", "settings", "reset"]);
         }
     });
 
@@ -227,9 +274,10 @@
             remove = createElement("span", {
                 "classes": ["remove"],
                 "attributes": {
-                    "title": "Remove"
+                    "title": "Remove",
+                    "aria-label": "Remove"
                 },
-                "html": "&times;"
+                "text": "\u00D7"
             }),
             li = createElement("li", {
                 "children": [text, remove]
@@ -239,7 +287,7 @@
             event.preventDefault();
             settings.highlightKeys = settingsObj.highlightKeys = settingsObj.highlightKeys.filter(item => item !== param);
             settingsProvider.save(settingsObj);
-            track(["send", "event", "settings", "highlightKeys", `removed: ${value}`]);
+            tracker.track(["send", "event", "settings", "highlightKeys", `removed: ${param}`]);
         });
 
         return li;
@@ -256,17 +304,5 @@
 
         // Add any rules
         styleSheet.sheet.insertRule(`#highlight-params > li { background-color: ${settings.color_highlight} !important; }`, styleSheet.sheet.cssRules.length);
-    }
-
-    /**
-     * GA Tracking
-     *
-     * @param data
-     * @param force
-     */
-    function track(data, force = false) {
-        if(settings.allowTracking || force) {
-            tracker.apply(window, data);
-        }
     }
 }());

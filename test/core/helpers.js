@@ -78,16 +78,6 @@ test("createElement should add text, if passed", t => {
     t.is(elementWithText.textContent, "foobar");
 });
 
-test("createElement should add HTML, if passed", t => {
-    let elementWithoutHTML = createElement("div"),
-        elementWithHTML = createElement("div", {
-            "html": "&amp;"
-        });
-
-    t.is(elementWithoutHTML.textContent, "");
-    t.is(elementWithHTML.textContent, "&");
-});
-
 test("createElement should add children, if passed", t => {
     let elementWithoutChildren = createElement("div"),
         child1 = createElement("div"),
