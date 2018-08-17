@@ -12,7 +12,7 @@ module.exports = function(grunt) {
             },
             "production": {
                 "name": "Omnibug",
-                "version": "1.2.2",
+                "version": "1.2.3",
                 "storageKey": "omnibug",
                 "feedbackUrl": "https://omnibug.io/feedback",
                 "analyticsID": "UA-114343677-2"
@@ -230,7 +230,6 @@ module.exports = function(grunt) {
         delete manifest.options_ui.chrome_style;
         delete manifest.options_page;
         delete manifest.background.persistent;
-        delete manifest.content_security_policy;
 
         grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Firefox's manifest.json. ").ok();

@@ -12,6 +12,7 @@ class OmnibugTracker
         // Set defaults
         this.track(["create", "##OMNIBUG_UA_ACCOUNT##", "auto"], true);
         this.track(["set", "checkProtocolTask", ()=>{}], true);
+        this.track(["set", "forceSSL", true], true);
         this.track(["set", "dimension1", "##OMNIBUG_VERSION##"], true);
     }
 
@@ -34,7 +35,7 @@ class OmnibugTracker
             (function(o,m,n,i,b,u,g){o['GoogleAnalyticsObject']=b;o[b]=o[b]||function(){
                 (o[b].q=o[b].q||[]).push(arguments)},o[b].l=1*new Date();u=m.createElement(n),
                 g=m.getElementsByTagName(n)[0];u.async=1;u.src=i;g.parentNode.insertBefore(u,g)
-            })(window,document,'script','https://www.google-analytics.com/analytics.js','tracker');
+            })(window,document,'script','../../assets/js/google-analytics.js','tracker');
 
             this.loaded = true;
         }
