@@ -230,7 +230,6 @@ module.exports = function(grunt) {
         delete manifest.options_ui.chrome_style;
         delete manifest.options_page;
         delete manifest.background.persistent;
-        delete manifest.content_security_policy;
 
         grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Firefox's manifest.json. ").ok();
