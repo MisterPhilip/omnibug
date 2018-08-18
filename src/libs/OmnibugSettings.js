@@ -137,6 +137,22 @@ class OmnibugSettings
     }
 
     /**
+     * Save a single setting to the browser's storage
+     *
+     * @param key
+     * @param value
+     *
+     * @return {Promise<*>}
+     */
+    updateItem(key, value)
+    {
+        return this.load().then((settings) => {
+            settings[key] = value;
+            return this.save(settings);
+        });
+    }
+
+    /**
      * Restore all default values, alias to `save()`
      *
      * @return {{}}}
