@@ -44,6 +44,10 @@ class MparticleProvider extends BaseProvider {
                 "key": "customattributes",
                 "name": "Custom Attributes"
             },
+            {
+                "key": "userattributes",
+                "name": "User Attributes"
+            },
         ];
     }
 
@@ -107,6 +111,10 @@ class MparticleProvider extends BaseProvider {
                 "name": "Is Upgrade (iu)",
                 "group": "general"
             },
+            "lc" : {
+                "name": "Location (lc)",
+                "group": "general"
+            },
             "lr" : {
                 "name": "Launch Referral (lr)",
                 "group": "general"
@@ -133,6 +141,10 @@ class MparticleProvider extends BaseProvider {
             },
             "sid" : {
                 "name": "Session UID (sid)",
+                "group": "general"
+            },
+            "str" : {
+                "name": "Event Store (str)",
                 "group": "general"
             },
             "str.uid.Expires" : {
@@ -234,7 +246,22 @@ class MparticleProvider extends BaseProvider {
                 "value": value,
                 "group": "customattributes"
             };
-        } else {
+        } else if (name.indexOf("ua.") === 0) {
+            result = {
+                "key":   name,
+                "field": name.slice(3,name.length),
+                "value": value,
+                "group": "userattributes"
+            };   
+        } else if (name.indexOf("ui[") === 0) {
+            // hide  
+            result = {
+                "key": name,
+                "value": value,
+                "hidden": true
+            };
+        }
+         else {
             result = super.handleQueryParam(name, value);
         }
         return result;
@@ -264,7 +291,68 @@ class MparticleProvider extends BaseProvider {
             });
         }
 
-        // Event Types
+        // Event Type Value parsed (et)
+        let etType = params.get("et");
+        if (etType) {
+            const etDict = {
+                "0": "Unknown",
+                "1": "Navigation",
+                "2": "Location",
+                "3": "Search",
+                "4": "Transaction",
+                "5": "UserContent",
+                "6": "UserPreference",
+                "7": "Social",
+                "8": "Other",
+                "9": "Media",
+                "10": "ProductAddToCart",
+                "11": "ProductRemoveFromCart",
+                "12": "ProductCheckout",
+                "13": "ProductCheckoutOption",
+                "14": "ProductClick",
+                "15": "ProductViewDetail",
+                "16": "ProductPurchase",
+                "17": "ProductRefund",
+                "18": "PromotionView",
+                "19": "PromotionClick",
+                "20": "ProductAddToWishlist",
+                "21": "ProductRemoveFromWishlist",
+                "22": "ProductImpression",
+                "23": "Attribution",
+            };
+            let etValue = !!(etDict[etType]) ? etDict[etType] : etType;
+            results.push({
+                "key":   "etParsed",
+                "field": "Event Type Value",
+                "value": etValue,
+                "group": "general"
+            });    
+        }
+        
+        // Data type value parsed
+        let dataType = params.get("dt");
+        if (dataType) {
+            const dataTypeDict = {
+                "1": "Session Start",
+                "2": "Session End",
+                "3": "Screen View",
+                "4": "Custom Event",
+                "5": "Crash Report",
+                "6": "Opt Out",
+                "10": "App State Transition",
+                "14": "Profile Change Message",
+                "16": "Commerce Event",
+            };
+            let dataTypeValue = !!(dataTypeDict[dataType]) ? dataTypeDict[dataType] : dataType;
+            results.push({
+                "key":   "dtvalue",
+                "field": "Data Type Value",
+                "value": dataTypeValue,
+                "group": "general"
+            });    
+        }
+        
+        // Event Name (n) value parsed to requesttype
         let eventType = params.get("n");
         const eventDict = {
             "pageView" : "Page View",
@@ -272,14 +360,58 @@ class MparticleProvider extends BaseProvider {
             "2" : "Session End",
             "10": "State Transition"
         };
-
         let eventTypeValue = !!(eventDict[eventType]) ? eventDict[eventType] : eventType;
         results.push({
             "key":   "requestTypeParsed",
-            "field": "Event Type",
+            "field": "Request Type",
             "value": eventTypeValue,
             "group": "general"
         });
+
+        // uid
+        const identityTypeDict = {
+            "0": "other",
+            "1": "customerid",
+            "2": "facebook",
+            "3": "twitter",
+            "4": "google",
+            "5": "microsoft",
+            "6": "yahoo",
+            "7": "email",
+            "8": "facebookcustomaudienceid",
+            "9": "other2",
+            "10": "other3",
+            "11": "other4"
+        };
+
+        let uiArray = [];
+        for (let p of params.entries()) {
+            let k = p[0],
+                v = p[1];
+            if (k.indexOf("ui[") === 0) {
+                 uiArray.push(k);
+                 uiArray.push(v);
+            }
+        }
+        
+        let output = [];
+        uiArray.map( (e, idx) => {
+            if (idx === 0 || idx % 4 === 0) {
+                output.push([e, uiArray[idx+1], uiArray[idx+2], uiArray[idx+3]]);
+            }
+        });
+
+        output.forEach(e => {
+            let idValue = e.toString().split(",")[1];
+            let typeValue = e.toString().split(",")[3];
+            results.push({
+                "key":   identityTypeDict[typeValue] ? identityTypeDict[typeValue] : typeValue,
+                "field": `Identity: ${identityTypeDict[typeValue]} (${typeValue})`,
+                "value": idValue,
+                "group": "userattributes"
+            });
+        });
+
         return results;
     }
 } // class
