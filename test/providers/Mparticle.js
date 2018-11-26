@@ -111,23 +111,23 @@ test("Provider returns custom event types", t => {
         });
 
     t.is(typeof pv, "object", "pv data is an object");
-    t.is(pv.field, "Event Type", "Field is Event Type");
-    t.is(pv.value, "Page View", "Event Type has been parsed to Page View");
+    t.is(pv.field, "Request Type", "Field is Request Type");
+    t.is(pv.value, "Page View", "Request Type has been parsed to Page View");
     t.is(pv.group, "general");
     
     t.is(typeof ss, "object", "ss data is an object");
-    t.is(ss.field, "Event Type", "Field is Event Type");
-    t.is(ss.value, "Session Start", "Event Type has been parsed to Session Start");
+    t.is(ss.field, "Request Type", "Field is Request Type");
+    t.is(ss.value, "Session Start", "Request Type has been parsed to Session Start");
     t.is(ss.group, "general");  
 
     t.is(typeof se, "object", "se data is an object");
-    t.is(se.field, "Event Type", "Field is Event Type");
-    t.is(se.value, "Session End", "Event Type has been parsed to Session End");
+    t.is(se.field, "Request Type", "Field is Request Type");
+    t.is(se.value, "Session End", "Request Type has been parsed to Session End");
     t.is(se.group, "general");
 
     t.is(typeof st, "object", "st data is an object");
-    t.is(st.field, "Event Type", "Field is Event Type");
-    t.is(st.value, "State Transition", "Event Type has been parsed to State Transition");
+    t.is(st.field, "Request Type", "Field is Request Type");
+    t.is(st.value, "State Transition", "Request Type has been parsed to State Transition");
     t.is(st.group, "general");
 
 });
@@ -168,8 +168,8 @@ test("Provider returns custom attribute data", t => {
 
 test("Provider 'Other' column is empty", t => {
     let provider = new MparticleProvider(),
-        url = "https://jssdks.mparticle.com/v1/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
-        postData = '{"n":"pageView","et":0,"ua":{},"str":{"uid":{"Expires":"2028-10-27T14:46:21.1929245Z","Value":"g=0000000-0000-0000-0000-000000000&u=5750111232213572680&cr=00000000"}},"attrs":{"channel":"home","device":"Desktop","domain":"www.example.com","env":"production","ga":"GA1.2.12345678.12345678","gid":"GA1.2.123456789.12345678","hash":"","host":"www.example.com","mcvid":"123456789","metricsid":"ABCD123456789","pagename":"home","pathname":"/","querystring":"","url":"https://www.example.com/","userAgent":"Mozilla/5.0"},"sdk":"1.16.2","sid":"3D3E8F3E-CD2C-434C-B1CB-0AD8111D5328","dt":3,"dbg":true,"ct":1,"o":null,"eec":0,"av":null,"cgid":"c64af3a7-0000-0000-0000-00000000","das":"00000000-0000-0000-0000-0000000000","uic":false,"flags":{},"pb":{}}';
+        url = "https://jssdks.mparticle.com/v2/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
+        postData = '{"n":"Page View","et":0,"ua":{"Metro Code":"505","Rad":"50","$FirstName":"Valued","Membership Type":"abc","Store Credit Balance":"$0.00","User Seed":"123456789","ehid":"123456789","Hashed Email":"123456789abcdefgh","Call Chain":"11111112222223333","MCID":"1111111122222222223333333"},"ui":[{"Identity":"123456789","Type":0},{"Identity":"123456","Type":1},{"Identity":"user@example.com","Type":7},{"Identity":"123456789","Type":10}],"str":{},"attrs":{"URL":"https://www.example.com?product=1","Color Depth":24,"Pixel Depth":24,"ci_sku":"","kid":"","cid":123456},"sdk":"2.7.8","sid":"11111111-0000-0000-0000-CE8EDCB9AA5C","dt":3,"dbg":false,"ct":1543074201113,"lc":null,"o":null,"eec":0,"cgid":"11111111-0000-0000-0000-615c003c9e48","das":"11111111-0000-0000-0000-d6b4efb4e32a","mpid":"123456789123456789"}';
 
     let results = provider.parseUrl(url, postData); 
 
@@ -179,4 +179,143 @@ test("Provider 'Other' column is empty", t => {
 
     t.is(typeof other, 'undefined', "other variable is an undefined");
 
+});
+
+test("User Attributes group populates with ua parameters", t => {
+    let provider = new MparticleProvider(),
+        url = "https://jssdks.mparticle.com/v2/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
+        postData = '{"n":"Page View","et":0,"ua":{"Metro Code":"505","Rad":"50","$FirstName":"Valued","Membership Type":"abc","Store Credit Balance":"$0.00","User Seed":"123456789","ehid":"123456789","Hashed Email":"123456789abcdefgh","Call Chain":"11111112222223333","MCID":"1111111122222222223333333"},"ui":[{"Identity":"123456789","Type":0},{"Identity":"123456","Type":1},{"Identity":"user@example.com","Type":7},{"Identity":"123456789","Type":10}],"str":{},"attrs":{"URL":"https://www.example.com?product=1","Color Depth":24,"Pixel Depth":24,"ci_sku":"","kid":"","cid":123456},"sdk":"2.7.8","sid":"11111111-0000-0000-0000-CE8EDCB9AA5C","dt":3,"dbg":false,"ct":1543074201113,"lc":null,"o":null,"eec":0,"cgid":"11111111-0000-0000-0000-615c003c9e48","das":"11111111-0000-0000-0000-d6b4efb4e32a","mpid":"123456789123456789"}';
+
+    let results = provider.parseUrl(url, postData);
+    let ehid = results.data.find((result) => {
+            return result.key === "ua.ehid";
+        }),
+        userSeed = results.data.find((result) => {
+                    return result.key === "ua.User Seed";
+                });
+
+    t.is(typeof ehid, "object", "ehid data is an object");
+    t.is(ehid.field, "ehid", "ehid is field value, ua. has been stripped");
+    t.is(ehid.value, "123456789", "ehid value is home");
+    t.is(ehid.group, "userattributes", "ehid is in userattributes");
+
+    t.is(typeof userSeed, "object", "userSeed data is an object");
+    t.is(userSeed.field, "User Seed", "userSeed is field value, ua. has been stripped");
+    t.is(userSeed.value, "123456789", "userSeed value is 123456789");
+    t.is(userSeed.group, "userattributes", "userSeed is in userattributes");
+
+});
+
+test("User identity values use custom parsing", t => {
+    let provider = new MparticleProvider(),
+        url = "https://jssdks.mparticle.com/v2/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
+        postData = '{"n":"Page View","et":0,"ua":{"Metro Code":"505","Rad":"50","$FirstName":"Valued","Membership Type":"abc","Store Credit Balance":"$0.00","User Seed":"123456789","ehid":"123456789","Hashed Email":"123456789abcdefgh","Call Chain":"11111112222223333","MCID":"1111111122222222223333333"},"ui":[{"Identity":"123456789","Type":0},{"Identity":"123456","Type":1},{"Identity":"user@example.com","Type":7},{"Identity":"123456789","Type":10}],"str":{},"attrs":{"URL":"https://www.example.com?product=1","Color Depth":24,"Pixel Depth":24,"ci_sku":"","kid":"","cid":123456},"sdk":"2.7.8","sid":"11111111-0000-0000-0000-CE8EDCB9AA5C","dt":3,"dbg":false,"ct":1543074201113,"lc":null,"o":null,"eec":0,"cgid":"11111111-0000-0000-0000-615c003c9e48","das":"11111111-0000-0000-0000-d6b4efb4e32a","mpid":"123456789123456789"}';
+
+    let results = provider.parseUrl(url, postData);
+    
+    let customerid = results.data.find((result) => {
+        return result.key === "customerid";
+    }),
+        email = results.data.find((result) => {
+            return result.key === "email"
+    });
+
+    t.is(typeof customerid, "object", "customerid data is an object");
+    t.is(customerid.field, "Identity: customerid (1)", "Field value has been custom parsed to Identity: customerid (1)");
+    t.is(customerid.value, "123456", "customerid value is 123456");
+    t.is(customerid.group, "userattributes", "customerid is in userattributes");
+
+    t.is(typeof email, "object", "email data is an object");
+    t.is(email.field, "Identity: email (7)", "Field value has been custom parsed to Identity: email (7)");
+    t.is(email.value, "user@example.com", "email value is user@example.com");
+    t.is(email.group, "userattributes", "email is in userattributes");
+})
+
+test("uid param key not in identityDict still shows parsed", t => {
+    let provider = new MparticleProvider(),
+        url = "https://jssdks.mparticle.com/v2/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
+        badIDpostData = '{"n":"Page View","et":0,"ua":{"Metro Code":"505","Rad":"50","$FirstName":"Valued","Membership Type":"abc","Store Credit Balance":"$0.00","User Seed":"123456789","ehid":"123456789","Hashed Email":"123456789abcdefgh","Call Chain":"11111112222223333","MCID":"1111111122222222223333333"},"ui":[{"Identity":"123456789","Type":99},{"Identity":"123456","Type":1},{"Identity":"user@example.com","Type":7},{"Identity":"123456789","Type":10}],"str":{},"attrs":{"URL":"https://www.example.com?product=1","Color Depth":24,"Pixel Depth":24,"ci_sku":"","kid":"","cid":123456},"sdk":"2.7.8","sid":"11111111-0000-0000-0000-CE8EDCB9AA5C","dt":3,"dbg":false,"ct":1543074201113,"lc":null,"o":null,"eec":0,"cgid":"11111111-0000-0000-0000-615c003c9e48","das":"11111111-0000-0000-0000-d6b4efb4e32a","mpid":"123456789123456789"}';
+
+    let results = provider.parseUrl(url, badIDpostData);
+
+    let badId = results.data.find((result) => {
+        return result.key === "99";
+    });
+       
+    t.is(typeof badId, "object", "badId data is an object");
+    t.is(badId.field, "Identity: undefined (99)", "Field value has been custom parsed to Identity: undefined (99)");
+    t.is(badId.value, "123456789", "value is 123456789");
+    t.is(badId.group, "userattributes", "badId is in userattributes");  
+
+});
+
+
+test("Provider returns custom data types", t=> {
+    let provider = new MparticleProvider(),
+        url = "https://jssdks.mparticle.com/v2/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
+        postData = '{"n":"Page View","et":0,"ua":{"Metro Code":"505","Rad":"50","$FirstName":"Valued","Membership Type":"abc","Store Credit Balance":"$0.00","User Seed":"123456789","ehid":"123456789","Hashed Email":"123456789abcdefgh","Call Chain":"11111112222223333","MCID":"1111111122222222223333333"},"ui":[{"Identity":"123456789","Type":0},{"Identity":"123456","Type":1},{"Identity":"user@example.com","Type":7},{"Identity":"123456789","Type":10}],"str":{},"attrs":{"URL":"https://www.example.com?product=1","Color Depth":24,"Pixel Depth":24,"ci_sku":"","kid":"","cid":123456},"sdk":"2.7.8","sid":"11111111-0000-0000-0000-CE8EDCB9AA5C","dt":3,"dbg":false,"ct":1543074201113,"lc":null,"o":null,"eec":0,"cgid":"11111111-0000-0000-0000-615c003c9e48","das":"11111111-0000-0000-0000-d6b4efb4e32a","mpid":"123456789123456789"}',
+        badDtPostData = '{"dt": "99"}'
+
+    let results = provider.parseUrl(url, postData),
+        badResults = provider.parseUrl(url, badDtPostData);
+
+
+    let dtvalue = results.data.find((result) => {
+        return result.key === "dtvalue";
+    }),
+        dt = results.data.find((result) => {
+            return result.key === "dt";
+    });
+    let bdt = badResults.data.find((result) => {
+        return result.key === "dt";
+    }),
+        badDtValue = badResults.data.find((result) => {
+        return result.key === "dtvalue";
+    })
+
+    t.is(dt.value, "3", "unparsed data type is 3")
+    t.is(typeof dtvalue, "object", "dtvalue data is an object");
+    t.is(dtvalue.field, "Data Type Value", "Field value has been custom parsed to Data Type Value");
+    t.is(dtvalue.value, "Screen View", "value is Screen View");
+    t.is(dtvalue.group, "general", "dtvalue is in general"); 
+
+    t.is(typeof badDtValue, "object", "badDtValue data is an object");
+    t.is(badDtValue.field, "Data Type Value", "Field value has been custom parsed to Data Type Value");
+    t.is(badDtValue.value, "99", "value is remains unparsed as 99");
+    t.is(badDtValue.group, "general", "badDtValue is in general"); 
+});
+
+test("Provider returns custom event types (et)", t=> {
+    let provider = new MparticleProvider(),
+        url = "https://jssdks.mparticle.com/v2/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
+        postData = '{"n":"Page View","et":15,"ua":{"Metro Code":"505","Rad":"50","$FirstName":"Valued","Membership Type":"abc","Store Credit Balance":"$0.00","User Seed":"123456789","ehid":"123456789","Hashed Email":"123456789abcdefgh","Call Chain":"11111112222223333","MCID":"1111111122222222223333333"},"ui":[{"Identity":"123456789","Type":0},{"Identity":"123456","Type":1},{"Identity":"user@example.com","Type":7},{"Identity":"123456789","Type":10}],"str":{},"attrs":{"URL":"https://www.example.com?product=1","Color Depth":24,"Pixel Depth":24,"ci_sku":"","kid":"","cid":123456},"sdk":"2.7.8","sid":"11111111-0000-0000-0000-CE8EDCB9AA5C","dt":3,"dbg":false,"ct":1543074201113,"lc":null,"o":null,"eec":0,"cgid":"11111111-0000-0000-0000-615c003c9e48","das":"11111111-0000-0000-0000-d6b4efb4e32a","mpid":"123456789123456789"}',
+        badEtPostData = '{"et":"99"}';
+
+    let results = provider.parseUrl(url, postData),
+        badResults = provider.parseUrl(url, badEtPostData);
+
+    let etvalue = results.data.find((result) => {
+        return result.key === "etParsed";
+    }),
+        et = results.data.find((result) => {
+            return result.key === "et";
+    });
+
+    let badEtValue = badResults.data.find((result) => {
+        return result.key === "etParsed";
+    }),
+        badEt = badResults.data.find((result) => {
+            return result.key === 'et';
+    });    
+
+    t.is(typeof badEtValue, "object", "badEtValue data is an object");
+    t.is(badEtValue.field, "Event Type Value", "Field value has been custom parsed to Event Type Value");
+    t.is(badEtValue.value, "99", "value is remains unparsed as 99");
+    t.is(badEtValue.group, "general", "badEtValue is in general");
+
+    t.is(et.value, "15", "unparsed event type is 15")
+    t.is(typeof etvalue, "object", "etvalue data is an object");
+    t.is(etvalue.field, "Event Type Value", "Field value has been custom parsed to Event Type Value");
+    t.is(etvalue.value, "ProductViewDetail", "value is ProductViewDetail");
+    t.is(etvalue.group, "general", "etvalue is in general"); 
 });
