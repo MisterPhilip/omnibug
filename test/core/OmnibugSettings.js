@@ -62,6 +62,21 @@ test("OmnibugSettings should save objects", t => {
     t.deepEqual(savedSettings, finalObject);
 });
 
+test("OmnibugSettings should save a single object", async t => {
+
+    chrome.storage.sync.get.yields({"##OMNIBUG_KEY##": {
+        "highlightKeys": ["foo", "bar"],
+        "providers": {}
+    }});
+
+    let settings = new OmnibugSettings(),
+        savedSettings = await settings.updateItem("highlightKeys", ["foo", "bar"]),
+        finalObject = JSON.parse(JSON.stringify(settings.defaults));
+    finalObject.highlightKeys = ["foo", "bar"];
+
+    t.deepEqual(savedSettings, finalObject);
+});
+
 test("OmnibugSettings should restore to defaults", t => {
     let settings = new OmnibugSettings(),
         savedSettings = settings.save({
