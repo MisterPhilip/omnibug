@@ -7,7 +7,10 @@ the details of the request
 
 For further details, see the [main project page](https://omnibug.io/) or check out [our blog](https://omnibug.io/blog/).
 
-
 ## Get it
 [Chrome](https://chrome.google.com/webstore/detail/omnibug/bknpehncffejahipecakbfkomebjmokl) or
 [Firefox](https://addons.mozilla.org/en-US/firefox/addon/omnibug/)
+
+## Contributing
+We're always looking for contributors to the project! Whether you're a developer wanting to add new features, or a 
+platform looking to add their tool to Omnibug, we're excited for your input. You can learn more on our [contributing page](CONTRIBUTING.md).
