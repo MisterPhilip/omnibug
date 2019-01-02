@@ -151,14 +151,14 @@
         </div>
     </div>
 
-    <div class="d-none" id="context-menu">
-        <ul class="menu">
+    <template id="context-menu-template">
+        <ul class="menu context-menu">
             <li class="divider" data-content="Options"></li>
-            <li class="menu-item"><a href="#" data-parameter="" data-context-menu>Highlight <span class="context-menu-parameter-key-pair"></span></a></li>
-            <li class="menu-item"><a href="#" data-parameter="" data-context-menu>Watch <span class="context-menu-parameter-name"></span>'s value</a></li>
-            <li class="menu-item"><a href="#" data-parameter="" data-context-menu>Copy <span class="context-menu-parameter-name"></span>'s value</a></li>
+            <li class="menu-item"><a href="#" data-parameter="" data-context-menu="highlight"><span class="context-menu-highlight-action">Highlight</span> <span class="context-menu-parameter-key-pair"></span></a></li>
+            <li class="menu-item"><a href="#" data-parameter="" data-context-menu="watch">Watch <span class="context-menu-parameter-name"></span>'s value</a></li>
+            <li class="menu-item"><a href="#" data-parameter="" data-context-menu="copy" data-value="">Copy <span class="context-menu-parameter-name"></span>'s value</a></li>
         </ul>
-    </div>
+    </template>
 
     <script src="../providers.js"></script>
     <script src="../libs/OmnibugSettings.js"></script>

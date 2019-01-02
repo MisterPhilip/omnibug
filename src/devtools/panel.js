@@ -87,6 +87,10 @@ window.Omnibug = (() => {
     });
 
     d.addEventListener('contextmenu', function(e) {
+        let contextMenu = d.querySelector(".context-menu");
+        if(contextMenu) {
+            contextMenu.remove();
+        }
         let tableRow = e.target.closest("tr[data-parameter-key]");
         if(tableRow) {
             console.log("contextmenu", tableRow.getBoundingClientRect());
@@ -97,25 +101,69 @@ window.Omnibug = (() => {
                 parameterName = tableRow.querySelector(".parameter-field").innerText,
                 parameterValue = tableRow.querySelector(".parameter-value");
 
-            let popover = d.getElementById("context-menu");
-            popover.classList.remove("d-none");
+            let popoverTemplate = d.getElementById("context-menu-template"),
+                popover = d.importNode(popoverTemplate.content, true);
+
+            popover.querySelectorAll(`[data-parameter]`).forEach((el) => {
+                el.setAttribute("data-parameter", parameterKey);
+            });
             popover.querySelectorAll(".context-menu-parameter-key-pair").forEach((elem) => {
                 elem.innerText = `${parameterName} (${parameterKey})`;
             });
             popover.querySelectorAll(".context-menu-parameter-name").forEach((elem) => {
                 elem.innerText = parameterName;
             });
+            popover.querySelector(`[data-context-menu="copy"]`).setAttribute("data-value", parameterValue.innerText);
+            if(settings.highlightKeys.indexOf(parameterKey) !== -1) {
+                popover.querySelector(".context-menu-highlight-action").innerText = "Un-highlight";
+            }
             parameterValue.appendChild(popover);
         }
     });
     d.addEventListener("click", function(e) {
-        if(!e.target.hasAttribute("data-context-menu")) {
-            let popover = d.getElementById("context-menu");
-            popover.classList.add("d-none");
+        if(e.target.hasAttribute("data-context-menu") || (e.target.parentNode && e.target.parentNode.hasAttribute("data-context-menu"))) {
+            let item = (e.target.hasAttribute("data-context-menu")) ? e.target : e.target.parentNode,
+                action = item.getAttribute("data-context-menu"),
+                parameterKey = item.getAttribute("data-parameter");
+
+            if(action === "highlight") {
+                let keys = settings.highlightKeys;
+                if(keys.indexOf(parameterKey) !== -1) {
+                    keys = keys.filter((param => param !== parameterKey));
+                } else {
+                    keys.push(parameterKey);
+                }
+                Omnibug.send_message({
+                    "type": "settings",
+                    "key": "highlightKeys",
+                    "value": keys
+                });
+            } else if(action === "watch") {
+                // @TODO: do something with watch here
+            } else if(action === "copy") {
+                let element = createElement("textarea");
+                element.textContent = item.getAttribute("data-value");
+                d.body.appendChild(element);
+                try {
+                    element.select();
+                    if(document.execCommand('copy')) {
+                        // @TODO: show success message
+                        console.log("copied (or so we think)");
+                    } else {
+                        console.warn("failed");
+                    }
+                } catch(e) {
+                    console.error("really failed", e);
+                } finally {
+                    element.remove();
+                }
+            }
+        }
+        let contextMenu = d.querySelector(".context-menu");
+        if(contextMenu) {
+            contextMenu.remove();
         }
     });
-
-
 
     // Add our listener for the account filter
     let filterAccount = d.getElementById("filter-account"),
