@@ -93,15 +93,12 @@ window.Omnibug = (() => {
         }
         let tableRow = e.target.closest("tr[data-parameter-key]");
         if(tableRow) {
-            console.log("contextmenu", tableRow.getBoundingClientRect());
-
-            // This was a right click on a data row
             e.preventDefault();
             let parameterKey = tableRow.getAttribute("data-parameter-key"),
                 parameterName = tableRow.querySelector(".parameter-field").innerText,
                 parameterValue = tableRow.querySelector(".parameter-value");
 
-            let popoverTemplate = d.getElementById("context-menu-template"),
+            let popoverTemplate = d.getElementById("row-context-menu-template"),
                 popover = d.importNode(popoverTemplate.content, true);
 
             popover.querySelectorAll(`[data-parameter]`).forEach((el) => {
@@ -138,30 +135,27 @@ window.Omnibug = (() => {
                     "key": "highlightKeys",
                     "value": keys
                 });
+                showToast("Preferences updated.", "success", 5);
             } else if(action === "watch") {
                 // @TODO: do something with watch here
             } else if(action === "copy") {
-                let element = createElement("textarea");
-                element.textContent = item.getAttribute("data-value");
-                d.body.appendChild(element);
-                try {
-                    element.select();
-                    if(document.execCommand('copy')) {
-                        // @TODO: show success message
-                        console.log("copied (or so we think)");
-                    } else {
-                        console.warn("failed");
-                    }
-                } catch(e) {
-                    console.error("really failed", e);
-                } finally {
-                    element.remove();
+                if(copyTextToClipboard(item.getAttribute("data-value"))) {
+                    showToast("Value copied to the clipboard.", "success", 5);
+                } else {
+                    showToast("Unable to copy to the clipboard.", "error");
                 }
             }
         }
         let contextMenu = d.querySelector(".context-menu");
         if(contextMenu) {
             contextMenu.remove();
+        }
+    });
+
+    // Toasts
+    document.getElementById("toasts").addEventListener("click", (event) => {
+        if(event.target.classList.contains("btn-clear")) {
+            event.target.parentNode.remove();
         }
     });
 
