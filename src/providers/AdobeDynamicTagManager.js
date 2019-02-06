@@ -17,6 +17,18 @@ class AdobeDynamicTagManagerProvider extends BaseProvider
     }
 
     /**
+     * Retrieve the column mappings for default columns (account, event type)
+     *
+     * @return {{}}
+     */
+    get columnMapping()
+    {
+        return {
+            "account":      "environment",
+        };
+    }
+
+    /**
      * Retrieve the group names & order
      *
      * @returns {*[]}
