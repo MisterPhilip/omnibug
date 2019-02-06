@@ -44,10 +44,15 @@ test("OmnibugProvider returns Adobe Launch", t => {
 
 test("AdobeLaunchProvider returns custom data", t => {
     let provider = new AdobeLaunchProvider(),
+        developmentUrl = "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176-development.min.js",
         stagingUrl = "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176-staging.min.js",
         prodUrl = "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176.min.js",
+        developmentResults = provider.parseUrl(developmentUrl),
         stagingResults = provider.parseUrl(stagingUrl),
         prodResults = provider.parseUrl(prodUrl),
+        developmentEnv = developmentResults.data.find((result) => {
+            return result.key === "environment";
+        }),
         stagingEnv = stagingResults.data.find((result) => {
             return result.key === "environment";
         }),
@@ -55,6 +60,8 @@ test("AdobeLaunchProvider returns custom data", t => {
             return result.key === "environment";
         });
 
+    t.is(typeof developmentEnv, "object");
+    t.is(developmentEnv.value, "development");
     t.is(typeof stagingEnv, "object");
     t.is(stagingEnv.value, "staging");
     t.is(typeof prodEnv, "object");
