@@ -1,0 +1,30 @@
+$iconPath: "../assets/images/icons/";
+
+$icons: (
+    "Adobe Analytics": $iconPath + "ADOBEANALYTICS16x16.png",
+    "Adobe Audience Manager": $iconPath + "ADOBEAUDIENCEMANAGER16x16.png",
+    "Adobe Dynamic Tag Manager": $iconPath + "ADOBEDYNAMICTAGMANAGER16x16.png",
+    "Adobe Heartbeat": $iconPath + "ADOBEHEARTBEAT16x16.png",
+    "Adobe Launch": $iconPath + "ADOBELAUNCH16x16.png", 
+    "Adobe Target": $iconPath + "ADOBETARGET16x16.png",
+    "Ensighten Manage": $iconPath + "ENSIGHTEN16x16.png",
+    "Facebook Pixel": $iconPath + "FACEBOOK16x16.png",
+    "Google Tag Manager": $iconPath + "GOOGLETAGMANAGER16x16.png",
+    "Mparticle": $iconPath + "MPARTICLE16x16.png",
+    "Optimizely X": $iconPath + "OPTIMIZELY16x16.png",
+    "Segment": $iconPath + "SEGMENT16x16.png",
+    "Tealium IQ": $iconPath + "TEALIUM16x16.png",
+    "Universal Analytics": $iconPath + "GOOGLEANALYTICS16x16.png"    
+);
+
+@mixin iconRule($title, $path) {
+    &[title="#{$title}"]::before {
+       content: url($path);
+     } 
+}
+
+
+
+    
+
+
