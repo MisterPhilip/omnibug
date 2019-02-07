@@ -1,6 +1,7 @@
 @import "../assets/styles/base";
 @import "../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
 @import "../../node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
+@import "../assets/styles/icons";
 
 html, body {
   height: 100%;
@@ -61,6 +62,7 @@ nav.navbar {
     z-index: 100;
 
     .container {
+      height: 21px;
       margin-top: -1.5em;
       margin-left: .75em;
     }
@@ -376,3 +378,14 @@ body.dark {
     background-color: darken($dark-body-background-color, 5%);
   }
 }
+
+span {
+  &[title]::before {
+    padding: 0.5em;
+    vertical-align: sub;
+  }
+
+  @each $title, $path in $icons {
+    @include iconRule($title, $path)
+    }
+}    
