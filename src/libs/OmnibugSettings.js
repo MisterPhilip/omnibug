@@ -88,7 +88,10 @@ class OmnibugSettings
             color_quotes      : "#ff0000",
             color_highlight   : "#ffff00",
             color_redirect    : "#eeeeee",
-            color_hover       : "#cccccc"
+            color_hover       : "#cccccc",
+
+            // provider icons
+            providerIcons: true
         };
     }
 

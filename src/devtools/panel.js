@@ -746,6 +746,11 @@ window.Omnibug = (() => {
         } else {
             document.body.classList.remove("dark");
         }
+
+        // Show/Hide provider icons
+        if (!settings.providerIcons) {
+            styleSheet.sheet.insertRule(`.label + span::before {content: "";}`);
+        }
     }
 
     /**
@@ -884,5 +889,4 @@ window.Omnibug = (() => {
             // do nothing, let the devtools.js update this method
         }
     };
-
 })();
