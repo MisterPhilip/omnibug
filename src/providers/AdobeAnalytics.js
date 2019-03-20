@@ -11,7 +11,7 @@ class AdobeAnalyticsProvider extends BaseProvider
     {
         super();
         this._key        = "ADOBEANALYTICS";
-        this._pattern    = /\/b\/ss\/|\.2o7\.net\/|\.sc\d?\.omtrdc\.net\/(?!id)/;
+        this._pattern    = /^([^#?]+)(\/b\/ss\/)|\.2o7\.net\/|\.sc\d?\.omtrdc\.net\/(?!id)/;
         this._name       = "Adobe Analytics";
         this._type       = "analytics";
     }
@@ -102,10 +102,6 @@ class AdobeAnalyticsProvider extends BaseProvider
             },
             "g": {
                 "name": "Current URL",
-                "group": "general"
-            },
-            "j": {
-                "name": "JavaScript version",
                 "group": "general"
             },
             "bw": {
@@ -401,6 +397,7 @@ class AdobeAnalyticsProvider extends BaseProvider
     {
         let results = [],
             rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//),
+            jsVersion = url.pathname.match(/\/(JS-[^\/]+)\//i),
             pev2 = params.get("pe"),
             requestType = "Page View";
         if(rsid) {
@@ -411,6 +408,20 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "group": this.keys.rsid ? this.keys.rsid.group : "general",
             });
         }
+        if(jsVersion) {
+            results.push({
+                "key":   "version",
+                "field": this.keys.version ? this.keys.version.name : "JavaScript Version",
+                "value": jsVersion[1],
+                "group": this.keys.version ? this.keys.version.group : "general",
+            });
+        }
+        results.push({
+            "key":   "trackingServer",
+            "field": "Tracking Server",
+            "value": url.hostname,
+            "group": "general",
+        });
 
         // Handle s.tl calls
         if(pev2 === "lnk_e") {
