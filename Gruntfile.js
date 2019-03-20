@@ -405,7 +405,7 @@ module.exports = function(grunt) {
         grunt.config.set("concat.providers-test-individual", {
             "options": {
                 "banner":  "const { URL } = require(\"url\");\n" +
-                            "const URLSearchParams = require(\"url-search-params\");\n",
+                            "const URLSearchParams = require(\"@ungap/url-search-params\");\n",
                 "process": function(source, filepath) {
                     var className = filepath.replace("./src/providers/", "").split(".")[0],
                         exportString = "";
@@ -454,7 +454,7 @@ module.exports = function(grunt) {
         grunt.config.set("concat.providers-test", {
             "options": {
                 "banner":   "const { URL } = require(\"url\");\n" +
-                "var URLSearchParams = require(\"url-search-params\");\n",
+                "var URLSearchParams = require(\"@ungap/url-search-params\");\n",
                 "footer": `\n${providerInclude.join("\n")}\nexport { OmnibugProvider };`
             },
             "files": {

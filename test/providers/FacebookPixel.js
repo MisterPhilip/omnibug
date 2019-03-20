@@ -11,7 +11,7 @@ test("FacebookPixelProvider returns provider information", t => {
     t.true(typeof provider.pattern === 'object' && provider.pattern instanceof RegExp, "Pattern should be a RegExp value");
 });
 
-test("FacebookPixelProvider pattern should match various UA domains", t => {
+test("FacebookPixelProvider pattern should match various FB domains", t => {
     let provider = new FacebookPixelProvider(),
         urls = [
             "http://www.facebook.com/tr/?id=123456&",
@@ -29,14 +29,6 @@ test("FacebookPixelProvider pattern should match various UA domains", t => {
 
 test("OmnibugProvider returns FacebookPixelProvider", t => {
     let url = "https://www.facebook.com/tr/?id=123456&ev=Purchase&dl=http%3A%2F%2Flocalhost%2Fomnibug%2Fproviders%2Ffacebook-pixel%2F&rl=&if=false&ts=1530050173791&cd[contents]=%5B%7B%22id%22%3A%221234%22%2C%22quantity%22%3A2%2C%22item_price%22%3A10%7D%2C%7B%22id%22%3A%224642%22%2C%22quantity%22%3A1%2C%22item_price%22%3A5%7D%5D&cd[content_type]=product&cd[value]=25&cd[currency]=USD&sw=2560&sh=1440&v=2.8.18&r=stable&ec=4&o=28&it=1530050173751";
-
-    let results = OmnibugProvider.parseUrl(url);
-    t.true(typeof results === "object" && results !== null, "Results is a non-null object");
-    t.is(results.provider.key, "FACEBOOKPIXEL", "Results provider is Facebook Pixel");
-});
-
-test("OmnibugProvider returns FacebookPixelProvider", t => {
-    let url = "https://www.facebook.com/tr/?id=123456&dl=http%3A%2F%2Flocalhost%2Fomnibug%2Fproviders%2Ffacebook-pixel%2F&rl=&if=false&ts=1530050173791&cd[contents]=%5B%7B%22id%22%3A%221234%22%2C%22quantity%22%3A2%2C%22item_price%22%3A10%7D%2C%7B%22id%22%3A%224642%22%2C%22quantity%22%3A1%2C%22item_price%22%3A5%7D%5D&cd[content_type]=product&cd[value]=25&cd[currency]=USD&sw=2560&sh=1440&v=2.8.18&r=stable&ec=4&o=28&it=1530050173751";
 
     let results = OmnibugProvider.parseUrl(url);
     t.true(typeof results === "object" && results !== null, "Results is a non-null object");

@@ -34,7 +34,7 @@ test("AdobeTargetProvider pattern should match Adobe Target domains", t => {
     });
 });
 
-test("OmnibugProvider returns AdobeAnalytics", t => {
+test("OmnibugProvider returns AdobeTarget", t => {
     let url = "http://omnibug.tt.omtrdc.net/m2/omnibug/mbox/standard?mboxHost=omnibug.io&mbox=foobar";
 
     let results = OmnibugProvider.parseUrl(url);
@@ -53,17 +53,12 @@ test("AdobeTargetProvider returns static data", t => {
     t.true(results.data.length > 0, "Data should be returned");
 });
 
-test("AdobeTargetProvider returns static data", t => {
+test("AdobeTargetProvider returns host data", t => {
     let provider = new AdobeTargetProvider(),
         url = "http://omnibug.tt.omtrdc.net/m2/omnibug/mbox/standard?mboxHost=omnibug.io&mbox=foobar";
 
-    let results = provider.parseUrl(url);
-
-    t.is(typeof results.provider, "object", "Results should have provider information");
-    t.is(results.provider.key, "ADOBETARGET", "Results provider is Adobe Target");
-    t.is(typeof results.data, "object", "Results should have data");
-
-    let mboxHost = results.data.find((result) => {
+    let results = provider.parseUrl(url),
+        mboxHost = results.data.find((result) => {
         return result.key === "mboxHost";
     });
     t.is(mboxHost.field, "Page Host", "Page Host should be returned");

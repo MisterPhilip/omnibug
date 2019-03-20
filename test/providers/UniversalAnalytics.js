@@ -38,14 +38,6 @@ test("OmnibugProvider returns UniversalAnalytics", t => {
     t.is(results.provider.key, "UNIVERSALANALYTICS", "Results provider is Universal Analytics");
 });
 
-test("OmnibugProvider returns UniversalAnalytics", t => {
-    let url = "https://www.google-analytics.com/r/collect?v=1&_v=j68&a=1805905905&t=pageview&_s=1&dl=https%3A%2F%2Fomnibug.io%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=2560x1440&vp=2560x1307&je=0&_u=KCDAAUIh~&jid=441640597&gjid=200209851&cid=191425359.1527202446&tid=UA-17508125-8&_gid=401227809.1529009937&_r=1&gtm=u64&z=1617633316";
-
-    let results = OmnibugProvider.parseUrl(url);
-    t.true(typeof results === "object" && results !== null, "Results is a non-null object");
-    t.is(results.provider.key, "UNIVERSALANALYTICS", "Results provider is Universal Analytics");
-});
-
 test("UniversalAnalyticsProvider returns static data", t => {
     let provider = new UniversalAnalyticsProvider(),
         url = "https://www.google-analytics.com/r/collect?v=1&_v=j68&a=1805905905&t=pageview&_s=1&dl=https%3A%2F%2Fomnibug.io%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=2560x1440&vp=2560x1307&je=0&_u=KCDAAUIh~&jid=441640597&gjid=200209851&cid=191425359.1527202446&tid=UA-17508125-8&_gid=401227809.1529009937&_r=1&gtm=u64&z=1617633316";
