@@ -273,7 +273,7 @@ test("Provider returns custom data types", t=> {
         return result.key === "dtvalue";
     })
 
-    t.is(dt.value, "3", "unparsed data type is 3")
+    t.is(dt.value.toString(), "3", "unparsed data type is 3");
     t.is(typeof dtvalue, "object", "dtvalue data is an object");
     t.is(dtvalue.field, "Data Type Value", "Field value has been custom parsed to Data Type Value");
     t.is(dtvalue.value, "Screen View", "value is Screen View");
@@ -310,10 +310,10 @@ test("Provider returns custom event types (et)", t=> {
 
     t.is(typeof badEtValue, "object", "badEtValue data is an object");
     t.is(badEtValue.field, "Event Type Value", "Field value has been custom parsed to Event Type Value");
-    t.is(badEtValue.value, "99", "value is remains unparsed as 99");
+    t.is(badEtValue.value.toString(), "99", "value is remains unparsed as 99");
     t.is(badEtValue.group, "general", "badEtValue is in general");
 
-    t.is(et.value, "15", "unparsed event type is 15")
+    t.is(et.value.toString(), "15", "unparsed event type is 15");
     t.is(typeof etvalue, "object", "etvalue data is an object");
     t.is(etvalue.field, "Event Type Value", "Field value has been custom parsed to Event Type Value");
     t.is(etvalue.value, "ProductViewDetail", "value is ProductViewDetail");
