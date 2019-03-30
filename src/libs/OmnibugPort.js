@@ -82,6 +82,8 @@ class OmnibugPort
                     } else {
                         this._settings.save(message.value);
                     }
+                } else if(message.type === "linkClick") {
+                    chrome.tabs.create({url: message.url});
                 }
             });
         });

@@ -160,6 +160,13 @@ window.Omnibug = (() => {
                 contextMenu.remove();
             }
         }
+        if(e.target.tagName === "A" && e.target.hasAttribute("target") && e.target.getAttribute("target") === "_blank") {
+            e.preventDefault();
+            Omnibug.send_message({
+                "type": "linkClick",
+                "url": e.target.getAttribute("href")
+            });
+        }
     });
 
     // Toasts
