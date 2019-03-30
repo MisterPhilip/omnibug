@@ -11,20 +11,35 @@ body {
   margin: 0 auto;
   color: $body-font-color;
   background-color: $body-background-color;
-  padding-top: 37px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 body > header, nav.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 37px;
 }
 body > main {
-  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+body > main > section {
+  flex: 1;
+}
+body > main > footer {
+  width: 100%;
+  text-align: center;
+  color: #999;
+}
+body > main > footer p {
+  margin: 0;
+  padding: .4em 0;
+}
+body > main > footer a {
+  color: lighten($primary-color, 15%);
 }
 details > summary {
   -moz-user-select: none;
