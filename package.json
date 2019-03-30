@@ -23,7 +23,10 @@
       "testOptions": {
         "presets": [
           [
-            "module:ava/stage-4", {"modules": false}
+            "module:ava/stage-4",
+            {
+              "modules": false
+            }
           ]
         ]
       }
@@ -101,13 +104,13 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-syntax-import-meta": "^7.2.0",
     "@babel/register": "^7.4.0",
-    "@fortawesome/fontawesome-free": "^5.8.0",
+    "@fortawesome/fontawesome-free": "^5.8.1",
     "@ungap/url-search-params": "^0.1.0",
-    "ava": "^1.3.1",
+    "ava": "^1.4.1",
     "babel-plugin-istanbul": "^5.1.1",
     "browser-env": "^3.2.6",
     "coveralls": "^3.0.3",
-    "grunt": "^1.0.3",
+    "grunt": "^1.0.4",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-concat": "^1.0.1",
@@ -121,7 +124,7 @@
   "homepage": "https://omnibug.io/",
   "dependencies": {
     "@babel/preset-stage-2": "^7.0.0",
-    "esm": "^3.2.18",
+    "esm": "^3.2.22",
     "grunt-sass": "^2.1.0",
     "jshint-html-reporter": "^0.2.5",
     "node-sass": "^4.11",
