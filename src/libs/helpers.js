@@ -69,3 +69,48 @@ const clearChildren = (element) => {
         element.removeChild(element.firstChild);
     }
 };
+
+/**
+ * Copy text to the clipboard
+ *
+ * @param text
+ * @returns {boolean}
+ */
+const copyTextToClipboard = (text) => {
+    let element = createElement("textarea");
+    element.textContent = text;
+    document.body.appendChild(element);
+    try {
+        element.select();
+        return document.execCommand('copy');
+    } catch(e) {
+        console.error("copying failed:", e);
+        return false;
+    } finally {
+        element.remove();
+    }
+};
+
+/**
+ * Show toast message
+ *
+ * @param message
+ * @param type
+ * @param timeout
+ */
+const showToast = (message, type = "primary", timeout = 10) => {
+    if(["primary", "success", "warning", "error"].indexOf(type) === -1) {
+        type = "primary";
+    }
+    let wrapper = document.getElementById("toasts"),
+        toastTemplate = document.getElementById("toast-template"),
+        toast = document.importNode(toastTemplate.content, true),
+        toastDiv = toast.querySelector(".toast");
+
+    toast.querySelector("span").innerText = message;
+    toastDiv.classList.add(`toast-${type}`);
+    wrapper.appendChild(toast);
+    window.setTimeout(() => {
+        toastDiv.remove();
+    }, timeout * 1000);
+};

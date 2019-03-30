@@ -150,6 +150,25 @@
             </div>
         </div>
     </div>
+
+    <div id="toasts"></div>
+
+    <template id="toast-template">
+        <div class="toast">
+            <button class="btn btn-clear float-right"></button>
+            <span></span>
+        </div>
+    </template>
+
+    <template id="row-context-menu-template">
+        <ul class="menu context-menu">
+            <li class="divider" data-content="Options"></li>
+            <li class="menu-item"><a href="#" data-parameter="" data-context-menu="highlight"><span class="context-menu-highlight-action">Highlight</span> <span class="context-menu-parameter-key-pair"></span></a></li>
+            <!--<li class="menu-item"><a href="#" data-parameter="" data-context-menu="watch">Watch <span class="context-menu-parameter-name"></span>'s value</a></li>-->
+            <li class="menu-item"><a href="#" data-parameter="" data-context-menu="copy" data-value="">Copy <span class="context-menu-parameter-name"></span>'s value</a></li>
+        </ul>
+    </template>
+
     <script src="../providers.js"></script>
     <script src="../libs/OmnibugSettings.js"></script>
     <script src="../libs/OmnibugTracker.js"></script>

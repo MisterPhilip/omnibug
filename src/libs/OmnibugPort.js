@@ -4,10 +4,17 @@
 /* exported OmnibugPort */
 class OmnibugPort
 {
-    constructor(details)
+    /**
+     * New OmnibugPort
+     *
+     * @param details   Tab details, as provided by the browser
+     * @param settings  OmnibugSettings object
+     */
+    constructor(details, settings)
     {
         this._name = details.name;
         this._port = details;
+        this._settings = settings;
     }
 
     /**
@@ -66,9 +73,17 @@ class OmnibugPort
             delete tabs[this.id];
         });
 
-        // logs messages from the port (in the background page's console!)
-        this.port.onMessage.addListener((msg) => {
-            console.log("Message from port[" + this.id + "]: ", msg);
+        this.port.onMessage.addListener((messages) => {
+            console.log("Message(s) from port[" + this.id + "]: ", messages);
+            messages.forEach((message) => {
+                if(message.type === "settings") {
+                    if(typeof message.key === "string" && message.value) {
+                        this._settings.updateItem(message.key, message.value);
+                    } else {
+                        this._settings.save(message.value);
+                    }
+                }
+            });
         });
 
         return tabs;

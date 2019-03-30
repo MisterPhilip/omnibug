@@ -50,11 +50,9 @@
     chrome.runtime.onConnect.addListener(async(details) => {
         console.log("chrome.runtime.onConnect", details);
         if(!cached.pattern) {
-            /*let loadedSettings = await settings.load();
-            setCachedSettings(loadedSettings);*/
             settings.load().then(setCachedSettings);
         }
-        let port = new OmnibugPort(details);
+        let port = new OmnibugPort(details, settings);
         if(!port.belongsToOmnibug)
         {
             return;
