@@ -103,18 +103,14 @@ const showToast = (message, type = "primary", timeout = 10) => {
         type = "primary";
     }
     let wrapper = document.getElementById("toasts"),
-        close = createElement("button", {
-            "classes": ["btn", "btn-clear", "float-right"]
-        }),
-        text = createElement("span", {
-            "text": message
-        }),
-        toast = createElement("div", {
-            "children": [close, text],
-            "classes": ["toast", `toast-${type}`]
-        });
+        toastTemplate = document.getElementById("toast-template"),
+        toast = document.importNode(toastTemplate.content, true),
+        toastDiv = toast.querySelector(".toast");
+
+    toast.querySelector("span").innerText = message;
+    toastDiv.classList.add(`toast-${type}`);
     wrapper.appendChild(toast);
     window.setTimeout(() => {
-        toast.remove();
+        toastDiv.remove();
     }, timeout * 1000);
 };

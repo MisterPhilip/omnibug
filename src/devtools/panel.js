@@ -124,11 +124,14 @@ window.Omnibug = (() => {
                 parameterKey = item.getAttribute("data-parameter");
 
             if(action === "highlight") {
-                let keys = settings.highlightKeys;
+                let keys = settings.highlightKeys,
+                    highlightType = "";
                 if(keys.indexOf(parameterKey) !== -1) {
                     keys = keys.filter((param => param !== parameterKey));
+                    highlightType = "un-highlight";
                 } else {
                     keys.push(parameterKey);
+                    highlightType = "highlight";
                 }
                 Omnibug.send_message({
                     "type": "settings",
@@ -136,17 +139,20 @@ window.Omnibug = (() => {
                     "value": keys
                 });
                 showToast("Preferences updated.", "success", 5);
+                tracker.track(["send", "event", "context menu", highlightType, parameterKey]);
             } else if(action === "watch") {
                 // @TODO: do something with watch here
             } else if(action === "copy") {
                 if(copyTextToClipboard(item.getAttribute("data-value"))) {
                     showToast("Value copied to the clipboard.", "success", 5);
+                    tracker.track(["send", "event", "context menu", "copy", "success"]);
                 } else {
                     showToast("Unable to copy to the clipboard.", "error");
+                    tracker.track(["send", "event", "context menu", "copy", "error"]);
                 }
             }
         }
-        let contextMenu = d.querySelector(".context-menu");
+        let contextMenu = e.target.closest(".context-menu");
         if(contextMenu) {
             contextMenu.remove();
         }
