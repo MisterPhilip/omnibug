@@ -11,6 +11,7 @@ $dark-body-background-color:    #242424;
 $dark-body-background-alt-color: #333;
 $dark-body-font-color:          #999;
 
+
 $font-size:   14px;
 
 $base-font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
@@ -18,6 +19,10 @@ $base-font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
 $fa-font-path: "../assets/fonts";
 
 @import "../../../node_modules/spectre.css/src/spectre";
+
+$success-color-dark: darken($success-color, 20%);
+$warning-color-dark: darken($warning-color, 20%);
+$error-color-dark: darken($error-color, 20%);
 
 @font-face {
   font-family: 'Source Sans Pro';

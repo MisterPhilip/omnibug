@@ -146,7 +146,9 @@ window.Omnibug = (() => {
                 } else if(action === "watch") {
                     // @TODO: do something with watch here
                 } else if(action === "copy") {
-                    if(copyTextToClipboard(item.getAttribute("data-value"))) {
+                    if(item.getAttribute("data-value") === "") {
+                        showToast("Value is empty, nothing to copy!", "warning", 5);
+                    } else if(copyTextToClipboard(item.getAttribute("data-value"))) {
                         showToast("Value copied to the clipboard.", "success", 5);
                         tracker.track(["send", "event", "context menu", "copy", "success"]);
                     } else {
@@ -155,8 +157,8 @@ window.Omnibug = (() => {
                     }
                 }
             }
-            let contextMenu = e.target.closest(".context-menu");
-            if(contextMenu) {
+            let contextMenu = d.querySelector(".context-menu");
+            if (contextMenu) {
                 contextMenu.remove();
             }
         }
@@ -654,9 +656,12 @@ window.Omnibug = (() => {
                     "classes": ["parameter-field"],
                     "text": row.field
                 }),
+                valueSpan = createElement("span", {
+                    "text": row.value
+                }),
                 value = createElement("td", {
                     "classes": ["parameter-value"],
-                    "text": row.value
+                    "children": [valueSpan]
                 }),
                 name = createElement("td", {
                     "attributes": {
@@ -784,8 +789,8 @@ window.Omnibug = (() => {
 
         // Wrap text or truncate with ellipsis
         if(!settings.wrapText) {
-            styleSheet.sheet.insertRule(`.parameter-value {white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;}`, styleSheet.sheet.cssRules.length);
-            styleSheet.sheet.insertRule(`.parameter-value:hover {white-space: normal; overflow: visible;  height:auto;}`, styleSheet.sheet.cssRules.length);
+            styleSheet.sheet.insertRule(`.parameter-value > span {white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;}`, styleSheet.sheet.cssRules.length);
+            styleSheet.sheet.insertRule(`.parameter-value > span:hover {white-space: normal; overflow: visible;  height:auto;}`, styleSheet.sheet.cssRules.length);
         }
 
         // Hide note field if disabled
@@ -826,7 +831,7 @@ window.Omnibug = (() => {
 
         // Quotes
         if(settings.showQuotes) {
-            styleSheet.sheet.insertRule(`.parameter-value:before, .parameter-value:after { content: '"'; color: ${settings.color_quotes}; }`, styleSheet.sheet.cssRules.length);
+            styleSheet.sheet.insertRule(`.parameter-value > span:before, .parameter-value > span:after { content: '"'; color: ${settings.color_quotes}; }`, styleSheet.sheet.cssRules.length);
         }
 
         // Themes

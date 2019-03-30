@@ -281,9 +281,12 @@ body.persist-disabled #persist-disable {
 td.parameter-value {
   position: relative;
 }
-.context-menu {
+.context-menu.menu {
   z-index: 9999;
   position: absolute;
+  .menu-item > a:focus, .menu-item > a:hover {
+    color: #fff;
+  }
 }
 
 /* Default colors, can be overridden in settings*/
@@ -395,6 +398,41 @@ body.dark {
   }
   .modal-title {
     color: #2dd4c7;
+  }
+
+  .context-menu.menu {
+    background-color: #111;
+    color: #999;
+    .divider {
+      border-color: #333;
+    }
+    .divider[data-content]::after, .divider-vert[data-content]::after {
+      background: #111;
+      color: #999;
+    }
+    .menu-item > a:focus, .menu-item > a:hover {
+      background: rgba(47, 132, 218, 0.75);
+      color: #ddd;
+    }
+  }
+
+  .toast {
+    &.toast-primary {
+      @include toast-variant($primary-color-dark);
+    }
+    &.toast-success {
+      @include toast-variant($success-color-dark);
+    }
+    &.toast-warning {
+      @include toast-variant($warning-color-dark);
+    }
+    &.toast-error {
+      @include toast-variant($error-color-dark);
+    }
+    button.btn.btn-clear {
+      background: none;
+    }
+    color: #ddd;
   }
 
   ::-webkit-scrollbar {
