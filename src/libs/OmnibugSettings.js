@@ -91,7 +91,10 @@ class OmnibugSettings
             color_hover       : "#cccccc",
 
             // provider icons
-            providerIcons: true
+            providerIcons: true,
+
+            // Context menu
+            contextMenuBeta: true
         };
     }
 

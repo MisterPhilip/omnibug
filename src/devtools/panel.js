@@ -87,74 +87,78 @@ window.Omnibug = (() => {
     });
 
     d.addEventListener('contextmenu', function(e) {
-        let contextMenu = d.querySelector(".context-menu");
-        if(contextMenu) {
-            contextMenu.remove();
-        }
-        let tableRow = e.target.closest("tr[data-parameter-key]");
-        if(tableRow) {
-            e.preventDefault();
-            let parameterKey = tableRow.getAttribute("data-parameter-key"),
-                parameterName = tableRow.querySelector(".parameter-field").innerText,
-                parameterValue = tableRow.querySelector(".parameter-value");
-
-            let popoverTemplate = d.getElementById("row-context-menu-template"),
-                popover = d.importNode(popoverTemplate.content, true);
-
-            popover.querySelectorAll(`[data-parameter]`).forEach((el) => {
-                el.setAttribute("data-parameter", parameterKey);
-            });
-            popover.querySelectorAll(".context-menu-parameter-key-pair").forEach((elem) => {
-                elem.innerText = `${parameterName} (${parameterKey})`;
-            });
-            popover.querySelectorAll(".context-menu-parameter-name").forEach((elem) => {
-                elem.innerText = parameterName;
-            });
-            popover.querySelector(`[data-context-menu="copy"]`).setAttribute("data-value", parameterValue.innerText);
-            if(settings.highlightKeys.indexOf(parameterKey) !== -1) {
-                popover.querySelector(".context-menu-highlight-action").innerText = "Un-highlight";
+        if(settings.contextMenuBeta) {
+            let contextMenu = d.querySelector(".context-menu");
+            if (contextMenu) {
+                contextMenu.remove();
             }
-            parameterValue.appendChild(popover);
+            let tableRow = e.target.closest("tr[data-parameter-key]");
+            if (tableRow) {
+                e.preventDefault();
+                let parameterKey = tableRow.getAttribute("data-parameter-key"),
+                    parameterName = tableRow.querySelector(".parameter-field").innerText,
+                    parameterValue = tableRow.querySelector(".parameter-value");
+
+                let popoverTemplate = d.getElementById("row-context-menu-template"),
+                    popover = d.importNode(popoverTemplate.content, true);
+
+                popover.querySelectorAll(`[data-parameter]`).forEach((el) => {
+                    el.setAttribute("data-parameter", parameterKey);
+                });
+                popover.querySelectorAll(".context-menu-parameter-key-pair").forEach((elem) => {
+                    elem.innerText = `${parameterName} (${parameterKey})`;
+                });
+                popover.querySelectorAll(".context-menu-parameter-name").forEach((elem) => {
+                    elem.innerText = parameterName;
+                });
+                popover.querySelector(`[data-context-menu="copy"]`).setAttribute("data-value", parameterValue.innerText);
+                if (settings.highlightKeys.indexOf(parameterKey) !== -1) {
+                    popover.querySelector(".context-menu-highlight-action").innerText = "Un-highlight";
+                }
+                parameterValue.appendChild(popover);
+            }
         }
     });
     d.addEventListener("click", function(e) {
-        if(e.target.hasAttribute("data-context-menu") || (e.target.parentNode && e.target.parentNode.hasAttribute("data-context-menu"))) {
-            let item = (e.target.hasAttribute("data-context-menu")) ? e.target : e.target.parentNode,
-                action = item.getAttribute("data-context-menu"),
-                parameterKey = item.getAttribute("data-parameter");
+        if(settings.contextMenuBeta) {
+            if(e.target.hasAttribute("data-context-menu") || (e.target.parentNode && e.target.parentNode.hasAttribute("data-context-menu"))) {
+                let item = (e.target.hasAttribute("data-context-menu")) ? e.target : e.target.parentNode,
+                    action = item.getAttribute("data-context-menu"),
+                    parameterKey = item.getAttribute("data-parameter");
 
-            if(action === "highlight") {
-                let keys = settings.highlightKeys,
-                    highlightType = "";
-                if(keys.indexOf(parameterKey) !== -1) {
-                    keys = keys.filter((param => param !== parameterKey));
-                    highlightType = "un-highlight";
-                } else {
-                    keys.push(parameterKey);
-                    highlightType = "highlight";
-                }
-                Omnibug.send_message({
-                    "type": "settings",
-                    "key": "highlightKeys",
-                    "value": keys
-                });
-                showToast("Preferences updated.", "success", 5);
-                tracker.track(["send", "event", "context menu", highlightType, parameterKey]);
-            } else if(action === "watch") {
-                // @TODO: do something with watch here
-            } else if(action === "copy") {
-                if(copyTextToClipboard(item.getAttribute("data-value"))) {
-                    showToast("Value copied to the clipboard.", "success", 5);
-                    tracker.track(["send", "event", "context menu", "copy", "success"]);
-                } else {
-                    showToast("Unable to copy to the clipboard.", "error");
-                    tracker.track(["send", "event", "context menu", "copy", "error"]);
+                if(action === "highlight") {
+                    let keys = settings.highlightKeys,
+                        highlightType = "";
+                    if(keys.indexOf(parameterKey) !== -1) {
+                        keys = keys.filter((param => param !== parameterKey));
+                        highlightType = "un-highlight";
+                    } else {
+                        keys.push(parameterKey);
+                        highlightType = "highlight";
+                    }
+                    Omnibug.send_message({
+                        "type": "settings",
+                        "key": "highlightKeys",
+                        "value": keys
+                    });
+                    showToast("Preferences updated.", "success", 5);
+                    tracker.track(["send", "event", "context menu", highlightType, parameterKey]);
+                } else if(action === "watch") {
+                    // @TODO: do something with watch here
+                } else if(action === "copy") {
+                    if(copyTextToClipboard(item.getAttribute("data-value"))) {
+                        showToast("Value copied to the clipboard.", "success", 5);
+                        tracker.track(["send", "event", "context menu", "copy", "success"]);
+                    } else {
+                        showToast("Unable to copy to the clipboard.", "error");
+                        tracker.track(["send", "event", "context menu", "copy", "error"]);
+                    }
                 }
             }
-        }
-        let contextMenu = e.target.closest(".context-menu");
-        if(contextMenu) {
-            contextMenu.remove();
+            let contextMenu = e.target.closest(".context-menu");
+            if(contextMenu) {
+                contextMenu.remove();
+            }
         }
     });
 
