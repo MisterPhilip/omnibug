@@ -657,7 +657,7 @@ window.Omnibug = (() => {
                     "text": row.field
                 }),
                 valueSpan = createElement("span", {
-                    "text": row.value
+                    "text": (row.key === "omnibug-postData" && typeof row.value === "object" ? JSON.stringify(row.value) : row.value)
                 }),
                 value = createElement("td", {
                     "classes": ["parameter-value"],

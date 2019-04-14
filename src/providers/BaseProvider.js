@@ -165,7 +165,7 @@ class BaseProvider
     {
         let params = [],
             parsed = {};
-        if(typeof postData === "string" && postData !== "")
+        if(typeof postData === "string" && postData)
         {
             try
             {
@@ -209,6 +209,13 @@ class BaseProvider
             {
                 console.error("postData is not JSON", e.message);
             }
+        }
+        else if(typeof postData === "object" && postData)
+        {
+            // Form data type
+            Object.entries(postData).forEach((entry) => {
+                params.push([entry[0], entry[1].toString()]);
+            });
         }
         return params;
     }
