@@ -177,10 +177,11 @@ nav.navbar {
     font-size: 1.1em;
     padding: .3em .3em .3em .5em;
     position: sticky;
-    top: 2.4em;
+    top: 2.2em;
     background-color: $bg-color-dark;
     border: 1px solid #ddd;
     border-bottom: 0;
+    z-index: 2;
   }
   table {
     border: 1px solid $border-color;
