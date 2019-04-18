@@ -453,13 +453,13 @@ class UniversalAnalyticsProvider extends BaseProvider
             };
         } else if(/^pr(\d+)(cd|cm)(\d+)$/i.test(name)) {
             let lookup = {
-                    "cd": "Custom Dimension",
-                    "cm": "Custom Metric"
+                    "cd": "Dimension",
+                    "cm": "Metric"
                 },
                 type = lookup[RegExp.$2] || "";
             result = {
                 "key":   name,
-                "field": `Product ${RegExp.$1} ${type} ${RegExp.$2}`,
+                "field": `Product ${RegExp.$1} ${type} ${RegExp.$3}`,
                 "value": value,
                 "group": "ecommerce"
             };
@@ -472,8 +472,8 @@ class UniversalAnalyticsProvider extends BaseProvider
             };
         } else if(/^il(\d+)pi(\d+)(cd|cm)(\d+)$/i.test(name)) {
             let lookup = {
-                    "cd": "Custom Dimension",
-                    "cm": "Custom Metric"
+                    "cd": "Dimension",
+                    "cm": "Metric"
                 },
                 type = lookup[RegExp.$3] || "";
             result = {
