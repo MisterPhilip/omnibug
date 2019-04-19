@@ -82,7 +82,7 @@ class AdobeAnalyticsProvider extends BaseProvider
             },
             "ndh": {
                 "name": "Image sent from JS?",
-                "group": "general"
+                "group": "other"
             },
             "ch": {
                 "name": "Channel",
@@ -98,7 +98,7 @@ class AdobeAnalyticsProvider extends BaseProvider
             },
             "cl": {
                 "name": "Cookie lifetime",
-                "group": "general"
+                "group": "other"
             },
             "g": {
                 "name": "Current URL",
@@ -106,35 +106,35 @@ class AdobeAnalyticsProvider extends BaseProvider
             },
             "bw": {
                 "name": "Browser width",
-                "group": "general"
+                "group": "other"
             },
             "bh": {
                 "name": "Browser height",
-                "group": "general"
+                "group": "other"
             },
             "s": {
                 "name": "Screen resolution",
-                "group": "general"
+                "group": "other"
             },
             "c": {
                 "name": "Screen color depth",
-                "group": "general"
+                "group": "other"
             },
             "ct": {
                 "name": "Connection type",
-                "group": "general"
+                "group": "other"
             },
             "p": {
                 "name": "Netscape plugins",
-                "group": "general"
+                "group": "other"
             },
             "k": {
                 "name": "Cookies enabled?",
-                "group": "general"
+                "group": "other"
             },
             "hp": {
                 "name": "Home page?",
-                "group": "general"
+                "group": "other"
             },
             "pid": {
                 "name": "Page ID",
@@ -178,15 +178,15 @@ class AdobeAnalyticsProvider extends BaseProvider
             },
             "t": {
                 "name": "Browser time",
-                "group": "general"
+                "group": "other"
             },
             "v": {
                 "name": "Javascript-enabled browser?",
-                "group": "general"
+                "group": "other"
             },
             "pccr": {
                 "name": "Prevent infinite redirects",
-                "group": "general"
+                "group": "other"
             },
             "vid": {
                 "name": "Visitor ID",
@@ -202,6 +202,10 @@ class AdobeAnalyticsProvider extends BaseProvider
             },
             "mid": {
                 "name": "Marketing Cloud Visitor ID",
+                "group": "general"
+            },
+            "mcorgid ": {
+                "name": "Marketing Cloud Org ID",
                 "group": "general"
             },
             "aid": {
@@ -242,11 +246,11 @@ class AdobeAnalyticsProvider extends BaseProvider
             },
             "vmk": {
                 "name": "Visitor migration key",
-                "group": "general"
+                "group": "other"
             },
             "vvp": {
                 "name": "Variable provider",
-                "group": "general"
+                "group": "other"
             },
             "xact": {
                 "name": "Transaction ID",
@@ -354,6 +358,13 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "field": "Hierarchy " + RegExp.$1,
                 "value": value,
                 "group": "hier"
+            };
+        } else if(/^(?:l|list)(\d+)$/i.test(name)) {
+            result = {
+                "key":   name,
+                "field": "List Var " + RegExp.$1,
+                "value": value,
+                "group": "eVars"
             };
         } else if(name.indexOf(".a.media.") > 0) {
             result = {
