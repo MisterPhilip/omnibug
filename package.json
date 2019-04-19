@@ -7,8 +7,9 @@
     "production": "grunt production",
     "beta": "grunt beta",
     "build": "grunt build",
-    "test": "grunt build-test-files && nyc --all ava",
-    "postinstall": "grunt build"
+    "test": "cross-env NODE_ENV=test grunt build-test-files && nyc --all ava",
+    "postinstall": "grunt build",
+    "coverage": "cross-env NODE_ENV=test nyc report -all"
   },
   "ava": {
     "files": [
@@ -19,22 +20,15 @@
       "esm",
       "./test/helpers/setup-browser-env.js"
     ],
-    "babel": {
-      "testOptions": {
-        "presets": [
-          [
-            "module:ava/stage-4",
-            {
-              "modules": false
-            }
-          ]
-        ]
-      }
-    }
+    "babel": false
   },
   "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ],
     "env": {
       "test": {
+        "sourceMaps": "inline",
         "plugins": [
           "istanbul",
           [
@@ -52,7 +46,7 @@
           [
             "@babel/plugin-proposal-class-properties",
             {
-              "loose": false
+              "loose": true
             }
           ],
           "@babel/plugin-proposal-json-strings"
@@ -69,10 +63,10 @@
       "text"
     ],
     "exclude": [
-      "./tests/**",
-      "./platform/**",
-      "./.github/**",
-      "./node_modules/**",
+      "tests/**",
+      "platform/**",
+      ".github/**",
+      "node_modules/**",
       "**/providers.js"
     ],
     "sourceMap": false,
@@ -93,7 +87,7 @@
     "url": "https://github.com/MisterPhilip/omnibug/issues"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.0",
+    "@babel/core": "^7.4.3",
     "@babel/plugin-proposal-class-properties": "^7.4.0",
     "@babel/plugin-proposal-decorators": "^7.4.0",
     "@babel/plugin-proposal-export-namespace-from": "^7.2.0",
@@ -103,13 +97,14 @@
     "@babel/plugin-proposal-throw-expressions": "^7.2.0",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-syntax-import-meta": "^7.2.0",
+    "@babel/preset-env": "^7.4.3",
     "@babel/register": "^7.4.0",
     "@fortawesome/fontawesome-free": "^5.8.1",
     "@ungap/url-search-params": "^0.1.0",
     "ava": "^1.4.1",
-    "babel-plugin-istanbul": "^5.1.1",
+    "babel-plugin-istanbul": "^5.1.2",
     "browser-env": "^3.2.6",
-    "coveralls": "^3.0.3",
+    "cross-env": "^5.2.0",
     "grunt": "^1.0.4",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-compress": "^1.4.3",
@@ -118,7 +113,7 @@
     "grunt-contrib-jshint": "~1.1.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-text-replace": "^0.4.0",
-    "nyc": "^13.3.0",
+    "nyc": "^14.0.0",
     "sinon-chrome": "^2.3.2"
   },
   "homepage": "https://omnibug.io/",
@@ -130,5 +125,9 @@
     "node-sass": "^4.11",
     "npm": "^6.9.0",
     "spectre.css": "^0.5.8"
+  },
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
   }
 }
