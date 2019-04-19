@@ -249,11 +249,22 @@ nav.navbar {
 #requests .navigation:first-of-type {
   border-top: 0;
 }
+.modal.modal-lg .modal-container {
+  max-height: none;
+}
 .modal-header {
   padding-bottom: 0;
 }
 .modal-footer {
   padding-top: 0;
+}
+.modal {
+  .btn.btn-clear {
+    &:focus, &:hover {
+      color: $primary-color;
+      background: none;
+    }
+  }
 }
 #filter-modal .modal-body {
   padding-top: 0;
@@ -380,6 +391,15 @@ body.dark {
   .modal-container {
     background-color: $dark-body-background-alt-color;
   }
+  .modal {
+    .btn.btn-clear {
+      color: #999;
+      &:focus, &:hover {
+        color: $primary-color;
+        background: none;
+      }
+    }
+  }
 
   .form-input {
     background-color: $dark-body-background-color;
@@ -458,5 +478,5 @@ span {
 
   @each $title, $path in $icons {
     @include iconRule($title, $path)
-    }
-}    
+  }
+}
