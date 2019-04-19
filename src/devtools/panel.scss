@@ -290,7 +290,7 @@ body.persist-disabled #persist-disable {
   display: none;
 }
 #persist-enable { color: #F44336; }
-td.parameter-value {
+tr[data-parameter-key] td {
   position: relative;
 }
 .context-menu.menu {

@@ -97,7 +97,8 @@ window.Omnibug = (() => {
                 e.preventDefault();
                 let parameterKey = tableRow.getAttribute("data-parameter-key"),
                     parameterName = tableRow.querySelector(".parameter-field").innerText,
-                    parameterValue = tableRow.querySelector(".parameter-value");
+                    parameterValue = tableRow.querySelector(".parameter-value").innerText,
+                    parentTD = (e.target.tagName === "TD") ? e.target : e.target.closest("td");
 
                 let popoverTemplate = d.getElementById("row-context-menu-template"),
                     popover = d.importNode(popoverTemplate.content, true);
@@ -111,11 +112,17 @@ window.Omnibug = (() => {
                 popover.querySelectorAll(".context-menu-parameter-name").forEach((elem) => {
                     elem.innerText = parameterName;
                 });
-                popover.querySelector(`[data-context-menu="copy"]`).setAttribute("data-value", parameterValue.innerText);
+                popover.querySelector(`[data-context-menu="copy"]`).setAttribute("data-value", parameterValue);
                 if (settings.highlightKeys.indexOf(parameterKey) !== -1) {
                     popover.querySelector(".context-menu-highlight-action").innerText = "Un-highlight";
                 }
-                parameterValue.appendChild(popover);
+                popover.querySelector(".context-menu").style.top = e.offsetY + "px";
+                if((document.documentElement.clientWidth - 200) < e.clientX) {
+                    popover.querySelector(".context-menu").style.left = (e.offsetX - 200) + "px";
+                } else {
+                    popover.querySelector(".context-menu").style.left = e.offsetX + "px";
+                }
+                parentTD.appendChild(popover);
             }
         }
     });
