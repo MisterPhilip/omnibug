@@ -1,7 +1,5 @@
 import test from 'ava';
 
-const chrome = require('sinon-chrome/extensions');
-
 import { OmnibugSettings } from "./../source/OmnibugSettings.js";
 
 test.beforeEach(t => {
@@ -104,6 +102,32 @@ test("OmnibugSettings should load saved changes", async t => {
     t.deepEqual(loadedSettings, savedSettings);
 });
 
+test("OmnibugSettings should load defaults if storage key does not exist", async t => {
+    let settings = new OmnibugSettings();
+    chrome.storage.sync.get.yields({});
+
+    let loadedSettings = await settings.load();
+    t.deepEqual(loadedSettings, settings.defaults);
+});
+
+test("OmnibugSettings should load default providers if providers are not already provided", async t => {
+    let settings = new OmnibugSettings();
+    chrome.storage.sync.get.yields({"##OMNIBUG_KEY##": {
+            "highlightKeys": ["foo", "bar"]
+        }});
+
+    let loadedSettings = await settings.load();
+    t.deepEqual(loadedSettings.providers, settings.defaults.providers);
+});
+
+test("OmnibugSettings should catch any exceptions thrown", async t => {
+    let settings = new OmnibugSettings();
+    chrome.storage.sync.get.yields(null);
+
+    const reason = await t.throwsAsync(settings.load());
+
+    t.is(reason.message, "Cannot read property '##OMNIBUG_KEY##' of null");
+});
 
 test("OmnibugSettings should migrate", async t => {
     let settings = new OmnibugSettings();

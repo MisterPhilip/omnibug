@@ -114,6 +114,7 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-text-replace": "^0.4.0",
     "nyc": "^14.0.0",
+    "sinon": "^7.3.2",
     "sinon-chrome": "^2.3.2"
   },
   "homepage": "https://omnibug.io/",
