@@ -48,7 +48,11 @@ class AdobeAnalyticsProvider extends BaseProvider
             {
                 "key": "eVars",
                 "name": "Custom Conversion Variables (eVars)"
-            }, 
+            },
+            {
+                "key": "listvar",
+                "name": "List Variables"
+            },
             {
                 "key": "hier",
                 "name": "Hierarchy Variables"
@@ -64,6 +68,10 @@ class AdobeAnalyticsProvider extends BaseProvider
             {
                 "key": "context",
                 "name": "Context Data"
+            },
+            {
+                "key": "customerid",
+                "name": "Customer ID"
             }
         ];
     }
@@ -364,7 +372,7 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "key":   name,
                 "field": "List Var " + RegExp.$1,
                 "value": value,
-                "group": "eVars"
+                "group": "listvar"
             };
         } else if(name.indexOf(".a.media.") > 0) {
             result = {
@@ -380,10 +388,17 @@ class AdobeAnalyticsProvider extends BaseProvider
                 "value": value,
                 "group": "activity"
             };
+        } else if(name.indexOf("cid.") === 0) {
+            result = {
+                "key":   name,
+                "field": name.replace("cid.", ""),
+                "value": value,
+                "group": "customerid"
+            };
         } else if(name.indexOf(".") > 0) {
             result = {
                 "key":   name,
-                "field": name.split(".").pop(),
+                "field": name.replace("c.", ""),
                 "value": value,
                 "group": "context"
             };
