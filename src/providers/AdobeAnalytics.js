@@ -14,6 +14,7 @@ class AdobeAnalyticsProvider extends BaseProvider
         this._pattern    = /^([^#?]+)(\/b\/ss\/)|\.2o7\.net\/|\.sc\d?\.omtrdc\.net\/(?!id)/;
         this._name       = "Adobe Analytics";
         this._type       = "analytics";
+        this._keywords   = ["aa", "site catalyst", "sitecatalyst", "omniture"];
     }
 
     /**

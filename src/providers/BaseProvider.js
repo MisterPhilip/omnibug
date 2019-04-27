@@ -12,6 +12,7 @@ class BaseProvider
         this._pattern    = /.*/;
         this._name       = "";
         this._type       = "";
+        this._keywords   = [];
     }
 
     /**
@@ -39,6 +40,16 @@ class BaseProvider
             "marketing":    "Marketing"
         };
         return types[this._type] || "Unknown";
+    }
+
+    /**
+     * Retrieve the keywords for searching
+     *
+     * @returns {[]}
+     */
+    get keywords()
+    {
+        return this._keywords;
     }
 
     /**

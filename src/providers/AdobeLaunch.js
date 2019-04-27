@@ -14,6 +14,7 @@ class AdobeLaunchProvider extends BaseProvider
         this._pattern    = /assets\.adobedtm\.com\/launch-[^\?#]+.js/;
         this._name       = "Adobe Launch";
         this._type       = "tagmanager";
+        this._keywords   = ["activate", "activation", "tms"];
     }
 
     /**

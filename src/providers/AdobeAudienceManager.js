@@ -14,6 +14,7 @@ class AdobeAudienceManagerProvider extends BaseProvider
         this._pattern    = /demdex\.net\/|\/id\?(?=.*d_visid_ver=)(?=.*mcorgid=)/;
         this._name       = "Adobe Audience Manager";
         this._type       = "visitorid";
+        this._keywords   = ["aam"];
     }
 
     /**

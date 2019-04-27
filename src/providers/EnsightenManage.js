@@ -14,6 +14,7 @@ class EnsightenManageProvider extends BaseProvider
         this._pattern    = /nexus\.ensighten\.com\/(?=.*Bootstrap\.js)/;
         this._name       = "Ensighten Manage";
         this._type       = "tagmanager";
+        this._keywords   = ["tms"];
     }
 
     /**

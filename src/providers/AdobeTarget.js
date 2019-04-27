@@ -14,6 +14,7 @@ class AdobeTargetProvider extends BaseProvider
         this._pattern    = /\.tt\.omtrdc\.net\/(?!cdn\/)/;
         this._name       = "Adobe Target";
         this._type       = "testing";
+        this._keywords   = ["test target", "test & target", "at", "tnt", "t&t", "omniture"];
     }
 
     /**

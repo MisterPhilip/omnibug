@@ -14,6 +14,7 @@ class AdobeDynamicTagManagerProvider extends BaseProvider
         this._pattern    = /\/satelliteLib-[^\.]+\.js/;
         this._name       = "Adobe Dynamic Tag Manager";
         this._type       = "tagmanager";
+        this._keywords   = ["dtm", "activate", "activation", "tms"];
     }
 
     /**

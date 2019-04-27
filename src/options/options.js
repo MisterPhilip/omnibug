@@ -2,7 +2,8 @@
 (function() {
 
     // Setup GA tracker
-    let tracker = new OmnibugTracker();
+    let tracker = new OmnibugTracker(),
+        providerSearch;
 
     /**
      * Setup a proxy handler to observe changes to the settings object
@@ -139,7 +140,7 @@
                 label = createElement("label", {
                     "attributes": {
                         "style": "display:block;",
-                        "data-provider": provider.name
+                        "data-provider": provider.key
                     },
                     "children": [input, labelText]
                 });
@@ -226,34 +227,64 @@
         event.target.value = "";
     });
 
+    console.log("search providers:", Object.values(providers));
+    providerSearch = new Fuse(Object.values(providers), {
+        findAllMatches: true,
+        threshold: 0.3,
+        location: 0,
+        distance: 50,
+        maxPatternLength: 20,
+        minMatchCharLength: 1,
+        includeScore: true,
+        includeMatches: true,
+        keys: [
+            {
+                name: "name",
+                weight: 0.50
+            },
+            {
+                name: "keywords",
+                weight: 0.30
+            },
+            {
+                name: "type",
+                weight: 0.20
+            }
+        ]
+    });
     document.getElementById("provider-search").addEventListener("input", (event) => {
         console.log("provider-search", event.target.value);
-        let searchTerm = (event.target.value || "").toLowerCase(),
+        let searchTerm = (event.target.value || "").substring(0, 20),
             providersList = document.getElementById("providers-list"),
             providerDetails = document.querySelectorAll("#providers-list > details"),
             providers = document.querySelectorAll("#providers-list label[data-provider]");
 
         if(searchTerm) {
             providersList.classList.add("searching");
+            let results = providerSearch.search(searchTerm);
+            console.log("search results:", results);
+
+            providers.forEach((provider) => {
+                if(results.find((searchProvider) => {
+                    return searchProvider.item.key === provider.getAttribute("data-provider");
+                }) !== undefined) {
+                    provider.setAttribute("style", "display:block;");
+                }
+                else
+                {
+                    provider.setAttribute("style", "display:none;");
+                }
+            });
+
+            providerDetails.forEach((element) => {
+                element.open = true;
+            });
         } else {
             providersList.classList.remove("searching");
-        }
-
-        providerDetails.forEach((element) => {
-            element.open = searchTerm !== "";
-        });
-
-        providers.forEach((provider) => {
-            let name = provider.getAttribute("data-provider") || "";
-            if(name.toLowerCase().indexOf(searchTerm) >= 0)
-            {
+            providers.forEach((provider) => {
                 provider.setAttribute("style", "display:block;");
-            }
-            else
-            {
-                provider.setAttribute("style", "display:none;");
-            }
-        });
+            });
+        }
     });
 
     document.getElementById("reset-defaults").addEventListener("click", (event) => {

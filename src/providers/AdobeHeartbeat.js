@@ -14,6 +14,7 @@ class AdobeHeartbeatProvider extends BaseProvider
         this._pattern    = /\.hb\.omtrdc\.net\//;
         this._name       = "Adobe Heartbeat";
         this._type       = "analytics";
+        this._keywords   = ["video"];
     }
 
     /**

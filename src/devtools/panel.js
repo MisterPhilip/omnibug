@@ -21,7 +21,8 @@ window.Omnibug = (() => {
         storageLoadedSettings = false,
         recordedData = [],
         allProviders = OmnibugProvider.getProviders(),
-        tracker = new OmnibugTracker;
+        tracker = new OmnibugTracker,
+        providerSearch;
 
 
     // Clear all requests
@@ -223,21 +224,52 @@ window.Omnibug = (() => {
     });
 
     // Add our filter
+    providerSearch = new Fuse(Object.values(allProviders), {
+        findAllMatches: true,
+        threshold: 0.3,
+        location: 0,
+        distance: 50,
+        maxPatternLength: 20,
+        minMatchCharLength: 1,
+        includeScore: true,
+        includeMatches: true,
+        keys: [
+            {
+                name: "name",
+                weight: 0.50
+            },
+            {
+                name: "keywords",
+                weight: 0.30
+            },
+            {
+                name: "type",
+                weight: 0.20
+            }
+        ]
+    });
     d.getElementById("provider-search").addEventListener("input", (event) => {
-        let searchTerm = (event.target.value || "").toLowerCase(),
+        let searchTerm = (event.target.value || "").substring(0, 20),
             providers = d.querySelectorAll("#filter-providers > li");
 
-        providers.forEach((provider) => {
-            let name = provider.getAttribute("data-provider") || "";
-            if(name.toLowerCase().indexOf(searchTerm) >= 0)
-            {
+        if(searchTerm) {
+            let results = providerSearch.search(searchTerm);
+            providers.forEach((provider) => {
+                if(results.find((searchProvider) => {
+                    return searchProvider.item.key === provider.getAttribute("data-provider");
+                }) !== undefined) {
+                    provider.classList.remove("d-none");
+                }
+                else
+                {
+                    provider.classList.add("d-none");
+                }
+            });
+        } else {
+            providers.forEach((provider) => {
                 provider.classList.remove("d-none");
-            }
-            else
-            {
-                provider.classList.add("d-none");
-            }
-        });
+            });
+        }
     });
 
     // Clear requests on navigation

@@ -14,6 +14,7 @@ class UniversalAnalyticsProvider extends BaseProvider
         this._pattern    = /\.(google-analytics\.com|doubleclick\.net)\/(r\/)?collect(?:[\/?]+|$)/;
         this._name       = "Universal Analytics";
         this._type       = "analytics";
+        this._keywords   = ["google", "google analytics", "ua", "ga"];
     }
 
     /**

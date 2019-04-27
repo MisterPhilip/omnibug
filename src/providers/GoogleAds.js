@@ -14,6 +14,7 @@ class GoogleAdsProvider extends BaseProvider
         this._pattern    = /googleads\.g\.doubleclick\.net\/pagead\//;
         this._name       = "Google Ads";
         this._type       = "marketing";
+        this._keywords   = ["aw", "ad words"];
     }
 
     /**

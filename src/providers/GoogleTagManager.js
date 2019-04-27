@@ -14,6 +14,7 @@ class GoogleTagManagerProvider extends BaseProvider
         this._pattern    = /googletagmanager\.com\/gtm\.js/;
         this._name       = "Google Tag Manager";
         this._type       = "tagmanager";
+        this._keywords   = ["tms"];
     }
 
     /**

@@ -14,6 +14,7 @@ class TealiumIQProvider extends BaseProvider
         this._pattern    = /tags\.tiqcdn\.com\/utag\/((?=.*utag\.js)|(?=.*utag\.sync\.js))/;
         this._name       = "Tealium IQ";
         this._type       = "tagmanager";
+        this._keywords   = ["tms"];
     }
 
     /**
