@@ -171,7 +171,7 @@ class BaseProvider
             {
                 parsed = JSON.parse(postData);
                 /* Based on https://stackoverflow.com/a/19101235 */
-                function recurse (cur, prop)
+                let recurse = (cur, prop) =>
                 {
                     if (Object(cur) !== cur)
                     {
@@ -202,7 +202,7 @@ class BaseProvider
                             params.push([prop, ""]);
                         }
                     }
-                }
+                };
                 recurse(parsed, "");
             }
             catch(e)
@@ -230,12 +230,14 @@ class BaseProvider
     handleQueryParam(name, value)
     {
         let param = this.keys[name] || {};
-        return {
-            "key":   name,
-            "field": param.name || name,
-            "value": value,
-            "group": param.group || "other"
-        };
+        if(!param.hidden) {
+            return {
+                "key":   name,
+                "field": param.name || name,
+                "value": value,
+                "group": param.group || "other"
+            };
+        }
     }
 
     /**
