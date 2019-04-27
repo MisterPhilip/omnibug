@@ -317,6 +317,18 @@ details.request.redirected [data-request-type] { background-color: #eeeeee; }
   margin-top: .25rem;
 }
 
+
+span {
+  &[title]::before {
+    padding: 0.5em;
+    vertical-align: sub;
+  }
+
+  @each $title, $path in $icons {
+    @include iconRule($title, $path)
+  }
+}
+
 body.dark {
   background-color: $dark-body-background-color;
   color: $dark-body-font-color;
@@ -467,16 +479,5 @@ body.dark {
   }
   ::-webkit-scrollbar-thumb {
     background-color: darken($dark-body-background-color, 5%);
-  }
-}
-
-span {
-  &[title]::before {
-    padding: 0.5em;
-    vertical-align: sub;
-  }
-
-  @each $title, $path in $icons {
-    @include iconRule($title, $path)
   }
 }
