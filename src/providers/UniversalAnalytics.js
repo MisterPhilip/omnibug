@@ -11,7 +11,7 @@ class UniversalAnalyticsProvider extends BaseProvider
     {
         super();
         this._key        = "UNIVERSALANALYTICS";
-        this._pattern    = /\.(google-analytics\.com|doubleclick\.net)\/(r\/)?collect(?:[\/?]+|$)/;
+        this._pattern    = /\.google-analytics\.com\/(r\/)?collect(?:[\/?]+|$)/;
         this._name       = "Universal Analytics";
         this._type       = "analytics";
         this._keywords   = ["google", "google analytics", "ua", "ga"];
@@ -380,6 +380,10 @@ class UniversalAnalyticsProvider extends BaseProvider
             "xvar": {
                 "name": "Content Experiment Variant",
                 "group": "optimize"
+            },
+            "_r": {
+                "name": "Display Features Enabled",
+                "group": "general"
             },
             "requestType": {
                 "hidden": true

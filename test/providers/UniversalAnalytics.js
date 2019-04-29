@@ -18,9 +18,7 @@ test("UniversalAnalyticsProvider pattern should match various UA domains", t => 
             "http://www.google-analytics.com/collect?",
             "http://www.google-analytics.com/collect/",
             "https://www.google-analytics.com/collect/?",
-            "https://www.google-analytics.com/collect",
-            "https://stats.g.doubleclick.net/r/collect?",
-            "http://stats.g.doubleclick.net/r/collect?"
+            "https://www.google-analytics.com/collect"
         ];
 
     urls.forEach((url) => {
@@ -52,17 +50,15 @@ test("UniversalAnalyticsProvider returns static data", t => {
 
 test("UniversalAnalyticsProvider returns the hit type", t => {
     let provider = new UniversalAnalyticsProvider(),
-        pvUrl = "https://www.google-analytics.com/r/collect?v=1&_v=j68&a=1805905905&t=pageview&_s=1&dl=https%3A%2F%2Fomnibug.io%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=2560x1440&vp=2560x1307&je=0&_u=KCDAAUIh~&jid=441640597&gjid=200209851&cid=191425359.1527202446&tid=UA-17508125-8&_gid=401227809.1529009937&_r=1&gtm=u64&z=1617633316",
-        dcUrl = "https://stats.g.doubleclick.net/r/collect?t=dc&aip=1&_r=3&v=1&_v=j68&tid=UA-17508125-1&cid=1920454291.1527480381&jid=988746071&gjid=430872552&_gid=308241203.1529009764&_u=CCCAgAADQ~&z=1277129440"
+        url = "https://www.google-analytics.com/r/collect?v=1&_v=j68&a=1805905905&t=pageview&_s=1&dl=https%3A%2F%2Fomnibug.io%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=2560x1440&vp=2560x1307&je=0&_u=KCDAAUIh~&jid=441640597&gjid=200209851&cid=191425359.1527202446&tid=UA-17508125-8&_gid=401227809.1529009937&_r=1&gtm=u64&z=1617633316",
+        results = provider.parseUrl(url);
 
-    let dcResults = provider.parseUrl(dcUrl);
-
-    let dcRequestType = dcResults.data.find((result) => {
+    let requestType = results.data.find((result) => {
         return result.key === "omnibug_requestType";
     });
 
-    t.is(typeof dcRequestType, "object");
-    t.is(dcRequestType.value, "DoubleClick");
+    t.is(typeof requestType, "object");
+    t.is(requestType.value, "Page View");
 });
 
 test("UniversalAnalyticsProvider returns POST data", t => {
