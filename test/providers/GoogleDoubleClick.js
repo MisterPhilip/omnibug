@@ -48,6 +48,9 @@ test("GoogleDoubleClickProvider returns data", t => {
         src = results.data.find((result) => {
             return result.key === "src";
         }),
+        account = results.data.find((result) => {
+            return result.key === "omnibug-account";
+        }),
         oref = results.data.find((result) => {
             return result.key === "~oref";
         });
@@ -58,6 +61,9 @@ test("GoogleDoubleClickProvider returns data", t => {
     t.is(typeof src, "object");
     t.is(src.field, "Account ID");
     t.is(src.value, "1234567");
+
+    t.is(typeof account, "object");
+    t.is(account.value, "DC-1234567/group1/thank123");
 
     t.is(typeof oref, "object");
     t.is(oref.field, "Page URL");

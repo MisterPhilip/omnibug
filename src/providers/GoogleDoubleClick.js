@@ -25,7 +25,7 @@ class GoogleDoubleClickProvider extends BaseProvider
     get columnMapping()
     {
         return {
-            "account":      "account",
+            "account":      "omnibug-account",
             "requestType":  "type"
         }
     }
@@ -224,8 +224,13 @@ class GoogleDoubleClickProvider extends BaseProvider
             "group": "general"
         });
 
+        // Add the type & category, if available, to the accounts column
+        /* istanbul ignore else */
+        if(params.get("type") && params.get("cat")) {
+            account += "/" + params.get("type") + "/" + params.get("cat");
+        }
         results.push({
-            "key":   "account",
+            "key":   "omnibug-account",
             "value": account,
             "hidden": true
         });
