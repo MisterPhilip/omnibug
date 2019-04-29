@@ -554,8 +554,6 @@ class UniversalAnalyticsProvider extends BaseProvider
             requestType = "Page View";
         } else if(hitType === "transaction" || hitType === "item") {
             requestType = "Ecommerce " + hitType.charAt(0).toUpperCase() + hitType.slice(1);
-        } else if(hitType === "dc") {
-            requestType = "DoubleClick";
         } else {
             requestType = hitType.charAt(0).toUpperCase() + hitType.slice(1);
         }
