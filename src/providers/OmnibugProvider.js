@@ -96,7 +96,7 @@ var OmnibugProvider = (function() {
                     patterns.push(providers[provider].pattern.source);
                 }
             });
-            return new RegExp(patterns.join("|"));
+            return new RegExp(patterns.join("|"), "i");
         }
     };
 })();

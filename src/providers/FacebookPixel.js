@@ -11,7 +11,7 @@ class FacebookPixelProvider extends BaseProvider
     {
         super();
         this._key        = "FACEBOOKPIXEL";
-        this._pattern    = /facebook\.com\/tr\/?\?/;
+        this._pattern    = /facebook\.com\/tr\/?(?!.*&ev=microdata)\?/i;
         this._name       = "Facebook Pixel";
         this._type       = "marketing";
     }

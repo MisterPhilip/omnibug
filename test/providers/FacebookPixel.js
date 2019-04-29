@@ -25,6 +25,7 @@ test("FacebookPixelProvider pattern should match various FB domains", t => {
     });
 
     t.false(provider.checkUrl("https://connect.facebook.net/signals/config/123456?v=2.8.18&r=stable"), "Provider should not match on non-provider based URLs");
+    t.false(provider.checkUrl("https://www.facebook.com/tr?id=123456&ev=Microdata"), "Provider should not match the microdata event");
 });
 
 test("OmnibugProvider returns FacebookPixelProvider", t => {
