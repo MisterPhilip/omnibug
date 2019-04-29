@@ -25,7 +25,7 @@ class GoogleAdsProvider extends BaseProvider
     get columnMapping()
     {
         return {
-            "account":      "account",
+            "account":      "omnibug-account",
             "requestType":  "requestType"
         }
     }
@@ -83,7 +83,8 @@ class GoogleAdsProvider extends BaseProvider
     handleCustom(url, params)
     {
         let results = [],
-            account = "AW-" + url.pathname.match(/\/(\d+)\/?$/)[1],
+            pathParts = url.pathname.match(/\/([^\/]+)\/(\d+)\/?$/),
+            account = "AW-" + pathParts[2],
             data = params.get("data") || "",
             dataEvent = data.match(/event=([^;]+)(?:$|;)/),
             requestType = "";
@@ -96,6 +97,16 @@ class GoogleAdsProvider extends BaseProvider
                 "value": account,
                 "group": "general"
             });
+
+            // Add the conversion label, if available, to the accounts column
+            if(params.get("label")) {
+                account += "/" + params.get("label");
+            }
+            results.push({
+                "key":   "omnibug-account",
+                "value": account,
+                "hidden": true
+            });
         }
 
         if(dataEvent && dataEvent.length) {
@@ -104,6 +115,8 @@ class GoogleAdsProvider extends BaseProvider
             } else {
                 requestType = dataEvent[1];
             }
+        } else {
+            requestType = (pathParts[1] === "viewthroughconversion") ? "Conversion" : pathParts[1].replace("viewthrough", "");
         }
 
         results.push({
