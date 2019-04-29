@@ -265,10 +265,12 @@ window.Omnibug = (() => {
                     provider.classList.add("d-none");
                 }
             });
+            d.getElementById("provider-select-all-title").innerText = "Select All/None Shown Below"
         } else {
             providers.forEach((provider) => {
                 provider.classList.remove("d-none");
             });
+            d.getElementById("provider-select-all-title").innerText = "Select All/None"
         }
     });
 

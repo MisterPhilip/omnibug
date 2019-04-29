@@ -266,8 +266,13 @@ nav.navbar {
     }
   }
 }
-#filter-modal .modal-body {
-  padding-top: 0;
+#filter-modal {
+  .modal-container {
+    height: 90vh;
+  }
+  .modal-body {
+    padding-top: 0;
+  }
 }
 #filter-providers {
   list-style-type: none;
