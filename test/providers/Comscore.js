@@ -42,38 +42,6 @@ test("OmnibugProvider returns ComscoreProvider", t => {
   t.is(results.provider.key, "COMSCORE", "Results provider is Comscore");
 });
 
-test("Provider returns client ID code", t => {
-  let provider = new ComscoreProvider(),
-    url =
-      "https://sb.scorecardresearch.com/p?c1=2&c2=123456789&ns_type=hidden&cv=2.0&cj=1&c4=https://www.example.com";
-
-  let results = provider.parseUrl(url),
-    clientID = results.data.find(result => {
-      return result.key === "clientID";
-    });
-
-  t.is(typeof clientID, "object", "clientID exists");
-  t.is(clientID.field, "Client ID", "Field is Client ID");
-  t.is(clientID.value, "123456789", "Client Code value is correct");
-  t.is(clientID.group, "general", "Client ID group is general");
-});
-
-test("Provider returns tag type", t => {
-  let provider = new ComscoreProvider(),
-    url =
-      "https://sb.scorecardresearch.com/p?c1=2&c2=123456789&ns_type=hidden&cv=2.0&cj=1&c4=https://www.example.com";
-
-  let results = provider.parseUrl(url),
-    tagType = results.data.find(result => {
-      return result.key === "tagType";
-    });
-
-  t.is(typeof tagType, "object", "tagType exists");
-  t.is(tagType.field, "Tag Type", "Field is Tag Type");
-  t.is(tagType.value, "2", "Tag Type value is correct");
-  t.is(tagType.group, "general", "Tag Type group is general");
-});
-
 test("Custom parameters group populates with c parameters", t => {
   let provider = new ComscoreProvider(),
     url =

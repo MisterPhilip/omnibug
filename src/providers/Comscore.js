@@ -10,7 +10,7 @@ class ComscoreProvider extends BaseProvider {
   constructor() {
     super();
     this._key = "COMSCORE";
-    this._pattern = /sb\.scorecardresearch\.com.+(?<!\.js)$/;
+    this._pattern = /sb\.scorecardresearch\.com(?!.*\.js($|[?#]))/;
     this._name = "Comscore";
     this._type = "marketing";
   }
@@ -23,7 +23,7 @@ class ComscoreProvider extends BaseProvider {
   get columnMapping() {
     return {
       account: "c2",
-      requestType: "requestType"
+      requestType: "c1"
     };
   }
 
@@ -35,32 +35,10 @@ class ComscoreProvider extends BaseProvider {
   get groups() {
     return [
       {
-        key: "general",
-        name: "General"
-      },
-      {
         key: "custom",
         name: "Custom"
       }
     ];
-  }
-
-  /**
-   * Get all of the available URL parameter keys
-   *
-   * @returns {{}}
-   */
-  get keys() {
-    return {
-      c1: {
-        name: "Tag Type",
-        group: "general"
-      },
-      c2: {
-        name: "Client ID",
-        group: "general"
-      }
-    };
   }
 
   /**
@@ -73,8 +51,8 @@ class ComscoreProvider extends BaseProvider {
    */
   handleQueryParam(name, value) {
     let result = {};
-
-    if (name.startsWith("c")) {
+    const customRegex = /^c\S+$/;
+    if (name.match(customRegex)) {
       result = {
         key: name,
         field: name,
@@ -85,39 +63,5 @@ class ComscoreProvider extends BaseProvider {
       result = super.handleQueryParam(name, value);
     }
     return result;
-  }
-
-  /**
-   * Parse custom properties for a given URL
-   *
-   * @param    {string}   url
-   * @param    {object}   params
-   *
-   * @returns {Array}
-   */
-  handleCustom(url, params) {
-    let results = [],
-      c1 = params.get("c1"),
-      c2 = params.get("c2");
-
-    if (c1) {
-      results.push({
-        key: "tagType",
-        field: "Tag Type",
-        value: c1,
-        group: "general"
-      });
-    }
-
-    if (c2) {
-      results.push({
-        key: "clientID",
-        field: "Client ID",
-        value: c2,
-        group: "general"
-      });
-    }
-
-    return results;
   }
 }
