@@ -70,7 +70,7 @@ window.Omnibug = (() => {
                 target.classList.remove("active");
                 if(modal === "filter-modal") {
                     let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
-                        return !provider[1] && settings.disabledProviders.includes(provider[0]);
+                        return !provider[1] && settings.providers[provider[0]].enabled;
                     });
                     tracker.track(["send", "event", "filter requests", "account", (filters.account === "") ? "no filter" : filters.accountType]);
                     tracker.track(["send", "event", "filter requests", "hidden providers", hiddenProviders.length]);
@@ -221,6 +221,52 @@ window.Omnibug = (() => {
         });
         tracker.track(["send", "event", "filter requests", ((checked) ? "show" : "hide") + " all"]);
         updateFiltersStyles();
+    });
+
+    // Clear filters
+    d.getElementById("filter-reset-all").addEventListener("click", (event) => {
+        event.preventDefault();
+        filters = {"providers": {}, "account": "", "accountType": "contains"};
+        Object.keys(allProviders).forEach((key) => {
+            filters.providers[key] = true;
+        });
+        buildProviderFilterPanel();
+    });
+
+    // Default filter save
+    d.getElementById("filter-save-default").addEventListener("click", (event) => {
+        let filterSettings = {},
+            disabledProviders = [],
+            enabledProviders =  [];
+
+        Object.entries(filters.providers).forEach((pair) => {
+            if(pair[1]) {
+                enabledProviders.push(pair[0]);
+            } else {
+                disabledProviders.push(pair[0]);
+            }
+        });
+
+        // Whitelist the selected providers, otherwise new providers would start to show up when they were added to Omnibug
+        if(disabledProviders.length) {
+            filterSettings.providers = enabledProviders;
+        }
+
+        if(filters.account) {
+            filterSettings.fields = {
+                "account": {
+                    "value": filters.account,
+                    "type": filters.accountType
+                }
+            };
+        }
+
+        Omnibug.send_message({
+            "type": "settings",
+            "key": "defaultFilters",
+            "value": filterSettings
+        });
+        showToast("Default filter updated.", "success", 5);
     });
 
     // Add our filter
@@ -409,7 +455,7 @@ window.Omnibug = (() => {
 
 
     // Setup our providers in our filters list
-    Object.keys(OmnibugProvider.getProviders()).forEach((key) => {
+    Object.keys(allProviders).forEach((key) => {
         filters.providers[key] = true;
     });
 
@@ -787,7 +833,25 @@ window.Omnibug = (() => {
 
             if(!storageLoadedSettings && fromStorage) {
                 tracker.track(["send", "pageview", "/panel"]);
-                storageLoadedSettings = true;
+            }
+        }
+
+        // Build any default filters
+        if(!storageLoadedSettings && fromStorage) {
+            if(!!Object.entries(settings.defaultFilters).length) {
+                filters = filters || {};
+                if(settings.defaultFilters.fields) {
+                    if(settings.defaultFilters.fields.account) {
+                        filters.account = settings.defaultFilters.fields.account.value;
+                        filters.accountType = settings.defaultFilters.fields.account.type;
+                    }
+                }
+                if(settings.defaultFilters.providers) {
+                    filters.providers = Object.keys(allProviders).reduce((filteredProviders, provider) => {
+                        filteredProviders[provider] = settings.defaultFilters.providers.includes(provider);
+                        return filteredProviders;
+                    }, {});
+                }
             }
         }
 
@@ -886,6 +950,10 @@ window.Omnibug = (() => {
         if (!settings.providerIcons) {
             styleSheet.sheet.insertRule(`.label + span::before {content: "";}`);
         }
+
+        if(fromStorage) {
+            storageLoadedSettings = true;
+        }
     }
 
     /**
@@ -928,9 +996,11 @@ window.Omnibug = (() => {
 
             // Check if the user has the provider enabled or not
             if(settings.providers[providerKey] && !settings.providers[providerKey].enabled) {
-                input.setAttribute("disabled", "disabled");
-                label.classList.add("disabled");
                 label.setAttribute("title", "This provider is currently disabled and requests for this provider will never be shown. You can re-enable it within the settings");
+                let warningIcon = createElement("i", {
+                    "classes": ["fas", "fa-exclamation-triangle"]
+                });
+                span.appendChild(warningIcon);
             } else {
                 if(filters.providers[providerKey]) {
                     input.checked = true;
@@ -950,6 +1020,9 @@ window.Omnibug = (() => {
 
             filters.providers[providerKey] = input.checked;
         }
+
+        d.getElementById("filter-account").value = filters.account || "";
+        d.getElementById("filter-account-type").value = ["contains", "starts", "ends", "exact"].includes(filters.accountType) ? filters.accountType : "contains";
 
         // Finally, update our stylesheet with the new filters
         updateFiltersStyles(true);

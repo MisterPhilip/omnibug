@@ -94,7 +94,9 @@ class OmnibugSettings
             providerIcons: true,
 
             // Context menu
-            contextMenuBeta: true
+            contextMenuBeta: true,
+
+            defaultFilters: {}
         };
     }
 

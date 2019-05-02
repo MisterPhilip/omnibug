@@ -272,6 +272,10 @@ nav.navbar {
   }
   .modal-body {
     padding-top: 0;
+    flex: 1;
+  }
+  .modal-footer {
+    padding: 0.5rem;
   }
 }
 #filter-providers {
@@ -279,6 +283,10 @@ nav.navbar {
   margin-top: 0;
   input {
     margin-right: .5em;
+  }
+  label .fa-exclamation-triangle {
+    margin-left: 1em;
+    color: $warning-color-dark;
   }
 }
 #provider-select-all-wrapper {
