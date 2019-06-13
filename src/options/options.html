@@ -129,6 +129,30 @@
 
         <fieldset>
             <div class="row">
+                <div class="col-label">Parameter sort order</div>
+                <div class="col">
+                    <div>
+                        <label title="Descriptions" for="paramSortOrderField">
+                            <input type="radio" name="paramSortOrder" id="paramSortOrderField"
+                                data-bind-property="paramSortOrder" value="field" />
+                            Sort by field
+                        </label>
+                    </div>
+                    <div>
+                        <label title="Descriptions" for="paramSortOrderLabel">
+                            <input type="radio" name="paramSortOrder" id="paramSortOrderLabel"
+                                data-bind-property="paramSortOrder" value="label" />
+                            Sort by renamed labels (provided above)
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <p class="help">You can sort by the parameter name, i.e. eVar1, eVar2, or sort by the renamed label you provided above.</p>
+        </fieldset>
+    
+
+        <fieldset>
+            <div class="row">
                 <div class="col-label">Parameter display style</div>
                 <div class="col">
                     <div>

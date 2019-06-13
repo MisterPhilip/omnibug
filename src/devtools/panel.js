@@ -128,7 +128,6 @@ window.Omnibug = (() => {
         }
     });
     d.addEventListener("click", function(e) {
-        // TODO add rename option here
         if(settings.contextMenuBeta) {
             if(e.target.hasAttribute("data-context-menu") || (e.target.parentNode && e.target.parentNode.hasAttribute("data-context-menu"))) {
                 let item = (e.target.hasAttribute("data-context-menu")) ? e.target : e.target.parentNode,
@@ -689,11 +688,6 @@ window.Omnibug = (() => {
                 groups[val] = groups[val] || [];
                 const newItem = {...item, label: renameParams[item.field]}
                 groups[val].push(newItem);
-                // TODO remove this
-                // if(renameParams[item.field]){
-                //     console.log(val);
-                //     console.log(newItem);
-                // }
             }
             return groups;
         }, {"summary": requestSummary});
@@ -739,9 +733,17 @@ window.Omnibug = (() => {
 
         // Loop through each of the data objects to create a new table row
         data.sort((a, b) => {
-            // TODO settings to sort by field or label
-            let aKey = a.field.toLowerCase(),
-                bKey = b.field.toLowerCase();
+            let aKey, bKey = '';
+            switch(settings.paramSortOrder) {
+                case "label":
+                    aKey = a.label ? a.label.toLowerCase() : a.field.toLowerCase();
+                    bKey = b.label ? b.label.toLowerCase() : b.field.toLowerCase();
+                    break;
+                default:
+                    aKey = a.field.toLowerCase();
+                    bKey = b.field.toLowerCase();
+                break;
+            }
             return aKey.localeCompare(bKey, "standard", {"numeric": true});
         }).forEach((row) => {
             let nameKey = createElement("span", {

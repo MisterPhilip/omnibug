@@ -75,6 +75,9 @@ class OmnibugSettings
 
             // Should newest or oldest entries show first?
             requestSortOrder: "asc",
+            
+            // Should params sort by field or label?
+            paramSortOrder: "field",
 
             // Allow tracking?
             allowTracking: true,

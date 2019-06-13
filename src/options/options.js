@@ -234,15 +234,20 @@
         document.getElementById("renameParamStatus").innerHTML = "";
     });
 
-    document.getElementById("renameParam").addEventListener("change", (event) => {
+    document.getElementById("renameParam").addEventListener("blur", (event) => {
         event.preventDefault();
-        // TODO add JSON parser to check if valid before saving
-        let newParam = event.target.value;
-        settings.renameParameters = newParam;
-        settingsProvider.save(settingsObj);
-        document.getElementById("renameParamStatus").innerHTML = "Saved";
-        
-        tracker.track(["send", "event", "settings", "renameParameter"]);
+
+        let jsonParams = event.target.value;
+        try {
+            const testingJson = JSON.parse(jsonParams)
+            settings.renameParameters = jsonParams;
+            settingsProvider.save(settingsObj);
+            document.getElementById("renameParamStatus").innerHTML = "Saved";
+            
+            tracker.track(["send", "event", "settings", "renameParameter"]);
+        } catch {
+            document.getElementById("renameParamStatus").innerHTML = "Invalid JSON provided, data is not saved.";
+        }
     });
 
 
