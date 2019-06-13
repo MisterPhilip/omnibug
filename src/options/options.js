@@ -31,6 +31,9 @@
                     paramList.appendChild(createHighlightParam(param));
                 });
             }
+            else if(prop === "renameParameters") {
+                document.getElementById("renameParam").value = value;
+            }
             else if(prop === "providers")
             {
                 let inputs = document.querySelectorAll(`input[data-bind-property="providers-enabled"]`);
@@ -226,6 +229,22 @@
 
         event.target.value = "";
     });
+    
+    document.getElementById("renameParam").addEventListener("focus", (event) => {
+        document.getElementById("renameParamStatus").innerHTML = "";
+    });
+
+    document.getElementById("renameParam").addEventListener("change", (event) => {
+        event.preventDefault();
+        // TODO add JSON parser to check if valid before saving
+        let newParam = event.target.value;
+        settings.renameParameters = newParam;
+        settingsProvider.save(settingsObj);
+        document.getElementById("renameParamStatus").innerHTML = "Saved";
+        
+        tracker.track(["send", "event", "settings", "renameParameter"]);
+    });
+
 
     console.log("search providers:", Object.values(providers));
     providerSearch = new Fuse(Object.values(providers), {

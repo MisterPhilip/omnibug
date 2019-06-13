@@ -128,6 +128,7 @@ window.Omnibug = (() => {
         }
     });
     d.addEventListener("click", function(e) {
+        // TODO add rename option here
         if(settings.contextMenuBeta) {
             if(e.target.hasAttribute("data-context-menu") || (e.target.parentNode && e.target.parentNode.hasAttribute("data-context-menu"))) {
                 let item = (e.target.hasAttribute("data-context-menu")) ? e.target : e.target.parentNode,
@@ -681,11 +682,18 @@ window.Omnibug = (() => {
             });
         });
 
+        let renameParams = JSON.parse(settings.renameParameters);
         let data = request.data.reduce((groups, item) => {
             if(!item.hidden) {
                 const val = item.group;
                 groups[val] = groups[val] || [];
-                groups[val].push(item);
+                const newItem = {...item, label: renameParams[item.field]}
+                groups[val].push(newItem);
+                // TODO remove this
+                // if(renameParams[item.field]){
+                //     console.log(val);
+                //     console.log(newItem);
+                // }
             }
             return groups;
         }, {"summary": requestSummary});
@@ -731,6 +739,7 @@ window.Omnibug = (() => {
 
         // Loop through each of the data objects to create a new table row
         data.sort((a, b) => {
+            // TODO settings to sort by field or label
             let aKey = a.field.toLowerCase(),
                 bKey = b.field.toLowerCase();
             return aKey.localeCompare(bKey, "standard", {"numeric": true});
@@ -741,7 +750,7 @@ window.Omnibug = (() => {
                 }),
                 nameField = createElement("span", {
                     "classes": ["parameter-field"],
-                    "text": row.field
+                    "text": row.label ? `${row.label} (${row.field})` : row.field
                 }),
                 valueSpan = createElement("span", {
                     "text": (row.key === "omnibug-postData" && typeof row.value === "object" ? JSON.stringify(row.value) : row.value)

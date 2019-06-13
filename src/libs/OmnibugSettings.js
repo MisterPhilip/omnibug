@@ -49,6 +49,9 @@ class OmnibugSettings
             // keys to highlight
             highlightKeys  : ["pageName", "ch", "events", "products"],
 
+            // JSON defining the params to rename
+            renameParameters: "{ \"eVar1\": \"Page Title\" }",
+
             // show entries expanded?
             alwaysExpand : false,
 
