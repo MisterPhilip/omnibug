@@ -49,6 +49,9 @@ class OmnibugSettings
             // keys to highlight
             highlightKeys  : ["pageName", "ch", "events", "products"],
 
+            // JSON defining the params to rename
+            renameParameters: "{ \"eVar1\": \"Page Title\" }",
+
             // show entries expanded?
             alwaysExpand : false,
 
@@ -72,6 +75,9 @@ class OmnibugSettings
 
             // Should newest or oldest entries show first?
             requestSortOrder: "asc",
+            
+            // Should params sort by field or label?
+            paramSortOrder: "field",
 
             // Allow tracking?
             allowTracking: true,
