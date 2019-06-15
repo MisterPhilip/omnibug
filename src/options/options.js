@@ -32,7 +32,7 @@
                 });
             }
             else if(prop === "renameParameters") {
-                document.getElementById("renameParam").value = value;
+                document.getElementById("renameParam").value = JSON.stringify(value);
             }
             else if(prop === "providers")
             {
@@ -240,12 +240,19 @@
         let stringParams = event.target.value;
         let jsonParams = {},
             parsedOK = false;
+        
+
         try {
             jsonParams = JSON.parse(stringParams)
             parsedOK = true;
         } catch {
-            document.getElementById("renameParamStatus").innerHTML = "Invalid JSON provided, data is not saved.";
-            return;
+            if(stringParams.trim().length === 0) {
+                parseOK = true;
+                jsonParams = {};
+            } else {
+                document.getElementById("renameParamStatus").innerHTML = "Invalid JSON provided, data is not saved.";
+                return;
+            }
         }
 
         if( parsedOK ) {
