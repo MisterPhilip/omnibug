@@ -237,7 +237,7 @@
     document.getElementById("renameParam").addEventListener("blur", (event) => {
         event.preventDefault();
 
-        let stringParams = event.target.value;
+        let stringParams = event.target.value.trim();
         let jsonParams = {},
             parsedOK = false;
         
@@ -246,8 +246,8 @@
             jsonParams = JSON.parse(stringParams)
             parsedOK = true;
         } catch {
-            if(stringParams.trim().length === 0) {
-                parseOK = true;
+            if(stringParams.length === 0) {
+                parsedOK = true;
                 jsonParams = {};
             } else {
                 document.getElementById("renameParamStatus").innerHTML = "Invalid JSON provided, data is not saved.";
