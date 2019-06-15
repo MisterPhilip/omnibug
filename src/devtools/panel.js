@@ -681,12 +681,11 @@ window.Omnibug = (() => {
             });
         });
 
-        let renameParams = JSON.parse(settings.renameParameters);
         let data = request.data.reduce((groups, item) => {
             if(!item.hidden) {
                 const val = item.group;
                 groups[val] = groups[val] || [];
-                const newItem = {...item, label: renameParams[item.field]}
+                const newItem = {...item, label: settings.renameParameters[item.field]}
                 groups[val].push(newItem);
             }
             return groups;
