@@ -237,16 +237,23 @@
     document.getElementById("renameParam").addEventListener("blur", (event) => {
         event.preventDefault();
 
-        let jsonParams = event.target.value;
+        let stringParams = event.target.value;
+        let jsonParams = {},
+            parsedOK = false;
         try {
-            const testingJson = JSON.parse(jsonParams)
+            jsonParams = JSON.parse(stringParams)
+            parsedOK = true;
+        } catch {
+            document.getElementById("renameParamStatus").innerHTML = "Invalid JSON provided, data is not saved.";
+            return;
+        }
+
+        if( parsedOK ) {
             settings.renameParameters = jsonParams;
             settingsProvider.save(settingsObj);
             document.getElementById("renameParamStatus").innerHTML = "Saved";
             
             tracker.track(["send", "event", "settings", "renameParameter"]);
-        } catch {
-            document.getElementById("renameParamStatus").innerHTML = "Invalid JSON provided, data is not saved.";
         }
     });
 
