@@ -24,6 +24,7 @@ test("OmnibugSettings should return a list of defaults", t => {
     t.is(typeof settings.defaults.defaultPattern, "string");
     t.is(typeof settings.defaults.providers, "object");
     t.is(typeof settings.defaults.highlightKeys, "object");
+    t.is(typeof settings.defaults.renameParameters, "string");
     t.is(typeof settings.defaults.alwaysExpand, "boolean");
     t.is(typeof settings.defaults.showQuotes, "boolean");
     t.is(typeof settings.defaults.showRedirects, "boolean");
@@ -33,6 +34,7 @@ test("OmnibugSettings should return a list of defaults", t => {
     t.is(typeof settings.defaults.showNotes, "boolean");
     t.is(typeof settings.defaults.allowTracking, "boolean");
     t.is(typeof settings.defaults.requestSortOrder, "string");
+    t.is(typeof settings.defaults.paramSortOrder, "string");
     t.is(typeof settings.defaults.theme, "string");
     t.is(typeof settings.defaults.color_load, "string");
     t.is(typeof settings.defaults.color_click, "string");

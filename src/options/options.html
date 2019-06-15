@@ -28,6 +28,23 @@
                 You can find the raw parameter names by hovering over the parameter name in Omnibug and it'll appear in parenthesis.</p>
         </fieldset>
 
+        <fieldset>
+            <div class="rxow">
+                <div class="col-label">Rename parameters</div>
+                <div class="col">
+                    <span id="renameParamStatus"></span>
+                    <textarea type="text" id="renameParam" placeholder="Rename Parameters"></textarea>
+                </div>
+            </div>
+            <p class="help">Specify JSON to change the name of your eVars, i.e.: 
+                <code>
+                    {
+                        "evar20": 
+                    }
+                </code>
+            </p>
+        </fieldset>
+
         <fieldset id="providers">
             <div class="row">
                 <div class="col-label">Enabled providers</div>
@@ -109,6 +126,30 @@
             </div>
             <p class="help">You can sort the requests either by newest first, or oldest first.</p>
         </fieldset>
+
+        <fieldset>
+            <div class="row">
+                <div class="col-label">Parameter sort order</div>
+                <div class="col">
+                    <div>
+                        <label title="Descriptions" for="paramSortOrderField">
+                            <input type="radio" name="paramSortOrder" id="paramSortOrderField"
+                                data-bind-property="paramSortOrder" value="field" />
+                            Sort by field
+                        </label>
+                    </div>
+                    <div>
+                        <label title="Descriptions" for="paramSortOrderLabel">
+                            <input type="radio" name="paramSortOrder" id="paramSortOrderLabel"
+                                data-bind-property="paramSortOrder" value="label" />
+                            Sort by renamed labels (provided above)
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <p class="help">You can sort by the parameter name, i.e. eVar1, eVar2, or sort by the renamed label you provided above.</p>
+        </fieldset>
+    
 
         <fieldset>
             <div class="row">

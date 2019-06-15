@@ -11,7 +11,7 @@ class GoogleDoubleClickProvider extends BaseProvider
     {
         super();
         this._key        = "DOUBLECLICK";
-        this._pattern    = /fls\.doubleclick\.net\/activityi(?!.*dc_pre);/;
+        this._pattern    = /(?:fls|ad)\.doubleclick\.net\/activityi(?!.*dc_pre);/;
         this._name       = "Google DoubleClick";
         this._type       = "marketing";
         this._keywords   = ["dc", "dcm"];

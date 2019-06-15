@@ -31,6 +31,9 @@
                     paramList.appendChild(createHighlightParam(param));
                 });
             }
+            else if(prop === "renameParameters") {
+                document.getElementById("renameParam").value = value;
+            }
             else if(prop === "providers")
             {
                 let inputs = document.querySelectorAll(`input[data-bind-property="providers-enabled"]`);
@@ -226,6 +229,27 @@
 
         event.target.value = "";
     });
+    
+    document.getElementById("renameParam").addEventListener("focus", (event) => {
+        document.getElementById("renameParamStatus").innerHTML = "";
+    });
+
+    document.getElementById("renameParam").addEventListener("blur", (event) => {
+        event.preventDefault();
+
+        let jsonParams = event.target.value;
+        try {
+            const testingJson = JSON.parse(jsonParams)
+            settings.renameParameters = jsonParams;
+            settingsProvider.save(settingsObj);
+            document.getElementById("renameParamStatus").innerHTML = "Saved";
+            
+            tracker.track(["send", "event", "settings", "renameParameter"]);
+        } catch {
+            document.getElementById("renameParamStatus").innerHTML = "Invalid JSON provided, data is not saved.";
+        }
+    });
+
 
     console.log("search providers:", Object.values(providers));
     providerSearch = new Fuse(Object.values(providers), {

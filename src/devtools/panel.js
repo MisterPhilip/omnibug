@@ -681,11 +681,13 @@ window.Omnibug = (() => {
             });
         });
 
+        let renameParams = JSON.parse(settings.renameParameters);
         let data = request.data.reduce((groups, item) => {
             if(!item.hidden) {
                 const val = item.group;
                 groups[val] = groups[val] || [];
-                groups[val].push(item);
+                const newItem = {...item, label: renameParams[item.field]}
+                groups[val].push(newItem);
             }
             return groups;
         }, {"summary": requestSummary});
@@ -731,8 +733,17 @@ window.Omnibug = (() => {
 
         // Loop through each of the data objects to create a new table row
         data.sort((a, b) => {
-            let aKey = a.field.toLowerCase(),
-                bKey = b.field.toLowerCase();
+            let aKey, bKey = '';
+            switch(settings.paramSortOrder) {
+                case "label":
+                    aKey = a.label ? a.label.toLowerCase() : a.field.toLowerCase();
+                    bKey = b.label ? b.label.toLowerCase() : b.field.toLowerCase();
+                    break;
+                default:
+                    aKey = a.field.toLowerCase();
+                    bKey = b.field.toLowerCase();
+                break;
+            }
             return aKey.localeCompare(bKey, "standard", {"numeric": true});
         }).forEach((row) => {
             let nameKey = createElement("span", {
@@ -741,7 +752,7 @@ window.Omnibug = (() => {
                 }),
                 nameField = createElement("span", {
                     "classes": ["parameter-field"],
-                    "text": row.field
+                    "text": row.label ? `${row.label} (${row.field})` : row.field
                 }),
                 valueSpan = createElement("span", {
                     "text": (row.key === "omnibug-postData" && typeof row.value === "object" ? JSON.stringify(row.value) : row.value)
