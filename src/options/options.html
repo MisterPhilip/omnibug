@@ -29,8 +29,8 @@
         </fieldset>
 
         <fieldset>
-            <div class="rxow">
-                <div class="col-label">Rename parameters</div>
+            <div class="row">
+                <div class="col-label">Rename parameters <span class="beta-badge">beta</span></div>
                 <div class="col">
                     <span id="renameParamStatus"></span>
                     <textarea type="text" id="renameParam" placeholder="Rename Parameters"></textarea>
@@ -43,7 +43,8 @@
                         "eVar2": "URL",
                         "prop40": "Your own label"
                     }
-                </code>. You can rename any of the provided field names listed in the OmniBug panel.
+                </code>. You can rename any of the provided field names listed in the Omnibug panel. <br />
+                <strong>Note:</strong> This feature is currently in beta and the functionality &amp; settings could change over time.
             </p>
         </fieldset>
 
@@ -144,14 +145,13 @@
                         <label title="Descriptions" for="paramSortOrderLabel">
                             <input type="radio" name="paramSortOrder" id="paramSortOrderLabel"
                                 data-bind-property="paramSortOrder" value="label" />
-                            Sort by renamed labels (provided above)
+                            Sort by renamed labels <span class="help">(provided above)</span>
                         </label>
                     </div>
                 </div>
             </div>
             <p class="help">You can sort by the parameter name, i.e. eVar1, eVar2, or sort by the renamed label you provided above.</p>
         </fieldset>
-    
 
         <fieldset>
             <div class="row">

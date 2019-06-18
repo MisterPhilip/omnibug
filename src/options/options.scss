@@ -198,3 +198,17 @@ footer p {
   text-align: center;
   color: #ccc;
 }
+$beta-color: #f7801a;
+.beta-badge {
+  color: $beta-color;
+  font-size: .75em;
+  text-transform: uppercase;
+  font-weight: bold;
+  box-shadow: 0 0 5px lighten($beta-color, 20%);
+  background: lighten($beta-color, 35%);
+  padding: .15em .3em;
+  border: 1px solid lighten($beta-color, 15%);
+  margin-left: .25rem;
+  display: inline-block;
+  border-radius: 3px;
+}
