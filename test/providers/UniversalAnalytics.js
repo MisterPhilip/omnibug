@@ -18,6 +18,10 @@ test("UniversalAnalyticsProvider pattern should match various UA domains", t => 
             "http://www.google-analytics.com/collect?",
             "http://www.google-analytics.com/collect/",
             "https://www.google-analytics.com/collect/?",
+            "http://www.google-analytics.com/g/collect",
+            "http://www.google-analytics.com/g/collect?",
+            "http://www.google-analytics.com/g/collect/",
+            "https://www.google-analytics.com/g/collect/?",
             "https://www.google-analytics.com/collect"
         ];
 
@@ -50,15 +54,22 @@ test("UniversalAnalyticsProvider returns static data", t => {
 
 test("UniversalAnalyticsProvider returns the hit type", t => {
     let provider = new UniversalAnalyticsProvider(),
-        url = "https://www.google-analytics.com/r/collect?v=1&_v=j68&a=1805905905&t=pageview&_s=1&dl=https%3A%2F%2Fomnibug.io%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=2560x1440&vp=2560x1307&je=0&_u=KCDAAUIh~&jid=441640597&gjid=200209851&cid=191425359.1527202446&tid=UA-17508125-8&_gid=401227809.1529009937&_r=1&gtm=u64&z=1617633316",
-        results = provider.parseUrl(url);
+        url1 = "https://www.google-analytics.com/r/collect?v=1&_v=j68&a=1805905905&t=pageview&_s=1&dl=https%3A%2F%2Fomnibug.io%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=2560x1440&vp=2560x1307&je=0&_u=KCDAAUIh~&jid=441640597&gjid=200209851&cid=191425359.1527202446&tid=UA-17508125-8&_gid=401227809.1529009937&_r=1&gtm=u64&z=1617633316",
+        url2 = "https://www.google-analytics.com/g/collect?v=2&tid=G-RJZRDLSZR5&gtm=2oe7v2&_p=1844589572&sr=2560x1440&cid=1473268947.1550531325&ul=en-us&_s=1&en=page_view&sid=1565188190&sct=2&seg=1&dl=https%3A%2F%2Fomnibug.io%2Ftest&dr=&dt=Omnibug%20test%20page",
+        results1 = provider.parseUrl(url1),
+        results2 = provider.parseUrl(url2);
 
-    let requestType = results.data.find((result) => {
-        return result.key === "omnibug_requestType";
-    });
+    let requestType1 = results1.data.find((result) => {
+            return result.key === "omnibug_requestType";
+        }),
+            requestType2 = results2.data.find((result) => {
+            return result.key === "omnibug_requestType";
+        });
 
-    t.is(typeof requestType, "object");
-    t.is(requestType.value, "Page View");
+    t.is(typeof requestType1, "object");
+    t.is(requestType1.value, "Page View");
+    t.is(typeof requestType2, "object");
+    t.is(requestType2.value, "Page View");
 });
 
 test("UniversalAnalyticsProvider returns POST data", t => {
