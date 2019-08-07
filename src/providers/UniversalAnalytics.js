@@ -11,7 +11,7 @@ class UniversalAnalyticsProvider extends BaseProvider
     {
         super();
         this._key        = "UNIVERSALANALYTICS";
-        this._pattern    = /\.google-analytics\.com\/(r\/)?collect(?:[\/?]+|$)/;
+        this._pattern    = /\.google-analytics\.com\/([rg]\/)?collect(?:[\/?]+|$)/;
         this._name       = "Universal Analytics";
         this._type       = "analytics";
         this._keywords   = ["google", "google analytics", "ua", "ga"];
@@ -182,6 +182,10 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "group": "general"
             },
             "t": {
+                "name": "Hit Type",
+                "group": "general"
+            },
+            "en": {
                 "name": "Hit Type",
                 "group": "general"
             },
@@ -546,14 +550,16 @@ class UniversalAnalyticsProvider extends BaseProvider
     handleCustom(url, params)
     {
         let results = [],
-            hitType = params.get("t") || "page view",
+            hitType = params.get("t") || params.get("en") || "page view",
             requestType = "";
 
         hitType = hitType.toLowerCase();
-        if(hitType === "pageview" || hitType === "screenview") {
+        if(hitType === "pageview" || hitType === "screenview" || hitType === "page_view") {
             requestType = "Page View";
         } else if(hitType === "transaction" || hitType === "item") {
             requestType = "Ecommerce " + hitType.charAt(0).toUpperCase() + hitType.slice(1);
+        } else if(hitType.indexOf("_")) {
+            requestType = hitType.replace(/_/g, " ");
         } else {
             requestType = hitType.charAt(0).toUpperCase() + hitType.slice(1);
         }
