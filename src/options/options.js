@@ -31,6 +31,16 @@
                     paramList.appendChild(createHighlightParam(param));
                 });
             }
+            else if(prop === "additionalSummary")
+            {
+                // do something special with these
+                let paramList = document.getElementById("addSummary-params");
+
+                clearChildren(paramList);
+                value.forEach((param) => {
+                    paramList.appendChild(createAdditionalSummaryParam(param));
+                });
+            }
             else if(prop === "renameParameters") {
                 document.getElementById("renameParam").value = JSON.stringify(value);
             }
@@ -201,7 +211,7 @@
 
                 tracker.init(settings.allowTracking);
 
-                if(field !== "providers" && field !== "highlightKeys") {
+                if(field !== "providers" && field !== "highlightKeys" && field !== "additionalSummary") {
                     tracker.track(["send", "event", "settings", field, String(value)], (field === "allowTracking"));
                 }
             });
@@ -229,6 +239,29 @@
 
         event.target.value = "";
     });
+
+    document.getElementById("addSummary").addEventListener("change", (event) => {
+      event.preventDefault();
+
+      let newParam = event.target.value,
+          paramList = document.getElementById("addSummary-params");
+
+      if(paramList.childElementCount < 3) {
+        if(newParam.trim() !== "" && settings.additionalSummary.indexOf(newParam) === -1) {
+            paramList.appendChild(createAdditionalSummaryParam(newParam));
+
+            settings.additionalSummary.push(newParam);
+            settingsProvider.save(settingsObj);
+
+            tracker.track(["send", "event", "settings", "additionalSummary", `added: ${newParam}`]);
+            document.getElementById("addSummaryStatus").innerHTML = "";
+        }
+      } else {
+        document.getElementById("addSummaryStatus").innerHTML = "You may only specify up to 3 parameters."
+      }
+
+      event.target.value = "";
+  });
     
     document.getElementById("renameParam").addEventListener("focus", (event) => {
         document.getElementById("renameParamStatus").innerHTML = "";
@@ -362,6 +395,31 @@
         return li;
     }
 
+    function createAdditionalSummaryParam(param) {
+      let text = createElement("span", {
+              "text": param
+          }),
+          remove = createElement("span", {
+              "classes": ["remove"],
+              "attributes": {
+                  "title": "Remove",
+                  "aria-label": "Remove"
+              },
+              "text": "\u00D7"
+          }),
+          li = createElement("li", {
+              "children": [text, remove]
+          });
+
+      remove.addEventListener("click", (event) => {
+          event.preventDefault();
+          settings.additionalSummary = settingsObj.additionalSummary = settingsObj.additionalSummary.filter(item => item !== param);
+          settingsProvider.save(settingsObj);
+          tracker.track(["send", "event", "settings", "additionalSummary", `removed: ${param}`]);
+      });
+
+      return li;
+  }
     /**
      * Load in new settings/styles
      */

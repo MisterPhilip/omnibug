@@ -67,26 +67,30 @@ fieldset {
   color: #999;
 }
 
-#highlight-params {
+#highlight-params,
+#addSummary-params {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-#highlight-params li {
+#highlight-params li,
+#addSummary-params li {
   display: inline-block;
   padding: .25em .25em .25em .5em;
   border: 1px solid #E8E8E8;
   border-radius: 5px;
   margin: 0.25em;
 }
-#highlight-params li .remove {
+#highlight-params li .remove,
+#addSummary-params li .remove {
   float: right;
   cursor: pointer;
   padding: 0.1em 0.25em;
   margin-left: 1em;
   color: #AAA;
 }
-#highlight-params li .remove:hover {
+#highlight-params li .remove:hover,
+#addSummary-params li .remove:hover {
   color: #333;
 }
 

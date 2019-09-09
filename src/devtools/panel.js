@@ -534,6 +534,28 @@ window.Omnibug = (() => {
     }
 
     /**
+     * Get value from data
+     * 
+     * @param field
+     * @param request 
+     * @return {string}
+     */
+    function getDataColumnValue(field, request) {
+      let value = "";
+      if (request.data) {
+        value = request.data.find((fld) => {
+          return fld.field === field;
+        })
+        if( value) {
+          value = value.value;
+        } else {
+          value = "";
+        }
+      }
+      return value;
+    }
+
+    /**
      * Build HTML for a request
      *
      * @param request
@@ -604,7 +626,7 @@ window.Omnibug = (() => {
                 "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-5"],
                 "children": [requestTypeEl, colTitleSpan, colTitleRedirect],
                 "attributes": {
-                    "title": request.provider.name + " - " + requestTypeValue.value
+                    "title": `${request.provider.name} ${requestTypeValue.value}`
                 }
             });
 
@@ -617,10 +639,19 @@ window.Omnibug = (() => {
             details.setAttribute("data-account", accountValue);
         }
 
+        // Add the event ID and Link Name, if exists
+        const colEvent = createElement("div", {
+          "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-2"],
+          "text": `${getDataColumnValue("Events", request)} - ${getDataColumnValue("Link name", request)}`,
+          "attributes": {
+            "title": "temp"
+          }
+        })
+
         // Add the timestamp
         let timestamp = new Date(request.request.timestamp).toLocaleString(),
             colTime = createElement("div", {
-                "classes": ["column", "col-6", "col-lg-4", "col-md-4", "col-sm-2"],
+                "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-2"],
                 "text": timestamp,
                 "attributes": {
                     "title": timestamp
@@ -630,7 +661,7 @@ window.Omnibug = (() => {
         // Wrap everything
         let summaryColumns = createElement("div", {
                 "classes": ["columns"],
-                "children": [colTitleWrapper, colAccount, colTime]
+                "children": [colTitleWrapper, colAccount, colEvent, colTime]
             }),
             summaryContainer = createElement("div", {
                 "classes": ["container"],

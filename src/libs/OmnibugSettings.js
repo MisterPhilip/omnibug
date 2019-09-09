@@ -49,6 +49,9 @@ class OmnibugSettings
             // keys to highlight
             highlightKeys  : ["pageName", "ch", "events", "products"],
 
+            // additional summary parameters
+            additionalSummary: [],
+            
             // JSON defining the params to rename
             renameParameters: {},
 
