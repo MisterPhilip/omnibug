@@ -24,6 +24,7 @@ test("OmnibugSettings should return a list of defaults", t => {
     t.is(typeof settings.defaults.defaultPattern, "string");
     t.is(typeof settings.defaults.providers, "object");
     t.is(typeof settings.defaults.highlightKeys, "object");
+    t.is(typeof settings.defaults.additionalSummary, "object");
     t.is(typeof settings.defaults.renameParameters, "object");
     t.is(typeof settings.defaults.alwaysExpand, "boolean");
     t.is(typeof settings.defaults.showQuotes, "boolean");
