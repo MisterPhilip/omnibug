@@ -640,13 +640,24 @@ window.Omnibug = (() => {
         }
 
         // Add the event ID and Link Name, if exists
-        const colEvent = createElement("div", {
-          "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-2"],
-          "text": `${getDataColumnValue("Events", request)} - ${getDataColumnValue("Link name", request)}`,
-          "attributes": {
-            "title": "temp"
-          }
-        })
+        let includeEventCol = false;
+        let colEvent = {};
+        if(settings.additionalSummary.length > 0) {
+          let colText = ""
+          settings.additionalSummary.forEach((fld) => {
+            colText = `${colText} - ${getDataColumnValue(fld, request)}`
+          });
+
+          colText = colText.substring(2); // trim the first 3 characters off including the first -
+          colEvent = createElement("div", {
+            "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-2"],
+            "text": colText,
+            "attributes": {
+              "title": "temp"
+            }
+          });
+          includeEventCol = true;
+        }
 
         // Add the timestamp
         let timestamp = new Date(request.request.timestamp).toLocaleString(),
@@ -661,7 +672,7 @@ window.Omnibug = (() => {
         // Wrap everything
         let summaryColumns = createElement("div", {
                 "classes": ["columns"],
-                "children": [colTitleWrapper, colAccount, colEvent, colTime]
+                "children": [colTitleWrapper, colAccount, (includeEventCol ? colEvent : null), colTime]
             }),
             summaryContainer = createElement("div", {
                 "classes": ["container"],
