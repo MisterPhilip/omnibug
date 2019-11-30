@@ -324,7 +324,7 @@ class MatomoProvider extends BaseProvider {
                 "name": "Latitude",
                 "group": "general"
             },
-            "long": {
+            "lat": {
                 "name": "Longitude",
                 "group": "general"
             },
@@ -382,6 +382,10 @@ class MatomoProvider extends BaseProvider {
             },
             "ma_se": {
                 "name": "Media Positions Played",
+                "group": "media"
+            },
+            "ma_fs": {
+                "name": "Fullscreen Media",
                 "group": "media"
             }
         };
