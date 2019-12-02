@@ -1,18 +1,18 @@
 /**
- * Matomo (Formerly Piwik)
- * http://matomo.org
+ * Piwik PRO
+ * https://piwik.pro
  *
  * @class
  * @extends BaseProvider
  */
-class MatomoProvider extends BaseProvider {
+class PiwikPROProvider extends BaseProvider {
     constructor() {
         super();
-        this._key = "MATOMO";
-        this._pattern = /\/(piwik|matomo)\.php\?/;
-        this._name = "Matomo";
+        this._key = "PIWIKPRO";
+        this._pattern = /\/ppms\.php\?/;
+        this._name = "Piwik PRO Analytics Suite";
         this._type = "analytics";
-        this._keywords = ["piwik"];
+        this._keywords = ["piwikpro"];
     }
 
     /**
@@ -551,7 +551,12 @@ class MatomoProvider extends BaseProvider {
             requestType = "Download Click";
         } else if (params.get("c_i")) {
             requestType = "Content Interaction";
+        }else if (params.get("ping")){
+            requestType = "Ping";
+        }else if (params.get("e_c")){
+            requestType = "Custom Event"
         }
+
         results.push({
             "key": "requestType",
             "value": requestType,
