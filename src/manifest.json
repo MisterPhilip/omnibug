@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
-    "name": "Omnibug",
-    "version": "Wersja zajebista",
+    "name": "##OMNIBUG_NAME##",
+    "version": "##OMNIBUG_VERSION##",
     "description": "Omnibug is a browser extension to decode and display outgoing digital marketing tool requests.",
     "author": "Philip Lawrence",
     "icons": {
