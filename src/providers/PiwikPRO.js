@@ -10,9 +10,9 @@ class PiwikPROProvider extends BaseProvider {
         super();
         this._key = "PIWIKPRO";
         this._pattern = /\/ppms\.php\?/;
-        this._name = "Piwik PRO Analytics Suite";
+        this._name = "Piwik PRO";
         this._type = "analytics";
-        this._keywords = ["piwikpro"];
+        this._keywords = ["piwikpro", "matomo"];
     }
 
     /**
@@ -482,7 +482,7 @@ class PiwikPROProvider extends BaseProvider {
                 "key": "_cvar",
                 "hidden": true
             };
-        } else if(name === "cvar") {
+        } else if (name === "cvar") {
             result = {
                 "key": "cvar",
                 "hidden": true
@@ -556,12 +556,12 @@ class PiwikPROProvider extends BaseProvider {
                     Object.entries(customVars).forEach(([key, [name, value]]) => {
                         results.push({
                             "key": `_cvar${key}n`,
-                            "field": `Visit Custom Variable ${key} Name`,
+                            "field": `Custom Visit Variable ${key} Name`,
                             "value": name,
                             "group": "custom"
                         }, {
                             "key": `_cvar${key}v`,
-                            "field": `Visit Custom Variable ${key} Value`,
+                            "field": `Custom Visit Variable ${key} Value`,
                             "value": value,
                             "group": "custom"
                         });
@@ -571,7 +571,7 @@ class PiwikPROProvider extends BaseProvider {
                 // do nothing
                 results.push({
                     "key": "_cvar",
-                    "field": "Visit Custom Variables",
+                    "field": "Custom Visit Variables",
                     "value": _cvar,
                     "group": "custom"
                 });
@@ -585,12 +585,12 @@ class PiwikPROProvider extends BaseProvider {
                     Object.entries(customVars).forEach(([key, [name, value]]) => {
                         results.push({
                             "key": `cvar${key}n`,
-                            "field": `Action Custom Variable ${key} Name`,
+                            "field": `Custom Action Variable ${key} Name`,
                             "value": name,
                             "group": "custom"
                         }, {
                             "key": `cvar${key}v`,
-                            "field": `Action Custom Variable ${key} Value`,
+                            "field": `Custom Action Variable ${key} Value`,
                             "value": value,
                             "group": "custom"
                         });
@@ -600,7 +600,7 @@ class PiwikPROProvider extends BaseProvider {
                 // do nothing
                 results.push({
                     "key": "cvar",
-                    "field": "Action Custom Variables",
+                    "field": "Custom Action Variables",
                     "value": cvar,
                     "group": "custom"
                 });
@@ -666,10 +666,10 @@ class PiwikPROProvider extends BaseProvider {
             requestType = "Download Click";
         } else if (params.get("c_i")) {
             requestType = "Content Interaction";
-        }else if (params.get("ping")){
-            requestType = "Ping";
-        }else if (params.get("e_c")){
+        } else if (params.get("e_c")) {
             requestType = "Custom Event"
+        } else if (params.get("ping")) {
+            requestType = "Ping";
         }
 
         results.push({

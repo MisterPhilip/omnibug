@@ -551,7 +551,12 @@ class MatomoProvider extends BaseProvider {
             requestType = "Download Click";
         } else if (params.get("c_i")) {
             requestType = "Content Interaction";
+        } else if (params.get("e_c")) {
+            requestType = "Custom Event"
+        } else if (params.get("ping")) {
+            requestType = "Ping";
         }
+
         results.push({
             "key": "requestType",
             "value": requestType,
