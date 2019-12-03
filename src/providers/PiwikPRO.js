@@ -61,6 +61,10 @@ class PiwikPROProvider extends BaseProvider {
             {
                 "key": "media",
                 "name": "Media"
+            },
+            {
+                "key": "rum",
+                "name": "Real User Monitoring"
             }
         ];
     }
@@ -92,7 +96,7 @@ class PiwikPROProvider extends BaseProvider {
                 "name": "Visitor ID",
                 "group": "general"
             },
-            "rand": {
+            "r": {
                 "name": "Cache Buster",
                 "group": "other"
             },
@@ -115,6 +119,10 @@ class PiwikPROProvider extends BaseProvider {
             "_idts": {
                 "name": "First Visit Timestamp",
                 "group": "other"
+            },
+            "_idn": {
+                "name": "New Visitor",
+                "group": "generalx"
             },
             "_rcn": {
                 "name": "Campaign Name",
@@ -383,6 +391,78 @@ class PiwikPROProvider extends BaseProvider {
             "ma_se": {
                 "name": "Media Positions Played",
                 "group": "media"
+            },
+            "t_us": {
+                "name": "Unload Event Start",
+                "group": "rum"
+            },
+            "t_ue": {
+                "name": "Unload Event End",
+                "group": "rum"
+            },
+            "t_rs": {
+                "name": "Redirect Start",
+                "group": "rum"
+            },
+            "t_re": {
+                "name": "Redirect End",
+                "group": "rum"
+            },
+            "t_fs": {
+                "name": "Fetch Start",
+                "group": "rum"
+            },
+            "t_ss": {
+                "name": "Secure Connection Start",
+                "group": "rum"
+            },
+            "t_ds": {
+                "name": "Domain Lookup Start",
+                "group": "rum"
+            },
+            "t_cs": {
+                "name": "Connect Start",
+                "group": "rum"
+            },
+            "t_ce": {
+                "name": "Connect End",
+                "group": "rum"
+            },
+            "t_qs": {
+                "name": "Request Start Start",
+                "group": "rum"
+            },
+            "t_as": {
+                "name": "Response Start",
+                "group": "rum"
+            },
+            "t_ae": {
+                "name": "Response End",
+                "group": "rum"
+            },
+            "t_dl": {
+                "name": "DOM Loading",
+                "group": "rum"
+            },
+            "t_di": {
+                "name": "DOM Interactive",
+                "group": "rum"
+            },
+            "t_ls": {
+                "name": "DOM Content Loaded Event Start",
+                "group": "rum"
+            },
+            "t_le": {
+                "name": "DOM Content Loaded Event End",
+                "group": "rum"
+            },
+            "t_dc": {
+                "name": "DOM Complete",
+                "group": "rum"
+            },
+            "t_ee": {
+                "name": "Load Event End",
+                "group": "rum"
             }
         };
     }
@@ -400,6 +480,11 @@ class PiwikPROProvider extends BaseProvider {
         if (name === "_cvar") {
             result = {
                 "key": "_cvar",
+                "hidden": true
+            };
+        } else if(name === "cvar") {
+            result = {
+                "key": "cvar",
                 "hidden": true
             };
         } else if (name === "ec_items") {
@@ -432,6 +517,7 @@ class PiwikPROProvider extends BaseProvider {
         let results = [],
             revenue = params.get("revenue"),
             _cvar = params.get("_cvar"),
+            cvar = params.get("cvar"),
             ec_items = params.get("ec_items"),
             requestType = "Page View";
 
@@ -470,12 +556,12 @@ class PiwikPROProvider extends BaseProvider {
                     Object.entries(customVars).forEach(([key, [name, value]]) => {
                         results.push({
                             "key": `_cvar${key}n`,
-                            "field": `Custom Variable ${key} Name`,
+                            "field": `Visit Custom Variable ${key} Name`,
                             "value": name,
                             "group": "custom"
                         }, {
                             "key": `_cvar${key}v`,
-                            "field": `Custom Variable ${key} Value`,
+                            "field": `Visit Custom Variable ${key} Value`,
                             "value": value,
                             "group": "custom"
                         });
@@ -485,8 +571,37 @@ class PiwikPROProvider extends BaseProvider {
                 // do nothing
                 results.push({
                     "key": "_cvar",
-                    "field": "Custom Variables",
+                    "field": "Visit Custom Variables",
                     "value": _cvar,
+                    "group": "custom"
+                });
+            }
+        }
+
+        if (cvar) {
+            try {
+                let customVars = JSON.parse(cvar);
+                if (typeof customVars === "object" && customVars) {
+                    Object.entries(customVars).forEach(([key, [name, value]]) => {
+                        results.push({
+                            "key": `cvar${key}n`,
+                            "field": `Action Custom Variable ${key} Name`,
+                            "value": name,
+                            "group": "custom"
+                        }, {
+                            "key": `cvar${key}v`,
+                            "field": `Action Custom Variable ${key} Value`,
+                            "value": value,
+                            "group": "custom"
+                        });
+                    })
+                }
+            } catch (e) {
+                // do nothing
+                results.push({
+                    "key": "cvar",
+                    "field": "Action Custom Variables",
+                    "value": cvar,
                     "group": "custom"
                 });
             }
