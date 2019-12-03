@@ -253,12 +253,16 @@ test("MatomoProvider handles request types", t => {
         exitUrl = "https://omnibug.matomo.cloud/matomo.php?exit=http%3A%2F%2Fmydomain.co.uk%2F&idsite=1&rec=1&r=966547&h=13&m=35&s=19&url=http%3A%2F%2Flocalhost%2Fmatomo.html&_id=6a45e22e58f0786b&_idts=1575143580&_idvc=1&_idn=0&_refts=0&_viewts=1575143580&_ects=1575145811&cs=windows-1252&send_image=1&pdf=1&qt=0&realp=0&wma=0&dir=0&fla=0&java=0&gears=0&ag=0&cookie=1&res=2560x1440&gt_ms=1&pv_id=tDfpI9",
         downloadUrl = "https://omnibug.matomo.cloud/matomo.php?download=http%3A%2F%2Fmydomain.co.uk%2Fmailto%2FAgent%20namexyz&idsite=1&rec=1&r=636736&h=13&m=35&s=11&url=http%3A%2F%2Flocalhost%2Fmatomo.html&_id=6a45e22e58f0786b&_idts=1575143580&_idvc=1&_idn=0&_refts=0&_viewts=1575143580&_ects=1575145811&cs=windows-1252&send_image=1&pdf=1&qt=0&realp=0&wma=0&dir=0&fla=0&java=0&gears=0&ag=0&cookie=1&res=2560x1440&gt_ms=1&pv_id=tDfpI9",
         searchUrl = "https://omnibug.matomo.cloud/matomo.php?search=Banana&search_cat=Organic%20Food&search_count=35&idsite=1&rec=1&r=387935&h=13&m=36&s=21&url=http%3A%2F%2Flocalhost%2Fmatomo.html&_id=6a45e22e58f0786b&_idts=1575143580&_idvc=1&_idn=0&_refts=0&_viewts=1575143580&_ects=1575145811&cs=windows-1252&send_image=1&pdf=1&qt=0&realp=0&wma=0&dir=0&fla=0&java=0&gears=0&ag=0&cookie=1&res=2560x1440&gt_ms=1&pv_id=tDfpI9",
-        contentUrl = "https://omnibug.matomo.cloud/matomo.php?c_i=tabActivated&c_n=Content%20Name&c_p=Content%20Piece&c_t=http%3A%2F%2Fwww.example.com&idsite=1&rec=1&r=336165&h=13&m=36&s=52&url=http%3A%2F%2Flocalhost%2Fmatomo.html&_id=6a45e22e58f0786b&_idts=1575143580&_idvc=1&_idn=0&_refts=0&_viewts=1575143580&_ects=1575145811&cs=windows-1252&send_image=1&pdf=1&qt=0&realp=0&wma=0&dir=0&fla=0&java=0&gears=0&ag=0&cookie=1&res=2560x1440&gt_ms=1&pv_id=tDfpI9";
+        contentUrl = "https://omnibug.matomo.cloud/matomo.php?c_i=tabActivated&c_n=Content%20Name&c_p=Content%20Piece&c_t=http%3A%2F%2Fwww.example.com&idsite=1&rec=1&r=336165&h=13&m=36&s=52&url=http%3A%2F%2Flocalhost%2Fmatomo.html&_id=6a45e22e58f0786b&_idts=1575143580&_idvc=1&_idn=0&_refts=0&_viewts=1575143580&_ects=1575145811&cs=windows-1252&send_image=1&pdf=1&qt=0&realp=0&wma=0&dir=0&fla=0&java=0&gears=0&ag=0&cookie=1&res=2560x1440&gt_ms=1&pv_id=tDfpI9",
+        pingUrl = "https://stats.omnibug.io/matomo.php?ping=1&idsite=1&rec=1&r=336165&h=13&m=36&s=52&url=http%3A%2F%2Flocalhost%2FPiwikPRO.html&_id=6a45e22e58f0786b&_idts=1575143580&_idvc=1&_idn=0&_refts=0&_viewts=1575143580&_ects=1575145811&cs=windows-1252&send_image=1&pdf=1&qt=0&realp=0&wma=0&dir=0&fla=0&java=0&gears=0&ag=0&cookie=1&res=2560x1440&gt_ms=1&pv_id=tDfpI9",
+        customEvent = "https://stats.omnibug.io/matomo.php?e_c=event%20category&e_a=event%20action&e_n=event%20name&idsite=1&rec=1&r=336165&h=13&m=36&s=52&url=http%3A%2F%2Flocalhost%2FPiwikPRO.html&_id=6a45e22e58f0786b&_idts=1575143580&_idvc=1&_idn=0&_refts=0&_viewts=1575143580&_ects=1575145811&cs=windows-1252&send_image=1&pdf=1&qt=0&realp=0&wma=0&dir=0&fla=0&java=0&gears=0&ag=0&cookie=1&res=2560x1440&gt_ms=1&pv_id=tDfpI9";
 
     let exitResults = provider.parseUrl(exitUrl),
         downloadResults = provider.parseUrl(downloadUrl),
         searchResults = provider.parseUrl(searchUrl),
         contentResults = provider.parseUrl(contentUrl),
+        pingResults = provider.parseUrl(pingUrl),
+        eventResults = provider.parseUrl(customEvent),
 
         exitType = exitResults.data.find((result) => {
             return result.key === "requestType";
@@ -271,9 +275,17 @@ test("MatomoProvider handles request types", t => {
         }),
         contentType = contentResults.data.find((result) => {
             return result.key === "requestType";
+        }),
+        pingType = pingResults.data.find((result) => {
+            return result.key === "requestType";
+        }),
+        eventType = eventResults.data.find((result) => {
+            return result.key === "requestType";
         });
     t.is(exitType.value, "Exit Click");
     t.is(downloadType.value, "Download Click");
     t.is(searchType.value, "Site Search");
     t.is(contentType.value, "Content Interaction");
+    t.is(pingType.value, "Ping");
+    t.is(eventType.value, "Custom Event");
 });
