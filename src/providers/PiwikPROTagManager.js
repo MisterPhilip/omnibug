@@ -51,7 +51,7 @@ class PiwikPROTagManagerProvider extends BaseProvider {
      */
     handleCustom(url, params) {
         let matches = url.pathname.match(/^\/containers\/([a-z0-9-]+)\.js/),
-            id = (matches && matches[1]) ? matches[1] : "";
+            id = (matches && matches[1]) ? matches[1] : /* istanbul ignore next: should never happen, but it's a simple string default */ "";
 
         return [
             {

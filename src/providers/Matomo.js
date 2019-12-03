@@ -466,6 +466,7 @@ class MatomoProvider extends BaseProvider {
         if (_cvar) {
             try {
                 let customVars = JSON.parse(_cvar);
+                /* istanbul ignore else: do nothing when it's null/empty */
                 if (typeof customVars === "object" && customVars) {
                     Object.entries(customVars).forEach(([key, [name, value]]) => {
                         results.push({
@@ -482,7 +483,7 @@ class MatomoProvider extends BaseProvider {
                     })
                 }
             } catch (e) {
-                // do nothing
+                /* istanbul ignore next: push the full value to the key */
                 results.push({
                     "key": "_cvar",
                     "field": "Custom Variables",
@@ -496,6 +497,7 @@ class MatomoProvider extends BaseProvider {
         if (ec_items) {
             try {
                 let products = JSON.parse(ec_items);
+                /* istanbul ignore else: do nothing when it's null/empty */
                 if (typeof products === "object" && products.length) {
                     products.forEach(([sku, name, category, price, qty], i) => {
                         let j = i + 1;
@@ -528,7 +530,7 @@ class MatomoProvider extends BaseProvider {
                     })
                 }
             } catch (e) {
-                // do nothing
+                /* istanbul ignore next: push the full value to the key */
                 results.push({
                     "key": "ec_items",
                     "field": "Products",
