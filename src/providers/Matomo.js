@@ -324,7 +324,7 @@ class MatomoProvider extends BaseProvider {
                 "name": "Latitude",
                 "group": "general"
             },
-            "long": {
+            "lat": {
                 "name": "Longitude",
                 "group": "general"
             },
@@ -382,6 +382,10 @@ class MatomoProvider extends BaseProvider {
             },
             "ma_se": {
                 "name": "Media Positions Played",
+                "group": "media"
+            },
+            "ma_fs": {
+                "name": "Fullscreen Media",
                 "group": "media"
             }
         };
@@ -466,7 +470,6 @@ class MatomoProvider extends BaseProvider {
         if (_cvar) {
             try {
                 let customVars = JSON.parse(_cvar);
-                /* istanbul ignore else: do nothing when it's null/empty */
                 if (typeof customVars === "object" && customVars) {
                     Object.entries(customVars).forEach(([key, [name, value]]) => {
                         results.push({
@@ -483,7 +486,7 @@ class MatomoProvider extends BaseProvider {
                     })
                 }
             } catch (e) {
-                /* istanbul ignore next: push the full value to the key */
+                // do nothing
                 results.push({
                     "key": "_cvar",
                     "field": "Custom Variables",
@@ -497,7 +500,6 @@ class MatomoProvider extends BaseProvider {
         if (ec_items) {
             try {
                 let products = JSON.parse(ec_items);
-                /* istanbul ignore else: do nothing when it's null/empty */
                 if (typeof products === "object" && products.length) {
                     products.forEach(([sku, name, category, price, qty], i) => {
                         let j = i + 1;
@@ -530,7 +532,7 @@ class MatomoProvider extends BaseProvider {
                     })
                 }
             } catch (e) {
-                /* istanbul ignore next: push the full value to the key */
+                // do nothing
                 results.push({
                     "key": "ec_items",
                     "field": "Products",
@@ -553,12 +555,7 @@ class MatomoProvider extends BaseProvider {
             requestType = "Download Click";
         } else if (params.get("c_i")) {
             requestType = "Content Interaction";
-        } else if (params.get("e_c")) {
-            requestType = "Custom Event"
-        } else if (params.get("ping")) {
-            requestType = "Ping";
         }
-
         results.push({
             "key": "requestType",
             "value": requestType,
