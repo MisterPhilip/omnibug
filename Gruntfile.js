@@ -1,5 +1,5 @@
 /* globals module, require */
-module.exports = function (grunt) {
+module.exports = function(grunt) {
 
     grunt.config.init({
         "extension": {
@@ -12,7 +12,7 @@ module.exports = function (grunt) {
             },
             "production": {
                 "name": "Omnibug",
-                "version": "1.13.1",
+                "version": "1.13.0",
                 "storageKey": "omnibug",
                 "feedbackUrl": "https://omnibug.io/feedback",
                 "analyticsID": "UA-114343677-2"
@@ -148,14 +148,14 @@ module.exports = function (grunt) {
 
     grunt.registerTask("build-beta", "Build the beta version", (browsers = "") => {
         let allowedBrowsers = ["chrome", "firefox"];
-        if (browsers === "") {
+        if(browsers === "") {
             browsers = allowedBrowsers;
         } else {
             browsers = browsers.split(",");
         }
         grunt.task.run("build-providers");
         browsers.forEach((b) => {
-            if (allowedBrowsers.indexOf(b) > -1) {
+            if(allowedBrowsers.indexOf(b) > -1) {
                 grunt.task.run(
                     "clean:" + b + ":beta",
                     "sass",
@@ -174,14 +174,14 @@ module.exports = function (grunt) {
 
     grunt.registerTask("build-production", "Build the extensions", (browsers = "") => {
         let allowedBrowsers = ["chrome", "firefox"];
-        if (browsers === "") {
+        if(browsers === "") {
             browsers = allowedBrowsers;
         } else {
             browsers = browsers.split(",");
         }
         grunt.task.run("build-providers");
         browsers.forEach((b) => {
-            if (allowedBrowsers.indexOf(b) > -1) {
+            if(allowedBrowsers.indexOf(b) > -1) {
                 grunt.task.run(
                     "clean:" + b + ":production",
                     "sass",
@@ -197,7 +197,7 @@ module.exports = function (grunt) {
         });
     });
 
-    grunt.registerTask("chrome-manifest", "Build the Chrome manifest.json file", function (version = "production") {
+    grunt.registerTask("chrome-manifest", "Build the Chrome manifest.json file", function(version = "production") {
         grunt.config.requires(`extension.${version}.version`);
 
         let browserOptions = grunt.config("chrome"),
@@ -215,7 +215,7 @@ module.exports = function (grunt) {
         grunt.log.write("Created Chrome's manifest.json. ").ok();
     });
 
-    grunt.registerTask("firefox-manifest", "Build the Firefox manifest.json file", function (version = "production") {
+    grunt.registerTask("firefox-manifest", "Build the Firefox manifest.json file", function(version = "production") {
         grunt.config.requires(`extension.${version}.version`, "firefox.gecko");
 
         let browserOptions = grunt.config("firefox"),
@@ -235,7 +235,7 @@ module.exports = function (grunt) {
         grunt.log.write("Created Firefox's manifest.json. ").ok();
     });
 
-    grunt.registerTask("build-copy", "Copy over the source files to the build directory", function (browser) {
+    grunt.registerTask("build-copy", "Copy over the source files to the build directory", function(browser) {
         grunt.config.requires(browser);
         let options = grunt.config(browser),
             filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*", "!libs/OmnibugTracker.*", "popup/*.*", "!**/*.scss", "!assets/styles/**"],
@@ -244,11 +244,11 @@ module.exports = function (grunt) {
                 cwd: "src/libs/",
                 src: [],
                 dest: "./platform/" + options.folder + "/libs",
-                rename: function (path, name) {
+                rename: function(path, name) {
                     return path + "/OmnibugTracker.js";
                 }
             };
-        if (options.tracking) {
+        if(options.tracking) {
             trackingLib.src.push("OmnibugTracker.js");
         } else {
             trackingLib.src.push("OmnibugTracker.disabled.js");
@@ -263,12 +263,11 @@ module.exports = function (grunt) {
                     dest: "./platform/" + options.folder
                 },
                 trackingLib
-            ]
-        });
+            ]});
         grunt.task.run("copy:" + browser);
     });
 
-    grunt.registerTask("build-concat", "Concat build files for a browser", function (browser) {
+    grunt.registerTask("build-concat", "Concat build files for a browser", function(browser) {
         grunt.config.requires(browser);
         let options = grunt.config(browser);
         let destFiles = {},
@@ -283,7 +282,7 @@ module.exports = function (grunt) {
         grunt.task.run("concat:" + browser);
     });
 
-    grunt.registerTask("build-placeholders", "Update placeholders in built files", function (browser, version = "production") {
+    grunt.registerTask("build-placeholders", "Update placeholders in built files", function(browser, version = "production") {
         grunt.config.requires(browser, `extension.${version}`);
         let browserOptions = grunt.config(browser),
             extensionOptions = grunt.config(`extension.${version}`),
@@ -329,7 +328,7 @@ module.exports = function (grunt) {
         grunt.task.run("replace:" + browser);
     });
 
-    grunt.registerTask("build-compress", "Compress build files into extension .zip", function (browser, version = "production") {
+    grunt.registerTask("build-compress", "Compress build files into extension .zip", function(browser, version = "production") {
         grunt.config.requires(browser, `extension.${version}`);
         let options = grunt.config(browser),
             extensionOptions = grunt.config(`extension.${version}`);
@@ -350,7 +349,7 @@ module.exports = function (grunt) {
         grunt.task.run("compress:" + browser);
     });
 
-    grunt.registerTask("build-test-files", "Build everything for testing", function () {
+    grunt.registerTask("build-test-files", "Build everything for testing", function() {
 
         grunt.config.set("concat.test-port", {
             "options": {
@@ -405,15 +404,15 @@ module.exports = function (grunt) {
          */
         grunt.config.set("concat.providers-test-individual", {
             "options": {
-                "banner": "const { URL } = require(\"url\");\n" +
-                    "const URLSearchParams = require(\"@ungap/url-search-params\");\n",
-                "process": function (source, filepath) {
+                "banner":  "const { URL } = require(\"url\");\n" +
+                            "const URLSearchParams = require(\"@ungap/url-search-params\");\n",
+                "process": function(source, filepath) {
                     var className = filepath.replace("./src/providers/", "").split(".")[0],
                         exportString = "";
-                    if (className === "OmnibugProvider") {
+                    if(className === "OmnibugProvider") {
                         source = `const BaseProvider = require("./BaseProvider.js").default;\n` + source;
                         source = source.replace("var OmnibugProvider", "export var OmnibugProvider");
-                    } else if (className === "BaseProvider") {
+                    } else if(className === "BaseProvider") {
                         // do nothing for now
                     } else {
                         className += "Provider";
@@ -447,15 +446,15 @@ module.exports = function (grunt) {
         // Load our providers into OmnibugProvider
         let providerInclude = [];
         providers.forEach((provider) => {
-            if (["OmnibugProvider", "BaseProvider"].indexOf(provider) === -1) {
+            if(["OmnibugProvider", "BaseProvider"].indexOf(provider) === -1) {
                 providerInclude.push(`OmnibugProvider.addProvider(new ${provider}());`);
             }
         });
 
         grunt.config.set("concat.providers-test", {
             "options": {
-                "banner": "const { URL } = require(\"url\");\n" +
-                    "var URLSearchParams = require(\"@ungap/url-search-params\");\n",
+                "banner":   "const { URL } = require(\"url\");\n" +
+                "var URLSearchParams = require(\"@ungap/url-search-params\");\n",
                 "footer": `\n${providerInclude.join("\n")}\nexport { OmnibugProvider };`
             },
             "files": {
@@ -464,8 +463,7 @@ module.exports = function (grunt) {
                     sourceBasePath + "OmnibugProvider.js",
                     sourceBasePath + "*.js",
                     ignoreFile
-                ]
-            }
+                ]}
         });
 
         grunt.task.run(["clean:test", "concat:providers-test", "concat:providers-test-individual", "concat:test-port", "concat:test-settings", "concat:test-helpers", "concat:test-tracker"]);
@@ -476,7 +474,7 @@ module.exports = function (grunt) {
      *
      * This will build the providers for use within the plugin, NOT for testing
      */
-    grunt.registerTask("build-providers", "Combine providers into a single file", function () {
+    grunt.registerTask("build-providers", "Combine providers into a single file", function() {
         grunt.task.run("clean:providers");
 
         const sourceBasePath = "./src/providers/",
@@ -491,7 +489,7 @@ module.exports = function (grunt) {
         // Load our providers into OmnibugProvider
         let providerInclude = [];
         providers.forEach((provider) => {
-            if (["OmnibugProvider", "BaseProvider"].indexOf(provider) === -1) {
+            if(["OmnibugProvider", "BaseProvider"].indexOf(provider) === -1) {
                 providerInclude.push(`OmnibugProvider.addProvider(new ${provider}());`);
             }
         });
