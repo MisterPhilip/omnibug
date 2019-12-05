@@ -1,18 +1,18 @@
 /**
- * Matomo (Formerly Piwik)
- * http://matomo.org
+ * Piwik PRO
+ * https://piwik.pro
  *
  * @class
  * @extends BaseProvider
  */
-class MatomoProvider extends BaseProvider {
+class PiwikPROProvider extends BaseProvider {
     constructor() {
         super();
-        this._key = "MATOMO";
-        this._pattern = /\/(piwik|matomo)\.php\?/;
-        this._name = "Matomo";
+        this._key = "PIWIKPRO";
+        this._pattern = /\/ppms\.php\?/;
+        this._name = "Piwik PRO";
         this._type = "analytics";
-        this._keywords = ["piwik"];
+        this._keywords = ["piwikpro", "matomo"];
     }
 
     /**
@@ -61,6 +61,10 @@ class MatomoProvider extends BaseProvider {
             {
                 "key": "media",
                 "name": "Media"
+            },
+            {
+                "key": "rum",
+                "name": "Real User Monitoring"
             }
         ];
     }
@@ -92,7 +96,7 @@ class MatomoProvider extends BaseProvider {
                 "name": "Visitor ID",
                 "group": "general"
             },
-            "rand": {
+            "r": {
                 "name": "Cache Buster",
                 "group": "other"
             },
@@ -115,6 +119,10 @@ class MatomoProvider extends BaseProvider {
             "_idts": {
                 "name": "First Visit Timestamp",
                 "group": "other"
+            },
+            "_idn": {
+                "name": "New Visitor",
+                "group": "generalx"
             },
             "_rcn": {
                 "name": "Campaign Name",
@@ -383,6 +391,78 @@ class MatomoProvider extends BaseProvider {
             "ma_se": {
                 "name": "Media Positions Played",
                 "group": "media"
+            },
+            "t_us": {
+                "name": "Unload Event Start",
+                "group": "rum"
+            },
+            "t_ue": {
+                "name": "Unload Event End",
+                "group": "rum"
+            },
+            "t_rs": {
+                "name": "Redirect Start",
+                "group": "rum"
+            },
+            "t_re": {
+                "name": "Redirect End",
+                "group": "rum"
+            },
+            "t_fs": {
+                "name": "Fetch Start",
+                "group": "rum"
+            },
+            "t_ss": {
+                "name": "Secure Connection Start",
+                "group": "rum"
+            },
+            "t_ds": {
+                "name": "Domain Lookup Start",
+                "group": "rum"
+            },
+            "t_cs": {
+                "name": "Connect Start",
+                "group": "rum"
+            },
+            "t_ce": {
+                "name": "Connect End",
+                "group": "rum"
+            },
+            "t_qs": {
+                "name": "Request Start Start",
+                "group": "rum"
+            },
+            "t_as": {
+                "name": "Response Start",
+                "group": "rum"
+            },
+            "t_ae": {
+                "name": "Response End",
+                "group": "rum"
+            },
+            "t_dl": {
+                "name": "DOM Loading",
+                "group": "rum"
+            },
+            "t_di": {
+                "name": "DOM Interactive",
+                "group": "rum"
+            },
+            "t_ls": {
+                "name": "DOM Content Loaded Event Start",
+                "group": "rum"
+            },
+            "t_le": {
+                "name": "DOM Content Loaded Event End",
+                "group": "rum"
+            },
+            "t_dc": {
+                "name": "DOM Complete",
+                "group": "rum"
+            },
+            "t_ee": {
+                "name": "Load Event End",
+                "group": "rum"
             }
         };
     }
@@ -400,6 +480,11 @@ class MatomoProvider extends BaseProvider {
         if (name === "_cvar") {
             result = {
                 "key": "_cvar",
+                "hidden": true
+            };
+        } else if (name === "cvar") {
+            result = {
+                "key": "cvar",
                 "hidden": true
             };
         } else if (name === "ec_items") {
@@ -432,6 +517,7 @@ class MatomoProvider extends BaseProvider {
         let results = [],
             revenue = params.get("revenue"),
             _cvar = params.get("_cvar"),
+            cvar = params.get("cvar"),
             ec_items = params.get("ec_items"),
             requestType = "Page View";
 
@@ -471,12 +557,12 @@ class MatomoProvider extends BaseProvider {
                     Object.entries(customVars).forEach(([key, [name, value]]) => {
                         results.push({
                             "key": `_cvar${key}n`,
-                            "field": `Custom Variable ${key} Name`,
+                            "field": `Custom Visit Variable ${key} Name`,
                             "value": name,
                             "group": "custom"
                         }, {
                             "key": `_cvar${key}v`,
-                            "field": `Custom Variable ${key} Value`,
+                            "field": `Custom Visit Variable ${key} Value`,
                             "value": value,
                             "group": "custom"
                         });
@@ -486,8 +572,38 @@ class MatomoProvider extends BaseProvider {
                 /* istanbul ignore next: push the full value to the key */
                 results.push({
                     "key": "_cvar",
-                    "field": "Custom Variables",
+                    "field": "Custom Visit Variables",
                     "value": _cvar,
+                    "group": "custom"
+                });
+            }
+        }
+
+        if (cvar) {
+            try {
+                let customVars = JSON.parse(cvar);
+                /* istanbul ignore else: do nothing when it's null/empty */
+                if (typeof customVars === "object" && customVars) {
+                    Object.entries(customVars).forEach(([key, [name, value]]) => {
+                        results.push({
+                            "key": `cvar${key}n`,
+                            "field": `Custom Action Variable ${key} Name`,
+                            "value": name,
+                            "group": "custom"
+                        }, {
+                            "key": `cvar${key}v`,
+                            "field": `Custom Action Variable ${key} Value`,
+                            "value": value,
+                            "group": "custom"
+                        });
+                    })
+                }
+            } catch (e) {
+                /* istanbul ignore next: push the full value to the key */
+                results.push({
+                    "key": "cvar",
+                    "field": "Custom Action Variables",
+                    "value": cvar,
                     "group": "custom"
                 });
             }
