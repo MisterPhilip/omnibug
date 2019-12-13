@@ -125,7 +125,7 @@
     "grunt-sass": "^2.1.0",
     "jshint-html-reporter": "^0.2.5",
     "node-sass": "^4.13.0",
-    "npm": "^6.12.0",
+    "npm": "^6.13.4",
     "spectre.css": "^0.5.8"
   },
   "engines": {
