@@ -59,21 +59,36 @@ test("GoogleAdsProvider returns data", t => {
 
 test("GoogleAdsProvider returns account", t => {
     let provider = new GoogleAdsProvider(),
-        url = "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/1111111/?random=1556397983526&cv=9&fst=1556397983526&num=1&bg=ffffff&guid=ON&resp=GooglemKTybQhCsO&u_h=1440&u_w=2560&u_ah=1400&u_aw=2560&u_cd=24&u_his=2&u_tz=-420&u_java=false&u_nplug=3&u_nmime=4&gtm=2ou430&sendb=1&data=event%3Dgtag.config&frm=0&url=https%3A%2F%2Fomnibug.io%2F&tiba=Omnibug%20%7C%20A%20Digital%20Marketing%20Debugging%20Tool&async=1&rfmt=3&fmt=4",
-        results = provider.parseUrl(url),
-        account = results.data.find((result) => {
+        urlOld = "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/1111111/?random=1556397983526&cv=9&fst=1556397983526&num=1&bg=ffffff&guid=ON&resp=GooglemKTybQhCsO&u_h=1440&u_w=2560&u_ah=1400&u_aw=2560&u_cd=24&u_his=2&u_tz=-420&u_java=false&u_nplug=3&u_nmime=4&gtm=2ou430&sendb=1&data=event%3Dgtag.config&frm=0&url=https%3A%2F%2Fomnibug.io%2F&tiba=Omnibug%20%7C%20A%20Digital%20Marketing%20Debugging%20Tool&async=1&rfmt=3&fmt=4",
+        urlNew = "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/AW-12345678/?random=1556397983526&cv=9&fst=1556397983526&num=1&bg=ffffff&guid=ON&resp=GooglemKTybQhCsO&u_h=1440&u_w=2560&u_ah=1400&u_aw=2560&u_cd=24&u_his=2&u_tz=-420&u_java=false&u_nplug=3&u_nmime=4&gtm=2ou430&sendb=1&data=event%3Dgtag.config&frm=0&url=https%3A%2F%2Fomnibug.io%2F&tiba=Omnibug%20%7C%20A%20Digital%20Marketing%20Debugging%20Tool&async=1&rfmt=3&fmt=4",
+        resultsOld = provider.parseUrl(urlOld),
+        resultsNew = provider.parseUrl(urlNew),
+        accountOld = resultsOld.data.find((result) => {
             return result.key === "account";
         }),
-        accountHidden = results.data.find((result) => {
+        accountNew = resultsNew.data.find((result) => {
+            return result.key === "account";
+        }),
+        accountHiddenOld = resultsOld.data.find((result) => {
+            return result.key === "omnibug-account";
+        }),
+        accountHiddenNew = resultsNew.data.find((result) => {
             return result.key === "omnibug-account";
         });
 
-    t.is(typeof account, "object");
-    t.is(account.field, "Account ID");
-    t.is(account.value, "AW-1111111");
+    t.is(typeof accountOld, "object");
+    t.is(accountOld.field, "Account ID");
+    t.is(accountOld.value, "AW-1111111");
 
-    t.is(typeof accountHidden, "object");
-    t.is(accountHidden.value, "AW-1111111");
+    t.is(typeof accountHiddenOld, "object");
+    t.is(accountHiddenOld.value, "AW-1111111");
+
+    t.is(typeof accountNew, "object");
+    t.is(accountNew.field, "Account ID");
+    t.is(accountNew.value, "AW-12345678");
+
+    t.is(typeof accountHiddenNew, "object");
+    t.is(accountHiddenNew.value, "AW-12345678");
 });
 
 test("GoogleAdsProvider returns account with conversion label", t => {
