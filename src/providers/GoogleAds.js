@@ -5,16 +5,14 @@
  * @class
  * @extends BaseProvider
  */
-class GoogleAdsProvider extends BaseProvider
-{
-    constructor()
-    {
+class GoogleAdsProvider extends BaseProvider {
+    constructor() {
         super();
-        this._key        = "GOOGLEADS";
-        this._pattern    = /googleads\.g\.doubleclick\.net\/pagead\//;
-        this._name       = "Google Ads";
-        this._type       = "marketing";
-        this._keywords   = ["aw", "ad words"];
+        this._key = "GOOGLEADS";
+        this._pattern = /googleads\.g\.doubleclick\.net\/pagead\//;
+        this._name = "Google Ads";
+        this._type = "marketing";
+        this._keywords = ["aw", "ad words"];
     }
 
     /**
@@ -22,11 +20,10 @@ class GoogleAdsProvider extends BaseProvider
      *
      * @return {{}}
      */
-    get columnMapping()
-    {
+    get columnMapping() {
         return {
-            "account":      "omnibug-account",
-            "requestType":  "requestType"
+            "account": "omnibug-account",
+            "requestType": "requestType"
         }
     }
 
@@ -35,8 +32,7 @@ class GoogleAdsProvider extends BaseProvider
      *
      * @returns {*[]}
      */
-    get groups()
-    {
+    get groups() {
         return [
             {
                 "key": "general",
@@ -50,8 +46,7 @@ class GoogleAdsProvider extends BaseProvider
      *
      * @returns {{}}
      */
-    get keys()
-    {
+    get keys() {
         return {
             "url": {
                 "name": "Page URL",
@@ -80,37 +75,36 @@ class GoogleAdsProvider extends BaseProvider
      *
      * @returns {Array}
      */
-    handleCustom(url, params)
-    {
+    handleCustom(url, params) {
         let results = [],
-            pathParts = url.pathname.match(/\/([^\/]+)\/(\d+)\/?$/),
+            pathParts = url.pathname.match(/\/([^\/]+)\/(?:AW-)?(\d+)\/?$/),
             account = "AW-" + pathParts[2],
             data = params.get("data") || "",
             dataEvent = data.match(/event=([^;]+)(?:$|;)/),
             requestType = "";
 
         /* istanbul ignore else */
-        if(account) {
+        if (account) {
             results.push({
-                "key":   "account",
+                "key": "account",
                 "field": "Account ID",
                 "value": account,
                 "group": "general"
             });
 
             // Add the conversion label, if available, to the accounts column
-            if(params.get("label")) {
+            if (params.get("label")) {
                 account += "/" + params.get("label");
             }
             results.push({
-                "key":   "omnibug-account",
+                "key": "omnibug-account",
                 "value": account,
                 "hidden": true
             });
         }
 
-        if(dataEvent && dataEvent.length) {
-            if(dataEvent[1] === "gtag.config") {
+        if (dataEvent && dataEvent.length) {
+            if (dataEvent[1] === "gtag.config") {
                 requestType = "Page View"
             } else {
                 requestType = dataEvent[1];
@@ -120,7 +114,7 @@ class GoogleAdsProvider extends BaseProvider
         }
 
         results.push({
-            "key":   "requestType",
+            "key": "requestType",
             "value": requestType,
             "field": "Request Type",
             "group": "general"
