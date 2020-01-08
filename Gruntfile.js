@@ -12,7 +12,7 @@ module.exports = function (grunt) {
             },
             "production": {
                 "name": "Omnibug",
-                "version": "1.13.1",
+                "version": "1.13.2",
                 "storageKey": "omnibug",
                 "feedbackUrl": "https://omnibug.io/feedback",
                 "analyticsID": "UA-114343677-2"
