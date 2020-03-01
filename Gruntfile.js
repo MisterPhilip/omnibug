@@ -1,6 +1,8 @@
-/* globals module */
-module.exports = function (grunt) {
+/* globals module, require */
+const sass = require("node-sass");
 
+module.exports = function (grunt) {
+    
     grunt.config.init({
         "extension": {
             "beta": {
@@ -71,6 +73,10 @@ module.exports = function (grunt) {
         },
         "pkg": grunt.file.readJSON("package.json"),
         "sass": {
+            "options": {
+                "implementation": sass,
+                "sourceMap": false
+            },
             "dist": {
                 "files": {
                     "src/devtools/panel.css": "src/devtools/panel.scss",

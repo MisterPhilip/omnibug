@@ -10,8 +10,8 @@
         "test": "cross-env NODE_ENV=test grunt build-test-files && nyc --all ava",
         "postinstall": "grunt build",
         "coverage": "cross-env NODE_ENV=test nyc report -all",
-        "eslint": "eslint src",
-        "eslint:fix": "eslint src --fix"
+        "lint": "eslint src",
+        "lint:fix": "eslint src --fix"
     },
     "ava": {
         "files": [
@@ -100,39 +100,39 @@
         "@babel/plugin-syntax-dynamic-import": "^7.2.0",
         "@babel/plugin-syntax-import-meta": "^7.2.0",
         "@babel/preset-env": "^7.6.3",
+        "@babel/preset-stage-2": "^7.0.0",
         "@babel/register": "^7.6.2",
-        "@fortawesome/fontawesome-free": "^5.11.2",
+        "@fortawesome/fontawesome-free": "^5.12.1",
         "@ungap/url-search-params": "^0.1.0",
         "ava": "^1.4.1",
-        "babel-plugin-istanbul": "^5.2.0",
+        "babel-plugin-istanbul": "^6.0.0",
         "browser-env": "^3.2.6",
-        "coveralls": "^3.0.7",
-        "cross-env": "^5.2.1",
+        "coveralls": "^3.0.9",
+        "cross-env": "^7.0.0",
         "eslint": "^6.8.0",
         "eslint-config-prettier": "^6.10.0",
+        "esm": "^3.2.25",
         "grunt": "^1.0.4",
-        "grunt-contrib-clean": "^1.1.0",
+        "grunt-contrib-clean": "^2.0.0",
         "grunt-contrib-compress": "^1.6.0",
         "grunt-contrib-concat": "^1.0.1",
         "grunt-contrib-copy": "^1.0.0",
-        "grunt-contrib-watch": "^1.0.0",
+        "grunt-contrib-watch": "^1.1.0",
         "grunt-eslint": "^22.0.0",
+        "grunt-sass": "^3.1.0",
         "grunt-text-replace": "^0.4.0",
-        "nyc": "^14.1.1",
-        "sinon": "^7.5.0",
-        "sinon-chrome": "^2.3.2"
+        "node-sass": "^4.13.0",
+        "nyc": "^15.0.0",
+        "sinon": "^9.0.0",
+        "sinon-chrome": "^3.0.0"
     },
     "homepage": "https://omnibug.io/",
     "dependencies": {
-        "@babel/preset-stage-2": "^7.0.0",
-        "esm": "^3.2.25",
-        "grunt-sass": "^2.1.0",
-        "node-sass": "^4.13.0",
-        "npm": "^6.12.0",
-        "spectre.css": "^0.5.8"
+        "spectre.css": "^0.5.8",
+        "yarn": "^1.22.0"
     },
     "engines": {
-        "node": ">=10.0.0",
-        "npm": ">=6.0.0"
+        "node": ">=12.16.0",
+        "yarn": ">=1.22.0"
     }
 }

@@ -39,16 +39,16 @@ Find an issue? That's not good! Here's a list of information that we needed when
 
 ### Installing locally
 
-To do any work, fork the original repository, and clone it locally. Then, install via [NPM](https://www.npmjs.com/):
+To do any work, fork the original repository, and clone it locally. Then, install via [yarn](https://yarnpkg.com/):
 ```
-$ npm install
+$ yarn install
 ```
 
 The installation process will download and install all of the requirements needed to build and develop Omnibug, as well 
 as run an initial build so you can immediately start using the development version. 
 
 Once installed on your machine, you can install as a developer / local version in Chrome and Firefox. You only need to 
-install them once within the respective browser. If you make any updates to the codebase (e.g. `npm run build`), you will
+install them once within the respective browser. If you make any updates to the codebase (e.g. `yarn run build`), you will
 need to click the refresh button within the browser's extension page. This prevents you from seeing the omnibug.io/installed 
 page multiple times.
 
@@ -62,24 +62,29 @@ To install the local version in Firefox, go to the [about:addons](Add-ons Manage
 From there, select "[Debug Add-ons](about:debugging#addons)", and then select "Load Temporary Add-on" and point to the `/platform/firefox/manifest.json` 
 file. Learn more at [Mozilla's docs](https://developer.mozilla.org/en-US/Add-ons/WebExtensions).
 
+##### Edge
+To install the local version in Edge, go to the [edge://extensions/](Extensions) settings, then be sure "Developer Mode" 
+is checked. Once developer mode is enabled, select "Load unpacked extension..." and point to the `/platform/chromium/manifest.json` 
+file. Learn more at [Microsoft's docs](https://docs.microsoft.com/en-us/microsoft-edge/extensions-chromium/).
+
 
 ### Coding Styles
 
-Honestly, our code style is kind of all over the place! It's something that will eventually be cleaned up, but here are 
-some basic guidelines:
+We use [ESLint](https://eslint.org/) to ensure a consistent code style. Here are some basic guidelines though:
 
 * Since we only support the latest few versions of Chrome and Firefox, we can safely use most of the ES6 features. Please 
 consider using these instead of outdated methods, as the ES6 version will provider a cleaner and faster code base.
 * Use 4 spaces for 1 tab
 * Any function, method, or class should have be declared on a it's own line
-  * Opening / closing brackets should be on it's own line, lining up with the name.
   * A [JSDoc comment](http://usejsdoc.org/) should be included for each function, method, or class
-* Use double quotes where possible
+* Use double quotes or template syntax (backticks) where possible
 * if / else statements should (_always_) have opening & closing brackets inline 
+* Run `yarn run lint` to view issues, and `yarn run lint:fix` to fix them. When you build, ESLint will run in the background and fail the build 
+if there are errors
 
 ### Adding a Provider
 
-A provider is simply a marketing technology that exists in Omnibug. This could be a tool for analytics , re-marketing, 
+A provider is simply a marketing technology that exists in Omnibug. This could be a tool for analytics, re-marketing, 
 UX-testing, etc. You can find a full list of providers in [our source code](https://github.com/MisterPhilip/omnibug/tree/master/src/providers).
 It is recommended to review a few existing providers to understand how providers can be setup. 
 
@@ -297,7 +302,7 @@ All providers should have a test suite included with their pull request. The fol
 
 Testing is done via [AVA](https://github.com/avajs/ava) and can be executed by running the following command:
 ```
-$ npm run test
+$ yarn run test
 ```
 
 This will run the build process to build the providers and core Omnibug classes, and then show the result of the test suite.
@@ -310,7 +315,7 @@ test coverage across the providers and core classes.
 Since each browser requires slightly different manifests & some need polyfills, [Grunt](https://gruntjs.com/) takes care 
 of building browser-specific code from the generic code base. To build for all browsers:
 ```
-$ npm run build
+$ yarn run build
 ```
 
 This will output to the `/platform/$BROWSER` folders, as well as output a `.zip` for distribution in the `/build/$BROWSER` folders.
