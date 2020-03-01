@@ -21,9 +21,11 @@
         settings.migrate()
             .then(setCachedSettings)
             .then((loaded) => { settings.save(loaded); });
-
+        
         if (details.reason === "install") {
-            chrome.tabs.create({ url: `https://omnibug.io/installed?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=install` });
+            chrome.tabs.create({
+                url: "pages/installed.html"
+            });
         }
     });
 

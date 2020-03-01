@@ -190,7 +190,7 @@ module.exports = function (grunt) {
     grunt.registerTask("build-copy", "Copy over the source files to the build directory", function (browser) {
         grunt.config.requires(browser);
         let options = grunt.config(browser),
-            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*", "!libs/OmnibugTracker.*", "popup/*.*", "!**/*.scss", "!assets/styles/**"],
+            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*", "!libs/OmnibugTracker.*", "popup/*.*", "pages/**", "!**/*.scss", "!assets/styles/**"],
             trackingLib = {
                 expand: true,
                 cwd: "src/libs/",
