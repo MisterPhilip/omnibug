@@ -337,6 +337,7 @@ details.request.redirected [data-request-type] { background-color: #eeeeee; }
   position: fixed;
   bottom: .5rem;
   right: 1.25rem;
+  z-index: 300;
 }
 #toasts .toast {
   padding: .25rem .25rem .25rem .35rem;
