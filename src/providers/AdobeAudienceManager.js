@@ -11,7 +11,7 @@ class AdobeAudienceManagerProvider extends BaseProvider
     {
         super();
         this._key        = "ADOBEAUDIENCEMANAGER";
-        this._pattern    = /demdex\.net\/(ibs|event)[?\/#:]/;
+        this._pattern    = /demdex\.net\/(ibs|event)[?/#:]/;
         this._name       = "Adobe Audience Manager";
         this._type       = "visitorid";
         this._keywords   = ["aam"];
@@ -27,7 +27,7 @@ class AdobeAudienceManagerProvider extends BaseProvider
         return {
             "requestType": "omnibug_requestType",
             "account": "omnibug_account"
-        }
+        };
     }
 
     /**
@@ -244,7 +244,7 @@ class AdobeAudienceManagerProvider extends BaseProvider
     {
         let results = [],
             accountID = url.hostname.replace(/^(dpm)?.demdex.net/i, ""),
-            requestType = url.pathname.match(/^\/([^?\/#:]+)/);
+            requestType = url.pathname.match(/^\/([^?/#:]+)/);
         results.push({
             "key":   "omnibug_account",
             "value": accountID,

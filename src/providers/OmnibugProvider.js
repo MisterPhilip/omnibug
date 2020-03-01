@@ -19,7 +19,7 @@ var OmnibugProvider = (function() {
      */
     let getProviderForUrl = (url) => {
         for(let provider in providers) {
-            if(providers.hasOwnProperty(provider) && providers[provider].checkUrl(url)) {
+            if (Object.prototype.hasOwnProperty.call(providers, provider) && providers[provider].checkUrl(url)) {
                 return providers[provider];
             }
         }

@@ -25,7 +25,7 @@ class SegmentProvider extends BaseProvider
     {
         return {
             "requestType":  "omnibug_requestType"
-        }
+        };
     }
 
     /**
@@ -51,7 +51,7 @@ class SegmentProvider extends BaseProvider
     handleCustom(url, params)
     {
         let results = [],
-            action = url.pathname.match(/\/v1\/([^\/]+)$/);
+            action = url.pathname.match(/\/v1\/([^/]+)$/);
         if(action) {
             let type = action[1].toLowerCase();
             if(type === "p" || type === "page") {

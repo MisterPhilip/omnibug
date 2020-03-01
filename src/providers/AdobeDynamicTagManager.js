@@ -11,7 +11,7 @@ class AdobeDynamicTagManagerProvider extends BaseProvider
     {
         super();
         this._key        = "ADOBEDTM";
-        this._pattern    = /\/satelliteLib-[^\.]+\.js/;
+        this._pattern    = /\/satelliteLib-[^.]+\.js/;
         this._name       = "Adobe Dynamic Tag Manager";
         this._type       = "tagmanager";
         this._keywords   = ["dtm", "activate", "activation", "tms"];
@@ -54,7 +54,7 @@ class AdobeDynamicTagManagerProvider extends BaseProvider
      */
     handleCustom(url, params)
     {
-        let matches =  url.pathname.match(/\/satelliteLib-[^\.-]+(-staging)?\.js/),
+        let matches =  url.pathname.match(/\/satelliteLib-[^.-]+(-staging)?\.js/),
             env = (matches && matches[1]) ? matches[1].replace("-", "") : "production",
             results = [];
         results.push({

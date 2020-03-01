@@ -11,7 +11,7 @@ class UniversalAnalyticsProvider extends BaseProvider
     {
         super();
         this._key        = "UNIVERSALANALYTICS";
-        this._pattern    = /\.google-analytics\.com\/([rg]\/)?collect(?:[\/?]+|$)/;
+        this._pattern    = /\.google-analytics\.com\/([rg]\/)?collect(?:[/?]+|$)/;
         this._name       = "Universal Analytics";
         this._type       = "analytics";
         this._keywords   = ["google", "google analytics", "ua", "ga"];
@@ -27,7 +27,7 @@ class UniversalAnalyticsProvider extends BaseProvider
         return {
             "account":     "tid",
             "requestType": "omnibug_requestType"
-        }
+        };
     }
 
     /**

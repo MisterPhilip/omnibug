@@ -27,7 +27,7 @@ class TealiumIQProvider extends BaseProvider
         return {
             "account":      "omnibug_account",
             "requestType":  "requestType"
-        }
+        };
     }
 
     /**

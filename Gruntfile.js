@@ -1,4 +1,4 @@
-/* globals module, require */
+/* globals module */
 module.exports = function (grunt) {
 
     grunt.config.init({
@@ -69,63 +69,6 @@ module.exports = function (grunt) {
                 },
             }
         },
-        "jshint": {
-            "options": {
-                "bitwise": true,
-                "camelcase": false,
-                "curly": true,
-                "eqeqeq": true,
-                "esversion": 6,
-                "forin": true,
-                "immed": true,
-                "indent": 4,
-                "latedef": true,
-                "newcap": true,
-                "noarg": true,
-                "noempty": true,
-                "nonew": true,
-                "plusplus": false,
-                "quotmark": true,
-                "regexp": true,
-                "undef": true,
-                "unused": true,
-                "strict": false,
-                "trailing": true,
-                "white": false,
-                "laxcomma": true,
-                "nonstandard": true,
-                "browser": true,
-                "maxparams": 3,
-                "maxdepth": 4,
-                "maxstatements": 50,
-                "maxerr": 200,
-                "globals": {
-                    "browser": true,
-                    "console": true,
-                    "OmnibugProvider": true,
-                    "BaseProvider": true
-                },
-                "reporter": require("jshint-html-reporter"),
-                "reporterOutput": "build/jshint/index.html"
-            },
-            "all": [
-                "Gruntfile.js",
-                "src/providers/*.js",
-                "src/libs/*.js",
-                "src/options/*.js",
-                "src/devtools/*.js",
-                "src/*.js"
-            ],
-            "build": [
-                "Gruntfile.js"
-            ],
-            "source": [
-                "src/*.js"
-            ],
-            "providers": [
-                "src/providers/*.js"
-            ]
-        },
         "pkg": grunt.file.readJSON("package.json"),
         "sass": {
             "dist": {
@@ -134,6 +77,9 @@ module.exports = function (grunt) {
                     "src/options/options.css": "src/options/options.scss"
                 }
             }
+        },
+        "eslint": {
+            "target": ["src/"]
         }
     });
 
@@ -142,9 +88,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-watch");
-    grunt.loadNpmTasks("grunt-contrib-jshint");
-    grunt.loadNpmTasks('grunt-text-replace');
-    grunt.loadNpmTasks('grunt-sass');
+    grunt.loadNpmTasks("grunt-text-replace");
+    grunt.loadNpmTasks("grunt-sass");
+    grunt.loadNpmTasks("grunt-eslint");
 
     grunt.registerTask("build-beta", "Build the beta version", (browsers = "") => {
         let allowedBrowsers = ["chrome", "firefox"];
@@ -408,8 +354,7 @@ module.exports = function (grunt) {
                 "banner": "const { URL } = require(\"url\");\n" +
                     "const URLSearchParams = require(\"@ungap/url-search-params\");\n",
                 "process": function (source, filepath) {
-                    var className = filepath.replace("./src/providers/", "").split(".")[0],
-                        exportString = "";
+                    var className = filepath.replace("./src/providers/", "").split(".")[0];
                     if (className === "OmnibugProvider") {
                         source = `const BaseProvider = require("./BaseProvider.js").default;\n` + source;
                         source = source.replace("var OmnibugProvider", "export var OmnibugProvider");
@@ -421,7 +366,6 @@ module.exports = function (grunt) {
                     }
                     source = source.replace(`class ${className}`, `export default class ${className}`);
                     return source;
-                    // return source + "\n" + exportString + `module.exports = ${className};`
                 }
             },
             "files": {}
@@ -432,7 +376,7 @@ module.exports = function (grunt) {
                 concat = grunt.config.get("concat.providers-test-individual");
 
             concat["files"][`./test/source/providers/${className}.js`] = fileName;
-            grunt.config.set('concat.providers-test-individual', concat);
+            grunt.config.set("concat.providers-test-individual", concat);
         });
 
         const sourceBasePath = "./src/providers/",
@@ -514,8 +458,8 @@ module.exports = function (grunt) {
     /*
      * Add aliases
      */
-    grunt.registerTask("default", ["build-production"]);
-    grunt.registerTask("build", ["build-production"]);
-    grunt.registerTask("production", ["build-production"]);
-    grunt.registerTask("beta", ["build-beta"]);
+    grunt.registerTask("default", ["eslint", "build-production"]);
+    grunt.registerTask("build", ["eslint", "build-production"]);
+    grunt.registerTask("production", ["eslint", "build-production"]);
+    grunt.registerTask("beta", ["eslint", "build-beta"]);
 };

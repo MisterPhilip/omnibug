@@ -26,7 +26,7 @@ class ATInternetProvider extends BaseProvider
         return {
             "account":      "s",
             "requestType":  "requestType"
-        }
+        };
     }
 
     /**

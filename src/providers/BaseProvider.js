@@ -204,7 +204,7 @@ class BaseProvider
                         let isEmpty = true;
                         for (let p in cur)
                         {
-                            if(!cur.hasOwnProperty(p)) { continue; }
+                            if (!Object.prototype.hasOwnProperty.call(cur, p)) { continue; }
                             isEmpty = false;
                             recurse(cur[p], prop ? prop+"."+p : p);
                         }

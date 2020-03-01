@@ -27,7 +27,7 @@ class AdobeAnalyticsProvider extends BaseProvider
         return {
             "account":      "rsid",
             "requestType":  "requestType"
-        }
+        };
     }
 
     /**
@@ -447,8 +447,8 @@ class AdobeAnalyticsProvider extends BaseProvider
     handleCustom(url, params)
     {
         let results = [],
-            rsid = url.pathname.match(/\/b\/ss\/([^\/]+)\//),
-            jsVersion = url.pathname.match(/\/(JS-[^\/]+)\//i),
+            rsid = url.pathname.match(/\/b\/ss\/([^/]+)\//),
+            jsVersion = url.pathname.match(/\/(JS-[^/]+)\//i),
             pev2 = params.get("pe"),
             requestType = "Page View";
         if(rsid) {

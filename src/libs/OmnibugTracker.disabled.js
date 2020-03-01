@@ -1,9 +1,8 @@
 /**
  * Omnibug Tracker
  */
-/* exported OmnibugTracker */
-class OmnibugTracker
-{
+// eslint-disable-next-line no-unused-vars
+class OmnibugTracker {
 
     static get browserTrackingEnabled() { return false; }
     init(allowTracking = true) { }

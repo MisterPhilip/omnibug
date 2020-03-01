@@ -1,4 +1,4 @@
-/* globals OmnibugProvider */
+/* globals OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, Fuse */
 (function() {
 
     // Setup GA tracker
@@ -113,7 +113,7 @@
         loadSettingsIntoProxy = (values) => {
             for(let setting in values)
             {
-                if(values.hasOwnProperty(setting)) {
+                if (Object.prototype.hasOwnProperty.call(values, setting)) {
                     settings[setting] = values[setting];
                 }
             }
@@ -124,7 +124,7 @@
         providerList = document.getElementById("providers-list"),
         groups = {};
     for(let provider in providers) {
-        if (!providers.hasOwnProperty(provider)) {
+        if (!Object.prototype.hasOwnProperty.call(providers, provider)) {
             continue;
         }
         groups[providers[provider].type] = groups[providers[provider].type] || [];
@@ -182,7 +182,7 @@
                     value = input.value;
 
                 // Validate the input attributes
-                if((field !== "providers-enabled" && !settings.hasOwnProperty(field)) || !type) { return; }
+                if ((field !== "providers-enabled" && !Object.prototype.hasOwnProperty.call(settings, field)) || !type) { return; }
 
                 // Do some value manipulation as needed
                 if(field === "providers-enabled") {
@@ -241,27 +241,27 @@
     });
 
     document.getElementById("addSummary").addEventListener("change", (event) => {
-      event.preventDefault();
+        event.preventDefault();
 
-      let newParam = event.target.value,
-          paramList = document.getElementById("addSummary-params");
+        let newParam = event.target.value,
+            paramList = document.getElementById("addSummary-params");
 
-      if(paramList.childElementCount < 3) {
-        if(newParam.trim() !== "" && settings.additionalSummary.indexOf(newParam) === -1) {
-            paramList.appendChild(createAdditionalSummaryParam(newParam));
+        if(paramList.childElementCount < 3) {
+            if(newParam.trim() !== "" && settings.additionalSummary.indexOf(newParam) === -1) {
+                paramList.appendChild(createAdditionalSummaryParam(newParam));
 
-            settings.additionalSummary.push(newParam);
-            settingsProvider.save(settingsObj);
+                settings.additionalSummary.push(newParam);
+                settingsProvider.save(settingsObj);
 
-            tracker.track(["send", "event", "settings", "additionalSummary", `added: ${newParam}`]);
-            document.getElementById("addSummaryStatus").innerHTML = "";
+                tracker.track(["send", "event", "settings", "additionalSummary", `added: ${newParam}`]);
+                document.getElementById("addSummaryStatus").innerHTML = "";
+            }
+        } else {
+            document.getElementById("addSummaryStatus").innerHTML = "You may only specify up to 3 parameters.";
         }
-      } else {
-        document.getElementById("addSummaryStatus").innerHTML = "You may only specify up to 3 parameters."
-      }
 
-      event.target.value = "";
-  });
+        event.target.value = "";
+    });
     
     document.getElementById("renameParam").addEventListener("focus", (event) => {
         document.getElementById("renameParamStatus").innerHTML = "";
@@ -276,9 +276,9 @@
         
 
         try {
-            jsonParams = JSON.parse(stringParams)
+            jsonParams = JSON.parse(stringParams);
             parsedOK = true;
-        } catch {
+        } catch(error) {
             if(stringParams.length === 0) {
                 parsedOK = true;
                 jsonParams = {};
@@ -396,30 +396,30 @@
     }
 
     function createAdditionalSummaryParam(param) {
-      let text = createElement("span", {
-              "text": param
-          }),
-          remove = createElement("span", {
-              "classes": ["remove"],
-              "attributes": {
-                  "title": "Remove",
-                  "aria-label": "Remove"
-              },
-              "text": "\u00D7"
-          }),
-          li = createElement("li", {
-              "children": [text, remove]
-          });
+        let text = createElement("span", {
+                "text": param
+            }),
+            remove = createElement("span", {
+                "classes": ["remove"],
+                "attributes": {
+                    "title": "Remove",
+                    "aria-label": "Remove"
+                },
+                "text": "\u00D7"
+            }),
+            li = createElement("li", {
+                "children": [text, remove]
+            });
 
-      remove.addEventListener("click", (event) => {
-          event.preventDefault();
-          settings.additionalSummary = settingsObj.additionalSummary = settingsObj.additionalSummary.filter(item => item !== param);
-          settingsProvider.save(settingsObj);
-          tracker.track(["send", "event", "settings", "additionalSummary", `removed: ${param}`]);
-      });
+        remove.addEventListener("click", (event) => {
+            event.preventDefault();
+            settings.additionalSummary = settingsObj.additionalSummary = settingsObj.additionalSummary.filter(item => item !== param);
+            settingsProvider.save(settingsObj);
+            tracker.track(["send", "event", "settings", "additionalSummary", `removed: ${param}`]);
+        });
 
-      return li;
-  }
+        return li;
+    }
     /**
      * Load in new settings/styles
      */

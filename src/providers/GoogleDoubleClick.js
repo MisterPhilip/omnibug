@@ -27,7 +27,7 @@ class GoogleDoubleClickProvider extends BaseProvider
         return {
             "account":      "omnibug-account",
             "requestType":  "type"
-        }
+        };
     }
 
     /**

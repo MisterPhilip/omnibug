@@ -1,14 +1,14 @@
+/* global OmnibugProvider */
+
 /**
  * Omnibug Settings
  */
-/* exported OmnibugSettings */
-class OmnibugSettings
-{
+// eslint-disable-next-line no-unused-vars
+class OmnibugSettings {
     /**
      * OmnibugSettings
      */
-    constructor()
-    {
+    constructor() {
         this.browser = chrome;
     }
 
@@ -17,13 +17,11 @@ class OmnibugSettings
      *
      * @return {string}
      */
-    get storage_type()
-    {
+    get storage_type() {
         return (this.browser.storage.sync) ? "sync" : "local";
     }
 
-    get storage_key()
-    {
+    get storage_key() {
         return "##OMNIBUG_KEY##";
     }
 
@@ -32,40 +30,39 @@ class OmnibugSettings
      *
      * @return {{defaultPattern: string, disabledProviders: string[], highlightKeys: string[], alwaysExpand: boolean, showQuotes: boolean, showRedirects: boolean, showFullNames: boolean, color_load: string, color_click: string, color_prev: string, color_quotes: string, color_hilite: string, color_redirect: string, color_hover: string}}
      */
-    get defaults()
-    {
+    get defaults() {
         let providers = {};
         Object.keys(OmnibugProvider.getProviders()).forEach((provider) => {
-            providers[provider] = {"enabled": true};
+            providers[provider] = { "enabled": true };
         });
 
         return {
             // pattern to match in request url
-            defaultPattern : OmnibugProvider.getPattern().source,
+            defaultPattern: OmnibugProvider.getPattern().source,
 
             // all providers (initially)
-            providers : providers,
+            providers: providers,
 
             // keys to highlight
-            highlightKeys  : ["pageName", "ch", "events", "products"],
+            highlightKeys: ["pageName", "ch", "events", "products"],
 
             // additional summary parameters
             additionalSummary: [],
-            
+
             // JSON defining the params to rename
             renameParameters: {},
 
             // show entries expanded?
-            alwaysExpand : false,
+            alwaysExpand: false,
 
             // surround values with quotes?
-            showQuotes : true,
+            showQuotes: true,
 
             // show redirected entries?
-            showRedirects : true,
+            showRedirects: true,
 
             // show full variable names?
-            showFullNames : true,
+            showFullNames: true,
 
             // show navigation requests
             showNavigation: true,
@@ -78,7 +75,7 @@ class OmnibugSettings
 
             // Should newest or oldest entries show first?
             requestSortOrder: "asc",
-            
+
             // Should params sort by field or label?
             paramSortOrder: "field",
 
@@ -92,12 +89,12 @@ class OmnibugSettings
             migrationIndex: 0,
 
             // colors
-            color_load        : "#dbedff",
-            color_click       : "#f1ffdb",
-            color_quotes      : "#ff0000",
-            color_highlight   : "#ffff00",
-            color_redirect    : "#eeeeee",
-            color_hover       : "#cccccc",
+            color_load: "#dbedff",
+            color_click: "#f1ffdb",
+            color_quotes: "#ff0000",
+            color_highlight: "#ffff00",
+            color_redirect: "#eeeeee",
+            color_hover: "#cccccc",
 
             // provider icons
             providerIcons: true,
@@ -114,12 +111,11 @@ class OmnibugSettings
      *
      * @returns {Promise}
      */
-    load()
-    {
+    load() {
         return new Promise((resolve, reject) => {
             this.browser.storage[this.storage_type].get(this.storage_key, (settings) => {
                 try {
-                    if(typeof settings[this.storage_key] === "object") {
+                    if (typeof settings[this.storage_key] === "object") {
                         if (typeof settings[this.storage_key].providers !== "object") {
                             settings[this.storage_key].providers = this.defaults.providers;
                         } else {
@@ -131,6 +127,7 @@ class OmnibugSettings
                 } catch (e) {
                     console.error(e);
                 } finally {
+                    // eslint-disable-next-line no-unsafe-finally
                     return resolve(Object.assign(this.defaults, settings[this.storage_key]));
                 }
             });
@@ -143,8 +140,7 @@ class OmnibugSettings
      * @param newSettings
      * @return {{}}}
      */
-    save(newSettings = {})
-    {
+    save(newSettings = {}) {
         let settings = {};
         settings[this.storage_key] = Object.assign(this.defaults, newSettings);
         this.browser.storage[this.storage_type].set(settings);
@@ -161,8 +157,7 @@ class OmnibugSettings
      *
      * @return {Promise<*>}
      */
-    updateItem(key, value)
-    {
+    updateItem(key, value) {
         return this.load().then((settings) => {
             settings[key] = value;
             return this.save(settings);
@@ -174,8 +169,7 @@ class OmnibugSettings
      *
      * @return {{}}}
      */
-    restoreDefaults()
-    {
+    restoreDefaults() {
         return this.save();
     }
 
@@ -184,10 +178,9 @@ class OmnibugSettings
      *
      * @return {Promise<*>}
      */
-    migrate()
-    {
+    migrate() {
         return this.load().then((settings) => {
-            if(typeof settings.enabledProviders === "object" && settings.migrationIndex < 1) {
+            if (typeof settings.enabledProviders === "object" && settings.migrationIndex < 1) {
                 let allProviders = Object.keys(OmnibugProvider.getProviders()),
                     providers = {};
                 allProviders.forEach((provider) => {

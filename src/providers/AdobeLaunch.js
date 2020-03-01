@@ -11,7 +11,7 @@ class AdobeLaunchProvider extends BaseProvider
     {
         super();
         this._key        = "ADOBELAUNCH";
-        this._pattern    = /assets\.adobedtm\.com\/launch-[^\?#]+.js/;
+        this._pattern    = /assets\.adobedtm\.com\/launch-[^?#]+.js/;
         this._name       = "Adobe Launch";
         this._type       = "tagmanager";
         this._keywords   = ["activate", "activation", "tms"];
@@ -54,7 +54,7 @@ class AdobeLaunchProvider extends BaseProvider
      */
     handleCustom(url, params)
     {
-        let matches =  url.pathname.match(/\/launch-[^\.-]+(-[^\.]+)(?:\.min)?\.js/),
+        let matches =  url.pathname.match(/\/launch-[^.-]+(-[^.]+)(?:\.min)?\.js/),
             env = (matches && matches[1]) ? matches[1].replace("-", "") : "production",
             results = [];
         results.push({

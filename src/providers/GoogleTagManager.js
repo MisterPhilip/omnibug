@@ -26,7 +26,7 @@ class GoogleTagManagerProvider extends BaseProvider
     {
         return {
             "account":      "id"
-        }
+        };
     }
 
     /**

@@ -27,7 +27,7 @@ class AdobeTargetProvider extends BaseProvider
         return {
             "account":      "mbox",
             "requestType":  "mboxType"
-        }
+        };
     }
 
     /**
@@ -174,8 +174,7 @@ class AdobeTargetProvider extends BaseProvider
      */
     handleCustom(url, params)
     {
-        let matches =  url.pathname.match( /\/([^\/]+)\/mbox\/([^\/?]+)/ ),
-            mboxName = "",
+        let matches =  url.pathname.match( /\/([^/]+)\/mbox\/([^/?]+)/ ),
             results = [];
         if(matches !== null && matches.length === 3) {
             results.push({

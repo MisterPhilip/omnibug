@@ -5,16 +5,14 @@
  * @class
  * @extends BaseProvider
  */
-class WebtrendsOnDemandProvider extends BaseProvider
-{
-    constructor()
-    {
+class WebtrendsOnDemandProvider extends BaseProvider {
+    constructor() {
         super();
-        this._key        = "WEBTRENDSONDEMAND";
-        this._pattern    = /\/dcs\.gif/;
-        this._name       = "Webtrends OnDemand";
-        this._type       = "analytics";
-        this._keywords   = ["webtrends", "analytics", "ondemand", "on demand"];
+        this._key = "WEBTRENDSONDEMAND";
+        this._pattern = /\/dcs\.gif/;
+        this._name = "Webtrends OnDemand";
+        this._type = "analytics";
+        this._keywords = ["webtrends", "analytics", "ondemand", "on demand"];
     }
 
     /**
@@ -22,12 +20,11 @@ class WebtrendsOnDemandProvider extends BaseProvider
      *
      * @return {{}}
      */
-    get columnMapping()
-    {
+    get columnMapping() {
         return {
-            "account":      "accountID",
-            "requestType":  "requestType"
-        }
+            "account": "accountID",
+            "requestType": "requestType"
+        };
     }
 
     /**
@@ -35,8 +32,7 @@ class WebtrendsOnDemandProvider extends BaseProvider
      *
      * @returns {*[]}
      */
-    get groups()
-    {
+    get groups() {
         return [
             {
                 "key": "general",
@@ -435,29 +431,28 @@ class WebtrendsOnDemandProvider extends BaseProvider
      *
      * @returns {void|{}}
      */
-    handleQueryParam(name, value)
-    {
+    handleQueryParam(name, value) {
         // Double encoded values plague WT params...
         value = decodeURIComponent(value);
 
         let result = {};
-        if(name === "WT.dl") {
+        if (name === "WT.dl") {
             result = {
                 "key": name,
                 "field": "Event Type",
                 "value": `${value} (${this._getRequestType(value)})`,
                 "group": "general"
-            }
-        } else if(/^WT\.hdr\.(.*)/i.test(name)) {
+            };
+        } else if (/^WT\.hdr\.(.*)/i.test(name)) {
             result = {
-                "key":   name,
+                "key": name,
                 "field": RegExp.$1,
                 "value": value,
                 "group": "headers"
             };
-        } else if(/^(?:WT\.seg_)(\d+)$/i.test(name)) {
+        } else if (/^(?:WT\.seg_)(\d+)$/i.test(name)) {
             result = {
-                "key":   name,
+                "key": name,
                 "field": "Segment of interest " + RegExp.$1,
                 "value": value,
                 "group": "general"
@@ -476,15 +471,14 @@ class WebtrendsOnDemandProvider extends BaseProvider
      *
      * @returns {Array}
      */
-    handleCustom(url, params)
-    {
+    handleCustom(url, params) {
         let results = [],
-            accountID = url.pathname.match(/^\/([^\/]+)\/dcs\.gif/),
+            accountID = url.pathname.match(/^\/([^/]+)\/dcs\.gif/),
             requestType = this._getRequestType(params.get("WT.dl"));
 
-        if(accountID) {
+        if (accountID) {
             results.push({
-                "key":   "accountID",
+                "key": "accountID",
                 "field": "Account ID",
                 "value": accountID[1],
                 "group": "general",
@@ -492,7 +486,7 @@ class WebtrendsOnDemandProvider extends BaseProvider
         }
 
         results.push({
-            "key":   "requestType",
+            "key": "requestType",
             "value": requestType,
             "hidden": true
         });

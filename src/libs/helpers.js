@@ -5,37 +5,38 @@
  * @param options
  * @returns {HTMLElement}
  */
+// eslint-disable-next-line no-unused-vars
 const createElement = (type, options = {}) => {
     let element = document.createElement(type);
 
     // Add any classes
-    if(typeof options.classes === "object" && options.classes.length) {
+    if (typeof options.classes === "object" && options.classes.length) {
         element.classList.add(...options.classes);
-    } else if(typeof options.classes === "string") {
+    } else if (typeof options.classes === "string") {
         element.classList.add(options.classes);
     }
 
     // Add any attributes
-    if(typeof options.attributes === "object") {
+    if (typeof options.attributes === "object") {
         Object.entries(options.attributes).forEach((attribute) => {
             element.setAttribute(...attribute);
         });
     }
 
     // Add a text node
-    if(options.text) {
+    if (options.text) {
         let textNode = document.createTextNode(options.text);
         element.appendChild(textNode);
     }
 
     // Add any children
-    if(typeof options.children === "object" && options.children.length) {
+    if (typeof options.children === "object" && options.children.length) {
         options.children.forEach((child) => {
-            if(child instanceof HTMLElement) {
+            if (child instanceof HTMLElement) {
                 element.appendChild(child);
             }
         });
-    } else if(typeof options.children === "object" && options.children instanceof HTMLElement) {
+    } else if (typeof options.children === "object" && options.children instanceof HTMLElement) {
         element.appendChild(options.children);
     }
 
@@ -47,11 +48,12 @@ const createElement = (type, options = {}) => {
  *
  * @param styleSheet
  */
+// eslint-disable-next-line no-unused-vars
 const clearStyles = (styleSheet) => {
-    if(!styleSheet || !styleSheet.sheet || !styleSheet.sheet.cssRules) {
+    if (!styleSheet || !styleSheet.sheet || !styleSheet.sheet.cssRules) {
         throw new TypeError("Parameter is not a stylesheet");
     }
-    while(styleSheet.sheet.cssRules.length) {
+    while (styleSheet.sheet.cssRules.length) {
         styleSheet.sheet.deleteRule(0);
     }
 };
@@ -61,8 +63,9 @@ const clearStyles = (styleSheet) => {
  *
  * @param element
  */
+// eslint-disable-next-line no-unused-vars
 const clearChildren = (element) => {
-    if(!(element instanceof HTMLElement)) {
+    if (!(element instanceof HTMLElement)) {
         throw new TypeError("Parameter is not an HTMLElement");
     }
     while (element.firstChild) {
@@ -76,14 +79,15 @@ const clearChildren = (element) => {
  * @param text
  * @returns {boolean}
  */
+// eslint-disable-next-line no-unused-vars
 const copyTextToClipboard = (text) => {
     let element = createElement("textarea");
     element.textContent = text;
     document.body.appendChild(element);
     try {
         element.select();
-        return document.execCommand('copy');
-    } catch(e) {
+        return document.execCommand("copy");
+    } catch (e) {
         console.error("copying failed:", e);
         return false;
     } finally {
@@ -98,8 +102,9 @@ const copyTextToClipboard = (text) => {
  * @param type
  * @param timeout
  */
+// eslint-disable-next-line no-unused-vars
 const showToast = (message, type = "primary", timeout = 10) => {
-    if(["primary", "success", "warning", "error"].indexOf(type) === -1) {
+    if (["primary", "success", "warning", "error"].indexOf(type) === -1) {
         type = "primary";
     }
     let wrapper = document.getElementById("toasts"),
