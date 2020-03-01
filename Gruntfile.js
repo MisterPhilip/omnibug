@@ -9,14 +9,14 @@ module.exports = function (grunt) {
                 "name": "Omnibug (Beta)",
                 "version": "0.9.6",
                 "storageKey": "omnibug-beta",
-                "feedbackUrl": "https://omnibug.io/beta-feedback",
+                "feedbackUrl": "https://github.com/MisterPhilip/omnibug/issues",
                 "analyticsID": "UA-114343677-3"
             },
             "production": {
                 "name": "Omnibug",
                 "version": "1.13.2",
                 "storageKey": "omnibug",
-                "feedbackUrl": "https://omnibug.io/feedback",
+                "feedbackUrl": "https://github.com/MisterPhilip/omnibug/issues",
                 "analyticsID": "UA-114343677-2"
             }
         },
@@ -250,6 +250,10 @@ module.exports = function (grunt) {
                 "overwrite": true,
                 "usePrefix": false,
                 "replacements": [
+                    {
+                        "from": "##YEAR##",
+                        "to": (new Date).getFullYear()
+                    },
                     {
                         "from": "##OMNIBUG_VERSION##",
                         "to": extensionOptions.version
