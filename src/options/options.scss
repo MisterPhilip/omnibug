@@ -1,8 +1,8 @@
 @import "../assets/styles/base";
 
 body {
-  min-width: 800px;
-  max-width: 1000px;
+  width: 800px;
+  max-width: 100%;
   margin: 0 auto;
   background-color: $body-background-color;
 }
