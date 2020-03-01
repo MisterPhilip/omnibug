@@ -129,7 +129,7 @@ window.Omnibug = (() => {
     });
     d.addEventListener("click", function (e) {
         if (settings.contextMenuBeta) {
-            if (e.target.hasAttribute("data-context-menu") || (e.target.parentNode && e.target.parentNode.hasAttribute("data-context-menu"))) {
+            if (e.target.hasAttribute("data-context-menu") || (e.target.parentNode && e.target.parentNode.hasAttribute && e.target.parentNode.hasAttribute("data-context-menu"))) {
                 let item = (e.target.hasAttribute("data-context-menu")) ? e.target : e.target.parentNode,
                     action = item.getAttribute("data-context-menu"),
                     parameterKey = item.getAttribute("data-parameter");
@@ -183,6 +183,25 @@ window.Omnibug = (() => {
                 "type": "linkClick",
                 "url": e.target.getAttribute("href")
             });
+        }
+    });
+    requestPanel.addEventListener("mousedown", (event) => {
+        if (event.target.tagName === "TD" && !event.target.classList.contains("parameter-value")) {
+            event.preventDefault();
+            let stylesheet = d.getElementById("cellWidthStyles"),
+                originalWidth = event.target.getBoundingClientRect().width,
+                offset = event.clientX;
+            let moveHandler = (event) => {
+                let width = originalWidth + (event.clientX - offset);
+                stylesheet.sheet.deleteRule(0);
+                stylesheet.sheet.insertRule(`.request-details tbody > tr > td:first-of-type { width: ${width > 25 ? width : 25}px; }`);
+            };
+            d.addEventListener("mousemove", moveHandler, true);
+            requestPanel.addEventListener("mouseup", (event) => {
+                d.removeEventListener("mousemove", moveHandler, true);
+                requestPanel.mouseup = null;
+            }, true);
+            
         }
     });
 
