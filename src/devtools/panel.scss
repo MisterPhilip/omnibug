@@ -322,6 +322,8 @@ tr[data-parameter-key] td {
 .context-menu.menu {
   z-index: 9999;
   position: absolute;
+  width: max-content;
+  font-weight: normal;
   .menu-item > a:focus, .menu-item > a:hover {
     color: #fff;
   }
