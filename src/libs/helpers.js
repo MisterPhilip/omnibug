@@ -74,28 +74,6 @@ const clearChildren = (element) => {
 };
 
 /**
- * Copy text to the clipboard
- *
- * @param text
- * @returns {boolean}
- */
-// eslint-disable-next-line no-unused-vars
-const copyTextToClipboard = (text) => {
-    let element = createElement("textarea");
-    element.textContent = text;
-    document.body.appendChild(element);
-    try {
-        element.select();
-        return document.execCommand("copy");
-    } catch (e) {
-        console.error("copying failed:", e);
-        return false;
-    } finally {
-        element.remove();
-    }
-};
-
-/**
  * Show toast message
  *
  * @param message

@@ -1,4 +1,4 @@
-/* global OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, copyTextToClipboard, showToast, Fuse */
+/* global OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, showToast, Fuse */
 
 /*
  * Omnibug
@@ -154,14 +154,21 @@ window.Omnibug = (() => {
                 } else if (action === "watch") {
                     // @TODO: do something with watch here
                 } else if (action === "copy") {
-                    if (item.getAttribute("data-value") === "") {
+                    let copyValue = item.getAttribute("data-value");
+                    if (copyValue === "") {
                         showToast("Value is empty, nothing to copy!", "warning", 5);
-                    } else if (copyTextToClipboard(item.getAttribute("data-value"))) {
-                        showToast("Value copied to the clipboard.", "success", 5);
-                        tracker.track(["send", "event", "context menu", "copy", "success"]);
                     } else {
-                        showToast("Unable to copy to the clipboard.", "error");
-                        tracker.track(["send", "event", "context menu", "copy", "error"]);
+                        navigator.clipboard.writeText(copyValue).then(
+                            () => {
+                                showToast("Value copied to the clipboard.", "success", 5);
+                                tracker.track(["send", "event", "context menu", "copy", "success"]);
+                            },
+                            (reason) => {
+                                showToast("Unable to copy to the clipboard.", "error");
+                                tracker.track(["send", "event", "context menu", "copy", "error"]);
+                                console.error(reason);
+                            }
+                        );
                     }
                 }
             }
