@@ -36,14 +36,12 @@ window.Omnibug = (() => {
 
     // Open settings from links in devtools
     d.querySelectorAll("a[href=\"#settings\"]").forEach((element) => {
-        if (!chrome || !chrome.runtime || !chrome.runtime.openOptionsPage) {
-            element.classList.add("d-none");
-        } else {
-            element.addEventListener("click", (event) => {
-                event.preventDefault();
-                chrome.runtime.openOptionsPage();
+        element.addEventListener("click", (event) => {
+            event.preventDefault();
+            window.Omnibug.send_message({
+                "type": "openSettings"
             });
-        }
+        });
     });
 
     // Open modals

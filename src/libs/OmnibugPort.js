@@ -77,6 +77,8 @@ class OmnibugPort {
                     }
                 } else if (message.type === "linkClick") {
                     chrome.tabs.create({ url: message.url });
+                } else if (message.type === "openSettings") {
+                    chrome.runtime.openOptionsPage();
                 }
             });
         });
