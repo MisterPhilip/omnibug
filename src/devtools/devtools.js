@@ -25,7 +25,7 @@
              * Receieves messages from the eventPage
              */
             port.onMessage.addListener((msg) => {
-                if(panelWindow) {
+                if (panelWindow) {
                     panelWindow.Omnibug.receive_message(msg);
                 } else {
                     queuedMessages.push(msg);
@@ -35,13 +35,13 @@
             /**
              * Called when the devtools panel is first shown
              */
-            let listener = ( _window ) => {
+            let listener = (_window) => {
                 panel.onShown.removeListener(listener); // Run once only
                 panelWindow = _window;
 
                 // Release queued messages
                 let msg;
-                while((msg = queuedMessages.shift())) {
+                while ((msg = queuedMessages.shift())) {
                     panelWindow.Omnibug.receive_message(msg);
                 }
 

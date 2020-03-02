@@ -1,3 +1,5 @@
+/* global OmnibugSettings, OmnibugProvider, OmnibugPort */
+
 /*
  * Omnibug
  * Persistent event page, running in background (controller)
@@ -18,10 +20,12 @@
     chrome.runtime.onInstalled.addListener((details) => {
         settings.migrate()
             .then(setCachedSettings)
-            .then((loaded) => {settings.save(loaded);});
-
-        if(details.reason === "install") {
-            chrome.tabs.create({url: `https://omnibug.io/installed?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=install`});
+            .then((loaded) => { settings.save(loaded); });
+        
+        if (details.reason === "install") {
+            chrome.tabs.create({
+                url: "pages/installed.html"
+            });
         }
     });
 
@@ -38,7 +42,7 @@
      */
     chrome.storage.onChanged.addListener((changes, storageType) => {
         console.log("onChanged", changes);
-        if(settings.storage_key in changes) {
+        if (settings.storage_key in changes) {
             setCachedSettings(changes[settings.storage_key].newValue);
         }
         sendSettingsToTabs(tabs);
@@ -47,14 +51,13 @@
     /**
      * Accept incoming connections from our devtools panels
      */
-    chrome.runtime.onConnect.addListener(async(details) => {
+    chrome.runtime.onConnect.addListener(async (details) => {
         console.log("chrome.runtime.onConnect", details);
-        if(!cached.pattern) {
+        if (!cached.pattern) {
             settings.load().then(setCachedSettings);
         }
         let port = new OmnibugPort(details, settings);
-        if(!port.belongsToOmnibug)
-        {
+        if (!port.belongsToOmnibug) {
             return;
         }
         let tabList = {};
@@ -69,30 +72,29 @@
     chrome.webRequest.onBeforeRequest.addListener(
         (details) => {
             // Ignore any requests for windows where devtools isn't open
-            if(!isValidTab(details.tabId) || !cached.pattern.test(details.url))
-            {
+            if (!isValidTab(details.tabId) || !cached.pattern.test(details.url)) {
                 return;
             }
 
             let data = {
                 "request": {
                     "initiator": details.initiator,
-                    "method":    details.method,
-                    "id":        details.requestId,
-                    "tab":       details.tabId,
+                    "method": details.method,
+                    "id": details.requestId,
+                    "tab": details.tabId,
                     "timestamp": details.timeStamp,
-                    "type":      details.type,
-                    "url":       details.url,
-                    "postData":  ""
+                    "type": details.type,
+                    "url": details.url,
+                    "postData": ""
                 },
                 "event": "webRequest"
             };
 
             // Grab any POST data that is included
-            if(details.method === "POST" && details.requestBody) {
-                if(details.requestBody.raw && details.requestBody.raw[0]) {
+            if (details.method === "POST" && details.requestBody) {
+                if (details.requestBody.raw && details.requestBody.raw[0]) {
                     data.request.postData = String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes));
-                } else if(typeof details.requestBody.formData === "object") {
+                } else if (typeof details.requestBody.formData === "object") {
                     data.request.postData = details.requestBody.formData;
                 }
             }
@@ -115,14 +117,14 @@
      */
     chrome.webNavigation.onBeforeNavigate.addListener(
         (details) => {
-            if(isValidTab(details.tabId) && details.frameId === 0) {
+            if (isValidTab(details.tabId) && details.frameId === 0) {
                 // We have a page load within a tab we care about, send a message to the devtools with the info
                 console.log("webNavigation.onCommitted called", details);
                 tabs[details.tabId].port.postMessage({
                     "request": {
-                        "tab":       details.tabId,
+                        "tab": details.tabId,
                         "timestamp": details.timeStamp,
-                        "url":       details.url
+                        "url": details.url
                     },
                     "event": "webNavigation"
                 });
@@ -150,7 +152,7 @@
         Object.values(tabs).forEach((tab) => {
             tab.port.postMessage({
                 "event": "settings",
-                "data":  cached.settings
+                "data": cached.settings
             });
         });
     }

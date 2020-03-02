@@ -25,7 +25,7 @@ class OptimizelyXProvider extends BaseProvider
     {
         return {
             "account":      "mbox"
-        }
+        };
     }
 
 

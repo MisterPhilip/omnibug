@@ -37,7 +37,6 @@
         "storage",
         "webRequest",
         "webNavigation",
-        "clipboardWrite",
         "*://*/*"
     ],
     "short_name": "Omnibug",

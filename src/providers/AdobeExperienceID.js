@@ -26,7 +26,7 @@ class AdobeExperienceIDProvider extends BaseProvider
         return {
             "requestType": "omnibug_requestType",
             "account": "omnibug_account"
-        }
+        };
     }
 
     /**

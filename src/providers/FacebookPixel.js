@@ -26,7 +26,7 @@ class FacebookPixelProvider extends BaseProvider
         return {
             "account":      "id",
             "requestType":  "requestType"
-        }
+        };
     }
 
     /**
@@ -167,7 +167,7 @@ class FacebookPixelProvider extends BaseProvider
         } else if(!this.keys[name] && name.indexOf("cd[") === 0) {
             result = {
                 "key":   name,
-                "field": name.replace(/^cd\[|\]$/g, ''),
+                "field": name.replace(/^cd\[|\]$/g, ""),
                 "value": value,
                 "group": "custom"
             };
@@ -208,7 +208,7 @@ class FacebookPixelProvider extends BaseProvider
                                 "group": "products"
                             });
                         });
-                    })
+                    });
                 }
             } catch(e) {
                 results.push({
@@ -216,7 +216,7 @@ class FacebookPixelProvider extends BaseProvider
                     "field": "Content",
                     "value": content,
                     "group": "products"
-                })
+                });
             }
         }
 

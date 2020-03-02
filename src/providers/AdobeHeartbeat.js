@@ -27,7 +27,7 @@ class AdobeHeartbeatProvider extends BaseProvider
         return {
             "account":      "s:sc:rsid",
             "requestType":  "omnibug_requestType"
-        }
+        };
     }
 
     /**

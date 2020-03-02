@@ -33,3 +33,7 @@ platform/
 # Ignore built CSS files
 .sass-cache/
 src/**/*.css
+
+# Editor Configs
+.vscode
+.idea

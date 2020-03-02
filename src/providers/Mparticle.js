@@ -203,7 +203,7 @@ class MparticleProvider extends BaseProvider {
                 "hidden": true
             };
         }
-         else {
+        else {
             result = super.handleQueryParam(name, value);
         }
         return result;
@@ -262,7 +262,7 @@ class MparticleProvider extends BaseProvider {
                 "22": "ProductImpression",
                 "23": "Attribution",
             };
-            let etValue = !!(etDict[etType]) ? etDict[etType] : etType;
+            let etValue = etDict[etType] ? etDict[etType] : etType;
             results.push({
                 "key":   "etParsed",
                 "field": "Event Type Value",
@@ -285,7 +285,7 @@ class MparticleProvider extends BaseProvider {
                 "14": "Profile Change Message",
                 "16": "Commerce Event",
             };
-            let dataTypeValue = !!(dataTypeDict[dataType]) ? dataTypeDict[dataType] : dataType;
+            let dataTypeValue = dataTypeDict[dataType] ? dataTypeDict[dataType] : dataType;
             results.push({
                 "key":   "dtvalue",
                 "field": "Data Type Value",
@@ -302,7 +302,7 @@ class MparticleProvider extends BaseProvider {
             "2" : "Session End",
             "10": "State Transition"
         };
-        let eventTypeValue = !!(eventDict[eventType]) ? eventDict[eventType] : eventType;
+        let eventTypeValue = eventDict[eventType] ? eventDict[eventType] : eventType;
         results.push({
             "key":   "requestTypeParsed",
             "field": "Request Type",
@@ -331,8 +331,8 @@ class MparticleProvider extends BaseProvider {
             let k = p[0],
                 v = p[1];
             if (k.indexOf("ui[") === 0) {
-                 uiArray.push(k);
-                 uiArray.push(v);
+                uiArray.push(k);
+                uiArray.push(v);
             }
         }
         

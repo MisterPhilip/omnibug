@@ -193,6 +193,19 @@ nav.navbar {
     width: 14em;
     font-weight: 600;
     padding-left: .3em;
+    &::after {
+        content: " ";
+        width: 5px;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        cursor: w-resize;
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
+    }
+  }
+  .parameter-value {
+      padding-left: 5px;
   }
 }
 .request-details:last-of-type {
@@ -201,7 +214,7 @@ nav.navbar {
   }
 }
 .request-details[open] {
-  > summary {
+  > summary { 
     border-bottom: 0;
   }
 }
@@ -309,6 +322,8 @@ tr[data-parameter-key] td {
 .context-menu.menu {
   z-index: 9999;
   position: absolute;
+  width: max-content;
+  font-weight: normal;
   .menu-item > a:focus, .menu-item > a:hover {
     color: #fff;
   }
@@ -324,6 +339,7 @@ details.request.redirected [data-request-type] { background-color: #eeeeee; }
   position: fixed;
   bottom: .5rem;
   right: 1.25rem;
+  z-index: 300;
 }
 #toasts .toast {
   padding: .25rem .25rem .25rem .35rem;
@@ -393,6 +409,9 @@ body.dark {
   .request .table-hover tbody tr:hover {
     background-color: #555;
     color: #ddd;
+  }
+  .request tbody > tr > td:first-of-type {
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .request-details > summary {

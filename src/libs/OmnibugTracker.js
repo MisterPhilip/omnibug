@@ -1,7 +1,7 @@
 /**
  * Omnibug Tracker
  */
-/* exported OmnibugTracker */
+// eslint-disable-next-line no-unused-vars
 class OmnibugTracker
 {
     constructor()
@@ -32,10 +32,10 @@ class OmnibugTracker
 
             // Load GA script
             window.GoogleAnalyticsObject = "tracker";
-            (function(o,m,n,i,b,u,g){o['GoogleAnalyticsObject']=b;o[b]=o[b]||function(){
-                (o[b].q=o[b].q||[]).push(arguments)},o[b].l=1*new Date();u=m.createElement(n),
-                g=m.getElementsByTagName(n)[0];u.async=1;u.src=i;g.parentNode.insertBefore(u,g)
-            })(window,document,'script','../../assets/js/google-analytics.js','tracker');
+            (function(o,m,n,i,b,u,g){o["GoogleAnalyticsObject"]=b;o[b]=o[b]||function(){
+                (o[b].q=o[b].q||[]).push(arguments);},o[b].l=1*new Date();u=m.createElement(n),
+            g = m.getElementsByTagName(n)[0]; u.async = 1; u.src = i; g.parentNode.insertBefore(u, g);
+            })(window,document,"script","../../assets/js/google-analytics.js","tracker");
 
             this.loaded = true;
         }

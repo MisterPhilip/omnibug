@@ -26,7 +26,7 @@ class EnsightenManageProvider extends BaseProvider
     {
         return {
             "account":      "omnibug_account"
-        }
+        };
     }
 
     /**

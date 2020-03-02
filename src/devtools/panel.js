@@ -1,3 +1,5 @@
+/* global OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, showToast, Fuse */
+
 /*
  * Omnibug
  * DevTools panel code (view)
@@ -8,15 +10,13 @@
  * USA.
  *
  */
-
-
 window.Omnibug = (() => {
 
     let d = document,
         settings = (new OmnibugSettings).defaults,
         requestPanel = d.getElementById("requests"),
         noRequests = d.getElementById("no-requests"),
-        filters = {"providers": {}, "account": "", "accountType": "contains"},
+        filters = { "providers": {}, "account": "", "accountType": "contains" },
         persist = true,
         storageLoadedSettings = false,
         recordedData = [],
@@ -30,20 +30,18 @@ window.Omnibug = (() => {
         element.addEventListener("click", (event) => {
             event.preventDefault();
             clearRequests();
-        })
+        });
     });
 
 
     // Open settings from links in devtools
     d.querySelectorAll("a[href=\"#settings\"]").forEach((element) => {
-        if(!chrome || !chrome.runtime || !chrome.runtime.openOptionsPage) {
-            element.classList.add("d-none");
-        } else {
-            element.addEventListener("click", (event) => {
-                event.preventDefault();
-                chrome.runtime.openOptionsPage();
+        element.addEventListener("click", (event) => {
+            event.preventDefault();
+            window.Omnibug.send_message({
+                "type": "openSettings"
             });
-        }
+        });
     });
 
     // Open modals
@@ -52,11 +50,11 @@ window.Omnibug = (() => {
             event.preventDefault();
 
             let target = d.getElementById(element.getAttribute("data-target-modal"));
-            if(target) {
+            if (target) {
                 target.classList.add("active");
-                tracker.track(["send", "event", "modal", "open", element.getAttribute("data-target-modal").replace(/^#/, '')]);
+                tracker.track(["send", "event", "modal", "open", element.getAttribute("data-target-modal").replace(/^#/, "")]);
             }
-        })
+        });
     });
 
     // Close modals
@@ -66,9 +64,9 @@ window.Omnibug = (() => {
 
             let target = element.closest(".modal"),
                 modal = target.getAttribute("id");
-            if(target) {
+            if (target) {
                 target.classList.remove("active");
-                if(modal === "filter-modal") {
+                if (modal === "filter-modal") {
                     let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
                         return !provider[1] && settings.providers[provider[0]].enabled;
                     });
@@ -77,7 +75,7 @@ window.Omnibug = (() => {
                 }
                 tracker.track(["send", "event", "modal", "close", modal]);
             }
-        })
+        });
     });
 
     // Add tracking to top nav
@@ -87,8 +85,8 @@ window.Omnibug = (() => {
         });
     });
 
-    d.addEventListener('contextmenu', function(e) {
-        if(settings.contextMenuBeta) {
+    d.addEventListener("contextmenu", function (e) {
+        if (settings.contextMenuBeta) {
             let contextMenu = d.querySelector(".context-menu");
             if (contextMenu) {
                 contextMenu.remove();
@@ -118,7 +116,7 @@ window.Omnibug = (() => {
                     popover.querySelector(".context-menu-highlight-action").innerText = "Un-highlight";
                 }
                 popover.querySelector(".context-menu").style.top = e.offsetY + "px";
-                if((document.documentElement.clientWidth - 200) < e.clientX) {
+                if ((document.documentElement.clientWidth - 200) < e.clientX) {
                     popover.querySelector(".context-menu").style.left = (e.offsetX - 200) + "px";
                 } else {
                     popover.querySelector(".context-menu").style.left = e.offsetX + "px";
@@ -127,41 +125,48 @@ window.Omnibug = (() => {
             }
         }
     });
-    d.addEventListener("click", function(e) {
-        if(settings.contextMenuBeta) {
-            if(e.target.hasAttribute("data-context-menu") || (e.target.parentNode && e.target.parentNode.hasAttribute("data-context-menu"))) {
+    d.addEventListener("click", function (e) {
+        if (settings.contextMenuBeta) {
+            if (e.target.hasAttribute("data-context-menu") || (e.target.parentNode && e.target.parentNode.hasAttribute && e.target.parentNode.hasAttribute("data-context-menu"))) {
                 let item = (e.target.hasAttribute("data-context-menu")) ? e.target : e.target.parentNode,
                     action = item.getAttribute("data-context-menu"),
                     parameterKey = item.getAttribute("data-parameter");
 
-                if(action === "highlight") {
+                if (action === "highlight") {
                     let keys = settings.highlightKeys,
                         highlightType = "";
-                    if(keys.indexOf(parameterKey) !== -1) {
+                    if (keys.indexOf(parameterKey) !== -1) {
                         keys = keys.filter((param => param !== parameterKey));
                         highlightType = "un-highlight";
                     } else {
                         keys.push(parameterKey);
                         highlightType = "highlight";
                     }
-                    Omnibug.send_message({
+                    window.Omnibug.send_message({
                         "type": "settings",
                         "key": "highlightKeys",
                         "value": keys
                     });
                     showToast("Preferences updated.", "success", 5);
                     tracker.track(["send", "event", "context menu", highlightType, parameterKey]);
-                } else if(action === "watch") {
+                } else if (action === "watch") {
                     // @TODO: do something with watch here
-                } else if(action === "copy") {
-                    if(item.getAttribute("data-value") === "") {
+                } else if (action === "copy") {
+                    let copyValue = item.getAttribute("data-value");
+                    if (copyValue === "") {
                         showToast("Value is empty, nothing to copy!", "warning", 5);
-                    } else if(copyTextToClipboard(item.getAttribute("data-value"))) {
-                        showToast("Value copied to the clipboard.", "success", 5);
-                        tracker.track(["send", "event", "context menu", "copy", "success"]);
                     } else {
-                        showToast("Unable to copy to the clipboard.", "error");
-                        tracker.track(["send", "event", "context menu", "copy", "error"]);
+                        navigator.clipboard.writeText(copyValue).then(
+                            () => {
+                                showToast("Value copied to the clipboard.", "success", 5);
+                                tracker.track(["send", "event", "context menu", "copy", "success"]);
+                            },
+                            (reason) => {
+                                showToast("Unable to copy to the clipboard.", "error");
+                                tracker.track(["send", "event", "context menu", "copy", "error"]);
+                                console.error(reason);
+                            }
+                        );
                     }
                 }
             }
@@ -170,18 +175,37 @@ window.Omnibug = (() => {
                 contextMenu.remove();
             }
         }
-        if(e.target.tagName === "A" && e.target.hasAttribute("target") && e.target.getAttribute("target") === "_blank") {
+        if (e.target.tagName === "A" && e.target.hasAttribute("target") && e.target.getAttribute("target") === "_blank") {
             e.preventDefault();
-            Omnibug.send_message({
+            window.Omnibug.send_message({
                 "type": "linkClick",
                 "url": e.target.getAttribute("href")
             });
         }
     });
+    requestPanel.addEventListener("mousedown", (event) => {
+        if (event.target.tagName === "TD" && !event.target.classList.contains("parameter-value")) {
+            event.preventDefault();
+            let stylesheet = d.getElementById("cellWidthStyles"),
+                originalWidth = event.target.getBoundingClientRect().width,
+                offset = event.clientX;
+            let moveHandler = (event) => {
+                let width = originalWidth + (event.clientX - offset);
+                stylesheet.sheet.deleteRule(0);
+                stylesheet.sheet.insertRule(`.request-details tbody > tr > td:first-of-type { width: ${width > 25 ? width : 25}px; }`);
+            };
+            d.addEventListener("mousemove", moveHandler, true);
+            requestPanel.addEventListener("mouseup", (event) => {
+                d.removeEventListener("mousemove", moveHandler, true);
+                requestPanel.mouseup = null;
+            }, true);
+            
+        }
+    });
 
     // Toasts
     document.getElementById("toasts").addEventListener("click", (event) => {
-        if(event.target.classList.contains("btn-clear")) {
+        if (event.target.classList.contains("btn-clear")) {
             event.target.parentNode.remove();
         }
     });
@@ -203,7 +227,7 @@ window.Omnibug = (() => {
     });
     filterAccount.addEventListener("keypress", (event) => {
         let key = event.which || event.keyCode;
-        if(key === 13) {
+        if (key === 13) {
             d.getElementById("filter-modal").classList.remove("active");
         }
     });
@@ -215,7 +239,7 @@ window.Omnibug = (() => {
             providers = d.querySelectorAll(`#filter-providers > li:not(.d-none) input[type="checkbox"]`);
         providers.forEach((provider) => {
             provider.checked = checked;
-            if(filters.providers.hasOwnProperty(provider.value)) {
+            if (Object.prototype.hasOwnProperty.call(filters.providers, provider.value)) {
                 filters.providers[provider.value] = checked;
             }
         });
@@ -226,7 +250,7 @@ window.Omnibug = (() => {
     // Clear filters
     d.getElementById("filter-reset-all").addEventListener("click", (event) => {
         event.preventDefault();
-        filters = {"providers": {}, "account": "", "accountType": "contains"};
+        filters = { "providers": {}, "account": "", "accountType": "contains" };
         Object.keys(allProviders).forEach((key) => {
             filters.providers[key] = true;
         });
@@ -237,10 +261,10 @@ window.Omnibug = (() => {
     d.getElementById("filter-save-default").addEventListener("click", (event) => {
         let filterSettings = {},
             disabledProviders = [],
-            enabledProviders =  [];
+            enabledProviders = [];
 
         Object.entries(filters.providers).forEach((pair) => {
-            if(pair[1]) {
+            if (pair[1]) {
                 enabledProviders.push(pair[0]);
             } else {
                 disabledProviders.push(pair[0]);
@@ -248,11 +272,11 @@ window.Omnibug = (() => {
         });
 
         // Whitelist the selected providers, otherwise new providers would start to show up when they were added to Omnibug
-        if(disabledProviders.length) {
+        if (disabledProviders.length) {
             filterSettings.providers = enabledProviders;
         }
 
-        if(filters.account) {
+        if (filters.account) {
             filterSettings.fields = {
                 "account": {
                     "value": filters.account,
@@ -261,7 +285,7 @@ window.Omnibug = (() => {
             };
         }
 
-        Omnibug.send_message({
+        window.Omnibug.send_message({
             "type": "settings",
             "key": "defaultFilters",
             "value": filterSettings
@@ -298,25 +322,24 @@ window.Omnibug = (() => {
         let searchTerm = (event.target.value || "").substring(0, 20),
             providers = d.querySelectorAll("#filter-providers > li");
 
-        if(searchTerm) {
+        if (searchTerm) {
             let results = providerSearch.search(searchTerm);
             providers.forEach((provider) => {
-                if(results.find((searchProvider) => {
+                if (results.find((searchProvider) => {
                     return searchProvider.item.key === provider.getAttribute("data-provider");
                 }) !== undefined) {
                     provider.classList.remove("d-none");
                 }
-                else
-                {
+                else {
                     provider.classList.add("d-none");
                 }
             });
-            d.getElementById("provider-select-all-title").innerText = "Select All/None Shown Below"
+            d.getElementById("provider-select-all-title").innerText = "Select All/None Shown Below";
         } else {
             providers.forEach((provider) => {
                 provider.classList.remove("d-none");
             });
-            d.getElementById("provider-select-all-title").innerText = "Select All/None"
+            d.getElementById("provider-select-all-title").innerText = "Select All/None";
         }
     });
 
@@ -346,27 +369,27 @@ window.Omnibug = (() => {
             exportData = recordedData;
 
         // filter out what is needed
-        if(!showNavigation) {
+        if (!showNavigation) {
             exportData = exportData.filter((request) => {
                 return request.event !== "webNavigation";
-            })
+            });
         }
-        if(useFilters) {
-           exportData = exportData.filter((request) => {
-               if(request.event === "webNavigation") { return true; }
-               let account = getMappedColumnValue("account", request);
-               return filters.providers[request.provider.key] === true
-                   && ((!filters.account && !account) || (account && account.indexOf(filters.account) !== -1));
-           });
+        if (useFilters) {
+            exportData = exportData.filter((request) => {
+                if (request.event === "webNavigation") { return true; }
+                let account = getMappedColumnValue("account", request);
+                return filters.providers[request.provider.key] === true
+                    && ((!filters.account && !account) || (account && account.indexOf(filters.account) !== -1));
+            });
         }
 
         // Check our file type to make sure we're OK
-        if(["csv", "tab"].indexOf(fileType) === -1) {
+        if (["csv", "tab"].indexOf(fileType) === -1) {
             fileType = "csv";
         }
 
         // generate a filename if one was not passed or contained too many bad chars
-        if(filename === "") {
+        if (filename === "") {
             let now = new Date(),
                 date = [now.getFullYear(), now.getMonth() + 1, now.getDate()].map((e) => e.toString().length === 1 ? "0" + e : e),
                 time = [now.getHours(), now.getMinutes() + 1, now.getSeconds()].map((e) => e.toString().length === 1 ? "0" + e : e);
@@ -381,7 +404,7 @@ window.Omnibug = (() => {
         let colDelim = (fileType === "csv") ? `","` : `"\t"`,
             exportText = exportData.map((request) => {
                 let row = [];
-                if(request.event === "webNavigation") {
+                if (request.event === "webNavigation") {
                     row = [
                         "Navigation",
                         "",
@@ -401,24 +424,24 @@ window.Omnibug = (() => {
                     ];
                 }
                 row.push(request.request.url.replace(/"/g, `\\"`));
-                if(typeof request.request.postData !== "string") {
+                if (typeof request.request.postData !== "string") {
                     row.push(JSON.stringify(request.request.postData));
                 } else {
                     row.push(request.request.postData);
                 }
                 row.push((new Date(request.request.timestamp)).toString());
-                if(settings.showNotes) {
+                if (settings.showNotes) {
                     row.push(request.request.note);
                 }
                 return `"` + row.join(colDelim) + `"`;
             }).join("\n");
         // Add any headers
         exportText = `"` + ["##OMNIBUG_NAME## v##OMNIBUG_VERSION##", "Exported " + (new Date()).toString()].join(colDelim) + `"\n`
-                   + `"` + ["Event Type", "Provider", "Account", "Request ID", "Request URL", "POST Data", "Timestamp", "Notes"].join(colDelim) + `"\n` + exportText;
+            + `"` + ["Event Type", "Provider", "Account", "Request ID", "Request URL", "POST Data", "Timestamp", "Notes"].join(colDelim) + `"\n` + exportText;
 
 
         // Generate the file to download
-        let blob = new Blob([exportText], {type: `text/${fileType}`}),
+        let blob = new Blob([exportText], { type: `text/${fileType}` }),
             url = window.URL.createObjectURL(blob);
 
         let link = createElement("a", {
@@ -448,7 +471,7 @@ window.Omnibug = (() => {
 
         // Close the modal overlay now that they've exported the file
         let modal = event.target.closest(".modal");
-        if(modal) {
+        if (modal) {
             modal.classList.remove("active");
         }
     });
@@ -474,13 +497,13 @@ window.Omnibug = (() => {
             request = recordedData.find((r) => {
                 return r.event === "webRequest" && String(r.request.id) === id && String(r.request.timestamp) === timestamp;
             });
-        if(typeof request !== "undefined") {
+        if (typeof request !== "undefined") {
             // this _should_ always trigger, but just in case...
             request.request.note = input.value;
         }
     }
 
-    function clearRequests( ) {
+    function clearRequests() {
         // Clear our current requests
         clearChildren(requestPanel);
 
@@ -522,11 +545,11 @@ window.Omnibug = (() => {
      */
     function getMappedColumnValue(column, request) {
         let value = "";
-        if(request.provider && request.provider.columns && request.provider.columns[column]) {
+        if (request.provider && request.provider.columns && request.provider.columns[column]) {
             value = request.data.find((el) => {
                 return el.key === request.provider.columns[column];
             });
-            if(value) {
+            if (value) {
                 value = value.value;
             }
         }
@@ -541,18 +564,18 @@ window.Omnibug = (() => {
      * @return {string}
      */
     function getDataColumnValue(field, request) {
-      let value = "";
-      if (request.data) {
-        value = request.data.find((fld) => {
-          return fld.field === field;
-        })
-        if( value) {
-          value = value.value;
-        } else {
-          value = "";
+        let value = "";
+        if (request.data) {
+            value = request.data.find((fld) => {
+                return fld.field === field;
+            });
+            if (value) {
+                value = value.value;
+            } else {
+                value = "";
+            }
         }
-      }
-      return value;
+        return value;
     }
 
     /**
@@ -577,7 +600,7 @@ window.Omnibug = (() => {
         updateRedirectedEntries(request.request.id);
 
         // Setup parent details element
-        if(settings.alwaysExpand) {
+        if (settings.alwaysExpand) {
             details.setAttribute("open", "open");
         }
 
@@ -605,35 +628,35 @@ window.Omnibug = (() => {
 
 
         // Add the provider name & request type (if applicable)
-        if(request.provider.columns.requestType) {
+        if (request.provider.columns.requestType) {
             requestTypeValue = request.data.find((el) => {
                 return el.key === request.provider.columns.requestType;
             });
         }
-        if(!requestTypeValue) {
-            requestTypeValue = {"value": "Other"};
+        if (!requestTypeValue) {
+            requestTypeValue = { "value": "Other" };
         }
 
         let requestTypeEl = createElement("span", {
-                "classes": ["label"],
-                "attributes": {
-                    "data-request-type": requestTypeValue.value,
-                },
-                "text": requestTypeValue.value
-            });
+            "classes": ["label"],
+            "attributes": {
+                "data-request-type": requestTypeValue.value,
+            },
+            "text": requestTypeValue.value
+        });
 
         let colTitleWrapper = createElement("div", {
-                "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-5"],
-                "children": [requestTypeEl, colTitleSpan, colTitleRedirect],
-                "attributes": {
-                    "title": `${request.provider.name} ${requestTypeValue.value}`
-                }
-            });
+            "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-5"],
+            "children": [requestTypeEl, colTitleSpan, colTitleRedirect],
+            "attributes": {
+                "title": `${request.provider.name} ${requestTypeValue.value}`
+            }
+        });
 
         // Add the account ID, if it exists
         let accountValue = getMappedColumnValue("account", request);
 
-        if(accountValue) {
+        if (accountValue) {
             colAccount.innerText = accountValue;
             colAccount.setAttribute("title", accountValue);
             details.setAttribute("data-account", accountValue);
@@ -642,21 +665,21 @@ window.Omnibug = (() => {
         // Add the event ID and Link Name, if exists
         let includeEventCol = false;
         let colEvent = {};
-        if(settings.additionalSummary.length > 0) {
-          let colText = ""
-          settings.additionalSummary.forEach((fld) => {
-            colText = `${colText} - ${getDataColumnValue(fld, request)}`
-          });
+        if (settings.additionalSummary.length > 0) {
+            let colText = "";
+            settings.additionalSummary.forEach((fld) => {
+                colText = `${colText} - ${getDataColumnValue(fld, request)}`;
+            });
 
-          colText = colText.substring(2); // trim the first 3 characters off including the first -
-          colEvent = createElement("div", {
-            "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-2"],
-            "text": colText,
-            "attributes": {
-              "title": "temp"
-            }
-          });
-          includeEventCol = true;
+            colText = colText.substring(2); // trim the first 3 characters off including the first -
+            colEvent = createElement("div", {
+                "classes": ["column", "col-3", "col-lg-4", "col-md-4", "col-sm-2"],
+                "text": colText,
+                "attributes": {
+                    "title": "temp"
+                }
+            });
+            includeEventCol = true;
         }
 
         // Add the timestamp
@@ -724,18 +747,18 @@ window.Omnibug = (() => {
         });
 
         let data = request.data.reduce((groups, item) => {
-            if(!item.hidden) {
+            if (!item.hidden) {
                 const val = item.group;
                 groups[val] = groups[val] || [];
-                const newItem = {...item, label: settings.renameParameters[item.field]}
+                const newItem = { ...item, label: settings.renameParameters[item.field] };
                 groups[val].push(newItem);
             }
             return groups;
-        }, {"summary": requestSummary});
+        }, { "summary": requestSummary });
 
         let groups = request.provider.groups || [];
-        groups.unshift({"key": "summary", "name": "Summary"});
-        groups.push({"key": "other", "name": "Other"});
+        groups.unshift({ "key": "summary", "name": "Summary" });
+        groups.push({ "key": "other", "name": "Other" });
 
         groups.forEach((group) => {
             if (data[group.key]) {
@@ -760,7 +783,7 @@ window.Omnibug = (() => {
         let wrapper = createElement("details", {
             "classes": ["request-details"]
         });
-        if(title !== "Summary") {
+        if (title !== "Summary") {
             wrapper.setAttribute("open", "open");
         }
 
@@ -774,8 +797,8 @@ window.Omnibug = (() => {
 
         // Loop through each of the data objects to create a new table row
         data.sort((a, b) => {
-            let aKey, bKey = '';
-            switch(settings.paramSortOrder) {
+            let aKey, bKey = "";
+            switch (settings.paramSortOrder) {
                 case "label":
                     aKey = a.label ? a.label.toLowerCase() : a.field.toLowerCase();
                     bKey = b.label ? b.label.toLowerCase() : b.field.toLowerCase();
@@ -783,9 +806,9 @@ window.Omnibug = (() => {
                 default:
                     aKey = a.field.toLowerCase();
                     bKey = b.field.toLowerCase();
-                break;
+                    break;
             }
-            return aKey.localeCompare(bKey, "standard", {"numeric": true});
+            return aKey.localeCompare(bKey, "standard", { "numeric": true });
         }).forEach((row) => {
             let nameKey = createElement("span", {
                     "classes": ["parameter-key"],
@@ -820,9 +843,9 @@ window.Omnibug = (() => {
 
         // Append the final results
         let table = createElement("table", {
-                "classes": ["table", "table-striped", "table-hover"],
-                "children": [tableBody]
-            });
+            "classes": ["table", "table-striped", "table-hover"],
+            "children": [tableBody]
+        });
         wrapper.appendChild(table);
 
         return wrapper;
@@ -840,7 +863,7 @@ window.Omnibug = (() => {
         });
 
         // check if we need to clear any existing requests out first...
-        if(!persist) {
+        if (!persist) {
             clearRequests();
         }
 
@@ -864,8 +887,8 @@ window.Omnibug = (() => {
 
         let theme = settings.theme,
             themeType = settings.theme === "auto" ? "auto" : "manual";
-        if(settings.theme === "auto") {
-            if(chrome.devtools.panels && chrome.devtools.panels.themeName === "dark") {
+        if (settings.theme === "auto") {
+            if (chrome.devtools.panels && chrome.devtools.panels.themeName === "dark") {
                 theme = "dark";
             } else {
                 theme = "light";
@@ -874,8 +897,8 @@ window.Omnibug = (() => {
 
         tracker.updateAllowTracking(settings.allowTracking);
 
-        if(settings.allowTracking) {
-            if(!storageLoadedSettings && fromStorage) {
+        if (settings.allowTracking) {
+            if (!storageLoadedSettings && fromStorage) {
                 tracker.init(settings.allowTracking);
             }
             tracker.track(["set", "dimension2", String(settings.showRedirects)], true);
@@ -883,22 +906,22 @@ window.Omnibug = (() => {
             tracker.track(["set", "dimension4", String(settings.showNotes)], true);
             tracker.track(["set", "dimension7", `${themeType}: ${theme}`], true);
 
-            if(!storageLoadedSettings && fromStorage) {
+            if (!storageLoadedSettings && fromStorage) {
                 tracker.track(["send", "pageview", "/panel"]);
             }
         }
 
         // Build any default filters
-        if(!storageLoadedSettings && fromStorage) {
-            if(!!Object.entries(settings.defaultFilters).length) {
+        if (!storageLoadedSettings && fromStorage) {
+            if (Object.entries(settings.defaultFilters).length) {
                 filters = filters || {};
-                if(settings.defaultFilters.fields) {
-                    if(settings.defaultFilters.fields.account) {
+                if (settings.defaultFilters.fields) {
+                    if (settings.defaultFilters.fields.account) {
                         filters.account = settings.defaultFilters.fields.account.value;
                         filters.accountType = settings.defaultFilters.fields.account.type;
                     }
                 }
-                if(settings.defaultFilters.providers) {
+                if (settings.defaultFilters.providers) {
                     filters.providers = Object.keys(allProviders).reduce((filteredProviders, provider) => {
                         filteredProviders[provider] = settings.defaultFilters.providers.includes(provider);
                         return filteredProviders;
@@ -914,12 +937,12 @@ window.Omnibug = (() => {
         clearStyles(styleSheet);
 
         // Highlight colors
-        if(settings.highlightKeys.length) {
+        if (settings.highlightKeys.length) {
             let highlightPrefix = "[data-parameter-key=\"",
                 highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]",
                 rule = "";
 
-            if(defaults.color_highlight !== settings.color_highlight) {
+            if (defaults.color_highlight !== settings.color_highlight) {
                 rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; } `;
                 styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
             } else {
@@ -933,66 +956,66 @@ window.Omnibug = (() => {
                 styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
             }
 
-            if(defaults.color_highlight !== settings.color_highlight) {
+            if (defaults.color_highlight !== settings.color_highlight) {
                 rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; }`;
                 styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
             }
         }
 
         // Reverse the direction of the entries to show newest first
-        if(settings.requestSortOrder === "desc") {
+        if (settings.requestSortOrder === "desc") {
             styleSheet.sheet.insertRule(`#requests {display: flex; flex-direction: column-reverse;}`, styleSheet.sheet.cssRules.length);
         }
 
         // Wrap text or truncate with ellipsis
-        if(!settings.wrapText) {
+        if (!settings.wrapText) {
             styleSheet.sheet.insertRule(`.parameter-value > span {white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;}`, styleSheet.sheet.cssRules.length);
             styleSheet.sheet.insertRule(`.parameter-value > span:hover {white-space: normal; overflow: visible;  height:auto;}`, styleSheet.sheet.cssRules.length);
         }
 
         // Hide note field if disabled
-        if(!settings.showNotes) {
+        if (!settings.showNotes) {
             styleSheet.sheet.insertRule(`.request-note {display: none;}`, styleSheet.sheet.cssRules.length);
         }
 
         // Background colors
-        if(defaults.color_click !== settings.color_click) {
+        if (defaults.color_click !== settings.color_click) {
             styleSheet.sheet.insertRule(`[data-request-type] { background-color: ${settings.color_click} !important; }`, styleSheet.sheet.cssRules.length);
         }
-        if(defaults.color_load !== settings.color_load) {
+        if (defaults.color_load !== settings.color_load) {
             styleSheet.sheet.insertRule(`[data-request-type="Page View"] { background-color: ${settings.color_load} !important; }`, styleSheet.sheet.cssRules.length);
         }
-        if(defaults.color_redirect !== settings.color_redirect) {
+        if (defaults.color_redirect !== settings.color_redirect) {
             styleSheet.sheet.insertRule(`details.request.redirected [data-request-type] { background-color: ${settings.color_redirect} !important; }`, styleSheet.sheet.cssRules.length);
         }
-        if(defaults.color_hover !== settings.color_hover) {
+        if (defaults.color_hover !== settings.color_hover) {
             styleSheet.sheet.insertRule(`.request .table-hover tbody tr:hover { background-color: ${settings.color_hover} !important; }`, styleSheet.sheet.cssRules.length);
         }
 
         // Key vs. name
-        if(settings.showFullNames) {
+        if (settings.showFullNames) {
             styleSheet.sheet.insertRule(`.parameter-key { display: none; }`, styleSheet.sheet.cssRules.length);
         } else {
             styleSheet.sheet.insertRule(`.parameter-field { display: none; }`, styleSheet.sheet.cssRules.length);
         }
 
         // Navigation requests
-        if(!settings.showNavigation) {
+        if (!settings.showNavigation) {
             styleSheet.sheet.insertRule(`.navigation { display: none; }`, styleSheet.sheet.cssRules.length);
         }
 
         // Redirected requests
-        if(!settings.showRedirects) {
+        if (!settings.showRedirects) {
             styleSheet.sheet.insertRule(`details.request.redirected:not([open]) { display: none; }`, styleSheet.sheet.cssRules.length);
         }
 
         // Quotes
-        if(settings.showQuotes) {
+        if (settings.showQuotes) {
             styleSheet.sheet.insertRule(`.parameter-value > span:before, .parameter-value > span:after { content: '"'; color: ${settings.color_quotes}; }`, styleSheet.sheet.cssRules.length);
         }
 
         // Themes
-        if(theme === "dark") {
+        if (theme === "dark") {
             document.body.classList.add("dark");
         } else {
             document.body.classList.remove("dark");
@@ -1003,7 +1026,7 @@ window.Omnibug = (() => {
             styleSheet.sheet.insertRule(`.label + span::before {content: "";}`);
         }
 
-        if(fromStorage) {
+        if (fromStorage) {
             storageLoadedSettings = true;
         }
     }
@@ -1018,8 +1041,8 @@ window.Omnibug = (() => {
         clearChildren(providerList);
 
         // Create an entry for _all_ of our providers
-        for(let providerKey in allProviders) {
-            if(!allProviders.hasOwnProperty(providerKey)) { continue; }
+        for (let providerKey in allProviders) {
+            if (!Object.prototype.hasOwnProperty.call(allProviders, providerKey)) { continue; }
 
             // Create our DOM elements
             let input = createElement("input", {
@@ -1047,14 +1070,14 @@ window.Omnibug = (() => {
                 });
 
             // Check if the user has the provider enabled or not
-            if(settings.providers[providerKey] && !settings.providers[providerKey].enabled) {
+            if (settings.providers[providerKey] && !settings.providers[providerKey].enabled) {
                 label.setAttribute("title", "This provider is currently disabled and requests for this provider will never be shown. You can re-enable it within the settings");
                 let warningIcon = createElement("i", {
                     "classes": ["fas", "fa-exclamation-triangle"]
                 });
                 span.appendChild(warningIcon);
             } else {
-                if(filters.providers[providerKey]) {
+                if (filters.providers[providerKey]) {
                     input.checked = true;
                 }
             }
@@ -1100,18 +1123,18 @@ window.Omnibug = (() => {
         });
 
         // Add hidden providers, if any
-        if(hiddenProviders.length) {
+        if (hiddenProviders.length) {
             styleSheet.sheet.insertRule(`${hiddenProviders.join(", ")} { display: none; }`);
         }
 
         // Add account filter, if applicable
-        if(filters.account) {
-            let filterMap = {"contains": "*", "starts": "^", "ends": "$", "exact": ""};
+        if (filters.account) {
+            let filterMap = { "contains": "*", "starts": "^", "ends": "$", "exact": "" };
             styleSheet.sheet.insertRule(`.request:not([data-account${filterMap[filters.accountType]}="${filters.account}" i]) { display: none; }`);
         }
 
         // Show the user that filters are (in)active
-        if(filters.account || hiddenProviders.length) {
+        if (filters.account || hiddenProviders.length) {
             d.body.classList.add("filters-active");
         } else {
             d.body.classList.remove("filters-active");
@@ -1125,19 +1148,19 @@ window.Omnibug = (() => {
          * @param message
          */
         receive_message(message) {
-            switch(message.event || "") {
+            switch (message.event || "") {
                 case "webRequest":
                     addRequest(message);
-                break;
+                    break;
                 case "webNavigation":
                     addNavigation(message);
-                break;
+                    break;
                 case "settings":
                     loadSettings(message.data, true);
-                break;
+                    break;
                 default:
                     this.send_message("Unknown message type", message);
-                break;
+                    break;
             }
         },
         /**

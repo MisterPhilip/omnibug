@@ -24,7 +24,7 @@ class PiwikPROProvider extends BaseProvider {
         return {
             "account": "trackingServer",
             "requestType": "requestType"
-        }
+        };
     }
 
     /**
@@ -566,7 +566,7 @@ class PiwikPROProvider extends BaseProvider {
                             "value": value,
                             "group": "custom"
                         });
-                    })
+                    });
                 }
             } catch (e) {
                 /* istanbul ignore next: push the full value to the key */
@@ -596,7 +596,7 @@ class PiwikPROProvider extends BaseProvider {
                             "value": value,
                             "group": "custom"
                         });
-                    })
+                    });
                 }
             } catch (e) {
                 /* istanbul ignore next: push the full value to the key */
@@ -643,7 +643,7 @@ class PiwikPROProvider extends BaseProvider {
                             "value": qty.toString(),
                             "group": "ecommerce"
                         });
-                    })
+                    });
                 }
             } catch (e) {
                 /* istanbul ignore next: push the full value to the key */
@@ -670,7 +670,7 @@ class PiwikPROProvider extends BaseProvider {
         } else if (params.get("c_i")) {
             requestType = "Content Interaction";
         } else if (params.get("e_c")) {
-            requestType = "Custom Event"
+            requestType = "Custom Event";
         } else if (params.get("ping")) {
             requestType = "Ping";
         }

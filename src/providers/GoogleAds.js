@@ -24,7 +24,7 @@ class GoogleAdsProvider extends BaseProvider {
         return {
             "account": "omnibug-account",
             "requestType": "requestType"
-        }
+        };
     }
 
     /**
@@ -77,7 +77,7 @@ class GoogleAdsProvider extends BaseProvider {
      */
     handleCustom(url, params) {
         let results = [],
-            pathParts = url.pathname.match(/\/([^\/]+)\/(?:AW-)?(\d+)\/?$/),
+            pathParts = url.pathname.match(/\/([^/]+)\/(?:AW-)?(\d+)\/?$/),
             account = "AW-" + pathParts[2],
             data = params.get("data") || "",
             dataEvent = data.match(/event=([^;]+)(?:$|;)/),
@@ -105,7 +105,7 @@ class GoogleAdsProvider extends BaseProvider {
 
         if (dataEvent && dataEvent.length) {
             if (dataEvent[1] === "gtag.config") {
-                requestType = "Page View"
+                requestType = "Page View";
             } else {
                 requestType = dataEvent[1];
             }
