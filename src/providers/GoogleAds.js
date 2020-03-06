@@ -9,7 +9,7 @@ class GoogleAdsProvider extends BaseProvider {
     constructor() {
         super();
         this._key = "GOOGLEADS";
-        this._pattern = /googleads\.g\.doubleclick\.net\/pagead\//;
+        this._pattern = /googleads\.g\.doubleclick\.net\/pagead\/(?:viewthrough)conversion/;
         this._name = "Google Ads";
         this._type = "marketing";
         this._keywords = ["aw", "ad words"];
