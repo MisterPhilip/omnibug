@@ -8,6 +8,8 @@ $icons: (
     "Adobe Heartbeat": $iconPath + "ADOBEHEARTBEAT16x16.png",
     "Adobe Launch": $iconPath + "ADOBELAUNCH16x16.png", 
     "Adobe Target": $iconPath + "ADOBETARGET16x16.png",
+    "AT Internet": $iconPath + "ATINTERNET16x16.png",
+    "Bing Ads": $iconPath + "BINGADS16x16.png",
     "Comscore": $iconPath + "COMSCORE16x16.png",
     "Ensighten Manage": $iconPath + "ENSIGHTEN16x16.png",
     "Facebook Pixel": $iconPath + "FACEBOOK16x16.png",
@@ -25,8 +27,7 @@ $icons: (
     "Snapchat": $iconPath + "SNAPCHAT16x16.png",
     "Tealium IQ": $iconPath + "TEALIUM16x16.png",
     "Twitter Conversion": $iconPath + "TWITTERPIXEL16x16.png",
-    "Universal Analytics": $iconPath + "GOOGLEANALYTICS16x16.png",
-    "AT Internet": $iconPath + "ATINTERNET16x16.png"
+    "Universal Analytics": $iconPath + "GOOGLEANALYTICS16x16.png"
 );
 
 @mixin iconRule($title, $path) {
