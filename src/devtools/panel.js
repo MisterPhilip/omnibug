@@ -879,11 +879,11 @@ window.Omnibug = (() => {
      * @param newSettings
      * @param fromStorage
      */
-    function loadSettings(newSettings, fromStorage = false) {
+    function loadSettings(newSettings = {}, fromStorage = false) {
         let styleSheet = d.getElementById("settingsStyles"),
             defaults = (new OmnibugSettings).defaults;
 
-        settings = newSettings;
+        settings = Object.assign(defaults, newSettings);
 
         let theme = settings.theme,
             themeType = settings.theme === "auto" ? "auto" : "manual";
@@ -912,7 +912,7 @@ window.Omnibug = (() => {
         }
 
         // Build any default filters
-        if (!storageLoadedSettings && fromStorage) {
+        if (!storageLoadedSettings && fromStorage && typeof settings.defaultFilters === "object" && settings.defaultFilters !== null) {
             if (Object.entries(settings.defaultFilters).length) {
                 filters = filters || {};
                 if (settings.defaultFilters.fields) {
