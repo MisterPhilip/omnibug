@@ -14,7 +14,7 @@ module.exports = function (grunt) {
             },
             "production": {
                 "name": "Omnibug",
-                "version": "1.14.0",
+                "version": "1.15.0",
                 "storageKey": "omnibug",
                 "feedbackUrl": "https://github.com/MisterPhilip/omnibug/issues",
                 "analyticsID": "UA-114343677-2"
