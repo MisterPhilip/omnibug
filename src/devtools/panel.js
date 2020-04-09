@@ -969,8 +969,8 @@ window.Omnibug = (() => {
 
         // Wrap text or truncate with ellipsis
         if (!settings.wrapText) {
-            styleSheet.sheet.insertRule(`.parameter-value > span {white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;}`, styleSheet.sheet.cssRules.length);
-            styleSheet.sheet.insertRule(`.parameter-value > span:hover {white-space: normal; overflow: visible;  height:auto;}`, styleSheet.sheet.cssRules.length);
+            styleSheet.sheet.insertRule(`.parameter-value > span {white-space: nowrap; overflow: hidden;  text-overflow: ellipsis; display: block;}`, styleSheet.sheet.cssRules.length);
+            styleSheet.sheet.insertRule(`tr:hover .parameter-value > span {white-space: normal; overflow: visible;  height:auto;}`, styleSheet.sheet.cssRules.length);
         }
 
         // Hide note field if disabled
