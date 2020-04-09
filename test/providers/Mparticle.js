@@ -15,7 +15,8 @@ test("Pattern should match Mparticle event requests", t => {
     let provider = new MparticleProvider(),
         urls = [
             "https://jssdks.mparticle.com/v1/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
-            "https://jssdks.mparticle.com/v2/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events"
+            "https://jssdks.mparticle.com/v2/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
+            "https://jssdks.mparticle.com/v2/JS/us1-xxxxxd9228826649aacb395919xxxxx/Events"
         ];
 
     urls.forEach((url) => {
@@ -66,19 +67,19 @@ test("Provider returns post data", t => {
 
     // Event Type (n)   
     t.is(typeof n, "object", "n parameter exists");
-    t.is(n.field, "Event Name (n)", "Field is Event Name (n)");
+    t.is(n.field, "Event Name", "Field is Event Name");
     t.is(n.value, "pageView", "Actual value is pageView");
     t.is(n.group, "general");
 
     // Session UID (sid)
     t.is(typeof sid, "object", "sid parameter exists");
-    t.is(sid.field, "Session UID (sid)", "Field is Session UID (sid)");
+    t.is(sid.field, "Session UID", "Field is Session UID (sid)");
     t.is(sid.value, "00000000-0000-0000-0000-1B0265340D22", "Actual value is 00000000-0000-0000-0000-1B0265340D22");
     t.is(sid.group, "general");
 
     // SDK Verison (sdk)
     t.is(typeof sdk, "object", "sdk parameter exists");
-    t.is(sdk.field, "SDK Version (sdk)", "Field is SDK Version (sdk)");
+    t.is(sdk.field, "SDK Version", "Field is SDK Version");
     t.is(sdk.value, "1.16.2", "SDK value is 1.16.2");
     t.is(sdk.group, "general");
 

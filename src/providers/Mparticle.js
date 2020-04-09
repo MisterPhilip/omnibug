@@ -10,7 +10,7 @@ class MparticleProvider extends BaseProvider {
     constructor() {
         super();
         this._key       = "MPARTICLE";
-        this._pattern   = /\.mparticle\.com\/v\d\/JS\/\w{32}\/Events$/;
+        this._pattern   = /\.mparticle\.com\/v\d\/JS\/[^/]+\/Events$/;
         this._name      = "Mparticle";
         this._type      = "marketing";
     }
@@ -60,43 +60,43 @@ class MparticleProvider extends BaseProvider {
     {
         return {
             "av" : {
-                "name": "Application Version (av)",
+                "name": "Application Version",
                 "group": "general"
             },
             "at" : {
-                "name": "Application State (at)",
+                "name": "Application State",
                 "group": "general"
             },
             "attrs" : {
-                "name": "Attributes (attrs)",
+                "name": "Attributes",
                 "group": "general"
             },
             "cgid" : {
-                "name": "Client Generated ID (cgid)",
+                "name": "Client Generated ID",
                 "group": "general"
             },
             "ct" : {
-                "name": "Unix Time (ct)",
+                "name": "Unix Time",
                 "group": "general"
             },
             "das" : {
-                "name": "Device Application Stamp (das)",
+                "name": "Device Application Stamp",
                 "group": "general"
             },
             "dbg" : {
-                "name": "Debug (dbg)",
+                "name": "Debug",
                 "group": "general"
             },
             "dt" : {
-                "name": "Data Type (dt)",
+                "name": "Data Type",
                 "group": "general"
             },
             "eec" : {
-                "name": "Expanded Event Count (eec)",
+                "name": "Expanded Event Count",
                 "group": "general"
             },
             "et" : {
-                "name": "Event Type (et)",
+                "name": "Event Type",
                 "group": "general"
             },
             "flags" : {
@@ -104,19 +104,19 @@ class MparticleProvider extends BaseProvider {
                 "group": "general"
             },
             "fr" : {
-                "name": "First Run (fr)",
+                "name": "First Run",
                 "group": "general"
             },
             "iu" : {
-                "name": "Is Upgrade (iu)",
+                "name": "Is Upgrade",
                 "group": "general"
             },
             "lc" : {
-                "name": "Location (lc)",
+                "name": "Location",
                 "group": "general"
             },
             "lr" : {
-                "name": "Launch Referral (lr)",
+                "name": "Launch Referral",
                 "group": "general"
             },
             "mpid" : {
@@ -124,27 +124,27 @@ class MparticleProvider extends BaseProvider {
                 "group": "general"
             },
             "n" : {
-                "name": "Event Name (n)",
+                "name": "Event Name",
                 "group": "general"
             },
             "o" : {
-                "name": "Opt-Out (o)",
+                "name": "Opt-Out",
                 "group": "general"
             },
             "pb" : {
-                "name": "User Product-Bags (pb)",
+                "name": "User Product-Bags",
                 "group": "general"
             },
             "sdk" : {
-                "name" : "SDK Version (sdk)",
+                "name" : "SDK Version",
                 "group": "general"
             },
             "sid" : {
-                "name": "Session UID (sid)",
+                "name": "Session UID",
                 "group": "general"
             },
             "str" : {
-                "name": "Event Store (str)",
+                "name": "Event Store",
                 "group": "general"
             },
             "str.uid.Expires" : {
@@ -156,15 +156,15 @@ class MparticleProvider extends BaseProvider {
                 "group": "general"
             },
             "ua" : {
-                "name": "User Attributes (ua)",
+                "name": "User Attributes",
                 "group": "general"
             },
             "ui" : {
-                "name": "User Identities (ui)",
+                "name": "User Identities",
                 "group": "general"
             },
             "uic" : {
-                "name": "User Identity Change (uic)",
+                "name": "User Identity Change",
                 "group": "general"
             },
         };
@@ -222,7 +222,7 @@ class MparticleProvider extends BaseProvider {
         let results = [];
 
         // Client Code
-        const clientCodeRe = /v\d\/JS\/(.+)\/Events$/;
+        const clientCodeRe = /v\d\/JS\/([^/]+)\/Events$/;
         let clientCodematches =  url.pathname.match(clientCodeRe);
         if(clientCodematches !== null) {
             results.push({
