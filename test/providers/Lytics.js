@@ -51,7 +51,7 @@ test("LyticsProvider returns client ID", t => {
         });
 
     t.is(typeof cid, "object");
-    t.is(cid.field, "Account ID (cid)");
+    t.is(cid.field, "Account ID");
     t.is(cid.value, "5a4ace928f7786173d963ced2784797f");
 
 });
@@ -65,7 +65,7 @@ test("LyticsProvider returns data", t => {
         });
 
     t.is(typeof ts, "object");
-    t.is(ts.field, "Timestamp (_ts)");
+    t.is(ts.field, "Timestamp");
     t.is(ts.value, "1589047242522");
 
 });
