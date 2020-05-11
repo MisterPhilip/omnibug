@@ -80,51 +80,51 @@ class LyticsProvider extends BaseProvider {
                 "group": "configuration"
             },
             "_e" : {
-                "name": "Event (_e)",
+                "name": "Event",
                 "group": "general"
             },
             "_ref" : {
-                "name": "Referral Domain (_ref)",
+                "name": "Referral Domain",
                 "group": "general"
             },
             "_tz" : {
-                "name": "User Time Zone (_tz)",
+                "name": "User Time Zone",
                 "group": "general"
             },
             "_ul" : {
-                "name": "User Language (_ul)",
+                "name": "User Language",
                 "group": "general"
             },
             "_sz" : {
-                "name": "Display Size (_sz)",
+                "name": "Display Size",
                 "group": "general"
             },
             "_ts" : {
-                "name": "Timestamp (_ts)",
+                "name": "Timestamp",
                 "group": "general"
             },
             "_nmob" : {
-                "name": "Not Mobile Device (_nmob)",
+                "name": "Not Mobile Device",
                 "group": "general"
             },
             "_device" : {
-                "name": "Current Device (_device)",
+                "name": "Current Device",
                 "group": "general"
             },
             "url" : {
-                "name": "URL (url)",
+                "name": "URL",
                 "group": "general"
             },
             "_uid" : {
-                "name": "Lytics UID (_uid)",
+                "name": "Lytics UID",
                 "group": "general"
             },
             "_uido" : {
-                "name": "Lytics UID (_uido)",
+                "name": "Lytics UID",
                 "group": "general"
             },
             "_v" : {
-                "name": "Javascript Tag Version (_v)",
+                "name": "Javascript Tag Version",
                 "group": "general"
             },
         };
@@ -173,10 +173,9 @@ class LyticsProvider extends BaseProvider {
         const clientCodeRe = /\/c\/(.+)$/;
         let clientCodematches =  url.pathname.match(clientCodeRe);
         if(clientCodematches !== null) {
-            console.log(clientCodematches[1]);
             results.push({
                 "key":   "cid",
-                "field": "Account ID (cid)",
+                "field": "Account ID",
                 "value": clientCodematches[1],
                 "group": "general"
             });
