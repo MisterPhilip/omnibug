@@ -1,18 +1,18 @@
 /**
- * Universal Analytics
+ * Google Analytics
  * https://developers.google.com/analytics/devguides/collection/analyticsjs/
  *
  * @class
  * @extends BaseProvider
  */
-class UniversalAnalyticsProvider extends BaseProvider
+class GoogleAnalyticsProvider extends BaseProvider
 {
     constructor()
     {
         super();
         this._key        = "UNIVERSALANALYTICS";
-        this._pattern    = /\.google-analytics\.com\/([rg]\/)?collect(?:[/?]+|$)/;
-        this._name       = "Universal Analytics";
+        this._pattern    = /(?:\.google-analytics|analytics\.google)\.com\/([rg]\/)?collect(?:[/?]+|$)/;
+        this._name       = "Google Analytics";
         this._type       = "analytics";
         this._keywords   = ["google", "google analytics", "ua", "ga"];
     }
@@ -406,7 +406,30 @@ class UniversalAnalyticsProvider extends BaseProvider
     handleQueryParam(name, value)
     {
         let result = {};
-        if(/^cd(\d+)$/i.test(name)) {
+        if(/^en\[(\d+)]$/.test(name)) {
+            const eventKey = parseInt(RegExp.$1, 10) + 1;
+            result = {
+                "key":   name,
+                "field": `Event ${eventKey} Type`,
+                "value": value,
+                "group": "events"
+            };
+        } else if(/^epn?\[(\d+)]\.(.+)$/.test(name)) {
+            const eventKey = parseInt(RegExp.$1, 10) + 1;
+            result = {
+                "key":   name,
+                "field": `Event ${eventKey} Data (${RegExp.$2})`,
+                "value": value,
+                "group": "events"
+            };
+        } else if(/^epn?\.(.+)$/.test(name)) {
+            result = {
+                "key":   name,
+                "field": `Event Data (${RegExp.$1})`,
+                "value": value,
+                "group": "events"
+            };
+        } else if(/^cd(\d+)$/i.test(name)) {
             result = {
                 "key":   name,
                 "field": `Custom Dimension ${RegExp.$1}`,
@@ -491,8 +514,7 @@ class UniversalAnalyticsProvider extends BaseProvider
                 "value": value,
                 "group": "ecommerce"
             };
-        } else if(/^il(\d+)pi(\d+)([a-z]{2})$/i.test(name))
-        {
+        } else if(/^il(\d+)pi(\d+)([a-z]{2})$/i.test(name)) {
             let lookup = {
                     "id": "ID",
                     "nm": "Name",
@@ -524,12 +546,29 @@ class UniversalAnalyticsProvider extends BaseProvider
     parsePostData(postData = "") {
         let params = [];
         // Handle POST data first, if applicable (treat as query params)
+        // eslint-disable-next-line no-debugger
+        debugger;
         if (typeof postData === "string" && postData !== "") {
-            let keyPairs = postData.split("&");
-            keyPairs.forEach((keyPair) => {
-                let splitPair = keyPair.split("=");
-                params.push([splitPair[0], decodeURIComponent(splitPair[1] || "")]);
-            });
+            if(/^en=/.test(postData)) {
+                const events = postData.split(/\s+/);
+                let eventNumber = 0;
+                events.forEach((event) => {
+                    const eventParams = event.split("&");
+                    eventParams.forEach((eventParam) => {
+                        const splitPair = eventParam.split("=");
+                        const eventKey = splitPair[0].split(".");
+                        eventKey[0] = `${eventKey[0]}[${eventNumber}]`;
+                        params.push([eventKey.join("."), decodeURIComponent(splitPair[1] || "")]);
+                    });
+                    eventNumber++;
+                });
+            } else {
+                const keyPairs = postData.split("&");
+                keyPairs.forEach((keyPair) => {
+                    const splitPair = keyPair.split("=");
+                    params.push([splitPair[0], decodeURIComponent(splitPair[1] || "")]);
+                });
+            }
         } else if (typeof postData === "object") {
             Object.entries(postData).forEach((entry) => {
                 // @TODO: consider handling multiple values passed?
@@ -550,7 +589,7 @@ class UniversalAnalyticsProvider extends BaseProvider
     handleCustom(url, params)
     {
         let results = [],
-            hitType = params.get("t") || params.get("en") || "page view",
+            hitType = params.get("t") || params.get("en") || params.get("en[0]") || "page view",
             requestType = "";
 
         hitType = hitType.toLowerCase();
