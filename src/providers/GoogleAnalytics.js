@@ -546,8 +546,6 @@ class GoogleAnalyticsProvider extends BaseProvider
     parsePostData(postData = "") {
         let params = [];
         // Handle POST data first, if applicable (treat as query params)
-        // eslint-disable-next-line no-debugger
-        debugger;
         if (typeof postData === "string" && postData !== "") {
             if(/^en=/.test(postData)) {
                 const events = postData.split(/\s+/);
