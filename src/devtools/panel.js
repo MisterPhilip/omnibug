@@ -156,17 +156,50 @@ window.Omnibug = (() => {
                     if (copyValue === "") {
                         showToast("Value is empty, nothing to copy!", "warning", 5);
                     } else {
-                        navigator.clipboard.writeText(copyValue).then(
-                            () => {
+                        let successCallback = () => {
                                 showToast("Value copied to the clipboard.", "success", 5);
                                 tracker.track(["send", "event", "context menu", "copy", "success"]);
                             },
-                            (reason) => {
+                            failureCallback = (reason) => {
                                 showToast("Unable to copy to the clipboard.", "error");
                                 tracker.track(["send", "event", "context menu", "copy", "error"]);
                                 console.error(reason);
+                            },
+                            fallback = () => {
+                                // sourced from https://gist.github.com/lgarron/d1dee380f4ed9d825ca7
+                                (new Promise((resolve, reject) => {
+                                    let success = false,
+                                        listener = (e) => {
+                                            e.clipboardData.setData("text/plain", copyValue);
+                                            e.preventDefault();
+                                            success = true;
+                                        };
+                                    document.addEventListener("copy", listener);
+                                    document.execCommand("copy");
+                                    document.removeEventListener("copy", listener);
+                                    success ? resolve() : reject();
+                                })).then(successCallback, failureCallback);
+                            };
+                        navigator.permissions.query({
+                            name: "clipboard-write"
+                        }).then(permissionStatus => {
+                            if(permissionStatus.state === "granted") {
+                                // Future versions of Firefox and/or Chrome will use this in conjunction with clipboard-write
+                                navigator.clipboard.writeText(copyValue).then(successCallback, failureCallback);
+                            } else {
+                                // Newer Chromium browsers have "clipboard-write" as a permission, but don't allow it in extensions due to Feature Policies
+                                fallback();
                             }
-                        );
+                        }).catch((e) => {
+                            try {
+                                // Firefox doesn't have the clipboard-write permission, but allows navigator.clipboard to work
+                                navigator.clipboard.writeText(copyValue).then(successCallback, failureCallback);
+                            } catch(ee) {
+                                // This shouldn't happen, but used as a fallback
+                                console.log("copy is falling back because of ", ee.message);
+                                fallback();
+                            }
+                        });
                     }
                 }
             }
