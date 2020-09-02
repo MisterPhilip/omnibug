@@ -14,26 +14,45 @@ test("GoogleAnalyticsProvider returns provider information", t => {
 test("GoogleAnalyticsProvider pattern should match various UA domains", t => {
     let provider = new GoogleAnalyticsProvider(),
         urls = [
-            "https://www.google-analytics.com/collect?",
-            "http://www.google-analytics.com/collect?",
+            "https://www.google-analytics.com/g/collect?v=2&tid=G-1234567",
+            "https://www.google-analytics.com/r/collect?v=2&tid=G-1234567",
+            "https://www.google-analytics.com/j/collect?v=2&tid=G-1234567",
+            "http://www.google-analytics.com/collect?v=2&tid=G-1234567",
             "http://www.google-analytics.com/collect/",
-            "https://www.google-analytics.com/collect/?",
+            "https://www.google-analytics.com/collect/",
             "http://www.google-analytics.com/g/collect",
-            "http://www.google-analytics.com/g/collect?",
             "http://www.google-analytics.com/g/collect/",
-            "https://www.google-analytics.com/g/collect/?",
             "https://www.google-analytics.com/collect",
+            "https://analytics.google.com/collect",
             "https://analytics.google.com/g/collect",
-            "https://analytics.google.com/g/collect?",
-            "http://analytics.google.com/g/collect",
-            "http://analytics.google.com/g/collect?"
+            "https://analytics.google.com/r/collect",
+            "https://analytics.google.com/j/collect",
+            "https://analytics.google.com/collect?v=2&tid=G-1234567",
+            "https://analytics.google.com/g/collect?v=2&tid=G-1234567",
+            "https://analytics.google.com/r/collect?v=2&tid=G-1234567",
+            "https://analytics.google.com/j/collect?v=2&tid=G-1234567",
+            "https://foo.appspot.com/collect",
+            "https://foo.appspot.com/g/collect",
+            "https://foo.appspot.com/r/collect",
+            "https://foo.appspot.com/j/collect",
+            "https://foo.appspot.com/collect/",
+            "https://foo.appspot.com/g/collect/",
+            "https://foo.appspot.com/r/collect/",
+            "https://foo.appspot.com/j/collect/",
+            "https://foo.appspot.com/collect?v=2&tid=G-1234567",
+            "https://foo.appspot.com/g/collect?v=2&tid=G-1234567",
+            "https://foo.appspot.com/r/collect?v=2&tid=G-1234567",
+            "https://foo.appspot.com/j/collect?v=2&tid=G-1234567",
         ];
 
     urls.forEach((url) => {
-        t.true(provider.checkUrl(url));
+        t.true(provider.checkUrl(url), `Provider should match ${url}`);
     });
 
     t.false(provider.checkUrl("https://omnibug.io/testing"), "Provider should not match on non-provider based URLs");
+    t.false(provider.checkUrl("https://omnibug.io/collection"), "Provider should not match on non-provider based URLs (/collect)");
+    t.false(provider.checkUrl("https://omnibug.io/collect?v=2&foo=bar"), "Provider should not match on non-provider based URLs (missing tid=)");
+    t.false(provider.checkUrl("https://omnibug.io/collect/?foo=bar"), "Provider should not match on non-provider based URLs (missing tid=)");
 });
 
 test("OmnibugProvider returns GoogleAnalytics", t => {
