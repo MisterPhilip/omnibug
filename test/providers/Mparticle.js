@@ -16,7 +16,8 @@ test("Pattern should match Mparticle event requests", t => {
         urls = [
             "https://jssdks.mparticle.com/v1/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
             "https://jssdks.mparticle.com/v2/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
-            "https://jssdks.mparticle.com/v2/JS/us1-xxxxxd9228826649aacb395919xxxxx/Events"
+            "https://jssdks.mparticle.com/v2/JS/us1-xxxxxd9228826649aacb395919xxxxx/Events",
+            "https://jssdks.mparticle.com/v3/JS/us1-11b0fef2fc080a4c90c5fa47accad965/events"
         ];
 
     urls.forEach((url) => {
@@ -27,7 +28,7 @@ test("Pattern should match Mparticle event requests", t => {
 });
 
 test("OmnibugProvider returns MparticleProvider", t => {
-    let url = "https://jssdks.mparticle.com/v1/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events";
+    let url = "https://jssdks.mparticle.com/v0/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events";
     
     let results = OmnibugProvider.parseUrl(url);
     t.true(typeof results === "object" && results !== null, "Results is a non-null object");
@@ -36,7 +37,7 @@ test("OmnibugProvider returns MparticleProvider", t => {
 
 test("Provider returns client ID code", t => {
     let provider = new MparticleProvider(),
-        url = "https://jssdks.mparticle.com/v1/JS/clientcodehere/Events";
+        url = "https://jssdks.mparticle.com/v0/JS/clientcodehere/Events";
 
     let results = provider.parseUrl(url),
         clientCode = results.data.find((result) => {
@@ -50,7 +51,7 @@ test("Provider returns client ID code", t => {
 
 test("Provider returns post data", t => {
     let provider = new MparticleProvider(),
-        url = "https://jssdks.mparticle.com/v1/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
+        url = "https://jssdks.mparticle.com/v0/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
         postData = '{"n":"pageView","ua":{},"str":{"uid":{"Expires":"2028-10-27T14:46:21.1929245Z","Value":"g=000000000-0000-0000-0000-c17f9f84faa0&u=000000000000000&cr=00000000"}},"attrs":null,"sdk":"1.16.2","sid":"00000000-0000-0000-0000-1B0265340D22","dt":10,"dbg":true,"ct":0,"o":null,"eec":0,"av":null,"cgid":"00000000-0000-0000-0000-24c7e879e4b7","das":"00000000-0000-0000-0000-c17f9f84faa0","uic":false,"fr":false,"iu":false,"at":1,"lr":"https://www.example.com/","pb":{}}';
 
     let results = provider.parseUrl(url, postData);
@@ -87,7 +88,7 @@ test("Provider returns post data", t => {
 
 test("Provider returns custom event types", t => {
     let provider = new MparticleProvider(),
-        url = "https://jssdks.mparticle.com/v1/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
+        url = "https://jssdks.mparticle.com/v0/JS/clientcodeherexxxxxxxxxxxxxxxxxx/Events",
         postData_pageview = '{"n":"pageView"}',
         postData_sessionStart = '{"n":"1"}',
         postData_sessionEnd = '{"n":"2"}',
@@ -320,3 +321,22 @@ test("Provider returns custom event types (et)", t=> {
     t.is(etvalue.value, "ProductViewDetail", "value is ProductViewDetail");
     t.is(etvalue.group, "general", "etvalue is in general"); 
 });
+
+test("V3 Provider returns events key event type", t=> {
+    let provider = new MparticleProvider(),
+        url = "https://jssdks.mparticle.com/v3/JS/us1-11b0fef2fc080a4c90c5fa47accad965/events",
+        postData = '{"events":[{"event_type":"application_state_transition","data":{"application_transition_type":"application_initialized","is_first_run":false,"is_upgrade":false,"timestamp_unixtime_ms":1599141725478,"session_uuid":"9C1CCC61-730F-4255-914F-EEC197761632","session_start_unixtime_ms":1599140148524,"custom_attributes":null,"location":null}}]}'
+    let results = provider.parseUrl(url, postData);
+    let event_type = results.data.find((result) => {
+      return result.key === "events[0].event_type";
+    });
+
+    t.is(event_type.value.toString(), "application_state_transition", "V3 event type is application_state_transition");
+    t.is(typeof event_type, "object", "etvalue data is an object");
+    t.is(event_type.field, "events[0].event_type", "Field value is the fallback V3 value of events[0].event_type");
+    t.is(event_type.value, "application_state_transition", "application_state_transition");
+    t.is(event_type.group, "other", "event_type  is in falls into Other"); 
+
+
+
+})

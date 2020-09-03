@@ -10,7 +10,7 @@ class MparticleProvider extends BaseProvider {
     constructor() {
         super();
         this._key       = "MPARTICLE";
-        this._pattern   = /\.mparticle\.com\/v\d\/JS\/[^/]+\/Events$/;
+        this._pattern   = /\.mparticle\.com\/v\d\/JS\/[^/]+\/events/i;
         this._name      = "Mparticle";
         this._type      = "marketing";
     }
@@ -222,7 +222,7 @@ class MparticleProvider extends BaseProvider {
         let results = [];
 
         // Client Code
-        const clientCodeRe = /v\d\/JS\/([^/]+)\/Events$/;
+        const clientCodeRe = /v\d\/JS\/([^/]+)\/events/i;
         let clientCodematches =  url.pathname.match(clientCodeRe);
         if(clientCodematches !== null) {
             results.push({
@@ -295,7 +295,10 @@ class MparticleProvider extends BaseProvider {
         }
         
         // Event Name (n) value parsed to requesttype
-        let eventType = params.get("n");
+
+        // v1 & v2 use 'n' parameter to store events
+        // v3 uses the events.event_type key
+        let eventType = params.get("n") || params.get("events[0].event_type");
         const eventDict = {
             "pageView" : "Page View",
             "1" : "Session Start",
