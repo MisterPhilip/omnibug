@@ -1,7 +1,8 @@
 /**
  * TikTok Tracking Events
- *
- *
+ * No public documentation is available for the TikTok standard events, which must be defined in the TikTok Ads platform (not in GTM, etc.)
+ * Events are currently being sent to API v1, but the provider regex is built to support future API versions (e.g. v2, v3, etc.)
+ * 
  * @class
  * @extends BaseProvider
  */
@@ -9,214 +10,125 @@ class TikTokProvider extends BaseProvider {
     constructor() {
         super();
         this._key = "TIKTOK";
-        this._pattern = /business\.topbuzz\.com\/2\/wap\/landing_tetris_log\//;
+        this._pattern = /https:\/\/analytics\.tiktok\.com\/api\/v[0-9]\/track/;
         this._name = "TikTok";
         this._type = "marketing";
         this._keywords = ["TikTok"];
     }
-    
+
     /**
      * Retrieve the column mappings for default columns (account, event type)
-     *
+     * The account is unique to each TikTok pixel event, meaning multiple events firing from the same pixel SDK will have discreet identifiers
+     * 
      * @return {{}}
      */
-    get columnMapping() {
+    get columnMapping()
+    {
         return {
-            "account": "track_data[advertiser_id]",
-            "requestType": "track_data[event_type]"
+            "account":     "context.pixel.code",
+            "requestType": "event"
         };
     }
-    
+
     /**
      * Retrieve the group names & order
      *
      * @returns {*[]}
      */
-    get groups() {
+    get groups()
+    {
         return [
             {
-                "key": "general",
-                "name": "General"
+                "key": "event",
+                "name": "Event"
             },
             {
-                "key": "event",
-                "name": "Event Data"
+                "key": "context",
+                "name": "Context"
             }
         ];
     }
-    
+
     /**
      * Get all of the available URL parameter keys
      *
      * @returns {{}}
      */
-    get keys() {
+    get keys()
+    {
         return {
-            "device_id": {
-                "name": "Device ID",
-                "group": "general"
+            "event": {
+                "name": "Event",
+                "group": "event"
             },
-            "user_id": {
-                "name": "User ID",
-                "group": "general"
+            "sdkid": {
+                "name": "SDK ID",
+                "group": "event"
             },
-            "uid": {
-                "name": "UID",
-                "group": "general"
+            "analytics_uniq_id": {
+                "name": "Analytics Unique ID",
+                "group": "event"
             },
-            "ut": {
-                "name": "UT",
-                "group": "general"
+            "timestamp": {
+                "name": "Timestamp",
+                "group": "event"
             },
-            "client_version": {
-                "name": "Client Version",
-                "group": "general"
-            },
-            "version_code": {
-                "name": "Version Code",
-                "group": "general"
-            },
-            "req_id": {
-                "name": "Request ID",
-                "group": "general"
-            },
-            "cid": {
-                "name": "Client ID",
-                "group": "general"
-            },
-            "site_id": {
-                "name": "Site ID",
-                "group": "general"
-            },
-            "ad_id": {
+            "context.ad.ad_id": {
                 "name": "Ad ID",
-                "group": "general"
+                "group": "context"
             },
-            "tt_bridge": {
-                "name": "TikTok Bridge",
-                "group": "general"
+            "context.ad.callback": {
+                "name": "Ad Callback",
+                "group": "context"
             },
-            "tt_env": {
-                "name": "TikTok Environment",
-                "group": "general"
+            "context.ad.convert_id": {
+                "name": "Ad Conversion ID",
+                "group": "context"
             },
-            "app_id": {
-                "name": "App ID",
-                "group": "general"
+            "context.ad.creative_id": {
+                "name": "Ad Creative ID",
+                "group": "context"
             },
-            "source": {
-                "name": "Source",
-                "group": "general"
+            "context.ad.idc": {
+                "name": "Ad IDC",
+                "group": "context"
             },
-            "sdk_version": {
-                "name": "SDK Version",
-                "group": "general"
+            "context.ad.log_extra": {
+                "name": "Ad Log Extra",
+                "group": "context"
             },
-            "t": {
-                "name": "Date-Time Stamp",
-                "group": "general"
+            "context.ad.req_id": {
+                "name": "Ad Request ID",
+                "group": "context"
             },
-            "track_data[event_type]": {
-                "name": "Event Type",
-                "group": "event"
+            "context.library.name": {
+                "name": "Library Name",
+                "group": "context"
             },
-            "track_data[event_pixel_id]": {
-                "name": "Event Pixel ID",
-                "group": "event"
+            "context.library.version": {
+                "name": "Library Version",
+                "group": "context"
             },
-            "track_data[advertiser_id]": {
-                "name": "Advertiser ID",
-                "group": "event"
+            "context.page.referrer": {
+                "name": "Page Referrer",
+                "group": "context"
             },
-            "track_data[data_type]": {
-                "name": "Data Type",
-                "group": "event"
-            },
-            "track_data[options]": {
-                "name": "Options",
-                "group": "event"
-            },
-            "track_data[log_extra]": {
-                "name": "Log Extra",
-                "group": "event"
-            },
-            "track_data[os]": {
-                "name": "Operating System",
-                "group": "event"
-            },
-            "track_data[page_url]": {
+            "context.page.url": {
                 "name": "Page URL",
-                "group": "event"
+                "group": "context"
             },
-            "track_data[page_type]": {
-                "name": "Page Type",
-                "group": "event"
+            "context.pixel.code": {
+                "name": "Pixel Code",
+                "group": "context"
+            },
+            "context.user.device_id": {
+                "name": "Device ID",
+                "group": "context"
+            },
+            "context.user.user_id": {
+                "name": "User ID",
+                "group": "context"
             }
-        };     
-    }
-
-    /**
-     * Parse a given URL parameter into human-readable form
-     *
-     * @param {string}  name
-     * @param {string}  value
-     *
-     * @returns {void|{}}
-     */
-    handleQueryParam(name, value) {
-        let result = {};
-        if (name === "track_data") {
-            // do handling in custom
-        } else {
-            result = super.handleQueryParam(name, value);
-        }
-        return result;
-    }
-    
-    /**
-     * Parse custom properties for a given URL
-     *
-     * @param    {string}   url
-     * @param    {object}   params
-     *
-     * @returns {Array}
-     */
-    handleCustom(url, params) {
-        let results = [],
-            eventData = params.get("track_data"),
-            requestType = "Event";
-
-        results.push({
-            "key": "requestType",
-            "value": requestType,
-            "hidden": true
-        });
-
-        // Any event-data
-        if (eventData) {
-            try {
-                let data = JSON.parse(eventData);
-                if (typeof data === "object" && data !== null){
-                    Object.entries(data).forEach(([key, data]) => {
-                        Object.entries(data).forEach(([key, data]) => {
-                            let result = super.handleQueryParam(`track_data[${key}]`, data);
-                            if (result) {
-                                results.push(result);
-                            }                           
-                        });
-                    }); 
-                }
-
-            } catch (e) {
-                results.push({
-                    "key": "track_event",
-                    "field": "Events",
-                    "value": eventData,
-                    "group": "events"
-                });
-            }
-        }
-
-        return results;
+        };
     }
 }
