@@ -1,4 +1,4 @@
-/* global OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, showToast, Fuse */
+/* global OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, showToast, getAppropriateTextColor, Fuse */
 
 /*
  * Omnibug
@@ -913,14 +913,14 @@ window.Omnibug = (() => {
      * @param fromStorage
      */
     function loadSettings(newSettings = {}, fromStorage = false) {
-        let styleSheet = d.getElementById("settingsStyles"),
-            defaults = (new OmnibugSettings).defaults;
+        let styleSheet = d.getElementById("settingsStyles");
+        const defaults = (new OmnibugSettings).defaults;
 
-        settings = Object.assign(defaults, newSettings);
+        const settings = Object.assign({}, defaults, newSettings);
 
         let theme = settings.theme,
-            themeType = settings.theme === "auto" ? "auto" : "manual";
-        if (settings.theme === "auto") {
+            themeType = theme === "auto" ? "auto" : "manual";
+        if (themeType === "auto") {
             if (chrome.devtools.panels && chrome.devtools.panels.themeName === "dark") {
                 theme = "dark";
             } else {
@@ -976,21 +976,18 @@ window.Omnibug = (() => {
                 rule = "";
 
             if (defaults.color_highlight !== settings.color_highlight) {
-                rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; } `;
+                const highlightedTextColor = getAppropriateTextColor(settings.color_highlight);
+
+                rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; color: ${highlightedTextColor}; } `;
                 styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
             } else {
-                rule = `${highlightKeys} { background-color: #ffff00 !important; } `;
+                rule = `${highlightKeys} { background-color: #ffff00 !important; color: #000; } `;
                 styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
 
                 // Add in dark theme
                 highlightPrefix = `.dark ${highlightPrefix}`;
                 highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]";
                 rule = ` ${highlightKeys} { background-color: rgba(47, 132, 218, 0.75) !important; color: #ddd; } `;
-                styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
-            }
-
-            if (defaults.color_highlight !== settings.color_highlight) {
-                rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; }`;
                 styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
             }
         }

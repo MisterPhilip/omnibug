@@ -97,3 +97,18 @@ const showToast = (message, type = "primary", timeout = 10) => {
         toastDiv.remove();
     }, timeout * 1000);
 };
+
+/**
+ * Get the appropriate text color for a given background color
+ *
+ * @param bgColor   string  The hexadecimal background color
+ */
+// eslint-disable-next-line no-unused-vars
+const getAppropriateTextColor = (bgColor = "#FFFFFF") => {
+    bgColor = bgColor.replace("#", "");
+    const r = parseInt(bgColor.substr(0,2),16),
+        g = parseInt(bgColor.substr(2,2),16),
+        b = parseInt(bgColor.substr(4,2),16),
+        yiq = ((r*299)+(g*587)+(b*114))/1000;
+    return (yiq >= 128) ? "#000" : "#FFF";
+};

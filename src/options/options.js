@@ -1,4 +1,4 @@
-/* globals OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, Fuse */
+/* globals OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, getAppropriateTextColor, Fuse */
 (function() {
 
     // Setup GA tracker
@@ -432,6 +432,7 @@
         clearStyles(styleSheet);
 
         // Add any rules
-        styleSheet.sheet.insertRule(`#highlight-params > li { background-color: ${settings.color_highlight} !important; }`, styleSheet.sheet.cssRules.length);
+        const highlightedTextColor = getAppropriateTextColor(settings.color_highlight);
+        styleSheet.sheet.insertRule(`#highlight-params > li { background-color: ${settings.color_highlight} !important; color: ${highlightedTextColor} }`, styleSheet.sheet.cssRules.length);
     }
 }());
