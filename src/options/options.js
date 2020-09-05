@@ -228,7 +228,9 @@
         let newParam = event.target.value,
             paramList = document.getElementById("highlight-params");
 
-        if(newParam.trim() !== "" && settings.highlightKeys.indexOf(newParam) === -1) {
+        if(newParam.trim() !== "" && !settings.highlightKeys.filter((key) => {
+            return key.toLowerCase() === newParam.toLowerCase();
+        }).length) {
             paramList.appendChild(createHighlightParam(newParam));
 
             settings.highlightKeys.push(newParam);

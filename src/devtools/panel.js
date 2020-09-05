@@ -972,7 +972,7 @@ window.Omnibug = (() => {
         // Highlight colors
         if (settings.highlightKeys.length) {
             let highlightPrefix = "[data-parameter-key=\"",
-                highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]",
+                highlightKeys = highlightPrefix + settings.highlightKeys.join(`" i], ${highlightPrefix}`) + "\" i]",
                 rule = "";
 
             if (defaults.color_highlight !== settings.color_highlight) {
