@@ -10,7 +10,7 @@ class MparticleProvider extends BaseProvider {
     constructor() {
         super();
         this._key       = "MPARTICLE";
-        this._pattern   = /\.mparticle\.com\/v\d\/JS\/[^/]+\/events/i;
+        this._pattern   = /\.mparticle\.com\/v\d\/JS\/[^/]+\/[eE]vents/;
         this._name      = "Mparticle";
         this._type      = "marketing";
     }
