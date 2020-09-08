@@ -6,7 +6,7 @@ import { OmnibugProvider } from "./../source/providers.js";
 test("Generic Demandbase Engagement Provider Information", t => {
   let provider = new DemandbaseEngagementProvider();
   t.is(provider.key, "DEMANDBASEENGAGEMENT", "Key should always be DEMANDBASEENGAGEMENT");
-  t.is(provider.type, "Marketing", "Type should always be marketing");
+  t.is(provider.type, "Visitor Identification", "Type should always be marketing");
   t.true(
     typeof provider.name === "string" && provider.name !== "",
     "Name should exist"

@@ -13,7 +13,7 @@ class DemandbaseEngagementProvider extends BaseProvider
         this._key        = "DEMANDBASEENGAGEMENT";
         this._pattern    = /api\.company-target\.com\/api\/v2\/ip\.json/;
         this._name       = "Demandbase Engagement";
-        this._type       = "marketing";
+        this._type       = "visitorid";
         this._keywords   = ["ip lookup"];
     }
 
