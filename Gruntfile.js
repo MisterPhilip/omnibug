@@ -14,7 +14,7 @@ module.exports = function (grunt) {
             },
             "production": {
                 "name": "Omnibug",
-                "version": "1.16.1",
+                "version": "1.17.0",
                 "storageKey": "omnibug",
                 "feedbackUrl": "https://github.com/MisterPhilip/omnibug/issues",
                 "analyticsID": "UA-114343677-2"
@@ -24,6 +24,10 @@ module.exports = function (grunt) {
             "folder": "chromium",
             "tracking": true
         },
+        "edge": {
+            "folder": "edge",
+            "tracking": true
+        },
         "firefox": {
             "gecko": "Omnibug@rosssimpson.com",
             "folder": "firefox",
@@ -31,6 +35,7 @@ module.exports = function (grunt) {
         },
         "clean": {
             "chrome": ["platform/chromium", "build/chrome_*.zip"],
+            "edge": ["platform/edge", "build/edge_*.zip"],
             "firefox": ["platform/firefox", "build/firefox_*.zip"],
             "providers": ["src/providers.js"],
             "test": ["test/source/**"]
@@ -53,6 +58,18 @@ module.exports = function (grunt) {
                     "build-copy:chrome",
                     "chrome-manifest",
                     "build-concat:chrome"
+                ],
+                "options": {
+                    "spawn": false,
+                },
+            },
+            "edge": {
+                "files": ["src/**"],
+                "tasks": [
+                    "clean:edge",
+                    "build-copy:edge",
+                    "edge-manifest",
+                    "build-concat:edge"
                 ],
                 "options": {
                     "spawn": false,
@@ -99,7 +116,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-eslint");
 
     grunt.registerTask("build-beta", "Build the beta version", (browsers = "") => {
-        let allowedBrowsers = ["chrome", "firefox"];
+        let allowedBrowsers = ["chrome", "edge", "firefox"];
         if (browsers === "") {
             browsers = allowedBrowsers;
         } else {
@@ -125,7 +142,7 @@ module.exports = function (grunt) {
 
 
     grunt.registerTask("build-production", "Build the extensions", (browsers = "") => {
-        let allowedBrowsers = ["chrome", "firefox"];
+        let allowedBrowsers = ["chrome", "edge", "firefox"];
         if (browsers === "") {
             browsers = allowedBrowsers;
         } else {
@@ -165,6 +182,24 @@ module.exports = function (grunt) {
 
         grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Chrome's manifest.json. ").ok();
+    });
+
+    grunt.registerTask("edge-manifest", "Build the Edge manifest.json file", function (version = "production") {
+        grunt.config.requires(`extension.${version}.version`);
+
+        let browserOptions = grunt.config("edge"),
+            extensionOptions = grunt.config(`extension.${version}`),
+            manifest = grunt.file.readJSON("src/manifest.json");
+
+        manifest.name = extensionOptions.name;
+        manifest.version = extensionOptions.version;
+
+        // Remove anything that will break Chrome
+        delete manifest.applications;
+        delete manifest.options_ui.browser_style;
+
+        grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
+        grunt.log.write("Created Edge's manifest.json. ").ok();
     });
 
     grunt.registerTask("firefox-manifest", "Build the Firefox manifest.json file", function (version = "production") {

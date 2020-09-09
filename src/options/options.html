@@ -25,7 +25,9 @@
             </div>
             <p class="help">Select parameters to highlight to easily see values. The values here should be the raw parameter names,
                 <em>not</em> the friendly names you see.<br />For example, for Adobe Analytics, to highlight <code>eVar10</code>, you should use <code>v10</code>.
-                You can find the raw parameter names by hovering over the parameter name in Omnibug and it'll appear in parenthesis.</p>
+                You can find the raw parameter names by hovering over the parameter name in Omnibug and it'll appear in parenthesis.
+                These keys are case-insensitive.
+            </p>
         </fieldset>
 
         <fieldset>
@@ -34,7 +36,7 @@
               <div class="col">
                   <ul id="addSummary-params"></ul>
                   <span id="addSummaryStatus"></span>
-                  <input type="text" id="addSummary" placeholder="Add parameter, maximum of 3"></input>
+                  <input type="text" id="addSummary" placeholder="Add parameter, maximum of 3" />
               </div>
           </div>
           <p class="help">Specify up to 3 additional values you wish to see in the summary list view. The values here should be the parameter names as 
@@ -277,7 +279,11 @@
                     </datalist>
                 </div>
             </div>
-            <p class="help">You can override the background color for parameters that are highlighted (see "Highlight parameters" setting above).</p>
+            <p class="help">
+                You can override the background color for parameters that are highlighted (see "Highlight parameters" setting above).
+                <em>Note:</em> for dark mode users, Omnibug will automatically switch this from the default yellow (<code>#ffff00</code>)
+                to a blue, but this can be overwritten if preferred. Simply change the color from <code>#ffff00</code> to any other value.
+            </p>
         </fieldset>
 
         <fieldset class="color">

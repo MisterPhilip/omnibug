@@ -1,4 +1,4 @@
-/* global OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, showToast, Fuse */
+/* global OmnibugSettings, OmnibugProvider, OmnibugTracker, createElement, clearStyles, clearChildren, showToast, getAppropriateTextColor, Fuse */
 
 /*
  * Omnibug
@@ -156,17 +156,50 @@ window.Omnibug = (() => {
                     if (copyValue === "") {
                         showToast("Value is empty, nothing to copy!", "warning", 5);
                     } else {
-                        navigator.clipboard.writeText(copyValue).then(
-                            () => {
+                        let successCallback = () => {
                                 showToast("Value copied to the clipboard.", "success", 5);
                                 tracker.track(["send", "event", "context menu", "copy", "success"]);
                             },
-                            (reason) => {
+                            failureCallback = (reason) => {
                                 showToast("Unable to copy to the clipboard.", "error");
                                 tracker.track(["send", "event", "context menu", "copy", "error"]);
                                 console.error(reason);
+                            },
+                            fallback = () => {
+                                // sourced from https://gist.github.com/lgarron/d1dee380f4ed9d825ca7
+                                (new Promise((resolve, reject) => {
+                                    let success = false,
+                                        listener = (e) => {
+                                            e.clipboardData.setData("text/plain", copyValue);
+                                            e.preventDefault();
+                                            success = true;
+                                        };
+                                    document.addEventListener("copy", listener);
+                                    document.execCommand("copy");
+                                    document.removeEventListener("copy", listener);
+                                    success ? resolve() : reject();
+                                })).then(successCallback, failureCallback);
+                            };
+                        navigator.permissions.query({
+                            name: "clipboard-write"
+                        }).then(permissionStatus => {
+                            if(permissionStatus.state === "granted") {
+                                // Future versions of Firefox and/or Chrome will use this in conjunction with clipboard-write
+                                navigator.clipboard.writeText(copyValue).then(successCallback, failureCallback);
+                            } else {
+                                // Newer Chromium browsers have "clipboard-write" as a permission, but don't allow it in extensions due to Feature Policies
+                                fallback();
                             }
-                        );
+                        }).catch((e) => {
+                            try {
+                                // Firefox doesn't have the clipboard-write permission, but allows navigator.clipboard to work
+                                navigator.clipboard.writeText(copyValue).then(successCallback, failureCallback);
+                            } catch(ee) {
+                                // This shouldn't happen, but used as a fallback
+                                console.log("copy is falling back because of ", ee.message);
+                                fallback();
+                            }
+                        });
                     }
                 }
             }
@@ -880,14 +913,14 @@ window.Omnibug = (() => {
      * @param fromStorage
      */
     function loadSettings(newSettings = {}, fromStorage = false) {
-        let styleSheet = d.getElementById("settingsStyles"),
-            defaults = (new OmnibugSettings).defaults;
+        let styleSheet = d.getElementById("settingsStyles");
+        const defaults = (new OmnibugSettings).defaults;
 
-        settings = Object.assign(defaults, newSettings);
+        const settings = Object.assign({}, defaults, newSettings);
 
         let theme = settings.theme,
-            themeType = settings.theme === "auto" ? "auto" : "manual";
-        if (settings.theme === "auto") {
+            themeType = theme === "auto" ? "auto" : "manual";
+        if (themeType === "auto") {
             if (chrome.devtools.panels && chrome.devtools.panels.themeName === "dark") {
                 theme = "dark";
             } else {
@@ -939,25 +972,22 @@ window.Omnibug = (() => {
         // Highlight colors
         if (settings.highlightKeys.length) {
             let highlightPrefix = "[data-parameter-key=\"",
-                highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]",
+                highlightKeys = highlightPrefix + settings.highlightKeys.join(`" i], ${highlightPrefix}`) + "\" i]",
                 rule = "";
 
             if (defaults.color_highlight !== settings.color_highlight) {
-                rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; } `;
+                const highlightedTextColor = getAppropriateTextColor(settings.color_highlight);
+
+                rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; color: ${highlightedTextColor}; } `;
                 styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
             } else {
-                rule = `${highlightKeys} { background-color: #ffff00 !important; } `;
+                rule = `${highlightKeys} { background-color: #ffff00 !important; color: #000; } `;
                 styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
 
                 // Add in dark theme
                 highlightPrefix = `.dark ${highlightPrefix}`;
                 highlightKeys = highlightPrefix + settings.highlightKeys.join(`"], ${highlightPrefix}`) + "\"]";
                 rule = ` ${highlightKeys} { background-color: rgba(47, 132, 218, 0.75) !important; color: #ddd; } `;
-                styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
-            }
-
-            if (defaults.color_highlight !== settings.color_highlight) {
-                rule = `${highlightKeys} { background-color: ${settings.color_highlight} !important; }`;
                 styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
             }
         }

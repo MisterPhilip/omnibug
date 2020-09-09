@@ -11,10 +11,10 @@ class GoogleAnalyticsProvider extends BaseProvider
     {
         super();
         this._key        = "UNIVERSALANALYTICS";
-        this._pattern    = /(?:\.google-analytics|analytics\.google)\.com\/([rg]\/)?collect(?:[/?]+|$)/;
+        this._pattern    = /https?:\/\/(?:[^/]+)\/([jrg]\/)?collect\/?(?:.*[&#?]tid=|$)/;
         this._name       = "Google Analytics";
         this._type       = "analytics";
-        this._keywords   = ["google", "google analytics", "ua", "ga"];
+        this._keywords   = ["google", "google analytics", "ua", "ga", "app+web", "app web", "a+w"];
     }
 
     /**
@@ -546,8 +546,6 @@ class GoogleAnalyticsProvider extends BaseProvider
     parsePostData(postData = "") {
         let params = [];
         // Handle POST data first, if applicable (treat as query params)
-        // eslint-disable-next-line no-debugger
-        debugger;
         if (typeof postData === "string" && postData !== "") {
             if(/^en=/.test(postData)) {
                 const events = postData.split(/\s+/);
@@ -581,7 +579,7 @@ class GoogleAnalyticsProvider extends BaseProvider
     /**
      * Parse custom properties for a given URL
      *
-     * @param    {string}   url
+     * @param    {object}   url
      * @param    {object}   params
      *
      * @returns {Array}
@@ -591,6 +589,13 @@ class GoogleAnalyticsProvider extends BaseProvider
         let results = [],
             hitType = params.get("t") || params.get("en") || params.get("en[0]") || "page view",
             requestType = "";
+
+        results.push({
+            "key":    "omnibug_hostname",
+            "value":  url.hostname,
+            "field":   "Google Analytics Host",
+            "group":  "general"
+        });
 
         hitType = hitType.toLowerCase();
         if(hitType === "pageview" || hitType === "screenview" || hitType === "page_view") {
