@@ -18,7 +18,8 @@ test("AdobeLaunchProvider pattern should match Adobe Launch calls", t => {
             "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176-staging.min.js",
             "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176-development.min.js",
             "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176.js",
-            "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176.min.js?cachebuster=1234abc"
+            "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176.min.js?cachebuster=1234abc",
+            "https://assets.adobedtm.com/abc123/abc123/launch-ENf3494c5e66666d119e0e439ecc59e176.js",
         ],
         badUrls = [
             "https://assets.adobedtm.com/satelliteLib-ENf3494c5e66666d119e0e439ecc59e176.js",
@@ -45,7 +46,7 @@ test("OmnibugProvider returns Adobe Launch", t => {
 test("AdobeLaunchProvider returns custom data", t => {
     let provider = new AdobeLaunchProvider(),
         developmentUrl = "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176-development.min.js",
-        stagingUrl = "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176-staging.min.js",
+        stagingUrl = "https://assets.adobedtm.com/abc123/abc123/launch-ENf3494c5e66666d119e0e439ecc59e176-staging.min.js",
         prodUrl = "https://assets.adobedtm.com/launch-ENf3494c5e66666d119e0e439ecc59e176.min.js",
         developmentResults = provider.parseUrl(developmentUrl),
         stagingResults = provider.parseUrl(stagingUrl),

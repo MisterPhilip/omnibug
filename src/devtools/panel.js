@@ -779,6 +779,7 @@ window.Omnibug = (() => {
             });
         });
 
+        console.log(settings.renameParameters);
         let data = request.data.reduce((groups, item) => {
             if (!item.hidden) {
                 const val = item.group;
@@ -916,7 +917,7 @@ window.Omnibug = (() => {
         let styleSheet = d.getElementById("settingsStyles");
         const defaults = (new OmnibugSettings).defaults;
 
-        const settings = Object.assign({}, defaults, newSettings);
+        settings = Object.assign({}, defaults, newSettings);
 
         let theme = settings.theme,
             themeType = theme === "auto" ? "auto" : "manual";
@@ -1178,7 +1179,8 @@ window.Omnibug = (() => {
          * @param message
          */
         receive_message(message) {
-            switch (message.event || "") {
+            message.event = message.event || "";
+            switch (message.event) {
                 case "webRequest":
                     addRequest(message);
                     break;
