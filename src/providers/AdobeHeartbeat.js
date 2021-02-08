@@ -443,9 +443,9 @@ class AdobeHeartbeatProvider extends BaseProvider
         if(/^customMetadata\./i.test(name)) {
             result = {
                 "key":   name,
-                "field": "prop" + RegExp.$1,
+                "field": name.replace(/^customMetadata\./i, ""),
                 "value": value,
-                "group": "props"
+                "group": "customMetadata"
             };
         } else if(/^params\.analytics\./i.test(name) && !(name in this.keys)) {
             result = {

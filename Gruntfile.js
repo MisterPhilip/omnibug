@@ -14,7 +14,7 @@ module.exports = function (grunt) {
             },
             "production": {
                 "name": "Omnibug",
-                "version": "1.17.2",
+                "version": "1.17.3",
                 "storageKey": "omnibug",
                 "feedbackUrl": "https://github.com/MisterPhilip/omnibug/issues",
                 "analyticsID": "UA-114343677-2"
@@ -22,11 +22,11 @@ module.exports = function (grunt) {
         },
         "chrome": {
             "folder": "chromium",
-            "tracking": true
+            "tracking": false
         },
         "edge": {
             "folder": "edge",
-            "tracking": true
+            "tracking": false
         },
         "firefox": {
             "gecko": "Omnibug@rosssimpson.com",
