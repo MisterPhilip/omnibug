@@ -15,11 +15,14 @@ test("EnsightenManageProvider pattern should match Ensighten calls", t => {
     let provider = new EnsightenManageProvider(),
         urls = [
             "https://nexus.ensighten.com/omnibug/Bootstrap.js",
+            "https://nexus-test.ensighten.com/omnibug/Bootstrap.js",
             "https://nexus.ensighten.com/omnibug/OmnibugProd/Bootstrap.js",
-            "https://nexus.ensighten.com/omnibug/OmnibugProd/Bootstrap.js?cacheBuster=1234"
+            "https://nexus.ensighten.com/omnibug/OmnibugProd/Bootstrap.js?cacheBuster=1234",
+            "https://nexus-test.ensighten.com/omnibug/OmnibugProd/Bootstrap.js?cacheBuster=1234"
         ],
         badUrls = [
             "https://nexus.ensighten.com/omnibug/OmnibugProd/serverComponent.php",
+            "https://dummy-domain.ensighten.com/omnibug/OmnibugProd/Bootstrap.js",
             "https://nexus.ensighten.com/omnibug/OmnibugProd/code/123456789.js?conditionId0=123456"
         ];
 
