@@ -1,6 +1,6 @@
 {
     "name": "omnibug",
-    "version": "1.17.3",
+    "version": "1.18.0",
     "description": "Omnibug Extension",
     "main": "Gruntfile.js",
     "scripts": {
@@ -45,12 +45,7 @@
                     "@babel/plugin-proposal-throw-expressions",
                     "@babel/plugin-syntax-dynamic-import",
                     "@babel/plugin-syntax-import-meta",
-                    [
-                        "@babel/plugin-proposal-class-properties",
-                        {
-                            "loose": true
-                        }
-                    ],
+                    "@babel/plugin-proposal-class-properties",
                     "@babel/plugin-proposal-json-strings"
                 ]
             }
