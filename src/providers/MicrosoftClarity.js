@@ -11,8 +11,8 @@ class MicrosoftClarityProvider extends BaseProvider {
         this._key = "MSCLARITY";
         this._pattern = /clarity\.ms\/tag\//;
         this._name = "Microsoft Clarity";
-        this._type = "marketing";
-        this._keywords = ["heatmap", "session record", "click"];
+        this._type = "replay";
+        this._keywords = ["heat map", "heatmap", "session record", "click"];
     }
 
     /**

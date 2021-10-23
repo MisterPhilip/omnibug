@@ -6,7 +6,7 @@ import { OmnibugProvider } from "./../source/providers.js";
 test("HotjarProvider returns provider information", t => {
     let provider = new HotjarProvider();
     t.is(provider.key, "HOTJAR", "Key should always be HOTJAR");
-    t.is(provider.type, "Marketing", "Type should always be marketing");
+    t.is(provider.type, "Session Replay/Heat Maps", "Type should always be replays");
     t.true(typeof provider.name === "string" && provider.name !== "", "Name should exist");
     t.true(typeof provider.pattern === 'object' && provider.pattern instanceof RegExp, "Pattern should be a RegExp value");
 });

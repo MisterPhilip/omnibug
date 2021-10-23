@@ -11,8 +11,8 @@ class HotjarProvider extends BaseProvider {
         this._key = "HOTJAR";
         this._pattern = /hotjar.com\/c\/hotjar-\d+\.js/;
         this._name = "Hotjar";
-        this._type = "marketing";
-        this._keywords = ["heatmap", "session record", "click"];
+        this._type = "replay";
+        this._keywords = ["heat map", "heatmap", "session record", "click"];
     }
 
     /**

@@ -6,7 +6,7 @@ import { OmnibugProvider } from "./../source/providers.js";
 test("MicrosoftClarityProvider returns provider information", t => {
     let provider = new MicrosoftClarityProvider();
     t.is(provider.key, "MSCLARITY", "Key should always be MSCLARITY");
-    t.is(provider.type, "Marketing", "Type should always be marketing");
+    t.is(provider.type, "Session Replay/Heat Maps", "Type should always be replay");
     t.true(typeof provider.name === "string" && provider.name !== "", "Name should exist");
     t.true(typeof provider.pattern === 'object' && provider.pattern instanceof RegExp, "Pattern should be a RegExp value");
 });
