@@ -1,6 +1,7 @@
 $iconPath: "../assets/images/icons/";
 
 $icons: (
+    "6Sense": $iconPath + "SIXSENSE16x16.png",
     "Adobe Analytics": $iconPath + "ADOBEANALYTICS16x16.png",
     "Adobe Audience Manager": $iconPath + "ADOBEAUDIENCEMANAGER16x16.png",
     "Adobe Experience Cloud ID": $iconPath + "ADOBEAUDIENCEMANAGER16x16.png",
@@ -19,17 +20,20 @@ $icons: (
     "Google Analytics": $iconPath + "GOOGLEANALYTICS16x16.png",
     "Google DoubleClick": $iconPath + "DOUBLECLICK16x16.png",
     "Google Tag Manager": $iconPath + "GOOGLETAGMANAGER16x16.png",
+    "Hotjar": $iconPath + "HOTJAR16x16.png",
     "LinkedIn Conversion": $iconPath + "LINKEDINPIXEL16x16.png",
     "Lytics": $iconPath + "LYTICS16x16.png",
     "Matomo": $iconPath + "MATOMO16x16.png",
     "Mparticle": $iconPath + "MPARTICLE16x16.png",
+    "Microsoft Clarity": $iconPath + "MSCLARITY16x16.png",
     "Optimizely X": $iconPath + "OPTIMIZELY16x16.png",
     "Pinterest Conversion": $iconPath + "PINTEREST16x16.png",
     "Piwik PRO": $iconPath + "PIWIKPRO16x16.png",
     "Piwik PRO Tag Manager": $iconPath + "PIWIKPRO16x16.png",
     "Segment": $iconPath + "SEGMENT16x16.png",
     "Snapchat": $iconPath + "SNAPCHAT16x16.png",
-    "Tealium IQ": $iconPath + "TEALIUM16x16.png",
+    "Tealium iQ": $iconPath + "TEALIUM16x16.png",
+    "Tealium EventStream": $iconPath + "TEALIUM16x16.png",
     "TikTok": $iconPath + "TIKTOK16x16.png",
     "Twitter Conversion": $iconPath + "TWITTERPIXEL16x16.png"
 );

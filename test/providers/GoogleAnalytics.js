@@ -43,16 +43,21 @@ test("GoogleAnalyticsProvider pattern should match various UA domains", t => {
             "https://foo.appspot.com/g/collect?v=2&tid=G-1234567",
             "https://foo.appspot.com/r/collect?v=2&tid=G-1234567",
             "https://foo.appspot.com/j/collect?v=2&tid=G-1234567",
+        ],
+        negativeUrls = [
+            "https://omnibug.io/testing",
+            "https://omnibug.io/collection",
+            "https://omnibug.io/collect?v=2&foo=bar",
+            "https://omnibug.io/collect/?foo=bar",
+            "https://e.clarity.ms/collect",
         ];
 
     urls.forEach((url) => {
         t.true(provider.checkUrl(url), `Provider should match ${url}`);
     });
-
-    t.false(provider.checkUrl("https://omnibug.io/testing"), "Provider should not match on non-provider based URLs");
-    t.false(provider.checkUrl("https://omnibug.io/collection"), "Provider should not match on non-provider based URLs (/collect)");
-    t.false(provider.checkUrl("https://omnibug.io/collect?v=2&foo=bar"), "Provider should not match on non-provider based URLs (missing tid=)");
-    t.false(provider.checkUrl("https://omnibug.io/collect/?foo=bar"), "Provider should not match on non-provider based URLs (missing tid=)");
+    negativeUrls.forEach((url) => {
+        t.false(provider.checkUrl(url), `Provider should not match non-provider url ${url}`);
+    });
 });
 
 test("OmnibugProvider returns GoogleAnalytics", t => {

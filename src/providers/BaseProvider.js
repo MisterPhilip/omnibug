@@ -37,7 +37,8 @@ class BaseProvider
             "testing":      "UX Testing",
             "tagmanager":   "Tag Manager",
             "visitorid":    "Visitor Identification",
-            "marketing":    "Marketing"
+            "marketing":    "Marketing",
+            "replay":       "Session Replay/Heat Maps"
         };
         return types[this._type] || "Unknown";
     }

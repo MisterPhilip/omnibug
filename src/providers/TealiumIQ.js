@@ -1,5 +1,5 @@
 /**
- * Tealium IQ
+ * Tealium iQ
  * https://tealium.com/products/tealium-iq-tag-management-system/
  *
  * @class
@@ -12,7 +12,7 @@ class TealiumIQProvider extends BaseProvider
         super();
         this._key        = "TEALIUMIQ";
         this._pattern    = /tags\.tiqcdn\.com\/utag\/((?=.*utag\.js)|(?=.*utag\.sync\.js))/;
-        this._name       = "Tealium IQ";
+        this._name       = "Tealium iQ";
         this._type       = "tagmanager";
         this._keywords   = ["tms"];
     }
