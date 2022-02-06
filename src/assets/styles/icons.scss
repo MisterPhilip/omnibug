@@ -38,7 +38,8 @@ $icons: (
     "Tealium iQ": $iconPath + "TEALIUM16x16.png",
     "Tealium EventStream": $iconPath + "TEALIUM16x16.png",
     "TikTok": $iconPath + "TIKTOK16x16.png",
-    "Twitter Conversion": $iconPath + "TWITTERPIXEL16x16.png"
+    "Twitter Conversion": $iconPath + "TWITTERPIXEL16x16.png",
+    "Zemanta": $iconPath + "ZEMANTA16x16.png"
 );
 
 @mixin iconRule($title, $path) {
