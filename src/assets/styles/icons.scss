@@ -16,26 +16,31 @@ $icons: (
     "Demandbase Engagement": $iconPath + "DEMANDBASEENGAGEMENT16x16.png",
     "Ensighten Manage": $iconPath + "ENSIGHTEN16x16.png",
     "Facebook Pixel": $iconPath + "FACEBOOK16x16.png",
+    "Glassbox": $iconPath + "GLASSBOX16x16.png",
     "Google Ads": $iconPath + "GOOGLEADS16x16.png",
     "Google Analytics": $iconPath + "GOOGLEANALYTICS16x16.png",
     "Google DoubleClick": $iconPath + "DOUBLECLICK16x16.png",
     "Google Tag Manager": $iconPath + "GOOGLETAGMANAGER16x16.png",
     "Hotjar": $iconPath + "HOTJAR16x16.png",
+    "Hubspot": $iconPath + "HUBSPOT16x16.png",
     "LinkedIn Conversion": $iconPath + "LINKEDINPIXEL16x16.png",
     "Lytics": $iconPath + "LYTICS16x16.png",
     "Matomo": $iconPath + "MATOMO16x16.png",
     "Mparticle": $iconPath + "MPARTICLE16x16.png",
     "Microsoft Clarity": $iconPath + "MSCLARITY16x16.png",
     "Optimizely X": $iconPath + "OPTIMIZELY16x16.png",
+    "Outbrain": $iconPath + "OUTBRAIN16x16.png",
     "Pinterest Conversion": $iconPath + "PINTEREST16x16.png",
     "Piwik PRO": $iconPath + "PIWIKPRO16x16.png",
     "Piwik PRO Tag Manager": $iconPath + "PIWIKPRO16x16.png",
+    "RTB House": $iconPath + "RTBHOUSE16x16.png",
     "Segment": $iconPath + "SEGMENT16x16.png",
     "Snapchat": $iconPath + "SNAPCHAT16x16.png",
     "Tealium iQ": $iconPath + "TEALIUM16x16.png",
     "Tealium EventStream": $iconPath + "TEALIUM16x16.png",
     "TikTok": $iconPath + "TIKTOK16x16.png",
-    "Twitter Conversion": $iconPath + "TWITTERPIXEL16x16.png"
+    "Twitter Conversion": $iconPath + "TWITTERPIXEL16x16.png",
+    "Zemanta": $iconPath + "ZEMANTA16x16.png"
 );
 
 @mixin iconRule($title, $path) {

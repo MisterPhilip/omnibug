@@ -129,7 +129,7 @@ test("OmnibugSettings should catch any exceptions thrown", async t => {
 
     const reason = await t.throwsAsync(settings.load());
 
-    t.is(reason.message, "Cannot read property '##OMNIBUG_KEY##' of null");
+    t.is(reason.message, "Cannot read properties of null (reading '##OMNIBUG_KEY##')");
 });
 
 test("OmnibugSettings should migrate", async t => {
