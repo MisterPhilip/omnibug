@@ -52,11 +52,11 @@ test("SplitIOProvider returns data for events", t => {
         eventProperties = results.data.find((result) => result.key === "eventProperties");
 
     t.is(typeof eventName, "object");
-    t.is(eventName.field, "Event Name");
+    t.is(eventName.field, "Event 1 Name");
     t.is(eventName.value, "mockEventName");
 
     t.is(typeof eventProperties, "object");
-    t.is(eventProperties.field, "Event Properties");
+    t.is(eventProperties.field, "Event 1 Properties");
     t.is(eventProperties.value, "{\"attribute\":\"mockAttributeValue\"}");
 });
 
@@ -68,6 +68,6 @@ test("SplitIOProvider returns data for impressions", t => {
         splitName = results.data.find((result) => result.key === "splitName");
 
     t.is(typeof splitName, "object");
-    t.is(splitName.field, "Split Name");
+    t.is(splitName.field, "Split 1 Name");
     t.is(splitName.value, "mockSplitName");
 });

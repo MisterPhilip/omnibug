@@ -94,27 +94,27 @@ class SplitIOProvider extends BaseProvider {
             "group": "other",
         }] : [];
 
-        const contents = isEvents ? (entries.flatMap(entry => [{
+        const contents = entries.flatMap((entry, i) => isEvents ? [{
             "key": "eventName",
             "value": entry.eventTypeId,
-            "field": "Event Name",
+            "field": `Event ${i + 1} Name`,
             "group": "general"
         }, {
             "key": "eventProperties",
             "value": JSON.stringify(entry.properties, undefined, 2),
-            "field": "Event Properties",
+            "field": `Event ${i + 1} Properties`,
             "group": "general"
         }, {
             "key": "eventAttributes",
             "value": JSON.stringify({trafficType: entry.trafficTypeName, value: entry.value, sdk: entry.sdk}, undefined, 2),
-            "field": "Event Attributes",
+            "field": `Event ${i + 1} Attributes`,
             "group": "general"
-        }])) : (entries.flatMap(entry => [{
+        }] : [{
             "key": "splitName",
             "value": entry.f,
-            "field": "Split Name",
+            "field": `Split ${i + 1} Name`,
             "group": "general"
-        }]));
+        }]);
 
         return [
             {
@@ -122,6 +122,7 @@ class SplitIOProvider extends BaseProvider {
                 "value": entries.map(e => isEvents ? e.eventTypeId : e.f).join(","),
                 "field": "Preview",
                 "group": "other",
+                "hidden": true
             },
             {
                 "key": "transferType",
