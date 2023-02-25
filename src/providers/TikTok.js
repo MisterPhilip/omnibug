@@ -10,7 +10,7 @@ class TikTokProvider extends BaseProvider {
     constructor() {
         super();
         this._key = "TIKTOK";
-        this._pattern = /https:\/\/analytics\.tiktok\.com\/api\/v[0-9]\/track/;
+        this._pattern = /https:\/\/analytics\.tiktok\.com\/api\/v[0-9]\/(?:track|pixel)/;
         this._name = "TikTok";
         this._type = "marketing";
         this._keywords = ["TikTok"];
