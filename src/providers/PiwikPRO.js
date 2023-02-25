@@ -9,7 +9,7 @@ class PiwikPROProvider extends BaseProvider {
     constructor() {
         super();
         this._key = "PIWIKPRO";
-        this._pattern = /\/ppms\.php\?/;
+        this._pattern = /\/ppms\.php/;
         this._name = "Piwik PRO";
         this._type = "analytics";
         this._keywords = ["piwikpro", "matomo"];
