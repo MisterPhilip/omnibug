@@ -1,6 +1,6 @@
 {
     "name": "omnibug",
-    "version": "1.19.1",
+    "version": "1.20.0",
     "description": "Omnibug Extension",
     "main": "Gruntfile.js",
     "scripts": {

@@ -445,7 +445,6 @@ window.Omnibug = (() => {
                         ""
                     ];
                 } else {
-                    console.log(request);
                     let account = getMappedColumnValue("account", request),
                         requestType = getMappedColumnValue("requestType", request);
 
@@ -793,7 +792,6 @@ window.Omnibug = (() => {
             });
         });
 
-        console.log(settings.renameParameters);
         let data = request.data.reduce((groups, item) => {
             if (!item.hidden) {
                 const val = item.group;
@@ -1157,8 +1155,6 @@ window.Omnibug = (() => {
 
         // Clear out any existing styles
         clearStyles(styleSheet);
-
-        console.log("providers", filters.providers);
 
         // Figure out what providers are hidden
         let hiddenProviders = Object.entries(filters.providers).filter((provider) => {
