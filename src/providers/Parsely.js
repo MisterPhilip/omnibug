@@ -11,7 +11,7 @@ class ParselyProvider extends BaseProvider
     {
         super();
         this._key        = "PARSELY";
-        this._pattern    = /https?:\/\/p1\.parsely\.com\/p(logger|x)\/\?rand=/;
+        this._pattern    = /https?:\/\/p1(-irl)?\.parsely\.com\/p(logger|x)\/\?rand=/;
         this._name       = "Parse.ly";
         this._type       = "analytics";
         this._keywords   = ["parsely", "parse.ly"];
