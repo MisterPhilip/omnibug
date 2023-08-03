@@ -1,20 +1,20 @@
 /**
- * Google Universal Analytics
- * https://developers.google.com/analytics/devguides/collection/analyticsjs/
+ * Google Analytics 4
+ * https://developers.google.com/analytics/devguides/collection/ga4
  *
  * @class
  * @extends BaseProvider
  */
-class GoogleAnalyticsProvider extends BaseProvider
+class GoogleAnalytics4Provider extends BaseProvider
 {
     constructor()
     {
         super();
-        this._key        = "UNIVERSALANALYTICS";
-        this._pattern    = /https?:\/\/([^/]+)(?<!clarity\.ms|transcend\.io)\/([jrg]\/)?collect\/?.*[&#?]tid=UA-/;
-        this._name       = "Google Universal Analytics";
+        this._key        = "GOOGLEANALYTICS4";
+        this._pattern    = /https?:\/\/([^/]+)(?<!clarity\.ms|transcend\.io)\/([jrg]\/)?collect\/?.*[&#?]tid=G-/;
+        this._name       = "Google Analytics 4";
         this._type       = "analytics";
-        this._keywords   = ["google", "google analytics", "ua", "ga"];
+        this._keywords   = ["google", "google analytics", "app+web", "app web", "a+w", "ga4"];
     }
 
     /**
@@ -59,20 +59,8 @@ class GoogleAnalyticsProvider extends BaseProvider
                 "name": "Timing"
             },
             {
-                "key": "dimension",
-                "name": "Custom Dimensions"
-            },
-            {
-                "key": "metric",
-                "name": "Custom Metrics"
-            },
-            {
                 "key": "promo",
                 "name": "Promotions"
-            },
-            {
-                "key": "optimize",
-                "name": "Google Optimize"
             },
             {
                 "key": "contentgroup",
@@ -238,8 +226,8 @@ class GoogleAnalyticsProvider extends BaseProvider
                 "group": "events"
             },
             "ti": {
-                "name": "Transaction ID",
-                "group": "ecommerce"
+                "name": "Traffic Type",
+                "group": "general"
             },
             "ta": {
                 "name": "Transaction Affiliation",
@@ -254,8 +242,8 @@ class GoogleAnalyticsProvider extends BaseProvider
                 "group": "ecommerce"
             },
             "tt": {
-                "name": "Transaction Tax",
-                "group": "ecommerce"
+                "name": "Traffic Type",
+                "group": "general"
             },
             "in": {
                 "name": "Item Name",
@@ -377,14 +365,6 @@ class GoogleAnalyticsProvider extends BaseProvider
                 "name": "Promotion Action",
                 "group": "ecommerce"
             },
-            "xid": {
-                "name": "Content Experiment ID",
-                "group": "optimize"
-            },
-            "xvar": {
-                "name": "Content Experiment Variant",
-                "group": "optimize"
-            },
             "_r": {
                 "name": "Display Features Enabled",
                 "group": "general"
@@ -406,19 +386,28 @@ class GoogleAnalyticsProvider extends BaseProvider
     handleQueryParam(name, value)
     {
         let result = {};
-        if(/^cd(\d+)$/i.test(name)) {
+        if(/^en\[(\d+)]$/.test(name)) {
+            const eventKey = parseInt(RegExp.$1, 10) + 1;
             result = {
                 "key":   name,
-                "field": `Custom Dimension ${RegExp.$1}`,
+                "field": `Event ${eventKey} Type`,
                 "value": value,
-                "group": "dimension"
+                "group": "events"
             };
-        } else if(/^cm(\d+)$/i.test(name)) {
+        } else if(/^epn?\[(\d+)]\.(.+)$/.test(name)) {
+            const eventKey = parseInt(RegExp.$1, 10) + 1;
             result = {
                 "key":   name,
-                "field": `Custom Metric ${RegExp.$1}`,
+                "field": `Event ${eventKey} Data (${RegExp.$2})`,
                 "value": value,
-                "group": "metric"
+                "group": "events"
+            };
+        } else if(/^epn?\.(.+)$/.test(name)) {
+            result = {
+                "key":   name,
+                "field": `Event Data (${RegExp.$1})`,
+                "value": value,
+                "group": "events"
             };
         } else if(/^cg(\d+)$/i.test(name)) {
             result = {
@@ -524,11 +513,26 @@ class GoogleAnalyticsProvider extends BaseProvider
         let params = [];
         // Handle POST data first, if applicable (treat as query params)
         if (typeof postData === "string" && postData !== "") {
-            const keyPairs = postData.split("&");
-            keyPairs.forEach((keyPair) => {
-                const splitPair = keyPair.split("=");
-                params.push([splitPair[0], decodeURIComponent(splitPair[1] || "")]);
-            });
+            if(/^en=/.test(postData)) {
+                const events = postData.split(/\s+/);
+                let eventNumber = 0;
+                events.forEach((event) => {
+                    const eventParams = event.split("&");
+                    eventParams.forEach((eventParam) => {
+                        const splitPair = eventParam.split("=");
+                        const eventKey = splitPair[0].split(".");
+                        eventKey[0] = `${eventKey[0]}[${eventNumber}]`;
+                        params.push([eventKey.join("."), decodeURIComponent(splitPair[1] || "")]);
+                    });
+                    eventNumber++;
+                });
+            } else {
+                const keyPairs = postData.split("&");
+                keyPairs.forEach((keyPair) => {
+                    const splitPair = keyPair.split("=");
+                    params.push([splitPair[0], decodeURIComponent(splitPair[1] || "")]);
+                });
+            }
         } else if (typeof postData === "object") {
             Object.entries(postData).forEach((entry) => {
                 // @TODO: consider handling multiple values passed?
@@ -549,7 +553,7 @@ class GoogleAnalyticsProvider extends BaseProvider
     handleCustom(url, params)
     {
         let results = [],
-            hitType = params.get("t")  || "Page View",
+            hitType = params.get("t") || params.get("en") || params.get("en[0]") || "Page View",
             requestType = "";
 
         results.push({

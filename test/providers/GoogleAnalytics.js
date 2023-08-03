@@ -14,35 +14,10 @@ test("GoogleAnalyticsProvider returns provider information", t => {
 test("GoogleAnalyticsProvider pattern should match various UA domains", t => {
     let provider = new GoogleAnalyticsProvider(),
         urls = [
-            "https://www.google-analytics.com/g/collect?v=2&tid=G-1234567",
-            "https://www.google-analytics.com/r/collect?v=2&tid=G-1234567",
-            "https://www.google-analytics.com/j/collect?v=2&tid=G-1234567",
-            "http://www.google-analytics.com/collect?v=2&tid=G-1234567",
-            "http://www.google-analytics.com/collect/",
-            "https://www.google-analytics.com/collect/",
-            "http://www.google-analytics.com/g/collect",
-            "http://www.google-analytics.com/g/collect/",
-            "https://www.google-analytics.com/collect",
-            "https://analytics.google.com/collect",
-            "https://analytics.google.com/g/collect",
-            "https://analytics.google.com/r/collect",
-            "https://analytics.google.com/j/collect",
-            "https://analytics.google.com/collect?v=2&tid=G-1234567",
-            "https://analytics.google.com/g/collect?v=2&tid=G-1234567",
-            "https://analytics.google.com/r/collect?v=2&tid=G-1234567",
-            "https://analytics.google.com/j/collect?v=2&tid=G-1234567",
-            "https://foo.appspot.com/collect",
-            "https://foo.appspot.com/g/collect",
-            "https://foo.appspot.com/r/collect",
-            "https://foo.appspot.com/j/collect",
-            "https://foo.appspot.com/collect/",
-            "https://foo.appspot.com/g/collect/",
-            "https://foo.appspot.com/r/collect/",
-            "https://foo.appspot.com/j/collect/",
-            "https://foo.appspot.com/collect?v=2&tid=G-1234567",
-            "https://foo.appspot.com/g/collect?v=2&tid=G-1234567",
-            "https://foo.appspot.com/r/collect?v=2&tid=G-1234567",
-            "https://foo.appspot.com/j/collect?v=2&tid=G-1234567",
+            "https://www.google-analytics.com/g/collect?v=2&tid=UA-1234567-1",
+            "https://www.google-analytics.com/r/collect?v=2&tid=UA-1234567-2",
+            "https://www.google-analytics.com/j/collect?v=2&tid=UA-1234567-2",
+            "http://www.google-analytics.com/collect?v=2&tid=UA-1234567-2",
         ],
         negativeUrls = [
             "https://omnibug.io/testing",
@@ -50,6 +25,15 @@ test("GoogleAnalyticsProvider pattern should match various UA domains", t => {
             "https://omnibug.io/collect?v=2&foo=bar",
             "https://omnibug.io/collect/?foo=bar",
             "https://e.clarity.ms/collect",
+            "http://www.google-analytics.com/collect?v=2&tid=G-1234567",
+            "https://foo.appspot.com/collect?v=2&tid=G-1234567",
+            "https://foo.appspot.com/g/collect?v=2&tid=G-1234567",
+            "https://foo.appspot.com/r/collect?v=2&tid=G-1234567",
+            "https://foo.appspot.com/j/collect?v=2&tid=G-1234567",
+            "https://analytics.google.com/collect?v=2&tid=G-1234567",
+            "https://analytics.google.com/g/collect?v=2&tid=G-1234567",
+            "https://analytics.google.com/r/collect?v=2&tid=G-1234567",
+            "https://analytics.google.com/j/collect?v=2&tid=G-1234567",
         ];
 
     urls.forEach((url) => {
@@ -97,7 +81,7 @@ test("GoogleAnalyticsProvider returns the hit type", t => {
     t.is(typeof requestType1, "object");
     t.is(requestType1.value, "Page View");
     t.is(typeof requestType2, "object");
-    t.is(requestType2.value, "Page View");
+    t.is(requestType2.value, "page view");
 });
 
 test("GoogleAnalyticsProvider returns POST data", t => {
@@ -114,50 +98,6 @@ test("GoogleAnalyticsProvider returns POST data", t => {
     t.is(eventCategory.field, "Event Category");
     t.is(eventCategory.value, "exit link");
     t.is(eventCategory.group, "events");
-});
-
-test("GoogleAnalyticsProvider returns App+Web POST data", t => {
-    let provider = new GoogleAnalyticsProvider(),
-        url = "https://www.google-analytics.com/g/collect?v=2&tid=G-HLPY6C0G1N&gtm=2oe871&_p=1075024922&sr=2560x1440&ul=en-us&cid=309365347.1597524282&dl=http%3A%2F%2Flocalhost%2Fomnibug%2Fappweb.html&dr=&dt=Omnibug%20App%2BWeb%20Test&sid=1597524282&sct=1&seg=1&_s=1",
-        postData = "en=page_view en=scroll&epn.percent_scrolled=90";
-
-    let results = provider.parseUrl(url, postData);
-
-    let event1Type = results.data.find((result) => {
-        return result.key === "en[0]";
-    });
-    let scrollDepth = results.data.find((result) => {
-        return result.key === "epn[1].percent_scrolled";
-    });
-    t.is(typeof scrollDepth, "object");
-    t.is(scrollDepth.field, "Event 2 Data (percent_scrolled)");
-    t.is(scrollDepth.value, "90");
-    t.is(scrollDepth.group, "events");
-});
-
-test("GoogleAnalyticsProvider returns custom dimensions/metrics", t => {
-    let provider = new GoogleAnalyticsProvider(),
-        url = "https://www.google-analytics.com/r/collect?v=1&_v=j68&a=1805905905&t=pageview&_s=1&dl=https%3A%2F%2Fomnibug.io%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=2560x1440&vp=2560x1307&je=0&_u=KCDAAUIh~&jid=441640597&gjid=200209851&cid=191425359.1527202446&tid=UA-17508125-8&_gid=401227809.1529009937&_r=1&gtm=u64&z=1617633316&cd3=foobar&cm1=12.20";
-
-    let results = provider.parseUrl(url);
-
-    let cm1 = results.data.find((result) => {
-        return result.key === "cm1";
-    });
-
-    t.is(typeof cm1, "object");
-    t.is(cm1.field, "Custom Metric 1");
-    t.is(cm1.value, "12.20");
-    t.is(cm1.group, "metric");
-
-    let cd3 = results.data.find((result) => {
-        return result.key === "cd3";
-    });
-
-    t.is(typeof cd3, "object");
-    t.is(cd3.field, "Custom Dimension 3");
-    t.is(cd3.value, "foobar");
-    t.is(cd3.group, "dimension");
 });
 
 test("GoogleAnalyticsProvider returns content groups", t => {
