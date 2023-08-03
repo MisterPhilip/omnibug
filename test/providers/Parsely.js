@@ -102,6 +102,6 @@ test("ParselyProvider returns the hit type", t => {
     t.is(requestType4.value, "Video Start");
     t.is(typeof requestType5, "object");
     t.is(requestType5.value, "Video Heartbeat");
-    t.is(typeof requestType5, "object");
-    t.is(requestType5.value, "Test");
+    t.is(typeof requestType6, "object");
+    t.is(requestType6.value, "Test");
 });

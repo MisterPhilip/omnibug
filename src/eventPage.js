@@ -71,8 +71,8 @@
      */
     chrome.webRequest.onBeforeRequest.addListener(
         (details) => {
-            // Ignore any requests for windows where devtools isn't open
-            if (!isValidTab(details.tabId) || !cached.pattern.test(details.url)) {
+            // Ignore any requests for windows where devtools isn't open, or options requests
+            if (details.method === "OPTIONS" || !isValidTab(details.tabId) || !cached.pattern.test(details.url)) {
                 return;
             }
 
