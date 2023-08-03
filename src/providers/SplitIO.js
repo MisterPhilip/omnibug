@@ -10,7 +10,7 @@ class SplitIOProvider extends BaseProvider {
         this._key = "SPLITIO";
         this._pattern = /events\.split\.io\/api\/(events\/(beacon|bulk)|testImpressions\/(count\/beacon|beacon|bulk))/;
         this._name = "SplitIO";
-        this._type = "Analytics";
+        this._type = "analytics";
         this._keywords = ["splitio", "abtest", "insight"];
     }
 

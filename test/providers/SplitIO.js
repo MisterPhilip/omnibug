@@ -57,7 +57,7 @@ test("SplitIOProvider returns data for events", t => {
 
     t.is(typeof eventProperties, "object");
     t.is(eventProperties.field, "Event 1 Properties");
-    t.is(eventProperties.value, "{\"attribute\":\"mockAttributeValue\"}");
+    t.is(eventProperties.value, `{\n  "attribute": "mockAttributeValue"\n}`);
 });
 
 test("SplitIOProvider returns data for impressions", t => {
