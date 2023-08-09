@@ -14,10 +14,12 @@ test("GoogleAnalyticsProvider returns provider information", t => {
 test("GoogleAnalyticsProvider pattern should match various UA domains", t => {
     let provider = new GoogleAnalyticsProvider(),
         urls = [
-            "https://www.google-analytics.com/g/collect?v=2&tid=UA-1234567-1",
+            "https://www.google-analytics.com/collect?v=2&tid=UA-1234567-1",
             "https://www.google-analytics.com/r/collect?v=2&tid=UA-1234567-2",
             "https://www.google-analytics.com/j/collect?v=2&tid=UA-1234567-2",
             "http://www.google-analytics.com/collect?v=2&tid=UA-1234567-2",
+            "http://www.google-analytics.com/collect",
+            "http://www.analytics.google.com/collect",
         ],
         negativeUrls = [
             "https://omnibug.io/testing",
@@ -25,15 +27,12 @@ test("GoogleAnalyticsProvider pattern should match various UA domains", t => {
             "https://omnibug.io/collect?v=2&foo=bar",
             "https://omnibug.io/collect/?foo=bar",
             "https://e.clarity.ms/collect",
-            "http://www.google-analytics.com/collect?v=2&tid=G-1234567",
             "https://foo.appspot.com/collect?v=2&tid=G-1234567",
             "https://foo.appspot.com/g/collect?v=2&tid=G-1234567",
             "https://foo.appspot.com/r/collect?v=2&tid=G-1234567",
             "https://foo.appspot.com/j/collect?v=2&tid=G-1234567",
-            "https://analytics.google.com/collect?v=2&tid=G-1234567",
+            "http://www.google-analytics.com/g/collect?v=2&tid=G-1234567",
             "https://analytics.google.com/g/collect?v=2&tid=G-1234567",
-            "https://analytics.google.com/r/collect?v=2&tid=G-1234567",
-            "https://analytics.google.com/j/collect?v=2&tid=G-1234567",
         ];
 
     urls.forEach((url) => {
@@ -67,9 +66,10 @@ test("GoogleAnalyticsProvider returns static data", t => {
 test("GoogleAnalyticsProvider returns the hit type", t => {
     let provider = new GoogleAnalyticsProvider(),
         url1 = "https://www.google-analytics.com/r/collect?v=1&_v=j68&a=1805905905&t=pageview&_s=1&dl=https%3A%2F%2Fomnibug.io%2F&ul=en-us&de=UTF-8&dt=Omnibug%20%3A%3A%20web%20metrics%20debugging%20tool&sd=24-bit&sr=2560x1440&vp=2560x1307&je=0&_u=KCDAAUIh~&jid=441640597&gjid=200209851&cid=191425359.1527202446&tid=UA-17508125-8&_gid=401227809.1529009937&_r=1&gtm=u64&z=1617633316",
-        url2 = "https://www.google-analytics.com/g/collect?v=2&tid=G-RJZRDLSZR5&gtm=2oe7v2&_p=1844589572&sr=2560x1440&cid=1473268947.1550531325&ul=en-us&_s=1&en=page_view&sid=1565188190&sct=2&seg=1&dl=https%3A%2F%2Fomnibug.io%2Ftest&dr=&dt=Omnibug%20test%20page",
+        url2 = "https://www.google-analytics.com/collect",
+        postData = "v=2&tid=G-RJZRDLSZR5&gtm=2oe7v2&_p=1844589572&sr=2560x1440&cid=1473268947.1550531325&ul=en-us&_s=1&en=page_view&sid=1565188190&sct=2&seg=1&dl=https%3A%2F%2Fomnibug.io%2Ftest&dr=&dt=Omnibug%20test%20page",
         results1 = provider.parseUrl(url1),
-        results2 = provider.parseUrl(url2);
+        results2 = provider.parseUrl(url2, postData);
 
     let requestType1 = results1.data.find((result) => {
             return result.key === "omnibug_requestType";
