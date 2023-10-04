@@ -11,7 +11,7 @@ class SegmentProvider extends BaseProvider
     {
         super();
         this._key        = "SEGMENT";
-        this._pattern    = /api\.segment\.io\//;
+        this._pattern    = /(\.segmentapis\.com\/)|(api\.segment\.io\/)/;
         this._name       = "Segment";
         this._type       = "analytics";
     }
