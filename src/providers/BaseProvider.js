@@ -34,6 +34,7 @@ class BaseProvider
     {
         let types = {
             "analytics":    "Analytics",
+            "customer":     "Customer Engagement",
             "testing":      "UX Testing",
             "tagmanager":   "Tag Manager",
             "visitorid":    "Visitor Identification",
