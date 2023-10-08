@@ -26,6 +26,7 @@ class AdobeLaunchCNProvider extends BaseProvider
     {
         return {
             "account":      "environment",
+            "requestType":  "_requestType",
         };
     }
 
@@ -62,6 +63,11 @@ class AdobeLaunchCNProvider extends BaseProvider
             "field": "Launch Environment",
             "value": env,
             "group": "general"
+        });
+        results.push({
+            "key": "_requestType",
+            "value": "Library Load",
+            "hidden": true,
         });
 
         return results;

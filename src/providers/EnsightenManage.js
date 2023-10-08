@@ -25,7 +25,8 @@ class EnsightenManageProvider extends BaseProvider
     get columnMapping()
     {
         return {
-            "account":      "omnibug_account"
+            "account":      "omnibug_account",
+            "requestType":  "_requestType",
         };
     }
 
@@ -77,6 +78,11 @@ class EnsightenManageProvider extends BaseProvider
                 "group": "general"
             });
         }
+        results.push({
+            "key": "_requestType",
+            "value": "Library Load",
+            "hidden": true,
+        });
 
         return results;
     }

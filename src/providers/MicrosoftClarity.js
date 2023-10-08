@@ -45,7 +45,7 @@ class MicrosoftClarityProvider extends BaseProvider {
             },
             {
                 "key": "omnibug_requestType",
-                "value": "Load",
+                "value": "Library Load",
                 "hidden": "true"
             }
         ];

@@ -56,7 +56,7 @@ class PiwikPROTagManagerProvider extends BaseProvider {
         return [
             {
                 "key": "requestType",
-                "value": "Load",
+                "value": "Library Load",
                 "hidden": true
             }, {
                 "key": "container_id",

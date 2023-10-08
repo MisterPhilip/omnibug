@@ -25,7 +25,8 @@ class GoogleTagManagerProvider extends BaseProvider
     get columnMapping()
     {
         return {
-            "account":      "id"
+            "account":      "id",
+            "requestType":  "_requestType",
         };
     }
 
@@ -61,5 +62,22 @@ class GoogleTagManagerProvider extends BaseProvider
                 "group": "general"
             }
         };
+    }
+
+    /**
+     * Parse custom properties for a given URL
+     *
+     * @param    {string}   url
+     * @param    {object}   params
+     *
+     * @returns {void|Array}
+     */
+    handleCustom(url, params)
+    {
+        return [{
+            "key": "_requestType",
+            "value": "Library Load",
+            "hidden": true,
+        }];
     }
 }

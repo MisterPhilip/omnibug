@@ -26,6 +26,7 @@ class AdobeDynamicTagManagerProvider extends BaseProvider
     {
         return {
             "account":      "environment",
+            "requestType":  "_requestType",
         };
     }
 
@@ -63,7 +64,11 @@ class AdobeDynamicTagManagerProvider extends BaseProvider
             "value": env,
             "group": "general"
         });
-
+        results.push({
+            "key": "_requestType",
+            "value": "Library Load",
+            "hidden": true,
+        });
         return results;
     }
 }

@@ -23,6 +23,7 @@ class HotjarProvider extends BaseProvider {
     get columnMapping() {
         return {
             "account":     "account",
+            "requestType":  "_requestType",
         };
     }
 
@@ -56,6 +57,11 @@ class HotjarProvider extends BaseProvider {
                 "field": "Account ID",
                 "value": url.pathname.match(/hotjar-(\d+)\.js/)[1],
                 "group": "general"
+            },
+            {
+                "key": "_requestType",
+                "value": "Library Load",
+                "hidden": true,
             }
         ];
     }
