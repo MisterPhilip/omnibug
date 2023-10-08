@@ -55,36 +55,51 @@ class TealiumIQProvider extends BaseProvider
      */
     handleCustom(url, params)
     {
-        let matches =  url.pathname.match(/^\/utag\/([^/]+)\/([^/]+)\/([^/]+)\/(utag(?:\.sync)?\.js)/),
-            results = [];
-        /* istanbul ignore else */
-        if(matches !== null && matches.length === 5) {
-            results.push({
-                "key":   "omnibug_account",
-                "value": `${matches[1]} / ${matches[2]}`,
-                "hidden": true
-            });
-            results.push({
-                "key":   "acccount",
-                "field": "Account",
-                "value": matches[1],
-                "group": "general"
-            });
+        let matches =  url.pathname.match(/([^/]+)\/([^/]+)\/(utag(?:\.sync)?\.js)/),
+            results = [],
+            account = null;
+
+        // When hosted on a first party domain, the account field does not exist
+        if(/^\/utag\/([^/]+)\//.test(url.pathname)) {
+            account = url.pathname.match(/^\/utag\/([^/]+)\//)[1];
+        }
+
+        if(matches !== null && matches.length === 4) {
+            if(account) {
+                results.push({
+                    "key":   "omnibug_account",
+                    "value": `${account} / ${matches[1]}`,
+                    "hidden": true
+                });
+                results.push({
+                    "key":   "acccount",
+                    "field": "Account",
+                    "value": account,
+                    "group": "general"
+                });
+            } else {
+                results.push({
+                    "key":   "omnibug_account",
+                    "value": matches[1],
+                    "hidden": true
+                });
+            }
+
             results.push({
                 "key":   "profile",
                 "field": "Profile",
-                "value": matches[2],
+                "value": matches[1],
                 "group": "general"
             });
             results.push({
                 "key":   "environment",
                 "field": "Environment",
-                "value": matches[3],
+                "value": matches[2],
                 "group": "general"
             });
             results.push({
                 "key":   "requestType",
-                "value": (matches[4] === "utag.js") ? "Async" : "Sync",
+                "value": ((matches[3] === "utag.js") ? "Async" : "Sync") + " Library Load",
                 "hidden": true
             });
         }
