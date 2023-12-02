@@ -100,14 +100,29 @@ nav.navbar {
 
   .redirected:hover .redirect-icon,
   .redirected:focus .redirect-icon {
-    color: $error-color;
+    color: red;
   }
-}
-.request:nth-of-type(odd) {
-  background-color: $body-background-color;
-}
-.request:nth-of-type(even) {
-  background-color: darken($body-background-color, 5%);
+  &:nth-of-type(odd) {
+    background-color: $body-background-color;
+    &.request-error > summary {
+      background-color: $warning-color-background;
+    }
+  }
+  &:nth-of-type(even) {
+    background-color: darken($body-background-color, 5%);
+    &.request-error > summary {
+      background-color: darken($warning-color-background, 5%);
+    }
+  }
+  &.request-error {
+    > summary {
+      color: $dark-warning-color-background;
+    }
+    .request-note {
+      margin-top: 0.4rem;
+    }
+  }
+
 }
 @keyframes request-highlight-odd {
   0% {
@@ -172,6 +187,17 @@ nav.navbar {
 .request.redirected:hover {
   .redirect-icon {
     color: $warning-color;
+  }
+}
+.request.request-error {
+  .request-error-icon {
+    margin-left: 0.25rem;
+  }
+  .request-error-message {
+    padding: 0.15rem 0.25rem;
+    border: 0;
+    background: $dark-warning-color-background;
+    color: white;
   }
 }
 .request.multipled {
@@ -403,9 +429,18 @@ body.dark {
 
   .request:nth-of-type(odd) {
     background-color: $dark-body-background-color;
+    &.request-error > summary {
+      background-color: $dark-warning-color-background;
+    }
   }
   .request:nth-of-type(even) {
     background-color: darken($dark-body-background-color, 5%);
+    &.request-error > summary {
+      background-color: darken($dark-warning-color-background, 5%);
+    }
+  }
+  .request.request-error > summary {
+    color: $warning-color-background;
   }
 
   .request:nth-of-type(odd):not([open]) {
@@ -443,6 +478,11 @@ body.dark {
   }
   .request[open], .request[open] > summary {
     border-color: #000;
+  }
+
+  .request-error-message {
+    background: $dark-warning-color-background;
+    color: $warning-color-background;
   }
 
   .request-note input:hover,

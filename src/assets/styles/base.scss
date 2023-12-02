@@ -24,6 +24,9 @@ $success-color-dark: darken($success-color, 20%);
 $warning-color-dark: darken($warning-color, 20%);
 $error-color-dark: darken($error-color, 20%);
 
+$warning-color-background: #fcebeb;
+$dark-warning-color-background: #AE0303;
+
 @font-face {
   font-family: 'Source Sans Pro';
   font-style: normal;

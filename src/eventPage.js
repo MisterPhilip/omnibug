@@ -121,10 +121,47 @@
         ["requestBody"]
     );
 
+    // HTTP 4xx/5xx Errors
+    chrome.webRequest.onHeadersReceived.addListener(
+        (details) => {
+            // Ignore any requests for windows where devtools isn't open, or options requests
+            if (details.method === "OPTIONS" || !isValidTab(details.tabId) || !cached.pattern.test(details.url) || details.statusCode < 400) {
+                return;
+            }
+            tabs[details.tabId].port.postMessage({
+                "request": {
+                    "id": details.requestId,
+                    "error": details.statusCode,
+                },
+                "event": "requestError"
+            });
+        },
+        { urls: ["<all_urls>"]}
+    );
+
+    // Cancelled/blocked requests (other extensions e.g. adblockers, network errors, etc.)
+    chrome.webRequest.onErrorOccurred.addListener(
+        (details) => {
+            // Ignore any requests for windows where devtools isn't open, or options requests
+            if (details.method === "OPTIONS" || !isValidTab(details.tabId) || (!cached.pattern.test(details.url) && !/\/.well-known\//i.test(details.url))) {
+                return;
+            }
+            console.log("onErrorOccurred error:", details.url, details);
+            tabs[details.tabId].port.postMessage({
+                "request": {
+                    "id": details.requestId,
+                    "error": details.error,
+                },
+                "event": "requestError"
+            });
+        },
+        { urls: ["<all_urls>"]}
+    );
+
     /**
      * Listen for all navigations that occur on a top-level frame
      */
-    chrome.webNavigation.onBeforeNavigate.addListener(
+    chrome.webNavigation.onCommitted.addListener(
         (details) => {
             if (isValidTab(details.tabId) && details.frameId === 0) {
                 // We have a page load within a tab we care about, send a message to the devtools with the info

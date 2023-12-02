@@ -919,6 +919,27 @@ window.Omnibug = (() => {
         requestPanel.appendChild(request);
     }
 
+    function addRequestError({ request }) {
+        let errorRequests = d.querySelectorAll(`.request[data-request-id="${request.id}"]`);
+        errorRequests.forEach((entryElement) => {
+            entryElement.classList.add("request-error");
+
+            const warningIcon = createElement("i", {
+                "classes": ["fas", "fa-exclamation-triangle", "request-error-icon"],
+                "title": "This request was not successful",
+            });
+            const entryTitle = entryElement.querySelector("summary > .container .label + span");
+            entryTitle.append(warningIcon);
+
+            const entryDetailsElement = entryElement.querySelector("div.redirect");
+            const errorInfoPanel = createElement("div", {
+                "classes": ["request-error-message"],
+                "text": "This request was NOT successful because " + ((typeof request.error === "number") ? `the server rejected it (HTTP ${request.error})` : `your browser stopped this request (${request.error})`),
+            });
+            entryDetailsElement.parentNode.insertBefore(errorInfoPanel, entryDetailsElement);
+        });
+    }
+
     /**
      * Load in new settings/styles
      *
@@ -1196,6 +1217,9 @@ window.Omnibug = (() => {
                     break;
                 case "webNavigation":
                     addNavigation(message);
+                    break;
+                case "requestError":
+                    addRequestError(message);
                     break;
                 case "settings":
                     loadSettings(message.data, true);
