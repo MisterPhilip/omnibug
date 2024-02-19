@@ -62,5 +62,5 @@ test("PiwikPROTagManagerProvider returns data", t => {
         });
     t.is(container_id.field, "Container ID");
     t.is(container_id.value, "aaa123cc-4f49-11e7-963e-000d3a2a4aaa");
-    t.is(requestType.value, "Load");
+    t.is(requestType.value, "Library Load");
 });

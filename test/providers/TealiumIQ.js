@@ -70,8 +70,8 @@ test("TealiumIQProvider returns request type", t => {
         });
 
     t.is(typeof resultsSync, "object");
-    t.is(resultsSync.value, "Sync");
+    t.is(resultsSync.value, "Sync Library Load");
 
     t.is(typeof resultsAsnyc, "object");
-    t.is(resultsAsnyc.value, "Async");
+    t.is(resultsAsnyc.value, "Async Library Load");
 });
