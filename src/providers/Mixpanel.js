@@ -61,6 +61,12 @@ class MixpanelProvider extends BaseProvider {
      * @return {Array|Object}
      */
     parsePostData(postData = "") {
+        // In some cases the post data comes in as a URI encoded string (similar to form data)
+        if(typeof postData === "string" && postData.indexOf("data=%5B") === 0) {
+            // Likely not the best solution, but solved until next version of Omnibug that better handles these scenarios
+            postData = decodeURIComponent(postData.slice(5));
+        }
+
         const original = super.parsePostData(postData),
             dataField = original.find(([key, value]) => key === "data");
         if(dataField) {
