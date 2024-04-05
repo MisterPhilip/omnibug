@@ -1,6 +1,5 @@
 /**
  * Indicative
- * https://www.https://app.indicative.com/#/segmentation/1c282f09-03b3-4921-bb8b-2b7c4a4f7321.com/
  *
  * @class
  * @extends BaseProvider
