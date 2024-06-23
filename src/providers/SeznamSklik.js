@@ -45,7 +45,7 @@ class SeznamSklikProvider extends BaseProvider
             },
             {
                 "key": "identities",
-                "name": "Identities (SHA-256 hashed)"
+                "name": "Identities"
             },
             {
                 "key": "zbozi.cz",
