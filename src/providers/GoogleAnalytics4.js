@@ -553,7 +553,6 @@ class GoogleAnalytics4Provider extends BaseProvider
     handleCustom(url, params)
     {
         let results = [],
-            hitType = params.get("t") || params.get("en") || params.get("en[0]") || "Page View",
             requestType = "";
 
         results.push({
@@ -563,16 +562,30 @@ class GoogleAnalytics4Provider extends BaseProvider
             "group":  "general"
         });
 
-        hitType = hitType.toLowerCase();
-        if(hitType === "pageview" || hitType === "screenview" || hitType === "page_view") {
-            requestType = "Page View";
-        } else if(hitType === "transaction" || hitType === "item") {
-            requestType = "Ecommerce " + hitType.charAt(0).toUpperCase() + hitType.slice(1);
-        } else if(hitType.indexOf("_")) {
-            requestType = hitType.replace(/_/g, " ");
+        const types = Array.from(params.entries())
+            .filter(([key, hitType]) => {
+                return key === "t" || key === "en" || /en\[\d+]/.test(key);
+            }).map(([key, hitType]) => {
+                let requestType;
+                hitType = hitType.toLowerCase();
+                if(hitType === "pageview" || hitType === "screenview" || hitType === "page_view") {
+                    requestType = "Page View";
+                } else if(hitType.indexOf("_")) {
+                    requestType = hitType.replace(/_/g, " ");
+                } else {
+                    requestType = hitType.charAt(0).toUpperCase() + hitType.slice(1);
+                }
+                return requestType;
+            });
+
+        if(types.length > 1) {
+            requestType = `(${types.length}) ${types.join(", ")}`;
+        } else if(types.length === 1) {
+            requestType = types.pop();
         } else {
-            requestType = hitType.charAt(0).toUpperCase() + hitType.slice(1);
+            requestType = "Other";
         }
+
         results.push({
             "key":    "omnibug_requestType",
             "value":  requestType,
