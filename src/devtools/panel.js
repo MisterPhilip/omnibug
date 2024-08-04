@@ -768,6 +768,26 @@ window.Omnibug = (() => {
             });
         body.appendChild(redirectWarning);
 
+        if(request.request.type === "ping" && request.request.method === "POST" && !request.request.postData) {
+            const warningIcon = createElement("i", {
+                    "classes": ["fas", "fa-exclamation-triangle", "request-error-icon"],
+                    "title": "This request was not successful",
+                }),
+                pingHelpLink = createElement("a", {
+                "attributes": {
+                    "target": "_blank",
+                    "href": "https://github.com/MisterPhilip/omnibug/issues/213"
+                },
+                "text": "Learn more."
+            }),
+            pingWarning = createElement("div", {
+                "classes": ["toast", "toast-error"],
+                "text": "Due to a Chrome bug, this type of request (ping) may not display all data points sent with the request. ",
+                "children": [pingHelpLink]
+            });
+            body.appendChild(pingWarning);
+        }
+
         // Add the note field & listener
         let noteInput = createElement("input", {
                 "classes": ["form-input"],
