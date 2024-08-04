@@ -11,7 +11,7 @@ class GoogleAnalyticsProvider extends BaseProvider
     {
         super();
         this._key        = "UNIVERSALANALYTICS";
-        this._pattern    = /(?:\.google-analytics|analytics\.google)\.com\/([^g]\/)?collect(?:[/#?]+|$)/;
+        this._pattern    = /(?:\.google-analytics|analytics\.google)\.com\/([^g]\/)?collect(?:[/#?]+(?!.*consentMode=)|$)/;
         this._name       = "Google Universal Analytics";
         this._type       = "analytics";
         this._keywords   = ["google", "google analytics", "ua", "ga"];
