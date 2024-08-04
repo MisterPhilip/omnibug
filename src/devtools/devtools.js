@@ -13,29 +13,31 @@
         "../assets/images/blue-32.png",
         "../devtools/panel.html",
         (panel) => {
+            console.log("devtools.panel.create", panel);
             let queuedMessages = [],
                 panelWindow,  // reference to devtools_panel.html's `window` object
                 port;
 
-            port = chrome.runtime.connect({
-                name: "##OMNIBUG_KEY##-" + chrome.devtools.inspectedWindow.tabId
-            });
+            const connectPort = () => {
+                port = chrome.runtime.connect({
+                    name: String(chrome.devtools.inspectedWindow.tabId)
+                });
 
-            /**
-             * Receieves messages from the eventPage
-             */
-            port.onMessage.addListener((msg) => {
-                if (panelWindow) {
-                    panelWindow.Omnibug.receive_message(msg);
-                } else {
-                    queuedMessages.push(msg);
-                }
-            });
+                port.onMessage.addListener((msg) => {
+                    if (panelWindow) {
+                        panelWindow.Omnibug.receive_message(msg);
+                    } else {
+                        queuedMessages.push(msg);
+                    }
+                });
+                port.onDisconnect.addListener(connectPort);
+            }
+            connectPort();
 
             /**
              * Called when the devtools panel is first shown
              */
-            let listener = (_window) => {
+            const listener = (_window) => {
                 panel.onShown.removeListener(listener); // Run once only
                 panelWindow = _window;
 
@@ -47,7 +49,9 @@
 
                 // Inject a reply mechanism into the caller
                 panelWindow.Omnibug.send_message = (...data) => {
-                    port.postMessage(data);
+                    if(port && port.postMessage) {
+                        port.postMessage(data);
+                    }
                 };
             };
             panel.onShown.addListener(listener);

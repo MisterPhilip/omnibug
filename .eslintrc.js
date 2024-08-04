@@ -9,6 +9,7 @@ module.exports = {
         "coverage/",
         "platform/",
         "providers.js",
+        "serviceWorker-full.js",
         "src/assets/js/**",
         "test/"
     ],

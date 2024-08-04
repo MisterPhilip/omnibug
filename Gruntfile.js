@@ -5,16 +5,9 @@ module.exports = function (grunt) {
     
     grunt.config.init({
         "extension": {
-            "beta": {
-                "name": "Omnibug (Beta)",
-                "version": "0.9.6",
-                "storageKey": "omnibug-beta",
-                "feedbackUrl": "https://github.com/MisterPhilip/omnibug/issues",
-                "analyticsID": "UA-114343677-3"
-            },
             "production": {
                 "name": "Omnibug",
-                "version": "1.24.0",
+                "version": "2.0.0",
                 "storageKey": "omnibug",
                 "feedbackUrl": "https://github.com/MisterPhilip/omnibug/issues",
                 "analyticsID": "UA-114343677-2"
@@ -29,7 +22,6 @@ module.exports = function (grunt) {
             "tracking": false
         },
         "firefox": {
-            "gecko": "Omnibug@rosssimpson.com",
             "folder": "firefox",
             "tracking": false
         },
@@ -37,7 +29,7 @@ module.exports = function (grunt) {
             "chrome": ["platform/chromium", "build/chrome_*.zip"],
             "edge": ["platform/edge", "build/edge_*.zip"],
             "firefox": ["platform/firefox", "build/firefox_*.zip"],
-            "providers": ["src/providers.js"],
+            "providers": ["src/providers.js", "src/serviceWorker-full.js"],
             "test": ["test/source/**"]
         },
         "watch": {
@@ -115,32 +107,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-sass");
     grunt.loadNpmTasks("grunt-eslint");
 
-    grunt.registerTask("build-beta", "Build the beta version", (browsers = "") => {
-        let allowedBrowsers = ["chrome", "edge", "firefox"];
-        if (browsers === "") {
-            browsers = allowedBrowsers;
-        } else {
-            browsers = browsers.split(",");
-        }
-        grunt.task.run("build-providers");
-        browsers.forEach((b) => {
-            if (allowedBrowsers.indexOf(b) > -1) {
-                grunt.task.run(
-                    "clean:" + b + ":beta",
-                    "sass",
-                    "build-copy:" + b + ":beta",
-                    b + "-manifest:beta",
-                    "build-concat:" + b + ":beta",
-                    "build-placeholders:" + b + ":beta",
-                    "build-compress:" + b + ":beta"
-                );
-            } else {
-                grunt.log.warn("Unknown browser " + b);
-            }
-        });
-    });
-
-
     grunt.registerTask("build-production", "Build the extensions", (browsers = "") => {
         let allowedBrowsers = ["chrome", "edge", "firefox"];
         if (browsers === "") {
@@ -177,8 +143,8 @@ module.exports = function (grunt) {
         manifest.version = extensionOptions.version;
 
         // Remove anything that will break Chrome
-        delete manifest.applications;
-        delete manifest.options_ui.browser_style;
+        delete manifest.browser_specific_settings;
+        delete manifest.background.scripts;
 
         grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Chrome's manifest.json. ").ok();
@@ -194,16 +160,16 @@ module.exports = function (grunt) {
         manifest.name = extensionOptions.name;
         manifest.version = extensionOptions.version;
 
-        // Remove anything that will break Chrome
-        delete manifest.applications;
-        delete manifest.options_ui.browser_style;
+        // Remove anything that will break Edge
+        delete manifest.browser_specific_settings;
+        delete manifest.background.scripts;
 
         grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Edge's manifest.json. ").ok();
     });
 
     grunt.registerTask("firefox-manifest", "Build the Firefox manifest.json file", function (version = "production") {
-        grunt.config.requires(`extension.${version}.version`, "firefox.gecko");
+        grunt.config.requires(`extension.${version}.version`);
 
         let browserOptions = grunt.config("firefox"),
             extensionOptions = grunt.config(`extension.${version}`),
@@ -211,12 +177,10 @@ module.exports = function (grunt) {
 
         manifest.name = extensionOptions.name;
         manifest.version = extensionOptions.version;
-        manifest.applications.gecko.id = browserOptions.gecko;
 
-        // Remove anything that will break Firefox"s import routine
-        delete manifest.options_ui.chrome_style;
-        delete manifest.options_page;
-        delete manifest.background.persistent;
+        // Remove anything that will break Firefox's import routine
+        delete manifest.minimum_chrome_version;
+        delete manifest.background.service_worker;
 
         grunt.file.write("platform/" + browserOptions.folder + "/manifest.json", JSON.stringify(manifest, null, 4));
         grunt.log.write("Created Firefox's manifest.json. ").ok();
@@ -225,7 +189,7 @@ module.exports = function (grunt) {
     grunt.registerTask("build-copy", "Copy over the source files to the build directory", function (browser) {
         grunt.config.requires(browser);
         let options = grunt.config(browser),
-            filesToCopy = ["eventPage.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*", "!libs/OmnibugTracker.*", "popup/*.*", "pages/**", "!**/*.scss", "!assets/styles/**"],
+            filesToCopy = ["serviceWorker-full.js", "providers.js", "options/*.*", "devtools/*.*", "assets/**", "libs/*.*", "!libs/OmnibugTracker.*", "popup/*.*", "pages/**", "!**/*.scss", "!assets/styles/**"],
             trackingLib = {
                 expand: true,
                 cwd: "src/libs/",
@@ -498,13 +462,25 @@ module.exports = function (grunt) {
             }
         });
         grunt.task.run("concat:providers");
+
+        grunt.config.set("concat.serviceWorker", {
+            "options": { },
+            files: {
+                "./src/serviceWorker-full.js": [
+                    "./src/libs/OmnibugPort.js",
+                    "./src/libs/OmnibugSettings.js",
+                    "./src/providers.js",
+                    "./src/serviceWorker.js"
+                ],
+            }
+        });
+        grunt.task.run("concat:serviceWorker");
     });
 
     /*
      * Add aliases
      */
-    grunt.registerTask("default", ["eslint", "build-production"]);
-    grunt.registerTask("build", ["eslint", "build-production"]);
+    grunt.registerTask("default", ["build-production"]);
+    grunt.registerTask("build", ["build-production"]);
     grunt.registerTask("production", ["eslint", "build-production"]);
-    grunt.registerTask("beta", ["eslint", "build-beta"]);
 };

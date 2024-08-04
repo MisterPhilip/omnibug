@@ -1,47 +1,43 @@
 {
-    "manifest_version": 2,
-    "name": "##OMNIBUG_NAME##",
-    "version": "##OMNIBUG_VERSION##",
-    "description": "Omnibug is a browser extension to decode and display outgoing digital marketing tool requests.",
-    "author": "Philip Lawrence",
-    "icons": {
-        "16": "assets/images/blue-16.png",
-        "48": "assets/images/blue-48.png",
-        "128": "assets/images/blue-128.png"
-    },
-    "background": {
-        "scripts": [
-            "libs/OmnibugSettings.js",
-            "libs/OmnibugPort.js",
-            "providers.js",
-            "eventPage.js"
-        ],
-        "persistent": true
-    },
-    "devtools_page": "devtools/devtools.html",
-    "homepage_url": "https://omnibug.io/?utm_source=extension&utm_medium=##BROWSER##&utm_campaign=homepage_url",
-    "options_ui": {
-        "page": "options/options.html"
-    },
-    "options_page": "options/options.html",
-    "browser_action": {
-        "default_icon": {
-            "16": "assets/images/blue-16.png",
-            "32": "assets/images/blue-32.png",
-            "48": "assets/images/blue-48.png"
-        },
-        "default_popup": "popup/popup.html"
-    },
-    "permissions": [
-        "storage",
-        "webRequest",
-        "webNavigation",
-        "*://*/*"
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "author": "Philip Lawrence",
+  "background": {
+    "scripts": [
+      "serviceWorker-full.js"
     ],
-    "short_name": "Omnibug",
-    "applications": {
-        "gecko": {
-            "id": "Omnibug@rosssimpson.com"
-        }
+    "service_worker": "serviceWorker-full.js"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "Omnibug@rosssimpson.com",
+      "strict_max_version": "*",
+      "strict_min_version": "109"
     }
+  },
+  "description": "Omnibug is a browser extension to decode and display outgoing digital marketing tool requests.",
+  "devtools_page": "devtools/devtools.html",
+  "homepage_url": "https://omnibug.io/?utm_source=extension&utm_medium=firefox&utm_campaign=homepage_url",
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "icons": {
+    "16": "assets/images/blue-16.png",
+    "48": "assets/images/blue-48.png",
+    "128": "assets/images/blue-128.png"
+  },
+  "manifest_version": 3,
+  "minimum_chrome_version": "102",
+  "name": "Omnibug",
+  "options_ui": {
+    "page": "options/options.html"
+  },
+  "permissions": [
+    "storage",
+    "webNavigation",
+    "webRequest"
+  ],
+  "short_name": "Omnibug",
+  "version": "2.0.0"
 }

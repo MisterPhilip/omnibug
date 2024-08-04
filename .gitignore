@@ -28,6 +28,7 @@ coverage/
 
 # Generated files
 src/providers.js
+src/serviceWorker-full.js
 platform/
 
 # Ignore built CSS files
