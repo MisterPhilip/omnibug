@@ -12,8 +12,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "Omnibug@rosssimpson.com",
-      "strict_max_version": "*",
-      "strict_min_version": "109"
+      "strict_min_version": "109.0"
     }
   },
   "description": "Omnibug is a browser extension to decode and display outgoing digital marketing tool requests.",
