@@ -37,6 +37,7 @@ const deleteTimer = (port) => {
         delete tabs[port.name];
     }
 }
+var providerPattern;
 
 /**
  * Accept incoming connections from our devtools panels
@@ -57,6 +58,9 @@ chrome.runtime.onConnect.addListener((port) => {
             "data": loadedSettings
         };
         port.postMessage(data);
+
+        // Cache the provider RegExp for slightly better performance
+        providerPattern = OmnibugProvider.getPattern(loadedSettings.providers);
     });
 
     port.onMessage.addListener((messages) => {
@@ -187,8 +191,6 @@ chrome.webNavigation.onCommitted.addListener(
     }
 );
 
-let providerPattern;
-
 /**
  * Check request to see if we care about it or not
  * @param details
@@ -196,7 +198,6 @@ let providerPattern;
  */
 function validProviderRequest(details) {
     if(typeof providerPattern === "undefined" || !(providerPattern instanceof RegExp)) {
-        // Cache the provider RegExp for slightly better performance
         providerPattern = OmnibugProvider.getPattern();
     }
     return details.method !== "OPTIONS" &&
@@ -229,4 +230,5 @@ function sendSettingsToTabs(settings) {
             "data": settings
         });
     });
+    providerPattern = OmnibugProvider.getPattern(settings.providers);
 }
