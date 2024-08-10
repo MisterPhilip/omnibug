@@ -757,7 +757,7 @@ window.Omnibug = (() => {
         let redirectHelpLink = createElement("a", {
                 "attributes": {
                     "target": "_blank",
-                    "href": "https://omnibug.io/help/redirected-requests"
+                    "href": "https://omnibug.io/help/redirected-requests?utm_source=omnibug&utm_medium=##BROWSER##&utm_campaign=redirect-help-warning"
                 },
                 "text": "Learn more."
             }),
@@ -768,7 +768,7 @@ window.Omnibug = (() => {
             });
         body.appendChild(redirectWarning);
 
-        if(request.request.type === "ping" && request.request.method === "POST" && !request.request.postData) {
+        if(request.request.postError) {
             const warningIcon = createElement("i", {
                     "classes": ["fas", "fa-exclamation-triangle", "request-error-icon"],
                     "title": "This request was not successful",
@@ -776,13 +776,13 @@ window.Omnibug = (() => {
                 pingHelpLink = createElement("a", {
                 "attributes": {
                     "target": "_blank",
-                    "href": "https://github.com/MisterPhilip/omnibug/issues/213"
+                    "href": "https://omnibug.io/help/post-data-error?utm_source=omnibug&utm_medium=##BROWSER##&utm_campaign=post-data-warning"
                 },
                 "text": "Learn more."
             }),
             pingWarning = createElement("div", {
                 "classes": ["toast", "toast-error"],
-                "text": "Due to a Chrome bug, this type of request (ping) may not display all data points sent with the request. ",
+                "text": "There was an error capturing the POST data. Some data points sent with the request may be missing in Omnibug. ",
                 "children": [pingHelpLink]
             });
             body.appendChild(pingWarning);

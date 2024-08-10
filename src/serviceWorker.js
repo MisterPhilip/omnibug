@@ -98,17 +98,21 @@ chrome.webRequest.onBeforeRequest.addListener(
                 "timestamp": details.timeStamp,
                 "type": details.type,
                 "url": details.url,
-                "postData": ""
+                "postData": "",
+                "postError": false
             },
             "event": "webRequest"
         };
 
         // Grab any POST data that is included
-        if (details.method === "POST" && details.requestBody) {
-            if (details.requestBody.raw && details.requestBody.raw[0]) {
-                data.request.postData = String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes));
-            } else if (typeof details.requestBody.formData === "object") {
-                data.request.postData = details.requestBody.formData;
+        if (details.method === "POST" && typeof details.requestBody !== "undefined") {
+            const body = details.requestBody;
+            if(typeof body.error !== "undefined" && body.error) {
+                data.request.postError = true;
+            } else if (typeof body.raw !== "undefined" && body.raw[0]) {
+                data.request.postData = String.fromCharCode.apply(null, new Uint8Array(body.raw[0].bytes));
+            } else if (typeof body.formData === "object") {
+                data.request.postData = body.formData;
             }
         }
 
