@@ -7,7 +7,7 @@ module.exports = function (grunt) {
         "extension": {
             "production": {
                 "name": "Omnibug",
-                "version": "2.0.2",
+                "version": "2.1.0",
                 "storageKey": "omnibug",
                 "feedbackUrl": "https://github.com/MisterPhilip/omnibug/issues",
                 "analyticsID": "UA-114343677-2"
