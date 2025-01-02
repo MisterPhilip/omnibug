@@ -243,7 +243,7 @@ class AdobeAudienceManagerProvider extends BaseProvider
     handleCustom(url, params)
     {
         let results = [],
-            accountID = url.hostname.replace(/^(dpm)?.demdex.net/i, ""),
+            accountID = url.hostname.replace(/^(dpm)?\.demdex.net/i, ""),
             requestType = url.pathname.match(/^\/([^?/#:]+)/);
         results.push({
             "key":   "omnibug_account",
