@@ -105,7 +105,7 @@ chrome.webRequest.onBeforeRequest.addListener(
         };
 
         // Grab any POST data that is included
-        if (details.method === "POST" && typeof details.requestBody !== "undefined") {
+        if (details.method === "POST" && typeof details.requestBody !== "undefined" && details.requestBody) {
             const body = details.requestBody;
             if(typeof body.error !== "undefined" && body.error) {
                 data.request.postError = true;
