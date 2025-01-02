@@ -456,10 +456,12 @@ window.Omnibug = (() => {
                     ];
                 }
                 row.push(request.request.url.replace(/"/g, `\\"`));
-                if (typeof request.request.postData !== "string") {
-                    row.push(JSON.stringify(request.request.postData));
+                if (typeof request.request.postData === "object" && request.request.postData) {
+                    row.push(JSON.stringify(request.request.postData).replace(/"/g, '""'));
+                } else if(typeof request.request.postData === "string") {
+                    row.push(request.request.postData.replace(/"/g, '""'));
                 } else {
-                    row.push(request.request.postData);
+                    row.push("");
                 }
                 row.push((new Date(request.request.timestamp)).toString());
                 if (settings.showNotes) {
