@@ -110,7 +110,9 @@ chrome.webRequest.onBeforeRequest.addListener(
             if(typeof body.error !== "undefined" && body.error) {
                 data.request.postError = true;
             } else if (typeof body.raw !== "undefined" && body.raw[0]) {
-                data.request.postData = String.fromCharCode.apply(null, new Uint8Array(body.raw[0].bytes));
+                data.request.postData = (new Uint8Array(body.raw[0].bytes)).reduce((postData, byte) => {
+                    return postData + String.fromCharCode(byte);
+                }, "");
             } else if (typeof body.formData === "object") {
                 data.request.postData = body.formData;
             }
