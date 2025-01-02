@@ -1,6 +1,6 @@
 /**
  * Ensighten Manage
- * https://www.ensighten.com/products/enterprise-tag-management/
+ * https://cheq.ai/ensighten/enterprise-tag-management/
  *
  * @class
  * @extends BaseProvider
@@ -14,7 +14,7 @@ class EnsightenManageProvider extends BaseProvider
         this._pattern    = /nexus(?:-test)?\.ensighten\.com\/(?=.*Bootstrap\.js)/;
         this._name       = "Ensighten Manage";
         this._type       = "tagmanager";
-        this._keywords   = ["tms"];
+        this._keywords   = ["tms", "cheq"];
     }
 
     /**
