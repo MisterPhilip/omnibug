@@ -29,7 +29,7 @@ future, and depend on volunteer's time to keep Omnibug running.
  * [Getting Help](#getting-help)
  
 ### Issues or Bugs
-Find an issue? That's not good! Here's a list of information that we needed when opening a Github issue:
+Find an issue? That's not good! Here's a list of information that are needed when opening a Github issue:
 
  * The browser name & version
  * OS name & version
@@ -70,17 +70,16 @@ file. Learn more at [Microsoft's docs](https://docs.microsoft.com/en-us/microsof
 
 ### Coding Styles
 
-We use [ESLint](https://eslint.org/) to ensure a consistent code style. Here are some basic guidelines though:
+We use [ESLint](https://eslint.org/) to ensure a consistent code style. Here are some basic guidelines:
 
 * Since we only support the latest few versions of Chrome and Firefox, we can safely use most of the ES6 features. Please 
-consider using these instead of outdated methods, as the ES6 version will provider a cleaner and faster code base.
+consider using these instead of outdated methods, as the ES6 version will provide a cleaner and faster code base.
 * Use 4 spaces for 1 tab
-* Any function, method, or class should have be declared on a it's own line
+* Any function, method, or class should have be declared on its own line
   * A [JSDoc comment](http://usejsdoc.org/) should be included for each function, method, or class
 * Use double quotes or template syntax (backticks) where possible
 * if / else statements should (_always_) have opening & closing brackets inline 
-* Run `yarn run lint` to view issues, and `yarn run lint:fix` to fix them. When you build, ESLint will run in the background and fail the build 
-if there are errors
+* Run `yarn run lint` to view issues, and `yarn run lint:fix` to fix them. When you build, ESLint will run in the background and fail the build if there are errors.
 
 ### Adding a Provider
 
@@ -91,7 +90,7 @@ It is recommended to review a few existing providers to understand how providers
 #### Provider Basics
 
 Every provider extends the [`BaseProvider` class](https://github.com/MisterPhilip/omnibug/blob/master/src/providers/BaseProvider.js). 
-The bare minimum requirement is to set the [`constructor()` method](#constructor), all other properties do not need to 
+The minimum requirement is to set the [`constructor()` method](#constructor), all other properties do not need to 
 override the `BaseProvider` implementation. However, it is recommended to extend several properties and methods to allow 
 for full customization and create a better user experience within Omnibug.
 
@@ -144,8 +143,8 @@ your provider.
 
 ##### get columnMapping
 
-`get columnMapping()` returns an object used for mapping values to the columns on the Omnibug overview screen. Right now, 
-there are 2 types of columns that can be mapped:
+`get columnMapping()` returns an object used for mapping values to the columns on the Omnibug overview screen. There are
+two types of columns that can be mapped:
   
   1. `account`, which is the account / client ID that is used by the provider.
   1. `requestType`, which is the type of request that is sent to the provider. This is what shows in the badges in the 
@@ -172,7 +171,7 @@ Any parameter that does not have a group set will be displayed under the `Other`
 
 ##### get keys
 
-`get keys()` returns an object used for to map raw parameter keys to friendly names and groupings. The `name` is the 
+`get keys()` returns an object used to map raw parameter keys to friendly names and groupings. The `name` is the 
 friendly version of the parameter's name (used for the `field` property), and the group should be the ID for the group 
 you want the parameter to be in (_see: [get groups()](#get-groups)_).
 
@@ -220,8 +219,8 @@ by the `get keys()` method. If it is, then the value is assigned and the paramet
 then it will show up under the `Other` group with the raw parameter key shown as the name.
 
 There are times that you may want to override this method. You might have a set of parameters that match a 
-certain naming schema but there are a lot of them and it doesn't make sense to list them all out. For example, your 
-provider has custom dimensions that are passed in the `cd1`, `cd2`, `cd3`, etc. format. Instead of listing each of those 
+certain naming schema, but there are a lot of them, and it doesn't make sense to list them all out. For example: your 
+provider has custom dimensions that are passed in the `cd1`, `cd2`, `cd3`, etc. format. Instead of listing each of these 
 possibilities out in the `get keys()` method, you could add logic here to see if the name matches your format and then 
 return an object with a dynamically generated name.
 
@@ -290,7 +289,7 @@ All providers should have a test suite included with their pull request. The fol
 * Verify that the `pattern` works
   * Check a handful of URLs to ensure that they _do_ match
   * Use bogus URLs to verify that it is not greedy
-  * Ensure that OmnibugProvider returns your provider for one or more of the test URLs
+  * Ensure that `OmnibugProvider` returns your provider for one or more of the test URLs
 * Check to verify your provider returns any data
 * Check for properly parsed POST data
 * Check for any dynamic parameters
@@ -325,6 +324,5 @@ This will output to the `/platform/$BROWSER` folders, as well as output a `.zip`
 
 If you get stuck or this documentation isn't clear, there are multiple ways to get help:
 
-* The [Omnibug Discord group](http://omnibug.io/discord)
 * [Github issues](https://github.com/MisterPhilip/omnibug/issues) with a "question" tag
 * Tweeting [@Omnibug](https://twitter.com/omnibug) with your question(s)
