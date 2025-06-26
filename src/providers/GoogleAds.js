@@ -63,6 +63,10 @@ class GoogleAdsProvider extends BaseProvider {
             "label": {
                 "name": "Conversion Label",
                 "group": "general"
+            },
+            "gcs": {
+                "name": "Consent Mode",
+                "group": "general"
             }
         };
     }

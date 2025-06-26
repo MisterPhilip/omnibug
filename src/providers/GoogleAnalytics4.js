@@ -369,6 +369,10 @@ class GoogleAnalytics4Provider extends BaseProvider
                 "name": "Display Features Enabled",
                 "group": "general"
             },
+            "gcs": {
+                "name": "Consent Mode",
+                "group": "general"
+            },
             "requestType": {
                 "hidden": true
             }
