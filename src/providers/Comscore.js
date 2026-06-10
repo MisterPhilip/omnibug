@@ -23,7 +23,7 @@ class ComscoreProvider extends BaseProvider {
     get columnMapping() {
         return {
             account: "c2",
-            requestType: "c1"
+            requestType: "ns_st_ev"
         };
     }
 
