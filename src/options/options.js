@@ -248,18 +248,14 @@
         let newParam = event.target.value,
             paramList = document.getElementById("addSummary-params");
 
-        if(paramList.childElementCount < 3) {
-            if(newParam.trim() !== "" && settings.additionalSummary.indexOf(newParam) === -1) {
-                paramList.appendChild(createAdditionalSummaryParam(newParam));
+        if(newParam.trim() !== "" && settings.additionalSummary.indexOf(newParam) === -1) {
+            paramList.appendChild(createAdditionalSummaryParam(newParam));
 
-                settings.additionalSummary.push(newParam);
-                settingsProvider.save(settingsObj);
+            settings.additionalSummary.push(newParam);
+            settingsProvider.save(settingsObj);
 
-                tracker.track(["send", "event", "settings", "additionalSummary", `added: ${newParam}`]);
-                document.getElementById("addSummaryStatus").innerHTML = "";
-            }
-        } else {
-            document.getElementById("addSummaryStatus").innerHTML = "You may only specify up to 3 parameters.";
+            tracker.track(["send", "event", "settings", "additionalSummary", `added: ${newParam}`]);
+            document.getElementById("addSummaryStatus").innerHTML = "";
         }
 
         event.target.value = "";
