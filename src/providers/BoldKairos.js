@@ -11,7 +11,7 @@ class BoldKairosProvider extends BaseProvider
     {
         super();
         this._key        = "BOLDKAIROS";
-        this._pattern    = /kairos[^/]*\.bold\.com\/api\/v1\//;
+        this._pattern    = /:\/\/kairos[^./]*\.bold\.com/;
         this._name       = "Bold Kairos";
         this._type       = "analytics";
     }
